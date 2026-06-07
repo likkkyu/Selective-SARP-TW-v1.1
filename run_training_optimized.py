@@ -192,7 +192,10 @@ class POMOTrainerOptimized:
         self.model.train()
         set_decode_type(self.model, 'sampling')
         allow_reject = epoch > self.args.reject_warmup_epochs
-        state_kwargs = {'allow_reject': allow_reject}
+        state_kwargs = {
+            'allow_reject': allow_reject,
+            'deadlock_limit': self.args.deadlock_limit,
+        }
 
         epoch_loss = 0.0
         epoch_objective = 0.0
@@ -251,13 +254,17 @@ class POMOTrainerOptimized:
                     objective_cost, _, pi, debug = self.model(
                         batch,
                         return_pi=True,
-                        state_kwargs={'allow_reject': True},
+                        state_kwargs={'allow_reject': True, 'deadlock_limit': self.args.deadlock_limit},
                         return_debug=True,
                     )
                     for key, value in debug.items():
                         debug_buffers.setdefault(key, []).append(value)
                 else:
-                    objective_cost, _, pi = self.model(batch, return_pi=True, state_kwargs={'allow_reject': True})
+                    objective_cost, _, pi = self.model(
+                        batch,
+                        return_pi=True,
+                        state_kwargs={'allow_reject': True, 'deadlock_limit': self.args.deadlock_limit}
+                    )
                 _, details = self.problem.get_costs(batch, pi, return_details=True)
 
                 all_objectives.append(objective_cost)
@@ -490,6 +497,7 @@ def parse_args():
     parser.add_argument('--reject-warmup-epochs', type=int, default=3, help='训练前若干 epoch 屏蔽 reject 动作，先学习服务')
     parser.add_argument('--reject-init-bias', type=float, default=-2.0, help='reject head 的初始 bias，负值用于抑制早期 reject')
     parser.add_argument('--collect-mask-diagnostics', action='store_true', help='在验证/评估中收集 mask 与动作可行性诊断指标')
+    parser.add_argument('--deadlock-limit', type=int, default=2, help='连续回 depot 且无可服务节点时的终止阈值')
     parser.add_argument('--resume-path', type=str, default=None, help='从已有 checkpoint 继续训练/微调')
     parser.add_argument('--resume-weights-only', action='store_true', help='仅加载模型权重，不恢复优化器状态')
     parser.add_argument('--no-cuda', action='store_true')
@@ -538,6 +546,7 @@ def build_phase_args(cli_args, graph_size):
         normalization_dir=cli_args.normalization_dir,
         num_vehicles=cli_args.num_vehicles,
         collect_mask_diagnostics=cli_args.collect_mask_diagnostics,
+        deadlock_limit=cli_args.deadlock_limit,
         resume_path=cli_args.resume_path,
         resume_weights_only=cli_args.resume_weights_only,
     )

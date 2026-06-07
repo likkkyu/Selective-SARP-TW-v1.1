@@ -64,7 +64,7 @@ class StateMCVRPPDTW(NamedTuple):
         return 2 * self.n_orders + 1
 
     @staticmethod
-    def initialize(input_data, visited_dtype=torch.uint8, allow_reject=True):
+    def initialize(input_data, visited_dtype=torch.uint8, allow_reject=True, deadlock_limit=2):
         depot = input_data['depot']
         loc = input_data['loc']
         node_type = input_data['node_type']
@@ -116,7 +116,7 @@ class StateMCVRPPDTW(NamedTuple):
             cur_coord=depot[:, None, :],
             deadlock_count=torch.zeros(batch_size, 1, dtype=torch.long, device=device),
             terminal_=torch.zeros(batch_size, 1, dtype=torch.bool, device=device),
-            i=torch.zeros(1, dtype=torch.int64, device=device),
+            i=torch.full((1,), int(deadlock_limit), dtype=torch.int64, device=device),
         )
 
     def _active_views(self):
@@ -269,7 +269,9 @@ class StateMCVRPPDTW(NamedTuple):
             depot_coord = coords_active[:, 0:1, :]
             dist_back = (coords_active - depot_coord).norm(p=2, dim=-1) * self.AREA_SIZE
             time_back = dist_back / self.VEHICLE_SPEED
-            predicted_total = (arrival_time + self.SERVICE_TIME + time_back) - self.trip_start_time
+            ongoing_trip_total = (arrival_time + self.SERVICE_TIME + time_back) - self.trip_start_time
+            fresh_trip_total = travel_time + self.SERVICE_TIME + time_back
+            predicted_total = torch.where(self.prev_a == 0, fresh_trip_total, ongoing_trip_total)
             trip_mask_full = predicted_total > self.MAX_TRIP_TIME + 1e-5
             trip_mask_full[:, 0] = False
         before_mask = service_mask.clone()
@@ -378,6 +380,7 @@ class StateMCVRPPDTW(NamedTuple):
         leaving_depot = (self.prev_a == DEPOT) & (actual_selected != DEPOT) & (~is_reject)
 
         new_time = torch.where(is_reject, self.current_time, is_depot * self.OPERATION_START + (1 - is_depot) * arrival_time)
+        dispatch_time = torch.where(is_reject, self.current_time, torch.where(leaving_depot, self.current_time, self.trip_start_time))
         new_used_vehicles = self.used_vehicles + leaving_depot.float()
 
         tw = time_windows_active.gather(1, actual_selected[:, :, None].expand(-1, -1, 2))
@@ -395,7 +398,11 @@ class StateMCVRPPDTW(NamedTuple):
         new_cap_p = torch.where(is_reject, self.used_capacity_passenger, torch.clamp(new_cap_p, min=0.0))
         new_cap_c = torch.where(is_reject, self.used_capacity_cargo, torch.clamp(new_cap_c, min=0.0))
 
-        new_trip_start = torch.where(is_reject, self.trip_start_time, is_depot * new_time + (1 - is_depot) * self.trip_start_time)
+        new_trip_start = torch.where(
+            is_reject,
+            self.trip_start_time,
+            torch.where(leaving_depot, dispatch_time, torch.where(is_depot > 0, new_time, self.trip_start_time))
+        )
 
         all_order_nodes_masked = current_mask[:, :, 1:2 * n_orders + 1].all(-1).to(torch.long)
         new_deadlock_count = torch.where(
@@ -403,7 +410,8 @@ class StateMCVRPPDTW(NamedTuple):
             self.deadlock_count + all_order_nodes_masked,
             torch.zeros_like(self.deadlock_count),
         )
-        new_terminal = self.terminal_ | (new_deadlock_count >= 2)
+        deadlock_limit = max(int(self.i.item()), 1)
+        new_terminal = self.terminal_ | (new_deadlock_count >= deadlock_limit)
 
         visited_ = self.visited_.clone()
         non_reject_selected = actual_selected.unsqueeze(-1)
