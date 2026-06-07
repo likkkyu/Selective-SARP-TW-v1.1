@@ -41,7 +41,7 @@
 | 2 | 双隔间容量 | 15 名乘客 + 20 货物单位 |
 | 3 | 单趟时长上限 | ≤ 3 h |
 | 4 | 每节点服务时长 | 3 min |
-| 5 | 提前到达 | 提前 ≤ 20 min（允许等待）；刚从 depot 发车的车辆可精准到达不强制等待 |
+| 5 | 提前到达 | 提前 ≤ 20 min（允许等待）；当前实现采用标准等待机制，不单独建模 depot 端延迟出发 |
 | 6 | depot 发车 | 任意时刻可发车；delivery 的 tw_e（上界）不强制 |
 | 7 | 需求/订单分布 | 乘客:货物 = 60:40；乘客需求 80% 取 {1,2} / 20% 取 {3,4}；货物 1–3 单位；乘客绕行惩罚高于货物 |
 
@@ -115,7 +115,7 @@
 
 ## 3.3 状态转移 update()
 
-关键逻辑：① depot 重置（回 depot 时 time→OPERATION_START、容量重置、trip_start 重置）；② 服务时刻 `start_service = max(new_time, earliest)`；③ deadlock_count / terminal 终止判定。**注意**：业务约束 5“刚发车车辆可精准到达不强制等待”需在此与 mask 联动核对。
+关键逻辑：① depot 重置（回 depot 时 time→OPERATION_START、容量重置、trip_start 重置）；② 服务时刻 `start_service = max(new_time, earliest)`；③ deadlock_count / terminal 终止判定。当前实现采用标准等待机制，不额外引入 depot 端延迟出发决策。
 
 # 第 4 章 · 网络架构：v6 现状 + 三项必做改造
 
@@ -182,7 +182,7 @@ all_logits = torch.cat([node_logits, reject_logit], dim=-1) # N+1 -> N+2
 
 **state 侧**：`update()` 增 reject 分支 —— 当 action==reject 索引时，选当前可达未服务 pickup 中 tw_late 最小者及其 delivery，标记 rejected（后续 mask 永久屏蔽），累计拒单计数供成本。
 
-> 💡 **口径联动**：v6 被动拒单触发（`REJECT_TIME=16:00`、`REJECT_DELAY_HOURS=1h`，`_compute_vehicle_and_penalty` 498–505 行）与新 30min/1h TW 语义不一致。改主动拒单后**移除/改写**被动触发，统一由 reject 动作 + `ALPHA_REJECT` 体现（见 11.4）。
+> 💡 **口径联动**：v6 被动拒单触发（`REJECT_TIME=16:00`、`REJECT_DELAY_HOURS=1h`）与新 30min/1h TW 语义不一致。当前实现已改为“主动 reject + 未履约兜底”双口径：显式 reject 走 `ALPHA_REJECT`，未显式 reject 但最终未完成的订单走 `ALPHA_UNFULFILLED`。
 
 ## 4.5 改造汇总与改动文件清单
 
@@ -190,9 +190,9 @@ all_logits = torch.cat([node_logits, reject_logit], dim=-1) # N+1 -> N+2
 |---|---|
 | `nets/attention_model.py` | (X) `_init_embed` 加 type_embedding+numeric_proj；(甲) reject_proj + N+2 logit + 解码循环传 reject |
 | `nets/graph_encoder.py` | (A) MHA 加 pd_bias + pd_pair_mask 透传；改 Sequential 容器 |
-| `state_mcvrptw_v2.py` | (甲) update() 加 reject 分支 + 永久屏蔽；get_mask() 同步 rejected；复核 depot 首段不强制等待 |
+| `state_mcvrptw_v2.py` | (甲) update() 加 reject 分支 + 永久屏蔽；get_mask() 同步 rejected；保持标准等待机制 |
 | `problem_mcvrptw_v2.py` | (数据) 生成 pd_pair_mask；(口径) Config 改容量/TW/需求/比例；移除被动拒单；向量化瓶颈；删废弃代码 |
-| `run_training_optimized.py` | (P0) 修复 POMO 多起点 rollout（见 11.2） |
+| `run_training_optimized.py` | (P0) 修复 shared-baseline 多 rollout（POMO-style，见 11.2） |
 
 # 第 5 章 · 训练流程
 
@@ -297,11 +297,11 @@ all_logits = torch.cat([node_logits, reject_logit], dim=-1) # N+1 -> N+2
 - **R1 POMO 失效(P0)**：不修则“POMO”名不副实，收敛慢、方差大 —— 优先级最高。
 - **R2 性能**：乘车时长统计的 `for b`+`.item()` 在 n=100 时严重拖慢（GPU/CPU 反复同步）—— 必须向量化。
 - **R3 改造耦合**：`pd_pair_mask` 透传需改 Sequential 容器，易引入 forward 签名错误 —— 小 batch 先验证前向/反向。
-- **R4 reject 语义**：主动拒单与被动惩罚不可并存，务必移除旧触发，否则双重计费。
+- **R4 reject 语义**：主动 reject 与未履约兜底要拆分统计，避免把显式拒单和静默漏单混成一个指标。
 - **R5 归一化**：未跑 calibrate 直接训练→目标失真、“假收敛”。
 - **R6 口径漂移**：Config 与 MODELING.md / 注释多处不一致 —— 改造后以代码为准并回写文档。
 - **R7 容量调小**：15/20 比 v6（20/50）更紧，K_max 与 deadlock 兜底需重评，避免大量拒单。
-- **R8 业务约束验证**：“刚发车精准到达不强制等待”需在 update() 验证，避免与提前等待逻辑冲突。
+- **R8 业务约束验证**：当前实现采用标准等待机制；若未来要建模 depot 端延迟出发，应作为新的状态/动作设计单独论证。
 
 # 第 11 章 · v6 代码整改清单（交本地 Claude Code 执行）
 

@@ -143,10 +143,12 @@ def evaluate():
     all_cargo_delay = []
     all_vehicle_cost = []
     all_reject_penalty = []
+    all_unfulfilled_penalty = []
     all_trip_overtime = []
     all_distance = []
     all_num_vehicles = []
     all_num_rejected = []
+    all_num_unfulfilled = []
     all_num_completed = []
     all_pickup_hard_violations = []
     all_total_ride_time_violations = []
@@ -171,14 +173,16 @@ def evaluate():
             _maybe('cargo_delay_cost', all_cargo_delay)
             _maybe('vehicle_cost', all_vehicle_cost)
             _maybe('reject_penalty', all_reject_penalty)
+            _maybe('unfulfilled_penalty', all_unfulfilled_penalty)
             _maybe('trip_overtime_penalty', all_trip_overtime)
             _maybe('total_distance', all_distance)
             _maybe('passenger_pickup_hard_violations', all_pickup_hard_violations)
             _maybe('passenger_total_ride_time_violations', all_total_ride_time_violations)
             _maybe('passenger_excess_ride_time_violations', all_excess_ride_time_violations)
-            # v6.2 修复 (评审项 #3): get_costs 返回的字段名是 used_vehicles / rejected_orders
+            # 当前 get_costs 中 rejected_orders 表示主动 reject 数；unfulfilled_orders 单独统计静默未完成
             _maybe('used_vehicles', all_num_vehicles)
             _maybe('rejected_orders', all_num_rejected)
+            _maybe('unfulfilled_orders', all_num_unfulfilled)
             _maybe('completed_orders', all_num_completed)
 
     def _stats(label, data, unit='RMB', fmt='{:.3f}'):
@@ -203,6 +207,7 @@ def evaluate():
     _stats('  Cargo Delay Cost', all_cargo_delay)
     _stats('  Vehicle Fixed Cost', all_vehicle_cost)
     _stats('  Reject Penalty', all_reject_penalty)
+    _stats('  Unfulfilled Penalty', all_unfulfilled_penalty)
     _stats('  Trip Overtime Penalty', all_trip_overtime)
     print()
     print('【运营指标】')
@@ -213,6 +218,7 @@ def evaluate():
     _stats('# Vehicles Used', all_num_vehicles, unit='', fmt='{:.2f}')
     _stats('# Completed Orders', all_num_completed, unit='', fmt='{:.2f}')
     _stats('# Rejected Orders', all_num_rejected, unit='', fmt='{:.2f}')
+    _stats('# Unfulfilled Orders', all_num_unfulfilled, unit='', fmt='{:.2f}')
     print()
     print('【训练目标 (归一化, 仅供参考)】')
     _stats('Total Cost (train)', all_cost_train, unit='', fmt='{:.4f}')
@@ -229,7 +235,8 @@ def evaluate():
     print(f'  Passenger Delivery Delay Cost : {Config.PASSENGER_DELAY_COST} RMB/min')
     print(f'  Cargo Delay Cost     : {Config.CARGO_DELAY_COST} RMB/min')
     print(f'  Vehicle Fixed Cost   : {Config.VEHICLE_COST} RMB/车')
-    print(f'  Reject Penalty (α)   : {Config.ALPHA_REJECT} RMB/单')
+    print(f'  Reject Penalty (α)   : {Config.ALPHA_REJECT} RMB/主动 reject 单')
+    print(f'  Unfulfilled (α)      : {Config.ALPHA_UNFULFILLED} RMB/未履约单')
     print(f'  Trip Overtime (α)    : {Config.ALPHA_TRIP_OVERTIME} RMB/h')
     print('=' * 64)
 

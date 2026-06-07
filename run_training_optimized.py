@@ -229,6 +229,9 @@ class POMOTrainerOptimized:
             'cargo_delay_cost_raw': [],
             'trip_overtime_penalty': [],
             'reject_penalty': [],
+            'unfulfilled_penalty': [],
+            'rejected_orders': [],
+            'unfulfilled_orders': [],
             'completed_orders': [],
             'vehicle_cost_raw': [],
             'total_distance': [],
@@ -265,7 +268,9 @@ class POMOTrainerOptimized:
             'avg_cargo_delay_cost': detail_buffers['cargo_delay_cost_raw'].mean().item(),
             'avg_trip_overtime_penalty': detail_buffers['trip_overtime_penalty'].mean().item(),
             'avg_reject_penalty': detail_buffers['reject_penalty'].mean().item(),
-            'avg_rejected_orders': (detail_buffers['reject_penalty'].mean().item() / Config.ALPHA_REJECT) if Config.ALPHA_REJECT > 0 else 0.0,
+            'avg_unfulfilled_penalty': detail_buffers['unfulfilled_penalty'].mean().item(),
+            'avg_rejected_orders': detail_buffers['rejected_orders'].mean().item(),
+            'avg_unfulfilled_orders': detail_buffers['unfulfilled_orders'].mean().item(),
             'avg_completed_orders': detail_buffers['completed_orders'].mean().item() if 'completed_orders' in detail_buffers else 0.0,
             'avg_vehicle_cost': detail_buffers['vehicle_cost_raw'].mean().item(),
             'avg_distance': detail_buffers['total_distance'].mean().item(),
@@ -333,8 +338,10 @@ class POMOTrainerOptimized:
             print(f"  Passenger Excess Ride-Time Violations: {val_results['avg_passenger_excess_ride_time_violations']:.2f}")
             print(f"  Trip Overtime: {val_results['avg_trip_overtime_penalty']:.2f} RMB")
             print(f"  Reject Penalty: {val_results['avg_reject_penalty']:.2f} RMB")
+            print(f"  Unfulfilled Penalty: {val_results['avg_unfulfilled_penalty']:.2f} RMB")
             print(f"  Avg Completed Orders: {val_results['avg_completed_orders']:.2f}")
             print(f"  Avg Rejected Orders: {val_results['avg_rejected_orders']:.2f}")
+            print(f"  Avg Unfulfilled Orders: {val_results['avg_unfulfilled_orders']:.2f}")
             print(f"  Vehicle Cost: {val_results['avg_vehicle_cost']:.2f} RMB")
             print(f"  Distance: {val_results['avg_distance']:.2f} km")
 
@@ -380,6 +387,8 @@ class POMOTrainerOptimized:
                     'ELECTRICITY_PRICE': Config.ELECTRICITY_PRICE,
                     'PASSENGER_DELAY_COST': Config.PASSENGER_DELAY_COST,
                     'CARGO_DELAY_COST': Config.CARGO_DELAY_COST,
+                    'ALPHA_REJECT': Config.ALPHA_REJECT,
+                    'ALPHA_UNFULFILLED': Config.ALPHA_UNFULFILLED,
                     'VEHICLE_SPEED': Config.VEHICLE_SPEED,
                     'OPERATION_START': Config.OPERATION_START,
                     'OPERATION_END': Config.OPERATION_END,

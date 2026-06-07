@@ -120,6 +120,7 @@ class Config:
     DEFAULT_NUM_VEHICLE_RATIO = 1 / 6
     VEHICLE_COST = 20.0
     ALPHA_REJECT = 500.0
+    ALPHA_UNFULFILLED = 600.0
     ALPHA_TRIP_OVERTIME = 200.0
 ```
 
@@ -177,6 +178,7 @@ class Config:
   - 选择当前 mask 下可达、未服务、tw_late 最紧迫的 pickup
   - 永久屏蔽该订单 pickup / delivery
   - 记录 reject_count
+- 时间推进仍采用标准等待机制：`start_service = max(arrival, earliest)`，不额外建模 depot 端延迟出发
 
 ---
 
@@ -199,8 +201,8 @@ class Config:
 `validate()` 当前聚合：
 - energy / passenger delay / cargo delay
 - trip overtime
-- reject penalty
-- completed / rejected / used vehicles
+- reject penalty / unfulfilled penalty
+- completed / rejected / unfulfilled / used vehicles
 - passenger pickup hard violations
 - passenger ride-time violations
 
@@ -248,6 +250,7 @@ class Config:
 | Passenger Max Ride Time | 70 min |
 | Passenger Excess Ride Time | 30 min |
 | Reject Penalty | 500 |
+| Unfulfilled Penalty | 600 |
 
 ---
 

@@ -42,7 +42,7 @@ Selective 的含义是：模型不再被动等待订单在后处理阶段“被�
 | Passenger : Cargo | 60 : 40 | 数据生成比例 |
 | Passenger demand | 80% 属于 {1,2}；20% 属于 {3,4} | group size |
 | Cargo demand | 1–3 单位 | 单位需求 |
-| 早到处理 | 允许等待，零罚 | depot 首段可精准到达 |
+| 早到处理 | 允许等待，零罚 | 当前采用标准等待机制，不显式建模 depot 端延迟出发 |
 
 ### 2.3 单价 / 罚款
 
@@ -51,7 +51,8 @@ Selective 的含义是：模型不再被动等待订单在后处理阶段“被�
 | $\omega_p$ | 0.6 元/min | Passenger delivery 延误单价 |
 | $\omega_c$ | 0.06 元/min | Cargo delivery 延误单价 |
 | $\omega_v$ | 20 元/车 | 固定派车成本（当前代码保留 20） |
-| $\omega_{rej}$ | 500 元/单 | reject / 未完整服务订单惩罚 |
+| $\omega_{rej}$ | 500 元/单 | 主动 reject 惩罚 |
+| $\omega_{unf}$ | 600 元/单 | 未显式 reject 但最终未完成订单惩罚 |
 | $\omega_{trip}$ | 200 元/h | 单趟超时软兜底 |
 | $\eta(W)$ | $0.18\cdot(1+W/10000)$ kWh/km | 随载重增加的能耗系数 |
 | $p_e$ | 1.0 元/kWh | 电价 |
@@ -68,15 +69,16 @@ $$
 + \underbrace{\sum_{i \in D^P} \omega_p \delta_i^P}_{\text{乘客 delivery 延误}}
 + \underbrace{\sum_{i \in D^C} \omega_c \delta_i^C}_{\text{货物 delivery 延误}}
 + \underbrace{\omega_v K_{used}}_{\text{车辆成本}}
-+ \underbrace{\omega_{rej} N_{rej}}_{\text{拒单}}
++ \underbrace{\omega_{rej} N_{rej}}_{\text{主动拒单}}
++ \underbrace{\omega_{unf} N_{unf}}_{\text{未履约兜底}}
 + \underbrace{\omega_{trip} \sum_k (T_k^{trip} - \tau_{trip}^{max})^+}_{\text{单趟超时}}
 $$
 
 其中：
 
 - $\delta_i$ 仅在 **delivery 节点** 累计；pickup 侧不计软延误。
-- 当前代码中 `reject_penalty` 由 `rejected_orders * ALPHA_REJECT` 统一体现。
-- 在可学习 reject 动作落地后，`N_{rej}` 优先表示主动 reject 的订单数；在旧路径兼容下也会覆盖未完整服务订单。
+- 当前代码中 `reject_penalty` 由 `rejected_orders * ALPHA_REJECT` 体现主动 reject。
+- 对未显式 reject 但最终未完成的订单，额外施加 `unfulfilled_penalty = unfulfilled_orders * ALPHA_UNFULFILLED`，防止模型通过静默漏单逃逸。
 
 ### 3.2 训练目标（归一化 + 加权）
 
@@ -86,6 +88,7 @@ J^{train} =
 + \alpha_D \left(\frac{\delta_p^{raw}}{\bar\delta_p^{(N)}} + \frac{\delta_c^{raw}}{\bar\delta_c^{(N)}}\right)
 + \alpha_V \frac{V^{raw}}{\bar V^{(N)}}
 + \omega_{rej} N_{rej}
++ \omega_{unf} N_{unf}
 + \omega_{trip} \sum_k (T_k^{trip} - \tau_{trip}^{max})^+
 $$
 
@@ -95,6 +98,7 @@ $$
 - `ALPHA_DELAY = 2`
 - `ALPHA_VEHICLE = 3`
 - `ALPHA_REJECT = 500`
+- `ALPHA_UNFULFILLED = 600`
 - `ALPHA_TRIP_OVERTIME = 200`
 
 归一化 profile 仍需按 graph size 通过 `calibrate_normalization` 预先校准。
@@ -267,7 +271,7 @@ encoder 的 `MultiHeadAttention` 已加入 `pd_bias` 与 `pd_pair_mask`：
 - 形成 `costs (B, pomo)`
 - `_pomo_loss` 使用同 instance 多解均值作为共享 baseline
 
-这是一个**可工作版 POMO-style 多 rollout**，但并未强制“不同首步起点”。
+这是一个**可工作版 POMO-style 多 rollout**，但并未强制“不同首步起点”。在当前含时间窗、类型与 PD 配对的约束问题上，我们保留 shared-baseline 多采样实现，而不强行改造成经典 N-start POMO。
 
 ---
 

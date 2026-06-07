@@ -62,6 +62,7 @@ def analyze_on_time_performance(batch, pi, problem):
             'passenger_ride_time_violations': float(details['passenger_ride_time_violations'][b].item()),
             'completed_orders': float(details['completed_orders'][b].item()),
             'rejected_orders': float(details['rejected_orders'][b].item()),
+            'unfulfilled_orders': float(details['unfulfilled_orders'][b].item()),
             'max_delay': max_delay,
             'overall_on_time_rate': (
                 details['passenger_delivery_on_time'][b].item() + details['cargo_delivery_on_time'][b].item()

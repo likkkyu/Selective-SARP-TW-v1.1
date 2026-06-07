@@ -99,11 +99,12 @@
 - `REJECT_TIME`
 - `REJECT_DELAY_HOURS`
 
-当前 reject 口径过渡为：
+当前 reject 口径已进一步拆分为：
 
-- 未完整服务订单 / reject_count 统一乘以 `ALPHA_REJECT`
+- `reject_penalty = rejected_orders * ALPHA_REJECT`（主动 reject）
+- `unfulfilled_penalty = unfulfilled_orders * ALPHA_UNFULFILLED`（未显式 reject 但最终未完成）
 
-为后续显式 reject 动作铺路，避免旧“超 16:00 / 超 1h”被动 reject 与新时间窗语义冲突。
+这样既保留“主动拒单”的干净语义，也避免模型通过静默漏单逃逸。
 
 ---
 
@@ -186,6 +187,8 @@
 - passenger ride time = 70 / 30
 - 类型嵌入 / pd_bias / reject 动作三项改造
 - 当前 POMO 为多 rollout 共享 baseline 版本
+- 当前等待语义采用标准 `start_service = max(arrival, earliest)`，不单独建模 depot 端延迟出发
+- 当前成本口径已拆分主动 reject 与 unfulfilled penalty
 
 ---
 

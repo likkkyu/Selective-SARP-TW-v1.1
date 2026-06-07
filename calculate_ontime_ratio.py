@@ -79,6 +79,7 @@ def calculate_ontime_ratio_single(sample, pi, tolerance_minutes=5):
         'passenger_ride_time_violations': float(details['passenger_ride_time_violations'][0].item()),
         'completed_orders': float(details['completed_orders'][0].item()),
         'rejected_orders': float(details['rejected_orders'][0].item()),
+        'unfulfilled_orders': float(details['unfulfilled_orders'][0].item()),
     }
 
 

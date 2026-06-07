@@ -1,8 +1,8 @@
 """
-客货混合Pickup-Delivery车辆路径问题（MCVRP-PDTW）v6
+Selective SARP-TW v1.1 的客货混合 Pickup-Delivery 车辆路径问题主实现。
 Multi-Compartment Vehicle Routing Problem with Pickup-Delivery and Time Windows
 
-服务质量强化版关键决策（2026-05）：
+当前主路径语义（2026-06）：
 1. 业务定位：响应式低峰客货共享调度，static-batch（day-ahead）规划
 2. 车队 K_max = ceil(N/6) 硬上限（当前代码口径，后续若重设需同步文档）
 3. 货物语义：每单 1-3 单位（能耗按每单位 1 kg 计），舱容 20 单位
@@ -13,18 +13,19 @@ Multi-Compartment Vehicle Routing Problem with Pickup-Delivery and Time Windows
 8. passenger delivery：软迟到成本；cargo 继续仅在 delivery 端统计软迟到
 9. 16:00 运营硬约束：DRL mask 禁止任何会超出 16:00 的非-depot 节点
 10. 单趟硬上限：3h（DRL mask + 软兜底 ALPHA_TRIP_OVERTIME=200）
-11. 训练目标 = objective_total（归一化+α 加权+软惩罚）
+11. 训练目标 = objective_total（归一化+α 加权+主动 reject + 未履约兜底）
     报告目标 = total_cost_raw（纯 RMB，三 baseline 同尺度）
 
-成本函数（论文模型，raw RMB）：
+成本函数（论文/评测口径，raw RMB）：
     Z = c_elec·ΣW_ij + ω_p·ΣDelay_i^{p,delivery} + ω_c·ΣDelay_i^{c,delivery}
-        + ω_v·K_used  + reject_penalty + trip_overtime_penalty
+        + ω_v·K_used + reject_penalty + unfulfilled_penalty + trip_overtime_penalty
 其中：
     - c_elec = 1.0 元/kWh
     - ω_p = 0.6 元/min（仅乘客 delivery）
     - ω_c = 0.06 元/min（仅货物 delivery）
     - ω_v = 20 元/车
-    - reject = 500 元/未服务订单（active reject 改造前的临时口径）
+    - reject = 500 元/主动 reject 订单
+    - unfulfilled = 600 元/未显式 reject 但最终未完成订单
     - trip_overtime = 200 元/h（safety net，合理解里 ≈ 0）
 """
 
@@ -75,7 +76,8 @@ class Config:
     ALPHA_ENERGY = 1.0
     ALPHA_DELAY = 2.0
     ALPHA_VEHICLE = 3.0
-    ALPHA_REJECT = 500.0          # 元/拒单（提高服务完成优先级，避免模型通过大量拒单逃逸）
+    ALPHA_REJECT = 500.0          # 元/主动 reject 订单
+    ALPHA_UNFULFILLED = 600.0     # 元/未显式 reject 但最终未完成订单（高于 reject，避免静默漏单）
     ALPHA_TRIP_OVERTIME = 200.0   # 元/h 单趟超时（safety net）
 
     # ---------- 约束开关（服务质量强化版） ----------
@@ -311,7 +313,7 @@ class MCVRPPDTW:
         2. passenger maximum ride time 为总时长 70 min / 超额 30 min 硬约束（主路径由 state.get_mask 保证）
         3. passenger delivery 保持软迟到成本
         4. cargo 继续仅在 delivery 节点统计软迟到
-        5. 早到等待，不罚成本
+        5. 早到等待，不罚成本；当前不显式建模 depot 端延迟出发决策
         """
         batch_size, seq_len = pi.size()
         device = pi.device
@@ -494,17 +496,22 @@ class MCVRPPDTW:
         trip_overtime_penalty = trip_overtime_total * Config.ALPHA_TRIP_OVERTIME
 
         reject_count = time_dict.get('reject_count', torch.zeros_like(unserved_orders))
-        rejected_orders = torch.maximum(unserved_orders, reject_count)
-        reject_penalty = rejected_orders * Config.ALPHA_REJECT
+        active_rejected_orders = torch.minimum(reject_count, unserved_orders)
+        unfulfilled_orders = torch.clamp(unserved_orders - active_rejected_orders, min=0.0)
+        reject_penalty = active_rejected_orders * Config.ALPHA_REJECT
+        unfulfilled_penalty = unfulfilled_orders * Config.ALPHA_UNFULFILLED
 
         return {
             'used_vehicles': used_vehicles,
             'vehicle_cost_raw': vehicle_cost_raw,
             'reject_penalty': reject_penalty,
+            'unfulfilled_penalty': unfulfilled_penalty,
             'reject_count': reject_count,
-            'rejected_orders': rejected_orders,
+            'active_rejected_orders': active_rejected_orders,
+            'rejected_orders': active_rejected_orders,
             'completed_orders': completed_orders,
             'unserved_orders': unserved_orders,
+            'unfulfilled_orders': unfulfilled_orders,
             'trip_overtime_penalty': trip_overtime_penalty,
             'trip_overtime_hours_total': trip_overtime_total,
         }
@@ -580,21 +587,23 @@ class MCVRPPDTW:
         weighted_delay_cost = Config.ALPHA_DELAY * (normalized_passenger_penalty + normalized_cargo_delay)
         weighted_vehicle_cost = Config.ALPHA_VEHICLE * normalized_vehicle_cost
 
-        # 训练目标 = 归一化加权 + 未服务订单拒单 + 单趟超时软惩罚
+        # 训练目标 = 归一化加权 + 主动 reject 惩罚 + 未履约兜底 + 单趟超时软惩罚
         total_cost = (
             weighted_energy_cost
             + weighted_delay_cost
             + weighted_vehicle_cost
             + vp_dict['reject_penalty']
+            + vp_dict['unfulfilled_penalty']
             + vp_dict['trip_overtime_penalty']
         )
-        # v6: 报告目标 = 纯人民币口径
+        # v1.1: 报告目标 = 纯人民币口径
         total_cost_raw = (
             energy_cost_raw
             + passenger_delivery_delay_cost_raw
             + cargo_delay_cost_raw
             + vp_dict['vehicle_cost_raw']
             + vp_dict['reject_penalty']
+            + vp_dict['unfulfilled_penalty']
             + vp_dict['trip_overtime_penalty']
         )
 
@@ -608,11 +617,14 @@ class MCVRPPDTW:
                 'cargo_delay_cost_raw': cargo_delay_cost_raw,
                 'vehicle_cost_raw': vp_dict['vehicle_cost_raw'],
                 'reject_penalty': vp_dict['reject_penalty'],
+                'unfulfilled_penalty': vp_dict['unfulfilled_penalty'],
                 'trip_overtime_penalty': vp_dict['trip_overtime_penalty'],
                 'trip_overtime_hours': vp_dict['trip_overtime_hours_total'],
+                'active_rejected_orders': vp_dict['active_rejected_orders'],
                 'rejected_orders': vp_dict['rejected_orders'],
                 'completed_orders': vp_dict['completed_orders'],
                 'unserved_orders': vp_dict['unserved_orders'],
+                'unfulfilled_orders': vp_dict['unfulfilled_orders'],
                 'normalized_energy_cost': normalized_energy_cost,
                 'normalized_passenger_penalty': normalized_passenger_penalty,
                 'normalized_cargo_delay_cost': normalized_cargo_delay,
@@ -1109,7 +1121,8 @@ def test_dataset():
     print(f"  乘客 delivery 延误成本: {details['passenger_delivery_delay_cost_raw'].mean().item():.4f} 元")
     print(f"  货物延误成本: {details['cargo_delay_cost_raw'].mean().item():.4f} 元")
     print(f"  单趟超时惩罚: {details['trip_overtime_penalty'].mean().item():.4f} 元")
-    print(f"  拒单惩罚: {details['reject_penalty'].mean().item():.4f} 元")
+    print(f"  主动拒单惩罚: {details['reject_penalty'].mean().item():.4f} 元")
+    print(f"  未履约兜底惩罚: {details['unfulfilled_penalty'].mean().item():.4f} 元")
     print(f"  车辆成本: {details['vehicle_cost_raw'].mean().item():.4f} 元, 使用车辆数: {details['used_vehicles'].mean().item():.2f}")
     print(f"  总行驶距离: {details['total_distance'].mean().item():.4f} km")
     print(f"  行程时间: {details['trip_time_hours'].mean().item():.4f} 小时")
