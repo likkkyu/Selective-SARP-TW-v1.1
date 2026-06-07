@@ -1,0 +1,11 @@
+outputs/*
+!outputs/normalization_profiles/
+!outputs/normalization_profiles/*.json
+outputs_smoke/
+__pycache__/
+*.pyc
+*.pt
+*.pth
+*.log
+.DS_Store
+.Rhistory
