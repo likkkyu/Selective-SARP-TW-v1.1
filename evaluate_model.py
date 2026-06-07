@@ -40,6 +40,8 @@ def parse_args():
                         help='解码方式 (default: greedy)')
     parser.add_argument('--no-cuda', action='store_true',
                         help='强制使用 CPU')
+    parser.add_argument('--diagnostics', action='store_true',
+                        help='输出 mask 与动作可行性诊断指标')
     return parser.parse_args()
 
 
@@ -153,12 +155,19 @@ def evaluate():
     all_pickup_hard_violations = []
     all_total_ride_time_violations = []
     all_excess_ride_time_violations = []
+    all_diagnostics = {}
 
     with torch.no_grad():
         for batch in test_loader:
             batch = {k: v.to(device) if torch.is_tensor(v) else v
                      for k, v in batch.items()}
-            cost, _, pi = model(batch, return_pi=True)
+            if args.diagnostics:
+                cost, _, pi, debug = model(batch, return_pi=True, return_debug=True)
+                for key, value in debug.items():
+                    if torch.is_tensor(value):
+                        all_diagnostics.setdefault(key, []).extend(value.tolist())
+            else:
+                cost, _, pi = model(batch, return_pi=True)
             _, details = MCVRPPDTW.get_costs(batch, pi, return_details=True)
 
             all_cost_train.extend(cost.tolist())
@@ -219,6 +228,24 @@ def evaluate():
     _stats('# Completed Orders', all_num_completed, unit='', fmt='{:.2f}')
     _stats('# Rejected Orders', all_num_rejected, unit='', fmt='{:.2f}')
     _stats('# Unfulfilled Orders', all_num_unfulfilled, unit='', fmt='{:.2f}')
+    if args.diagnostics and all_diagnostics:
+        print()
+        print('【Mask / 可行性诊断】')
+        for label, key, fmt in [
+            ('Feasible pickups/step', 'diag_feasible_pickups', '{:.2f}'),
+            ('Feasible deliveries/step', 'diag_feasible_deliveries', '{:.2f}'),
+            ('Any service feasible rate', 'diag_any_service_feasible', '{:.2f}'),
+            ('Depot-only rate', 'diag_depot_only', '{:.2f}'),
+            ('Reject available rate', 'diag_reject_available_rate', '{:.2f}'),
+            ('Feasible->depot rate', 'diag_service_feasible_but_selected_depot', '{:.2f}'),
+            ('Feasible->reject rate', 'diag_service_feasible_but_selected_reject', '{:.2f}'),
+            ('Mask by pickup TW', 'diag_mask_pickup_tw', '{:.2f}'),
+            ('Mask by ride time', 'diag_mask_ride_time', '{:.2f}'),
+            ('Mask by trip time', 'diag_mask_trip_time', '{:.2f}'),
+            ('Mask by ops end', 'diag_mask_ops_end', '{:.2f}'),
+            ('Mask by vehicle limit', 'diag_mask_vehicle_limit', '{:.2f}'),
+        ]:
+            _stats(label, all_diagnostics.get(key, []), unit='', fmt=fmt)
     print()
     print('【训练目标 (归一化, 仅供参考)】')
     _stats('Total Cost (train)', all_cost_train, unit='', fmt='{:.4f}')

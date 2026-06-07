@@ -37,6 +37,7 @@ class StateMCVRPPDTW(NamedTuple):
     passenger_pickup_time: torch.Tensor
     rejected_: torch.Tensor
     reject_count: torch.Tensor
+    allow_reject: bool
     lengths: torch.Tensor
     cur_coord: torch.Tensor
     deadlock_count: torch.Tensor
@@ -63,7 +64,7 @@ class StateMCVRPPDTW(NamedTuple):
         return 2 * self.n_orders + 1
 
     @staticmethod
-    def initialize(input_data, visited_dtype=torch.uint8):
+    def initialize(input_data, visited_dtype=torch.uint8, allow_reject=True):
         depot = input_data['depot']
         loc = input_data['loc']
         node_type = input_data['node_type']
@@ -110,6 +111,7 @@ class StateMCVRPPDTW(NamedTuple):
             passenger_pickup_time=torch.full((batch_size, 1, n_orders), -1.0, device=device),
             rejected_=torch.zeros(batch_size, 1, n_orders, dtype=torch.uint8, device=device),
             reject_count=torch.zeros(batch_size, 1, device=device),
+            allow_reject=bool(allow_reject),
             lengths=torch.zeros(batch_size, 1, device=device),
             cur_coord=depot[:, None, :],
             deadlock_count=torch.zeros(batch_size, 1, dtype=torch.long, device=device),
@@ -148,33 +150,65 @@ class StateMCVRPPDTW(NamedTuple):
         order_idx = torch.where(has_candidate, order_idx, torch.full_like(order_idx, -1))
         return order_idx
 
-    def get_mask(self):
+    def get_mask(self, return_debug=False):
         batch_size = self.ids.size(0)
         n_orders = self.n_orders
         device = self.coords.device
 
         ids_flat, coords_active, node_type_active, time_windows_active, demand_p_full, demand_c_full = self._active_views()
 
-        mask = self.visited.clone()
-        reject_index = self.reject_index
+        debug = None
+        if return_debug:
+            debug_keys = [
+                'diag_mask_visited',
+                'diag_mask_precedence',
+                'diag_mask_cap_passenger',
+                'diag_mask_cap_cargo',
+                'diag_mask_pickup_tw',
+                'diag_mask_ride_time',
+                'diag_mask_trip_time',
+                'diag_mask_ops_end',
+                'diag_mask_vehicle_limit',
+                'diag_depot_carry_block',
+                'diag_depot_no_work_block',
+                'diag_depot_fallback_used',
+                'diag_reject_candidate_available',
+                'diag_reject_allowed',
+            ]
+            debug = {key: torch.zeros(batch_size, device=device) for key in debug_keys}
 
-        pickup_not_done = (self.picked_up_ == 0).to(torch.uint8)
-        rejected = self.rejected_.to(torch.uint8)
-        mask[:, :, n_orders + 1: 2 * n_orders + 1] = (
-            mask[:, :, n_orders + 1: 2 * n_orders + 1] | pickup_not_done | rejected
-        )
-        mask[:, :, 1:n_orders + 1] = mask[:, :, 1:n_orders + 1] | rejected
+        service_mask = self.visited[:, :, 1:2 * n_orders + 1].bool().squeeze(1).clone()
+        if return_debug:
+            debug['diag_mask_visited'] = service_mask.sum(1).float()
+
+        pickup_not_done = (self.picked_up_ == 0).squeeze(1).bool()
+        rejected = self.rejected_.squeeze(1).bool()
+        precedence_mask = torch.zeros_like(service_mask)
+        if n_orders > 0:
+            precedence_mask[:, :n_orders] = rejected
+            precedence_mask[:, n_orders:] = pickup_not_done | rejected
+        before_mask = service_mask.clone()
+        service_mask |= precedence_mask
+        if return_debug:
+            debug['diag_mask_precedence'] = (service_mask & ~before_mask).sum(1).float()
 
         remaining_cap_p = self.PASSENGER_CAPACITY - self.used_capacity_passenger
         remaining_cap_c = self.CARGO_CAPACITY - self.used_capacity_cargo
+        node_type_real = node_type_active[:, 1:2 * n_orders + 1]
+        demand_p_real = demand_p_full[:, 1:2 * n_orders + 1]
+        demand_c_real = demand_c_full[:, 1:2 * n_orders + 1]
 
-        is_passenger = node_type_active == 1
-        cap_mask_p = is_passenger & (demand_p_full > remaining_cap_p + 1e-5)
+        cap_mask_p = (node_type_real == 1) & (demand_p_real > remaining_cap_p + 1e-5)
+        before_mask = service_mask.clone()
+        service_mask |= cap_mask_p
+        if return_debug:
+            debug['diag_mask_cap_passenger'] = (service_mask & ~before_mask).sum(1).float()
 
-        is_cargo = node_type_active == 0
-        cap_mask_c = is_cargo & (demand_c_full > remaining_cap_c + 1e-5)
-
-        mask[:, :, :2 * n_orders + 1] = mask[:, :, :2 * n_orders + 1] | cap_mask_p.unsqueeze(1).to(torch.uint8) | cap_mask_c.unsqueeze(1).to(torch.uint8)
+        cap_mask_c = (node_type_real == 0) & (demand_c_real > remaining_cap_c + 1e-5)
+        before_mask = service_mask.clone()
+        service_mask |= cap_mask_c
+        if return_debug:
+            debug['diag_mask_cap_cargo'] = (service_mask & ~before_mask).sum(1).float()
 
         dist_to_nodes = (coords_active - self.cur_coord).norm(p=2, dim=-1) * self.AREA_SIZE
         travel_time = dist_to_nodes / self.VEHICLE_SPEED
@@ -184,15 +218,17 @@ class StateMCVRPPDTW(NamedTuple):
         node_positions = torch.arange(coords_active.size(1), device=device)[None, :]
         is_passenger_node = node_type_active == 1
         is_pickup_node = (node_positions >= 1) & (node_positions <= n_orders)
-        is_delivery_node = (node_positions >= n_orders + 1) & (node_positions <= 2 * n_orders)
 
-        passenger_pickup_mask = (
+        passenger_pickup_mask_full = (
             Config.HARD_PASSENGER_PICKUP_TIMEWINDOW
             & is_passenger_node
             & is_pickup_node
             & (arrival_time > tw_end + 1e-5)
         )
-        mask[:, :, :2 * n_orders + 1] = mask[:, :, :2 * n_orders + 1] | passenger_pickup_mask.unsqueeze(1).to(torch.uint8)
+        before_mask = service_mask.clone()
+        service_mask |= passenger_pickup_mask_full[:, 1:2 * n_orders + 1]
+        if return_debug:
+            debug['diag_mask_pickup_tw'] = (service_mask & ~before_mask).sum(1).float()
 
         if n_orders > 0:
             order_indices = torch.arange(n_orders, device=device)
@@ -219,38 +255,56 @@ class StateMCVRPPDTW(NamedTuple):
                     | (excess_ride_time_hours > passenger_excess_ride_time_limit + 1e-5)
                 )
             )
-            ride_time_mask = torch.zeros(batch_size, coords_active.size(1), dtype=torch.bool, device=device)
-            ride_time_mask.scatter_(1, delivery_indices.unsqueeze(0).expand(batch_size, -1), ride_time_violation)
-            mask[:, :, :2 * n_orders + 1] = mask[:, :, :2 * n_orders + 1] | ride_time_mask.unsqueeze(1).to(torch.uint8)
+            ride_time_mask_full = torch.zeros(batch_size, coords_active.size(1), dtype=torch.bool, device=device)
+            ride_time_mask_full.scatter_(1, delivery_indices.unsqueeze(0).expand(batch_size, -1), ride_time_violation)
+        else:
+            ride_time_mask_full = torch.zeros(batch_size, coords_active.size(1), dtype=torch.bool, device=device)
+        before_mask = service_mask.clone()
+        service_mask |= ride_time_mask_full[:, 1:2 * n_orders + 1]
+        if return_debug:
+            debug['diag_mask_ride_time'] = (service_mask & ~before_mask).sum(1).float()
 
+        trip_mask_full = torch.zeros(batch_size, coords_active.size(1), dtype=torch.bool, device=device)
         if Config.HARD_MAX_TRIP_TIME:
             depot_coord = coords_active[:, 0:1, :]
             dist_back = (coords_active - depot_coord).norm(p=2, dim=-1) * self.AREA_SIZE
             time_back = dist_back / self.VEHICLE_SPEED
             predicted_total = (arrival_time + self.SERVICE_TIME + time_back) - self.trip_start_time
-            if predicted_total.dim() == 2:
-                predicted_total = predicted_total.unsqueeze(1)
-            trip_mask = (predicted_total > self.MAX_TRIP_TIME + 1e-5)
-            trip_mask[:, :, 0] = False
-            mask[:, :, :2 * n_orders + 1] = mask[:, :, :2 * n_orders + 1] | trip_mask.to(torch.uint8)
+            trip_mask_full = predicted_total > self.MAX_TRIP_TIME + 1e-5
+            trip_mask_full[:, 0] = False
+        before_mask = service_mask.clone()
+        service_mask |= trip_mask_full[:, 1:2 * n_orders + 1]
+        if return_debug:
+            debug['diag_mask_trip_time'] = (service_mask & ~before_mask).sum(1).float()
 
+        ops_end_mask_full = torch.zeros(batch_size, coords_active.size(1), dtype=torch.bool, device=device)
         if Config.HARD_OPERATION_END:
             depot_coord_v6 = coords_active[:, 0:1, :]
             dist_back_v6 = (coords_active - depot_coord_v6).norm(p=2, dim=-1) * self.AREA_SIZE
             time_back_v6 = dist_back_v6 / self.VEHICLE_SPEED
             predicted_finish = arrival_time + self.SERVICE_TIME + time_back_v6
-            if predicted_finish.dim() == 2:
-                predicted_finish = predicted_finish.unsqueeze(1)
-            ops_end_mask = (predicted_finish > self.OPERATION_END + 1e-5)
-            ops_end_mask[:, :, 0] = False
-            mask[:, :, :2 * n_orders + 1] = mask[:, :, :2 * n_orders + 1] | ops_end_mask.to(torch.uint8)
+            ops_end_mask_full = predicted_finish > self.OPERATION_END + 1e-5
+            ops_end_mask_full[:, 0] = False
+        before_mask = service_mask.clone()
+        service_mask |= ops_end_mask_full[:, 1:2 * n_orders + 1]
+        if return_debug:
+            debug['diag_mask_ops_end'] = (service_mask & ~before_mask).sum(1).float()
 
-        is_carrying = (self.used_capacity_passenger > 1e-5) | (self.used_capacity_cargo > 1e-5)
-        mask[:, :, 0] = mask[:, :, 0] | is_carrying.to(torch.uint8)
+        mask = self.visited.clone()
+        if n_orders > 0:
+            mask[:, :, 1:2 * n_orders + 1] = service_mask.unsqueeze(1).to(torch.uint8)
+        reject_index = self.reject_index
+
+        is_carrying = ((self.used_capacity_passenger > 1e-5) | (self.used_capacity_cargo > 1e-5)).squeeze(1)
+        if return_debug:
+            debug['diag_depot_carry_block'] = is_carrying.float()
+        mask[:, :, 0] = mask[:, :, 0] | is_carrying[:, None].to(torch.uint8)
 
         n_visited = self.visited_[:, :, 1:2 * n_orders + 1].sum(-1)
-        at_depot_no_work = (self.prev_a == 0) & (n_visited == 0)
-        mask[:, :, 0] = mask[:, :, 0] | at_depot_no_work.to(torch.uint8)
+        at_depot_no_work = ((self.prev_a == 0) & (n_visited == 0)).squeeze(1)
+        if return_debug:
+            debug['diag_depot_no_work_block'] = at_depot_no_work.float()
+        mask[:, :, 0] = mask[:, :, 0] | at_depot_no_work[:, None].to(torch.uint8)
 
         all_done = ((self.visited_[:, :, 1:2 * n_orders + 1].sum(-1) == 2 * n_orders) | (self.rejected_.sum(-1) == n_orders)).to(torch.uint8)
         if Config.HARD_VEHICLE_LIMIT:
@@ -260,9 +314,14 @@ class StateMCVRPPDTW(NamedTuple):
             at_depot = (self.prev_a == 0).to(torch.uint8)
             block_all_when_exhausted = at_capacity & at_depot & (1 - all_done)
             if block_all_when_exhausted.any():
-                mask[:, :, :2 * n_orders + 1] = mask[:, :, :2 * n_orders + 1] | block_all_when_exhausted[:, :, None].expand_as(mask[:, :, :2 * n_orders + 1])
+                before_service = mask[:, :, 1:2 * n_orders + 1].bool().squeeze(1).clone()
+                expanded = block_all_when_exhausted[:, :, None].expand_as(mask[:, :, 1:2 * n_orders + 1]).bool()
+                mask[:, :, 1:2 * n_orders + 1] = mask[:, :, 1:2 * n_orders + 1] | expanded.to(torch.uint8)
+                if return_debug:
+                    after_service = mask[:, :, 1:2 * n_orders + 1].bool().squeeze(1)
+                    debug['diag_mask_vehicle_limit'] = (after_service & ~before_service).sum(1).float()
                 mask[:, :, 0] = mask[:, :, 0] | block_all_when_exhausted
-
+        
         all_order_nodes_masked = mask[:, :, 1:2 * n_orders + 1].bool().all(-1)
         if Config.HARD_VEHICLE_LIMIT:
             import math as _math
@@ -271,12 +330,20 @@ class StateMCVRPPDTW(NamedTuple):
             allow_depot_fallback = all_order_nodes_masked & can_start_new_vehicle
         else:
             allow_depot_fallback = all_order_nodes_masked
+        if return_debug:
+            debug['diag_depot_fallback_used'] = allow_depot_fallback.squeeze(-1).float()
         mask[:, :, 0] = mask[:, :, 0] & (~allow_depot_fallback).to(torch.uint8)
 
         reject_candidates = self._deterministic_reject_order(mask)
-        reject_allowed = (reject_candidates >= 0) & (~all_done.squeeze(-1).bool())
+        reject_candidate_available = reject_candidates >= 0
+        reject_allowed = reject_candidate_available & (~all_done.squeeze(-1).bool()) & bool(self.allow_reject)
+        if return_debug:
+            debug['diag_reject_candidate_available'] = reject_candidate_available.float()
+            debug['diag_reject_allowed'] = reject_allowed.float()
         mask[:, :, reject_index] = (~reject_allowed).view(-1, 1).to(torch.uint8)
 
+        if return_debug:
+            return mask.bool(), debug
         return mask.bool()
 
     def update(self, selected):
@@ -439,6 +506,7 @@ class StateMCVRPPDTW(NamedTuple):
                 passenger_pickup_time=self.passenger_pickup_time[key],
                 rejected_=self.rejected_[key],
                 reject_count=self.reject_count[key],
+                allow_reject=self.allow_reject,
                 lengths=self.lengths[key],
                 cur_coord=self.cur_coord[key],
                 deadlock_count=self.deadlock_count[key],

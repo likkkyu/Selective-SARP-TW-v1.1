@@ -154,6 +154,7 @@ class POMOTrainerOptimized:
             shrink_size=self.args.shrink_size,
             max_decode_steps=self.args.max_decode_steps,
             max_consecutive_depot=self.args.max_consecutive_depot,
+            reject_init_bias=self.args.reject_init_bias,
         )
 
     def _to_device(self, batch):
@@ -165,14 +166,14 @@ class POMOTrainerOptimized:
             for key, value in batch.items()
         }
 
-    def _pomo_forward(self, batch):
+    def _pomo_forward(self, batch, state_kwargs=None):
         if self.args.pomo_size <= 1:
-            cost, log_likelihood = self.model(batch)
+            cost, log_likelihood = self.model(batch, state_kwargs=state_kwargs)
             return cost.unsqueeze(1), log_likelihood.unsqueeze(1)
 
         batch_size = batch['loc'].size(0)
         repeated_batch = self._repeat_for_pomo(batch, self.args.pomo_size)
-        cost, log_likelihood = self.model(repeated_batch)
+        cost, log_likelihood = self.model(repeated_batch, state_kwargs=state_kwargs)
         return cost.reshape(batch_size, self.args.pomo_size), log_likelihood.reshape(batch_size, self.args.pomo_size)
 
     @staticmethod
@@ -190,6 +191,8 @@ class POMOTrainerOptimized:
     def train_epoch(self, epoch, train_loader):
         self.model.train()
         set_decode_type(self.model, 'sampling')
+        allow_reject = epoch > self.args.reject_warmup_epochs
+        state_kwargs = {'allow_reject': allow_reject}
 
         epoch_loss = 0.0
         epoch_objective = 0.0
@@ -199,7 +202,7 @@ class POMOTrainerOptimized:
         progress = tqdm(train_loader, desc=f"Epoch {epoch} (lr={current_lr:.2e})")
         for batch_idx, batch in enumerate(progress, start=1):
             batch = self._to_device(batch)
-            costs, log_probs = self._pomo_forward(batch)
+            costs, log_probs = self._pomo_forward(batch, state_kwargs=state_kwargs)
             loss, mean_objective = self._pomo_loss(costs, log_probs)
 
             self.optimizer.zero_grad()
@@ -239,11 +242,22 @@ class POMOTrainerOptimized:
             'passenger_total_ride_time_violations': [],
             'passenger_excess_ride_time_violations': [],
         }
+        debug_buffers = {} if self.args.collect_mask_diagnostics else None
 
         with torch.no_grad():
             for batch in tqdm(val_loader, desc='Validating'):
                 batch = self._to_device(batch)
-                objective_cost, _, pi = self.model(batch, return_pi=True)
+                if self.args.collect_mask_diagnostics:
+                    objective_cost, _, pi, debug = self.model(
+                        batch,
+                        return_pi=True,
+                        state_kwargs={'allow_reject': True},
+                        return_debug=True,
+                    )
+                    for key, value in debug.items():
+                        debug_buffers.setdefault(key, []).append(value)
+                else:
+                    objective_cost, _, pi = self.model(batch, return_pi=True, state_kwargs={'allow_reject': True})
                 _, details = self.problem.get_costs(batch, pi, return_details=True)
 
                 all_objectives.append(objective_cost)
@@ -255,8 +269,11 @@ class POMOTrainerOptimized:
         raw_total_costs = torch.cat(raw_total_costs, dim=0)
         for key in detail_buffers:
             detail_buffers[key] = torch.cat(detail_buffers[key], dim=0)
+        if debug_buffers is not None:
+            for key in debug_buffers:
+                debug_buffers[key] = torch.cat(debug_buffers[key], dim=0)
 
-        return {
+        results = {
             'avg_objective': all_objectives.mean().item(),
             'std_objective': all_objectives.std().item(),
             'avg_cost': raw_total_costs.mean().item(),
@@ -280,6 +297,10 @@ class POMOTrainerOptimized:
             'avg_passenger_ride_time_violations': detail_buffers['passenger_total_ride_time_violations'].mean().item(),
             'avg_passenger_delay_cost': detail_buffers['passenger_delivery_delay_cost_raw'].mean().item(),
         }
+        if debug_buffers is not None:
+            for key, value in debug_buffers.items():
+                results[key] = value.mean().item()
+        return results
 
     def train(self):
         print('\n' + '=' * 70)
@@ -289,6 +310,8 @@ class POMOTrainerOptimized:
         print(f"Batch size: {self.args.batch_size}")
         print(f"POMO size: {self.args.pomo_size}")
         print(f"Epochs: {self.args.n_epochs}")
+        print(f"Reject warmup epochs: {self.args.reject_warmup_epochs}")
+        print(f"Reject init bias: {self.args.reject_init_bias}")
         print('=' * 70)
 
         os.makedirs(self.args.save_dir, exist_ok=True)
@@ -344,6 +367,20 @@ class POMOTrainerOptimized:
             print(f"  Avg Unfulfilled Orders: {val_results['avg_unfulfilled_orders']:.2f}")
             print(f"  Vehicle Cost: {val_results['avg_vehicle_cost']:.2f} RMB")
             print(f"  Distance: {val_results['avg_distance']:.2f} km")
+            if self.args.collect_mask_diagnostics:
+                print("  [Mask Diagnostics]")
+                print(f"    Feasible pickups/step     : {val_results.get('diag_feasible_pickups', 0.0):.2f}")
+                print(f"    Feasible deliveries/step  : {val_results.get('diag_feasible_deliveries', 0.0):.2f}")
+                print(f"    Any service feasible rate : {val_results.get('diag_any_service_feasible', 0.0):.2f}")
+                print(f"    Depot-only rate           : {val_results.get('diag_depot_only', 0.0):.2f}")
+                print(f"    Reject available rate     : {val_results.get('diag_reject_available_rate', 0.0):.2f}")
+                print(f"    Feasible->depot rate      : {val_results.get('diag_service_feasible_but_selected_depot', 0.0):.2f}")
+                print(f"    Feasible->reject rate     : {val_results.get('diag_service_feasible_but_selected_reject', 0.0):.2f}")
+                print(f"    Mask by pickup TW         : {val_results.get('diag_mask_pickup_tw', 0.0):.2f}")
+                print(f"    Mask by ride time         : {val_results.get('diag_mask_ride_time', 0.0):.2f}")
+                print(f"    Mask by trip time         : {val_results.get('diag_mask_trip_time', 0.0):.2f}")
+                print(f"    Mask by ops end           : {val_results.get('diag_mask_ops_end', 0.0):.2f}")
+                print(f"    Mask by vehicle limit     : {val_results.get('diag_mask_vehicle_limit', 0.0):.2f}")
 
             if val_results['avg_objective'] < best_val_objective:
                 best_val_objective = val_results['avg_objective']
@@ -450,6 +487,9 @@ def parse_args():
     parser.add_argument('--shrink-size', type=int, default=16, help='decoder shrink_size，0 表示禁用')
     parser.add_argument('--max-decode-steps', type=int, default=None, help='decoder 最大步数上限，默认按节点数自动推断')
     parser.add_argument('--max-consecutive-depot', type=int, default=8, help='连续 depot 选择上限，超过后强制终止当前 rollout')
+    parser.add_argument('--reject-warmup-epochs', type=int, default=3, help='训练前若干 epoch 屏蔽 reject 动作，先学习服务')
+    parser.add_argument('--reject-init-bias', type=float, default=-2.0, help='reject head 的初始 bias，负值用于抑制早期 reject')
+    parser.add_argument('--collect-mask-diagnostics', action='store_true', help='在验证/评估中收集 mask 与动作可行性诊断指标')
     parser.add_argument('--resume-path', type=str, default=None, help='从已有 checkpoint 继续训练/微调')
     parser.add_argument('--resume-weights-only', action='store_true', help='仅加载模型权重，不恢复优化器状态')
     parser.add_argument('--no-cuda', action='store_true')
@@ -471,6 +511,8 @@ def build_phase_args(cli_args, graph_size):
         shrink_size=None if (cli_args.shrink_size is not None and cli_args.shrink_size <= 0) else cli_args.shrink_size,
         max_decode_steps=cli_args.max_decode_steps,
         max_consecutive_depot=cli_args.max_consecutive_depot,
+        reject_warmup_epochs=cli_args.reject_warmup_epochs,
+        reject_init_bias=cli_args.reject_init_bias,
         tanh_clipping=cli_args.tanh_clipping,
         normalization=cli_args.normalization,
         graph_size=graph_size,
@@ -495,6 +537,7 @@ def build_phase_args(cli_args, graph_size):
         normalization_seed=cli_args.normalization_seed,
         normalization_dir=cli_args.normalization_dir,
         num_vehicles=cli_args.num_vehicles,
+        collect_mask_diagnostics=cli_args.collect_mask_diagnostics,
         resume_path=cli_args.resume_path,
         resume_weights_only=cli_args.resume_weights_only,
     )

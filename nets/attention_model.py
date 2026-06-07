@@ -59,7 +59,8 @@ class AttentionModel(nn.Module):
                  checkpoint_encoder=False,
                  shrink_size=None,
                  max_decode_steps=None,
-                 max_consecutive_depot=8):
+                 max_consecutive_depot=8,
+                 reject_init_bias=-2.0):
         super(AttentionModel, self).__init__()
 
         self.embedding_dim = embedding_dim
@@ -123,6 +124,7 @@ class AttentionModel(nn.Module):
         self.project_fixed_context = nn.Linear(embedding_dim, embedding_dim, bias=False)
         self.project_step_context = nn.Linear(step_context_dim, embedding_dim, bias=False)
         self.reject_proj = nn.Linear(step_context_dim, 1)
+        nn.init.constant_(self.reject_proj.bias, reject_init_bias)
         assert embedding_dim % n_heads == 0
         self.project_out = nn.Linear(embedding_dim, embedding_dim, bias=False)
 
@@ -160,7 +162,7 @@ class AttentionModel(nn.Module):
         pd_pair_mask[:, delivery_nodes, pickup_nodes] = passenger_delivery | cargo_delivery
         return pd_pair_mask
 
-    def forward(self, input, return_pi=False):
+    def forward(self, input, return_pi=False, state_kwargs=None, return_debug=False):
         """
         :param input: (batch_size, graph_size, node_dim) input node features or dictionary with multiple tensors
         :param return_pi: whether to return the output sequences, this is optional as it is not compatible with
@@ -180,12 +182,16 @@ class AttentionModel(nn.Module):
         else:
             embeddings, _ = self.embedder(init_embed, pd_pair_mask=pd_pair_mask)
 
-        _log_p, pi = self._inner(input, embeddings)
+        _log_p, pi, debug = self._inner(input, embeddings, state_kwargs=state_kwargs, return_debug=return_debug)
 
         cost, mask = self.problem.get_costs(input, pi)
         ll = self._calc_log_likelihood(_log_p, pi, mask)
+        if return_pi and return_debug:
+            return cost, ll, pi, debug
         if return_pi:
             return cost, ll, pi
+        if return_debug:
+            return cost, ll, debug
 
         return cost, ll
 
@@ -277,17 +283,48 @@ class AttentionModel(nn.Module):
             )
         return self.init_embed(input)
 
-    def _inner(self, input, embeddings):
+    def _inner(self, input, embeddings, state_kwargs=None, return_debug=False):
         outputs = []
         sequences = []
 
-        state = self.problem.make_state(input)
+        state = self.problem.make_state(input, **(state_kwargs or {}))
         fixed = self._precompute(embeddings)
 
         batch_size = state.ids.size(0)
         node_count = embeddings.size(1)
         max_steps = self.max_decode_steps or max(node_count * 3, 8)
         consecutive_depot = torch.zeros(batch_size, dtype=torch.long, device=embeddings.device)
+        debug_totals = None
+        if return_debug:
+            debug_totals = {
+                'diag_steps': torch.zeros(batch_size, device=embeddings.device),
+                'diag_feasible_pickups': torch.zeros(batch_size, device=embeddings.device),
+                'diag_feasible_deliveries': torch.zeros(batch_size, device=embeddings.device),
+                'diag_feasible_service': torch.zeros(batch_size, device=embeddings.device),
+                'diag_any_service_feasible': torch.zeros(batch_size, device=embeddings.device),
+                'diag_depot_only': torch.zeros(batch_size, device=embeddings.device),
+                'diag_reject_available_rate': torch.zeros(batch_size, device=embeddings.device),
+                'diag_service_feasible_but_selected_depot': torch.zeros(batch_size, device=embeddings.device),
+                'diag_service_feasible_but_selected_reject': torch.zeros(batch_size, device=embeddings.device),
+                'diag_selected_pickup': torch.zeros(batch_size, device=embeddings.device),
+                'diag_selected_delivery': torch.zeros(batch_size, device=embeddings.device),
+                'diag_selected_depot': torch.zeros(batch_size, device=embeddings.device),
+                'diag_selected_reject': torch.zeros(batch_size, device=embeddings.device),
+                'diag_mask_visited': torch.zeros(batch_size, device=embeddings.device),
+                'diag_mask_precedence': torch.zeros(batch_size, device=embeddings.device),
+                'diag_mask_cap_passenger': torch.zeros(batch_size, device=embeddings.device),
+                'diag_mask_cap_cargo': torch.zeros(batch_size, device=embeddings.device),
+                'diag_mask_pickup_tw': torch.zeros(batch_size, device=embeddings.device),
+                'diag_mask_ride_time': torch.zeros(batch_size, device=embeddings.device),
+                'diag_mask_trip_time': torch.zeros(batch_size, device=embeddings.device),
+                'diag_mask_ops_end': torch.zeros(batch_size, device=embeddings.device),
+                'diag_mask_vehicle_limit': torch.zeros(batch_size, device=embeddings.device),
+                'diag_depot_carry_block': torch.zeros(batch_size, device=embeddings.device),
+                'diag_depot_no_work_block': torch.zeros(batch_size, device=embeddings.device),
+                'diag_depot_fallback_used': torch.zeros(batch_size, device=embeddings.device),
+                'diag_reject_candidate_available': torch.zeros(batch_size, device=embeddings.device),
+                'diag_reject_allowed': torch.zeros(batch_size, device=embeddings.device),
+            }
 
         i = 0
         while not (self.shrink_size is None and state.all_finished()):
@@ -304,8 +341,24 @@ class AttentionModel(nn.Module):
                     fixed = fixed[unfinished]
                     consecutive_depot = consecutive_depot[unfinished]
 
-            log_p, mask = self._get_log_p(fixed, state, consecutive_depot=consecutive_depot)
+            log_p, mask, step_debug = self._get_log_p(
+                fixed,
+                state,
+                consecutive_depot=consecutive_depot,
+                return_debug=return_debug,
+            )
             selected = self._select_node(log_p.exp()[:, 0, :], mask[:, 0, :])
+            if return_debug:
+                service_feasible = step_debug['diag_any_service_feasible'] > 0
+                debug_totals['diag_selected_depot'] += (selected == 0).float()
+                debug_totals['diag_selected_reject'] += (selected == state.reject_index).float()
+                debug_totals['diag_selected_pickup'] += ((selected >= 1) & (selected <= state.n_orders)).float()
+                debug_totals['diag_selected_delivery'] += ((selected >= state.n_orders + 1) & (selected <= 2 * state.n_orders)).float()
+                debug_totals['diag_service_feasible_but_selected_depot'] += (service_feasible & (selected == 0)).float()
+                debug_totals['diag_service_feasible_but_selected_reject'] += (service_feasible & (selected == state.reject_index)).float()
+                for key in debug_totals:
+                    if key in step_debug:
+                        debug_totals[key] += step_debug[key]
             consecutive_depot = torch.where(selected == 0, consecutive_depot + 1, torch.zeros_like(consecutive_depot))
 
             state = state.update(selected)
@@ -332,7 +385,47 @@ class AttentionModel(nn.Module):
             outputs.append(dummy_log_p[:, 0, :])
             sequences.append(dummy_selected)
 
-        return torch.stack(outputs, 1), torch.stack(sequences, 1)
+        if return_debug:
+            denom = torch.clamp(debug_totals['diag_steps'], min=1.0)
+            normalized_debug = {}
+            rate_keys = {
+                'diag_feasible_pickups',
+                'diag_feasible_deliveries',
+                'diag_feasible_service',
+                'diag_any_service_feasible',
+                'diag_depot_only',
+                'diag_reject_available_rate',
+                'diag_service_feasible_but_selected_depot',
+                'diag_service_feasible_but_selected_reject',
+                'diag_selected_pickup',
+                'diag_selected_delivery',
+                'diag_selected_depot',
+                'diag_selected_reject',
+                'diag_mask_visited',
+                'diag_mask_precedence',
+                'diag_mask_cap_passenger',
+                'diag_mask_cap_cargo',
+                'diag_mask_pickup_tw',
+                'diag_mask_ride_time',
+                'diag_mask_trip_time',
+                'diag_mask_ops_end',
+                'diag_mask_vehicle_limit',
+                'diag_depot_carry_block',
+                'diag_depot_no_work_block',
+                'diag_depot_fallback_used',
+                'diag_reject_candidate_available',
+                'diag_reject_allowed',
+            }
+            for key, value in debug_totals.items():
+                if key == 'diag_steps':
+                    normalized_debug[key] = value
+                elif key in rate_keys:
+                    normalized_debug[key] = value / denom
+                else:
+                    normalized_debug[key] = value
+            return torch.stack(outputs, 1), torch.stack(sequences, 1), normalized_debug
+
+        return torch.stack(outputs, 1), torch.stack(sequences, 1), None
 
     def sample_many(self, input, batch_rep=1, iter_rep=1):
         return sample_many(
@@ -384,13 +477,17 @@ class AttentionModel(nn.Module):
             torch.arange(log_p.size(-1), device=log_p.device, dtype=torch.int64).repeat(log_p.size(0), 1)[:, None, :]
         )
 
-    def _get_log_p(self, fixed, state, normalize=True, consecutive_depot=None):
+    def _get_log_p(self, fixed, state, normalize=True, consecutive_depot=None, return_debug=False):
         step_context = self._get_parallel_step_context(fixed.node_embeddings, state)
         query = fixed.context_node_projected + self.project_step_context(step_context)
 
         glimpse_K, glimpse_V, logit_K = self._get_attention_node_data(fixed, state)
 
-        mask = state.get_mask()
+        step_debug = None
+        if return_debug:
+            mask, step_debug = state.get_mask(return_debug=True)
+        else:
+            mask = state.get_mask()
         if consecutive_depot is not None and self.max_consecutive_depot is not None:
             depot_limit_reached = (consecutive_depot >= self.max_consecutive_depot)
             if depot_limit_reached.any():
@@ -405,6 +502,18 @@ class AttentionModel(nn.Module):
             mask = mask.clone()
             mask[all_masked, :, 0] = False
 
+        if return_debug:
+            service_mask = mask[:, 0, 1:1 + 2 * state.n_orders]
+            pickup_mask = mask[:, 0, 1:1 + state.n_orders]
+            delivery_mask = mask[:, 0, 1 + state.n_orders:1 + 2 * state.n_orders]
+            step_debug['diag_steps'] = torch.ones(mask.size(0), device=mask.device)
+            step_debug['diag_feasible_service'] = (~service_mask).sum(-1).float()
+            step_debug['diag_feasible_pickups'] = (~pickup_mask).sum(-1).float()
+            step_debug['diag_feasible_deliveries'] = (~delivery_mask).sum(-1).float()
+            step_debug['diag_any_service_feasible'] = (~service_mask).any(-1).float()
+            step_debug['diag_depot_only'] = ((~mask[:, 0, 0]) & service_mask.all(-1) & mask[:, 0, -1]).float()
+            step_debug['diag_reject_available_rate'] = (~mask[:, 0, -1]).float()
+
         log_p, glimpse = self._one_to_many_logits(query, step_context, glimpse_K, glimpse_V, logit_K, mask)
 
         if normalize:
@@ -412,7 +521,7 @@ class AttentionModel(nn.Module):
 
         assert not torch.isnan(log_p).any()
 
-        return log_p, mask
+        return log_p, mask, step_debug
 
     def _get_parallel_step_context(self, embeddings, state, from_depot=False):
         current_node = state.get_current_node()
