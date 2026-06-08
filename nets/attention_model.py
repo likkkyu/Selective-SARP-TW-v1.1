@@ -318,12 +318,15 @@ class AttentionModel(nn.Module):
                 'diag_mask_ride_time': torch.zeros(batch_size, device=embeddings.device),
                 'diag_mask_trip_time': torch.zeros(batch_size, device=embeddings.device),
                 'diag_mask_ops_end': torch.zeros(batch_size, device=embeddings.device),
+                'diag_mask_pickup_commitment': torch.zeros(batch_size, device=embeddings.device),
                 'diag_mask_vehicle_limit': torch.zeros(batch_size, device=embeddings.device),
                 'diag_depot_carry_block': torch.zeros(batch_size, device=embeddings.device),
                 'diag_depot_no_work_block': torch.zeros(batch_size, device=embeddings.device),
                 'diag_depot_fallback_used': torch.zeros(batch_size, device=embeddings.device),
                 'diag_reject_candidate_available': torch.zeros(batch_size, device=embeddings.device),
                 'diag_reject_allowed': torch.zeros(batch_size, device=embeddings.device),
+                'diag_reject_predeparture_available': torch.zeros(batch_size, device=embeddings.device),
+                'diag_reject_inroute_available': torch.zeros(batch_size, device=embeddings.device),
             }
 
         i = 0
@@ -409,12 +412,15 @@ class AttentionModel(nn.Module):
                 'diag_mask_ride_time',
                 'diag_mask_trip_time',
                 'diag_mask_ops_end',
+                'diag_mask_pickup_commitment',
                 'diag_mask_vehicle_limit',
                 'diag_depot_carry_block',
                 'diag_depot_no_work_block',
                 'diag_depot_fallback_used',
                 'diag_reject_candidate_available',
                 'diag_reject_allowed',
+                'diag_reject_predeparture_available',
+                'diag_reject_inroute_available',
             }
             for key, value in debug_totals.items():
                 if key == 'diag_steps':
@@ -620,7 +626,10 @@ class AttentionModel(nn.Module):
         compatibility = torch.matmul(glimpse_Q, glimpse_K.transpose(-2, -1)) / math.sqrt(glimpse_Q.size(-1))
         if self.mask_inner:
             assert self.mask_logits, "Cannot mask inner without masking logits"
-            node_mask = mask[:, :, :-1]
+            node_mask = mask[:, :, :-1].clone()
+            all_node_masked = node_mask.all(-1)
+            if all_node_masked.any():
+                node_mask[all_node_masked] = False
             compatibility[node_mask[:, :, None, :][None, :, :, :, :].expand_as(compatibility)] = -math.inf
 
         heads = torch.matmul(torch.softmax(compatibility, dim=-1), glimpse_V)

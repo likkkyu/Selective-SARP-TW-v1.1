@@ -152,6 +152,8 @@ def evaluate():
     all_num_rejected = []
     all_num_unfulfilled = []
     all_num_completed = []
+    all_num_pickup_only = []
+    all_num_started_not_completed = []
     all_pickup_hard_violations = []
     all_total_ride_time_violations = []
     all_excess_ride_time_violations = []
@@ -193,6 +195,8 @@ def evaluate():
             _maybe('rejected_orders', all_num_rejected)
             _maybe('unfulfilled_orders', all_num_unfulfilled)
             _maybe('completed_orders', all_num_completed)
+            _maybe('pickup_only_orders', all_num_pickup_only)
+            _maybe('started_not_completed_orders', all_num_started_not_completed)
 
     def _stats(label, data, unit='RMB', fmt='{:.3f}'):
         if not data:
@@ -228,6 +232,8 @@ def evaluate():
     _stats('# Completed Orders', all_num_completed, unit='', fmt='{:.2f}')
     _stats('# Rejected Orders', all_num_rejected, unit='', fmt='{:.2f}')
     _stats('# Unfulfilled Orders', all_num_unfulfilled, unit='', fmt='{:.2f}')
+    _stats('# Pickup-only Orders', all_num_pickup_only, unit='', fmt='{:.2f}')
+    _stats('# Started-not-completed', all_num_started_not_completed, unit='', fmt='{:.2f}')
     if args.diagnostics and all_diagnostics:
         print()
         print('【Mask / 可行性诊断】')
@@ -243,7 +249,10 @@ def evaluate():
             ('Mask by ride time', 'diag_mask_ride_time', '{:.2f}'),
             ('Mask by trip time', 'diag_mask_trip_time', '{:.2f}'),
             ('Mask by ops end', 'diag_mask_ops_end', '{:.2f}'),
+            ('Mask by pickup commitment', 'diag_mask_pickup_commitment', '{:.2f}'),
             ('Mask by vehicle limit', 'diag_mask_vehicle_limit', '{:.2f}'),
+            ('Reject predeparture rate', 'diag_reject_predeparture_available', '{:.2f}'),
+            ('Reject in-route rate', 'diag_reject_inroute_available', '{:.2f}'),
         ]:
             _stats(label, all_diagnostics.get(key, []), unit='', fmt=fmt)
     print()

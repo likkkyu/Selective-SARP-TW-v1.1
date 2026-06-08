@@ -118,10 +118,8 @@ class Config:
 
     # ---------- 时间窗分布参数（按时段混合采样） ----------
     # 三个时段：[10,12), [12,14), [14,16)
-    PASSENGER_TW_PERIOD_WEIGHTS = (0.35, 0.25, 0.40)
-    CARGO_TW_PERIOD_WEIGHTS = (0.45, 0.20, 0.35)
-    MIN_AFTERNOON_ORDER_RATIO = 0.15  # 25 单主线：下午订单占比下限
-    MIN_AFTERNOON_ORDER_RATIO_LARGE = 0.05  # 50/100 单主线：下午订单占比下限下调
+    PASSENGER_TW_PERIOD_WEIGHTS = (0.50, 0.32, 0.18)
+    CARGO_TW_PERIOD_WEIGHTS = (0.52, 0.30, 0.18)
 
     # ---------- 车队规模（50 单主线训练回到较宽松预算，先学服务，再收紧） ----------
     MIN_NUM_VEHICLES = 1
@@ -496,6 +494,14 @@ class MCVRPPDTW:
         trip_overtime_penalty = trip_overtime_total * Config.ALPHA_TRIP_OVERTIME
 
         reject_count = time_dict.get('reject_count', torch.zeros_like(unserved_orders))
+        explicit_reject_mask = (~pickup_visit) & (~delivery_visit)
+        rejected_orders = explicit_reject_mask.float().sum(1).clamp(max=reject_count)
+        pickup_only_mask = pickup_visit & (~delivery_visit)
+        delivery_without_pickup_mask = delivery_visit & (~pickup_visit)
+        started_not_completed_mask = pickup_only_mask | delivery_without_pickup_mask
+        pickup_only_orders = pickup_only_mask.float().sum(1)
+        delivery_without_pickup_orders = delivery_without_pickup_mask.float().sum(1)
+        started_not_completed_orders = started_not_completed_mask.float().sum(1)
         active_rejected_orders = torch.minimum(reject_count, unserved_orders)
         unfulfilled_orders = torch.clamp(unserved_orders - active_rejected_orders, min=0.0)
         reject_penalty = active_rejected_orders * Config.ALPHA_REJECT
@@ -512,6 +518,11 @@ class MCVRPPDTW:
             'completed_orders': completed_orders,
             'unserved_orders': unserved_orders,
             'unfulfilled_orders': unfulfilled_orders,
+            'pickup_only_orders': pickup_only_orders,
+            'delivery_without_pickup_orders': delivery_without_pickup_orders,
+            'started_not_completed_orders': started_not_completed_orders,
+            'pickup_only_mask': pickup_only_mask,
+            'started_not_completed_mask': started_not_completed_mask,
             'trip_overtime_penalty': trip_overtime_penalty,
             'trip_overtime_hours_total': trip_overtime_total,
         }
@@ -625,6 +636,9 @@ class MCVRPPDTW:
                 'completed_orders': vp_dict['completed_orders'],
                 'unserved_orders': vp_dict['unserved_orders'],
                 'unfulfilled_orders': vp_dict['unfulfilled_orders'],
+                'pickup_only_orders': vp_dict['pickup_only_orders'],
+                'delivery_without_pickup_orders': vp_dict['delivery_without_pickup_orders'],
+                'started_not_completed_orders': vp_dict['started_not_completed_orders'],
                 'normalized_energy_cost': normalized_energy_cost,
                 'normalized_passenger_penalty': normalized_passenger_penalty,
                 'normalized_cargo_delay_cost': normalized_cargo_delay,
@@ -1022,13 +1036,6 @@ class MCVRPPDTWDataset(Dataset):
         passenger_probs = passenger_probs / passenger_probs.sum()
         cargo_probs = cargo_probs / cargo_probs.sum()
 
-        afternoon_ratio = Config.MIN_AFTERNOON_ORDER_RATIO_LARGE if n_orders >= 50 else Config.MIN_AFTERNOON_ORDER_RATIO
-        min_afternoon_count = min(
-            n_orders,
-            int(math.ceil(n_orders * afternoon_ratio)),
-        )
-        afternoon_indices = set(torch.randperm(n_orders)[:min_afternoon_count].tolist())
-
         for i in range(n_orders):
             earliest_arrival = Config.OPERATION_START + travel_time_from_depot[i]
             tw_width = Config.PASSENGER_TW_WIDTH if node_type[i] == 1 else Config.CARGO_TW_WIDTH
@@ -1036,11 +1043,8 @@ class MCVRPPDTWDataset(Dataset):
             feasible_start_low = max(Config.OPERATION_START, float(earliest_arrival))
             feasible_start_high = Config.OPERATION_END - tw_width
 
-            if i in afternoon_indices:
-                period_idx = 2
-            else:
-                probs = passenger_probs if node_type[i] == 1 else cargo_probs
-                period_idx = int(torch.multinomial(probs, 1).item())
+            probs = passenger_probs if node_type[i] == 1 else cargo_probs
+            period_idx = int(torch.multinomial(probs, 1).item())
 
             period_low_raw, period_high_raw = period_bounds[period_idx]
             period_low = max(feasible_start_low, period_low_raw)

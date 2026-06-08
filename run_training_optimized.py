@@ -239,6 +239,8 @@ class POMOTrainerOptimized:
             'rejected_orders': [],
             'unfulfilled_orders': [],
             'completed_orders': [],
+            'pickup_only_orders': [],
+            'started_not_completed_orders': [],
             'vehicle_cost_raw': [],
             'total_distance': [],
             'passenger_pickup_hard_violations': [],
@@ -296,6 +298,8 @@ class POMOTrainerOptimized:
             'avg_rejected_orders': detail_buffers['rejected_orders'].mean().item(),
             'avg_unfulfilled_orders': detail_buffers['unfulfilled_orders'].mean().item(),
             'avg_completed_orders': detail_buffers['completed_orders'].mean().item() if 'completed_orders' in detail_buffers else 0.0,
+            'avg_pickup_only_orders': detail_buffers['pickup_only_orders'].mean().item() if 'pickup_only_orders' in detail_buffers else 0.0,
+            'avg_started_not_completed_orders': detail_buffers['started_not_completed_orders'].mean().item() if 'started_not_completed_orders' in detail_buffers else 0.0,
             'avg_vehicle_cost': detail_buffers['vehicle_cost_raw'].mean().item(),
             'avg_distance': detail_buffers['total_distance'].mean().item(),
             'avg_passenger_pickup_hard_violations': detail_buffers['passenger_pickup_hard_violations'].mean().item(),
@@ -372,6 +376,8 @@ class POMOTrainerOptimized:
             print(f"  Avg Completed Orders: {val_results['avg_completed_orders']:.2f}")
             print(f"  Avg Rejected Orders: {val_results['avg_rejected_orders']:.2f}")
             print(f"  Avg Unfulfilled Orders: {val_results['avg_unfulfilled_orders']:.2f}")
+            print(f"  Avg Pickup-only Orders: {val_results['avg_pickup_only_orders']:.2f}")
+            print(f"  Avg Started-not-completed Orders: {val_results['avg_started_not_completed_orders']:.2f}")
             print(f"  Vehicle Cost: {val_results['avg_vehicle_cost']:.2f} RMB")
             print(f"  Distance: {val_results['avg_distance']:.2f} km")
             if self.args.collect_mask_diagnostics:
@@ -387,7 +393,10 @@ class POMOTrainerOptimized:
                 print(f"    Mask by ride time         : {val_results.get('diag_mask_ride_time', 0.0):.2f}")
                 print(f"    Mask by trip time         : {val_results.get('diag_mask_trip_time', 0.0):.2f}")
                 print(f"    Mask by ops end           : {val_results.get('diag_mask_ops_end', 0.0):.2f}")
+                print(f"    Mask by pickup commitment : {val_results.get('diag_mask_pickup_commitment', 0.0):.2f}")
                 print(f"    Mask by vehicle limit     : {val_results.get('diag_mask_vehicle_limit', 0.0):.2f}")
+                print(f"    Reject predeparture rate  : {val_results.get('diag_reject_predeparture_available', 0.0):.2f}")
+                print(f"    Reject in-route rate      : {val_results.get('diag_reject_inroute_available', 0.0):.2f}")
 
             if val_results['avg_objective'] < best_val_objective:
                 best_val_objective = val_results['avg_objective']

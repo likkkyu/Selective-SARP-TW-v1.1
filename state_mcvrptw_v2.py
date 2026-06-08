@@ -41,6 +41,7 @@ class StateMCVRPPDTW(NamedTuple):
     lengths: torch.Tensor
     cur_coord: torch.Tensor
     deadlock_count: torch.Tensor
+    deadlock_limit: torch.Tensor
     terminal_: torch.Tensor
     i: torch.Tensor
 
@@ -62,6 +63,12 @@ class StateMCVRPPDTW(NamedTuple):
     @property
     def reject_index(self):
         return 2 * self.n_orders + 1
+
+    def has_open_started_orders(self):
+        if self.n_orders == 0:
+            return torch.zeros(self.ids.size(0), 1, dtype=torch.bool, device=self.coords.device)
+        delivered = self.visited[:, :, self.n_orders + 1:2 * self.n_orders + 1].bool()
+        return (self.picked_up_.bool() & (~delivered) & (~self.rejected_.bool())).any(-1)
 
     @staticmethod
     def initialize(input_data, visited_dtype=torch.uint8, allow_reject=True, deadlock_limit=2):
@@ -115,8 +122,9 @@ class StateMCVRPPDTW(NamedTuple):
             lengths=torch.zeros(batch_size, 1, device=device),
             cur_coord=depot[:, None, :],
             deadlock_count=torch.zeros(batch_size, 1, dtype=torch.long, device=device),
+            deadlock_limit=torch.full((batch_size, 1), max(int(deadlock_limit), 1), dtype=torch.int64, device=device),
             terminal_=torch.zeros(batch_size, 1, dtype=torch.bool, device=device),
-            i=torch.full((1,), int(deadlock_limit), dtype=torch.int64, device=device),
+            i=torch.zeros(batch_size, 1, dtype=torch.int64, device=device),
         )
 
     def _active_views(self):
@@ -130,14 +138,16 @@ class StateMCVRPPDTW(NamedTuple):
             self.demand_cargo[ids_flat],
         )
 
-    def _deterministic_reject_order(self, mask):
-        batch_size = mask.size(0)
-        device = mask.device
+    def _deterministic_reject_order(self, mask=None):
+        batch_size = self.ids.size(0)
+        device = self.coords.device
         n_orders = self.n_orders
         if n_orders == 0:
             return torch.full((batch_size,), -1, dtype=torch.long, device=device)
 
-        candidate_pickups = ~mask[:, 0, 1:n_orders + 1].bool()
+        pickup_visited = self.visited[:, :, 1:n_orders + 1].bool().squeeze(1)
+        delivery_visited = self.visited[:, :, n_orders + 1:2 * n_orders + 1].bool().squeeze(1)
+        candidate_pickups = (~pickup_visited) & (~delivery_visited)
         candidate_pickups = candidate_pickups & (self.rejected_.squeeze(1) == 0)
         candidate_pickups = candidate_pickups & (self.picked_up_.squeeze(1) == 0)
 
@@ -168,12 +178,15 @@ class StateMCVRPPDTW(NamedTuple):
                 'diag_mask_ride_time',
                 'diag_mask_trip_time',
                 'diag_mask_ops_end',
+                'diag_mask_pickup_commitment',
                 'diag_mask_vehicle_limit',
                 'diag_depot_carry_block',
                 'diag_depot_no_work_block',
                 'diag_depot_fallback_used',
                 'diag_reject_candidate_available',
                 'diag_reject_allowed',
+                'diag_reject_predeparture_available',
+                'diag_reject_inroute_available',
             ]
             debug = {key: torch.zeros(batch_size, device=device) for key in debug_keys}
 
@@ -229,6 +242,66 @@ class StateMCVRPPDTW(NamedTuple):
         service_mask |= passenger_pickup_mask_full[:, 1:2 * n_orders + 1]
         if return_debug:
             debug['diag_mask_pickup_tw'] = (service_mask & ~before_mask).sum(1).float()
+
+        open_started = self.has_open_started_orders().squeeze(1)
+        pickup_commitment_mask = torch.zeros(batch_size, n_orders, dtype=torch.bool, device=device)
+        if n_orders > 0:
+            pickup_coords = coords_active[:, 1:n_orders + 1, :]
+            delivery_coords = coords_active[:, n_orders + 1:2 * n_orders + 1, :]
+            pickup_finish = torch.maximum(
+                arrival_time[:, 1:n_orders + 1],
+                time_windows_active[:, 1:n_orders + 1, 0]
+            ) + self.SERVICE_TIME
+            open_before = (
+                self.picked_up_.squeeze(1).bool()
+                & (~self.rejected_.squeeze(1).bool())
+                & (~self.visited[:, :, n_orders + 1:2 * n_orders + 1].bool().squeeze(1))
+            )
+            delivery_travel_from_pickup = torch.cdist(pickup_coords, delivery_coords, p=2) * self.AREA_SIZE / self.VEHICLE_SPEED
+            delivery_arrival_from_pickup = pickup_finish[:, :, None] + delivery_travel_from_pickup
+            time_back_from_delivery = (
+                (delivery_coords - coords_active[:, 0:1, :]).norm(p=2, dim=-1) * self.AREA_SIZE / self.VEHICLE_SPEED
+            )
+            predicted_finish_after_delivery = delivery_arrival_from_pickup + self.SERVICE_TIME + time_back_from_delivery[:, None, :]
+            trip_start_after_pickup = torch.where(self.prev_a == 0, self.current_time, self.trip_start_time).squeeze(1)
+            predicted_trip_after_delivery = predicted_finish_after_delivery - trip_start_after_pickup[:, None, None]
+
+            passenger_orders = (node_type_active[:, 1:n_orders + 1] == 1)
+            passenger_pickup_time_after = self.passenger_pickup_time.squeeze(1)[:, None, :].expand(-1, n_orders, -1).clone()
+            eye = torch.eye(n_orders, dtype=torch.bool, device=device).unsqueeze(0)
+            passenger_pickup_time_after = torch.where(eye, pickup_finish[:, :, None], passenger_pickup_time_after)
+            open_after = open_before[:, None, :].expand(-1, n_orders, -1) | eye
+
+            direct_ride_time = (
+                (pickup_coords - delivery_coords).norm(p=2, dim=-1) * self.AREA_SIZE / self.VEHICLE_SPEED
+            )
+            ride_time_hours = delivery_arrival_from_pickup - passenger_pickup_time_after
+            excess_ride_time_hours = torch.clamp(ride_time_hours - direct_ride_time[:, None, :], min=0.0)
+            passenger_total_ride_time_limit = Config.PASSENGER_MAX_RIDE_TIME_MINUTES / 60.0
+            passenger_excess_ride_time_limit = Config.PASSENGER_MAX_EXCESS_RIDE_TIME_MINUTES / 60.0
+            passenger_valid_pickup_time = passenger_pickup_time_after >= 0
+            ride_time_violation_after_pickup = (
+                Config.HARD_PASSENGER_MAX_RIDE_TIME
+                & passenger_orders[:, None, :]
+                & passenger_valid_pickup_time
+                & (
+                    (ride_time_hours > passenger_total_ride_time_limit + 1e-5)
+                    | (excess_ride_time_hours > passenger_excess_ride_time_limit + 1e-5)
+                )
+            )
+            trip_violation_after_pickup = Config.HARD_MAX_TRIP_TIME & (predicted_trip_after_delivery > self.MAX_TRIP_TIME + 1e-5)
+            ops_end_violation_after_pickup = Config.HARD_OPERATION_END & (predicted_finish_after_delivery > self.OPERATION_END + 1e-5)
+            direct_delivery_feasible = ~(ride_time_violation_after_pickup | trip_violation_after_pickup | ops_end_violation_after_pickup)
+            pickup_commitment_mask = (open_after & (~direct_delivery_feasible)).any(-1)
+
+        pickup_commitment_mask = pickup_commitment_mask | open_started[:, None]
+        commitment_mask_full = torch.zeros(batch_size, coords_active.size(1), dtype=torch.bool, device=device)
+        if n_orders > 0:
+            commitment_mask_full[:, 1:n_orders + 1] = pickup_commitment_mask
+        before_mask = service_mask.clone()
+        service_mask |= commitment_mask_full[:, 1:2 * n_orders + 1]
+        if return_debug:
+            debug['diag_mask_pickup_commitment'] = (service_mask & ~before_mask).sum(1).float()
 
         if n_orders > 0:
             order_indices = torch.arange(n_orders, device=device)
@@ -338,11 +411,20 @@ class StateMCVRPPDTW(NamedTuple):
 
         reject_candidates = self._deterministic_reject_order(mask)
         reject_candidate_available = reject_candidates >= 0
-        reject_allowed = reject_candidate_available & (~all_done.squeeze(-1).bool()) & bool(self.allow_reject)
+        pre_departure_gate = (
+            (self.prev_a == 0)
+            & (self.used_capacity_passenger <= 1e-5)
+            & (self.used_capacity_cargo <= 1e-5)
+            & (~self.has_open_started_orders())
+        ).squeeze(1)
+        reject_allowed = reject_candidate_available & (~all_done.squeeze(-1).bool()) & bool(self.allow_reject) & pre_departure_gate
+        mask[:, :, reject_index] = (~reject_allowed).view(-1, 1).to(torch.uint8)
         if return_debug:
+            reject_available = mask[:, :, reject_index].eq(0).view(-1)
             debug['diag_reject_candidate_available'] = reject_candidate_available.float()
             debug['diag_reject_allowed'] = reject_allowed.float()
-        mask[:, :, reject_index] = (~reject_allowed).view(-1, 1).to(torch.uint8)
+            debug['diag_reject_predeparture_available'] = (reject_available & pre_departure_gate).float()
+            debug['diag_reject_inroute_available'] = (reject_available & (~pre_departure_gate)).float()
 
         if return_debug:
             return mask.bool(), debug
@@ -410,7 +492,7 @@ class StateMCVRPPDTW(NamedTuple):
             self.deadlock_count + all_order_nodes_masked,
             torch.zeros_like(self.deadlock_count),
         )
-        deadlock_limit = max(int(self.i.item()), 1)
+        deadlock_limit = torch.clamp(self.deadlock_limit, min=1)
         new_terminal = self.terminal_ | (new_deadlock_count >= deadlock_limit)
 
         visited_ = self.visited_.clone()
@@ -469,20 +551,23 @@ class StateMCVRPPDTW(NamedTuple):
             lengths=new_lengths,
             cur_coord=selected_coord,
             deadlock_count=new_deadlock_count,
+            deadlock_limit=self.deadlock_limit,
             terminal_=new_terminal,
             i=self.i + 1,
         )
 
     def all_finished(self):
+        open_started = self.has_open_started_orders()
         all_visited = ((self.visited_[:, :, 1:2 * self.n_orders + 1].sum(-1) == self.n_orders * 2) | (self.rejected_.sum(-1) == self.n_orders))
         at_depot = self.prev_a == 0
-        return ((all_visited & at_depot) | self.terminal_).all()
+        return ((((all_visited & at_depot) | self.terminal_) & (~open_started))).all()
 
     def get_finished(self):
+        open_started = self.has_open_started_orders()
         all_visited = ((self.visited_[:, :, 1:2 * self.n_orders + 1].sum(-1) == self.n_orders * 2) | (self.rejected_.sum(-1) == self.n_orders))
         at_depot = self.prev_a == 0
-        deadlock_finished = self.deadlock_count >= 2
-        return ((all_visited & at_depot) | deadlock_finished | self.terminal_).squeeze(-1)
+        deadlock_finished = self.deadlock_count >= torch.clamp(self.deadlock_limit, min=1)
+        return ((((all_visited & at_depot) | deadlock_finished | self.terminal_) & (~open_started))).squeeze(-1)
 
     def get_current_node(self):
         return self.prev_a
@@ -518,6 +603,8 @@ class StateMCVRPPDTW(NamedTuple):
                 lengths=self.lengths[key],
                 cur_coord=self.cur_coord[key],
                 deadlock_count=self.deadlock_count[key],
+                deadlock_limit=self.deadlock_limit[key],
                 terminal_=self.terminal_[key],
+                i=self.i[key],
             )
         raise TypeError(f"Invalid key type: {type(key)}")
