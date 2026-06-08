@@ -42,6 +42,12 @@ def parse_args():
                         help='强制使用 CPU')
     parser.add_argument('--diagnostics', action='store_true',
                         help='输出 mask 与动作可行性诊断指标')
+    parser.add_argument('--max-concurrent-open-orders', type=int, default=1,
+                        help='共享实验：允许的最大并发 open 单数量 (default: 1)')
+    parser.add_argument('--enable-delivery-viability', action='store_true',
+                        help='共享实验：对 delivery 也启用 viability 过滤')
+    parser.add_argument('--enable-viability-fallback', action='store_true',
+                        help='共享实验：若 delivery viability 全挡死则启用安全回退')
     return parser.parse_args()
 
 
@@ -163,13 +169,18 @@ def evaluate():
         for batch in test_loader:
             batch = {k: v.to(device) if torch.is_tensor(v) else v
                      for k, v in batch.items()}
+            state_kwargs = {
+                'max_concurrent_open_orders': args.max_concurrent_open_orders,
+                'enable_delivery_viability': args.enable_delivery_viability,
+                'enable_viability_fallback': args.enable_viability_fallback,
+            }
             if args.diagnostics:
-                cost, _, pi, debug = model(batch, return_pi=True, return_debug=True)
+                cost, _, pi, debug = model(batch, return_pi=True, return_debug=True, state_kwargs=state_kwargs)
                 for key, value in debug.items():
                     if torch.is_tensor(value):
                         all_diagnostics.setdefault(key, []).extend(value.tolist())
             else:
-                cost, _, pi = model(batch, return_pi=True)
+                cost, _, pi = model(batch, return_pi=True, state_kwargs=state_kwargs)
             _, details = MCVRPPDTW.get_costs(batch, pi, return_details=True)
 
             all_cost_train.extend(cost.tolist())
@@ -250,6 +261,12 @@ def evaluate():
             ('Mask by trip time', 'diag_mask_trip_time', '{:.2f}'),
             ('Mask by ops end', 'diag_mask_ops_end', '{:.2f}'),
             ('Mask by pickup commitment', 'diag_mask_pickup_commitment', '{:.2f}'),
+            ('Open started count', 'diag_open_started_count', '{:.2f}'),
+            ('Open started eq2 rate', 'diag_open_started_eq2', '{:.2f}'),
+            ('Second pickup feasible', 'diag_second_pickup_feasible', '{:.2f}'),
+            ('Second pickup blocked', 'diag_second_pickup_blocked_by_commitment', '{:.2f}'),
+            ('Delivery viability masked', 'diag_delivery_viability_masked', '{:.2f}'),
+            ('Delivery viability fallback', 'diag_delivery_viability_fallback', '{:.2f}'),
             ('Mask by vehicle limit', 'diag_mask_vehicle_limit', '{:.2f}'),
             ('Reject predeparture rate', 'diag_reject_predeparture_available', '{:.2f}'),
             ('Reject in-route rate', 'diag_reject_inroute_available', '{:.2f}'),
