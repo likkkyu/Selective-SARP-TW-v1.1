@@ -16,6 +16,8 @@ def parse_args():
     parser.add_argument('--max-concurrent-open-orders', type=int, default=6)
     parser.add_argument('--enable-delivery-viability', action='store_true')
     parser.add_argument('--enable-viability-fallback', action='store_true')
+    parser.add_argument('--trace-first-failure', action='store_true',
+                        help='打印首个 no_move / orphan 样本的逐步轨迹')
     return parser.parse_args()
 
 
@@ -25,32 +27,109 @@ def _node_coord(batch, node_idx):
     return batch['loc'][0, node_idx - 1]
 
 
-def choose_action(mask, state, policy, rng, batch):
-    feasible = (~mask[0, 0]).nonzero(as_tuple=False).squeeze(-1).tolist()
-    pickups = [idx for idx in feasible if 1 <= idx <= state.n_orders]
-    deliveries = [idx for idx in feasible if state.n_orders + 1 <= idx <= 2 * state.n_orders]
+def _order_deadline(batch, state, order_idx):
+    return float(batch['time_windows'][0, order_idx, 1].item())
+
+
+def _service_coord(batch, state, action):
+    kind, order_idx = action
+    if kind == 'P':
+        node_idx = order_idx + 1
+    else:
+        node_idx = state.n_orders + order_idx + 1
+    return _node_coord(batch, node_idx)
+
+
+def choose_action(state, policy, rng, batch, pickups, deliveries):
+    service_actions = [('P', idx) for idx in pickups] + [('D', idx) for idx in deliveries]
+    if not service_actions:
+        return None
+
     cur_coord = state.cur_coord[0, 0]
     if policy == 'bad':
-        if pickups:
-            return max(pickups, key=lambda idx: torch.norm(_node_coord(batch, idx) - cur_coord).item())
-        if deliveries:
-            return max(deliveries, key=lambda idx: torch.norm(_node_coord(batch, idx) - cur_coord).item())
-        if 0 in feasible:
-            return 0
-        if state.reject_index in feasible:
-            return state.reject_index
-        return None
+        pickup_actions = [action for action in service_actions if action[0] == 'P']
+        delivery_actions = [action for action in service_actions if action[0] == 'D']
+        candidates = pickup_actions if pickup_actions else delivery_actions
+        return max(candidates, key=lambda action: torch.norm(_service_coord(batch, state, action) - cur_coord).item())
+
     if policy == 'oracle':
         if deliveries:
-            return min(deliveries, key=lambda idx: float(batch['time_windows'][0, idx - 1, 1].item()))
-        if pickups:
-            return min(pickups, key=lambda idx: float(batch['time_windows'][0, idx - 1, 1].item()))
-        if 0 in feasible:
-            return 0
-        return None
-    if feasible:
-        return rng.choice(feasible)
-    return None
+            return ('D', min(deliveries, key=lambda idx: _order_deadline(batch, state, idx)))
+        return ('P', min(pickups, key=lambda idx: _order_deadline(batch, state, idx)))
+
+    return rng.choice(service_actions)
+
+
+def _service_candidates(mask, state):
+    feasible = (~mask[0, 0]).nonzero(as_tuple=False).squeeze(-1).tolist()
+    pickups = [idx - 1 for idx in feasible if 1 <= idx <= state.n_orders]
+    deliveries = [idx - (state.n_orders + 1) for idx in feasible if state.n_orders + 1 <= idx <= 2 * state.n_orders]
+    return pickups, deliveries
+
+
+def _summarize_order_set(order_indices):
+    return [int(idx) + 1 for idx in order_indices]
+
+
+def _collect_trace_snapshot(state, mask, debug, pickups, deliveries, step, selected_action=None, note=''):
+    open_mask = state.get_open_started_mask()[0]
+    open_orders = torch.nonzero(open_mask, as_tuple=False).squeeze(-1).tolist()
+    snapshot = {
+        'step': int(step),
+        'note': note,
+        'selected_action': selected_action,
+        'open_orders': _summarize_order_set(open_orders),
+        'pickups': _summarize_order_set(pickups),
+        'deliveries': _summarize_order_set(deliveries),
+        'current_time': float(state.current_time[0, 0].item()),
+        'trip_start_time': float(state.trip_start_time[0, 0].item()),
+        'prev_node': int(state.prev_a[0, 0].item()),
+        'used_vehicles': float(state.used_vehicles[0, 0].item()),
+        'diag_open_started_count': float(debug['diag_open_started_count'][0].item()),
+        'diag_second_pickup_feasible': float(debug['diag_second_pickup_feasible'][0].item()),
+        'diag_second_pickup_blocked_by_commitment': float(debug['diag_second_pickup_blocked_by_commitment'][0].item()),
+        'diag_delivery_viability_masked': float(debug['diag_delivery_viability_masked'][0].item()),
+        'diag_delivery_viability_fallback': float(debug['diag_delivery_viability_fallback'][0].item()),
+        'diag_mask_pickup_tw': float(debug['diag_mask_pickup_tw'][0].item()),
+        'diag_mask_ride_time': float(debug['diag_mask_ride_time'][0].item()),
+        'diag_mask_trip_time': float(debug['diag_mask_trip_time'][0].item()),
+        'diag_mask_ops_end': float(debug['diag_mask_ops_end'][0].item()),
+        'diag_mask_pickup_commitment': float(debug['diag_mask_pickup_commitment'][0].item()),
+        'diag_depot_fallback_used': float(debug['diag_depot_fallback_used'][0].item()),
+    }
+    return snapshot
+
+
+def _print_trace(sample_idx, trace, result):
+    print('-' * 64)
+    print(f'TRACE sample={sample_idx}')
+    for snapshot in trace:
+        selected = snapshot['selected_action']
+        if selected is None:
+            selected_text = 'None'
+        else:
+            kind, order_idx = selected
+            selected_text = f'{kind}{int(order_idx) + 1}'
+        print(
+            f"step={snapshot['step']:02d} note={snapshot['note']} selected={selected_text} "
+            f"open={snapshot['open_orders']} pickups={snapshot['pickups']} deliveries={snapshot['deliveries']} "
+            f"t={snapshot['current_time']:.2f} trip_start={snapshot['trip_start_time']:.2f} prev={snapshot['prev_node']}"
+        )
+        print(
+            '  '
+            f"diag_open={snapshot['diag_open_started_count']:.2f} second_ok={snapshot['diag_second_pickup_feasible']:.2f} "
+            f"second_block={snapshot['diag_second_pickup_blocked_by_commitment']:.2f} delivery_masked={snapshot['diag_delivery_viability_masked']:.2f} "
+            f"fallback={snapshot['diag_delivery_viability_fallback']:.2f} pickup_tw={snapshot['diag_mask_pickup_tw']:.2f} "
+            f"ride={snapshot['diag_mask_ride_time']:.2f} trip={snapshot['diag_mask_trip_time']:.2f} "
+            f"ops={snapshot['diag_mask_ops_end']:.2f} commitment={snapshot['diag_mask_pickup_commitment']:.2f} "
+            f"depot_fallback={snapshot['diag_depot_fallback_used']:.2f}"
+        )
+    print(
+        f"result completed={result['completed']:.2f} picked={result['picked']:.2f} "
+        f"orphans={result['orphans']:.2f} dead_end={result['dead_end']:.2f} "
+        f"fallback={result['fallback']:.2f} no_move={result['no_move']:.2f}"
+    )
+    print('-' * 64)
 
 
 def run_episode(sample, policy, args, rng):
@@ -62,27 +141,60 @@ def run_episode(sample, policy, args, rng):
         enable_viability_fallback=args.enable_viability_fallback,
     )
     actions = []
+    trace = []
     max_depth = 0
     fallback_count = 0.0
     dead_end_count = 0.0
     no_move_count = 0.0
-    for _ in range(max(8, state.n_orders * 6)):
+
+    for step in range(max(16, state.n_orders * 8)):
         mask, debug = state.get_mask(return_debug=True)
         max_depth = max(max_depth, int(debug['diag_open_started_count'][0].item()))
-        fallback_count += float(debug['diag_delivery_viability_fallback'][0].item())
+        pickups, deliveries = _service_candidates(mask, state)
         open_count = int(debug['diag_open_started_count'][0].item())
-        feasible_delivery_count = int((~mask[0, 0, state.n_orders + 1:2 * state.n_orders + 1]).sum().item())
-        feasible_pickup_count = int((~mask[0, 0, 1:state.n_orders + 1]).sum().item())
-        if open_count > 0 and feasible_delivery_count == 0:
-            dead_end_count += 1.0
-        if state.get_finished().all():
+        fallback_flag = float(debug['diag_delivery_viability_fallback'][0].item())
+        fallback_count += fallback_flag
+        if args.enable_viability_fallback:
+            dead_end_count += fallback_flag
+
+        if args.trace_first_failure:
+            trace.append(_collect_trace_snapshot(state, mask, debug, pickups, deliveries, step, note='before_action'))
+
+        if not pickups and not deliveries:
+            if open_count > 0:
+                no_move_count += 1.0
+                if args.trace_first_failure:
+                    trace.append(_collect_trace_snapshot(state, mask, debug, pickups, deliveries, step, note='no_move_break'))
+                break
+            if state.get_finished().all():
+                if args.trace_first_failure:
+                    trace.append(_collect_trace_snapshot(state, mask, debug, pickups, deliveries, step, note='finished_break'))
+                break
+            if not bool(mask[0, 0, 0].item()):
+                actions.append(0)
+                if args.trace_first_failure:
+                    trace.append(_collect_trace_snapshot(state, mask, debug, pickups, deliveries, step, selected_action=('DEPOT', -1), note='depot_return'))
+                state = state.update(torch.tensor([0], dtype=torch.long, device=state.coords.device))
+                continue
+            if args.trace_first_failure:
+                trace.append(_collect_trace_snapshot(state, mask, debug, pickups, deliveries, step, note='blocked_break'))
             break
-        selected = choose_action(mask, state, policy, rng, batch)
-        if selected is None:
-            no_move_count += 1.0
+
+        selected_action = choose_action(state, policy, rng, batch, pickups, deliveries)
+        if selected_action is None:
+            if open_count > 0:
+                no_move_count += 1.0
+            if args.trace_first_failure:
+                trace.append(_collect_trace_snapshot(state, mask, debug, pickups, deliveries, step, note='selected_none_break'))
             break
+
+        kind, order_idx = selected_action
+        selected = order_idx + 1 if kind == 'P' else state.n_orders + order_idx + 1
         actions.append(selected)
-        state = state.update(torch.tensor([selected]))
+        if args.trace_first_failure:
+            trace.append(_collect_trace_snapshot(state, mask, debug, pickups, deliveries, step, selected_action=selected_action, note='apply_action'))
+        state = state.update(torch.tensor([selected], dtype=torch.long, device=state.coords.device))
+
     pi = torch.tensor([actions if actions else [0]], dtype=torch.long)
     _, details = MCVRPPDTW.get_costs(batch, pi, return_details=True)
     picked = float(details['completed_orders'][0].item() + details['pickup_only_orders'][0].item())
@@ -94,6 +206,7 @@ def run_episode(sample, policy, args, rng):
         'dead_end': float(dead_end_count),
         'fallback': float(fallback_count),
         'no_move': float(no_move_count),
+        'trace': trace,
     }
 
 
@@ -102,10 +215,15 @@ def main():
     dataset = MCVRPPDTWDataset(num_samples=args.num_samples, graph_size=args.graph_size, seed=args.seed)
     rng = random.Random(args.seed)
     totals = {'completed': 0.0, 'picked': 0.0, 'orphans': 0.0, 'max_depth': 0.0, 'dead_end': 0.0, 'fallback': 0.0, 'no_move': 0.0}
-    for sample in dataset:
+    traced_failure = False
+    for sample_idx, sample in enumerate(dataset):
         result = run_episode(sample, args.policy, args, rng)
         for key in totals:
             totals[key] += result[key]
+        if args.trace_first_failure and (not traced_failure):
+            if result['no_move'] > 0 or result['orphans'] > 0:
+                _print_trace(sample_idx, result['trace'], result)
+                traced_failure = True
     scale = float(args.num_samples)
     print('=' * 64)
     print('共享 mask 压力测试结果')

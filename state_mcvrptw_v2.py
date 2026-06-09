@@ -137,6 +137,126 @@ class StateMCVRPPDTW(NamedTuple):
                 return True
         return False
 
+    def _delivery_step_feasible(self, start_coord, start_time, trip_start_time, order_idx,
+                                delivery_coords, delivery_earliest, delivery_to_depot_time,
+                                passenger_orders, passenger_pickup_times, direct_ride_time):
+        delivery_coord = delivery_coords[order_idx]
+        current_time = float(start_time)
+        trip_start = float(trip_start_time)
+        travel_time = float(((delivery_coord - start_coord).norm(p=2) * self.AREA_SIZE / self.VEHICLE_SPEED).item())
+        arrival_time = current_time + travel_time
+        if passenger_orders[order_idx].item():
+            pickup_time = float(passenger_pickup_times[order_idx].item())
+            if pickup_time < 0:
+                return False, None, None
+            ride_time = arrival_time - pickup_time
+            excess_ride_time = max(ride_time - float(direct_ride_time[order_idx].item()), 0.0)
+            if Config.HARD_PASSENGER_MAX_RIDE_TIME and (
+                ride_time > Config.PASSENGER_MAX_RIDE_TIME_MINUTES / 60.0 + 1e-5
+                or excess_ride_time > Config.PASSENGER_MAX_EXCESS_RIDE_TIME_MINUTES / 60.0 + 1e-5
+            ):
+                return False, None, None
+        service_start = max(arrival_time, float(delivery_earliest[order_idx].item()))
+        finish_time = service_start + self.SERVICE_TIME
+        finish_with_return = finish_time + float(delivery_to_depot_time[order_idx].item())
+        if Config.HARD_MAX_TRIP_TIME and (finish_with_return - trip_start > self.MAX_TRIP_TIME + 1e-5):
+            return False, None, None
+        if Config.HARD_OPERATION_END and (finish_with_return > self.OPERATION_END + 1e-5):
+            return False, None, None
+        return True, delivery_coord, finish_time
+
+    def _has_any_physical_delivery_step(self, start_coord, start_time, trip_start_time, open_mask,
+                                        delivery_coords, delivery_earliest, delivery_to_depot_time,
+                                        passenger_orders, passenger_pickup_times, direct_ride_time):
+        open_indices = torch.nonzero(open_mask, as_tuple=False).squeeze(-1)
+        if open_indices.numel() == 0:
+            return True
+        for order_idx_tensor in open_indices:
+            order_idx = int(order_idx_tensor.item())
+            feasible_step, _, _ = self._delivery_step_feasible(
+                start_coord,
+                start_time,
+                trip_start_time,
+                order_idx,
+                delivery_coords,
+                delivery_earliest,
+                delivery_to_depot_time,
+                passenger_orders,
+                passenger_pickup_times,
+                direct_ride_time,
+            )
+            if feasible_step:
+                return True
+        return False
+
+    def _get_legal_delivery_orders(self, start_coord, start_time, trip_start_time, open_mask,
+                                   delivery_coords, delivery_earliest, delivery_to_depot_time,
+                                   passenger_orders, passenger_pickup_times, direct_ride_time,
+                                   allow_fallback=False):
+        open_indices = torch.nonzero(open_mask, as_tuple=False).squeeze(-1)
+        if open_indices.numel() == 0:
+            return [], [], False
+
+        physical_orders = []
+        viable_orders = []
+        for order_idx_tensor in open_indices:
+            order_idx = int(order_idx_tensor.item())
+            feasible_step, next_coord, finish_time = self._delivery_step_feasible(
+                start_coord,
+                start_time,
+                trip_start_time,
+                order_idx,
+                delivery_coords,
+                delivery_earliest,
+                delivery_to_depot_time,
+                passenger_orders,
+                passenger_pickup_times,
+                direct_ride_time,
+            )
+            if not feasible_step:
+                continue
+            physical_orders.append(order_idx)
+            open_after = open_mask.clone()
+            open_after[order_idx] = False
+            if self._has_legal_delivery_path(
+                next_coord,
+                finish_time,
+                trip_start_time,
+                open_after,
+                delivery_coords,
+                delivery_earliest,
+                delivery_to_depot_time,
+                passenger_orders,
+                passenger_pickup_times,
+                direct_ride_time,
+            ):
+                viable_orders.append(order_idx)
+
+        used_fallback = bool(allow_fallback and len(viable_orders) == 0 and len(physical_orders) > 0)
+        legal_orders = physical_orders if used_fallback else viable_orders
+        return legal_orders, physical_orders, used_fallback
+
+    def _has_legal_delivery_path(self, start_coord, start_time, trip_start_time, open_mask,
+                                 delivery_coords, delivery_earliest, delivery_to_depot_time,
+                                 passenger_orders, passenger_pickup_times, direct_ride_time):
+        open_indices = torch.nonzero(open_mask, as_tuple=False).squeeze(-1)
+        if open_indices.numel() == 0:
+            return True
+        legal_orders, _, _ = self._get_legal_delivery_orders(
+            start_coord,
+            start_time,
+            trip_start_time,
+            open_mask,
+            delivery_coords,
+            delivery_earliest,
+            delivery_to_depot_time,
+            passenger_orders,
+            passenger_pickup_times,
+            direct_ride_time,
+            allow_fallback=False,
+        )
+        return len(legal_orders) > 0
+
     @staticmethod
     def initialize(
         input_data,
@@ -238,7 +358,7 @@ class StateMCVRPPDTW(NamedTuple):
         order_idx = torch.where(has_candidate, order_idx, torch.full_like(order_idx, -1))
         return order_idx
 
-    def get_mask(self, return_debug=False):
+    def get_mask(self, return_debug=False, skip_pickup_commitment=False):
         batch_size = self.ids.size(0)
         n_orders = self.n_orders
         device = self.coords.device
@@ -397,7 +517,7 @@ class StateMCVRPPDTW(NamedTuple):
             debug['diag_mask_ops_end'] = (service_mask & ~before_mask).sum(1).float()
 
         pickup_commitment_mask = torch.zeros(batch_size, n_orders, dtype=torch.bool, device=device)
-        if n_orders > 0:
+        if n_orders > 0 and (not skip_pickup_commitment):
             pickup_coords = coords_active[:, 1:n_orders + 1, :]
             delivery_coords = coords_active[:, n_orders + 1:2 * n_orders + 1, :]
             delivery_earliest = time_windows_active[:, n_orders + 1:2 * n_orders + 1, 0]
@@ -427,6 +547,8 @@ class StateMCVRPPDTW(NamedTuple):
                     pickup_commitment_mask[batch_idx, candidate_indices] = True
                     second_pickup_blocked = int(candidate_indices.numel())
                 else:
+                    batch_state = self[batch_idx:batch_idx + 1]
+                    batch_mask = batch_state.get_mask(skip_pickup_commitment=True)
                     for candidate_idx_tensor in candidate_indices:
                         candidate_idx = int(candidate_idx_tensor.item())
                         open_after = open_before[batch_idx].clone()
@@ -435,10 +557,11 @@ class StateMCVRPPDTW(NamedTuple):
                             pickup_commitment_mask[batch_idx, candidate_idx] = True
                             second_pickup_blocked += 1
                             continue
+
                         passenger_pickup_times_after = passenger_pickup_times_before[batch_idx].clone()
                         if passenger_orders[batch_idx, candidate_idx].item():
                             passenger_pickup_times_after[candidate_idx] = pickup_finish[batch_idx, candidate_idx]
-                        feasible_completion = self._has_feasible_open_completion(
+                        completion_feasible = self._has_feasible_open_completion(
                             pickup_coords[batch_idx, candidate_idx],
                             pickup_finish[batch_idx, candidate_idx],
                             trip_start_after_pickup[batch_idx],
@@ -450,8 +573,46 @@ class StateMCVRPPDTW(NamedTuple):
                             passenger_pickup_times_after,
                             direct_ride_time[batch_idx],
                         )
-                        pickup_commitment_mask[batch_idx, candidate_idx] = not feasible_completion
-                        if feasible_completion:
+
+                        candidate_node = candidate_idx + 1
+                        selected = torch.tensor([candidate_node], dtype=torch.long, device=device)
+                        next_state = batch_state.update(selected, current_mask=batch_mask)
+                        next_mask = next_state.get_mask(skip_pickup_commitment=True)
+                        next_open_count = int(next_state.get_open_started_count()[0, 0].item())
+                        next_feasible_deliveries = int((~next_mask[0, 0, n_orders + 1:2 * n_orders + 1]).sum().item())
+                        next_state_feasible = (next_open_count == 0) or (next_feasible_deliveries > 0)
+
+                        fallback_safe = True
+                        if self.enable_viability_fallback and next_open_count > 0:
+                            next_delivery_coords = next_state.coords[:, n_orders + 1:2 * n_orders + 1, :][0]
+                            next_delivery_earliest = next_state.time_windows[:, n_orders + 1:2 * n_orders + 1, 0][0]
+                            next_delivery_to_depot_time = (
+                                (next_delivery_coords - next_state.coords[:, 0:1, :][0]).norm(p=2, dim=-1)
+                                * self.AREA_SIZE / self.VEHICLE_SPEED
+                            )
+                            next_passenger_orders = (next_state.node_type[:, 1:n_orders + 1] == 1)[0]
+                            next_passenger_pickup_times = next_state.passenger_pickup_time.squeeze(1)[0]
+                            next_direct_ride_time = (
+                                (next_state.coords[:, 1:n_orders + 1, :][0] - next_delivery_coords).norm(p=2, dim=-1)
+                                * self.AREA_SIZE / self.VEHICLE_SPEED
+                            )
+                            next_trip_start = next_state.trip_start_time[0, 0] if next_state.prev_a[0, 0].item() != 0 else next_state.current_time[0, 0]
+                            fallback_safe = self._has_any_physical_delivery_step(
+                                next_state.cur_coord[0, 0],
+                                next_state.current_time[0, 0],
+                                next_trip_start,
+                                next_state.get_open_started_mask()[0],
+                                next_delivery_coords,
+                                next_delivery_earliest,
+                                next_delivery_to_depot_time,
+                                next_passenger_orders,
+                                next_passenger_pickup_times,
+                                next_direct_ride_time,
+                            )
+
+                        candidate_feasible = completion_feasible and next_state_feasible and fallback_safe
+                        pickup_commitment_mask[batch_idx, candidate_idx] = not candidate_feasible
+                        if candidate_feasible:
                             second_pickup_feasible += 1
                         else:
                             second_pickup_blocked += 1
@@ -476,35 +637,29 @@ class StateMCVRPPDTW(NamedTuple):
             delivery_earliest = time_windows_active[:, n_orders + 1:2 * n_orders + 1, 0]
             direct_ride_time = direct_distance / self.VEHICLE_SPEED
             open_mask_full = self.get_open_started_mask()
-            physical_delivery_feasible = ~service_mask[:, n_orders:]
             for batch_idx in range(batch_size):
-                physical_delivery_indices = torch.nonzero(physical_delivery_feasible[batch_idx], as_tuple=False).squeeze(-1)
-                if physical_delivery_indices.numel() == 0:
+                trip_start = self.trip_start_time[batch_idx, 0] if self.prev_a[batch_idx, 0].item() != 0 else self.current_time[batch_idx, 0]
+                legal_orders, physical_orders, used_fallback = self._get_legal_delivery_orders(
+                    self.cur_coord[batch_idx, 0],
+                    self.current_time[batch_idx, 0],
+                    trip_start,
+                    open_mask_full[batch_idx],
+                    coords_active[batch_idx, n_orders + 1:2 * n_orders + 1, :],
+                    delivery_earliest[batch_idx],
+                    delivery_to_depot_time[batch_idx],
+                    passenger_orders[batch_idx],
+                    self.passenger_pickup_time.squeeze(1)[batch_idx],
+                    direct_ride_time[batch_idx],
+                    allow_fallback=self.enable_viability_fallback,
+                )
+                if len(physical_orders) == 0:
                     continue
-                delivery_kept = False
-                for delivery_idx_tensor in physical_delivery_indices:
-                    order_idx = int(delivery_idx_tensor.item())
-                    open_after = open_mask_full[batch_idx].clone()
-                    open_after[order_idx] = False
-                    feasible_completion = self._has_feasible_open_completion(
-                        coords_active[batch_idx, order_idx + n_orders + 1],
-                        torch.maximum(arrival_time[batch_idx, order_idx + n_orders + 1], delivery_earliest[batch_idx, order_idx]) + self.SERVICE_TIME,
-                        self.trip_start_time[batch_idx, 0] if self.prev_a[batch_idx, 0].item() != 0 else self.current_time[batch_idx, 0],
-                        open_after,
-                        coords_active[batch_idx, n_orders + 1:2 * n_orders + 1, :],
-                        delivery_earliest[batch_idx],
-                        delivery_to_depot_time[batch_idx],
-                        passenger_orders[batch_idx],
-                        self.passenger_pickup_time.squeeze(1)[batch_idx],
-                        direct_ride_time[batch_idx],
-                    )
-                    delivery_viability_mask[batch_idx, order_idx] = not feasible_completion
-                    if feasible_completion:
-                        delivery_kept = True
-                if self.enable_viability_fallback and physical_delivery_indices.numel() > 0 and not delivery_kept:
-                    delivery_viability_mask[batch_idx, physical_delivery_indices] = False
-                    if return_debug:
-                        debug['diag_delivery_viability_fallback'][batch_idx] = 1.0
+                legal_set = set(legal_orders)
+                for order_idx in physical_orders:
+                    if order_idx not in legal_set:
+                        delivery_viability_mask[batch_idx, order_idx] = True
+                if used_fallback and return_debug:
+                    debug['diag_delivery_viability_fallback'][batch_idx] = 1.0
             delivery_viability_mask_full = torch.zeros(batch_size, coords_active.size(1), dtype=torch.bool, device=device)
             delivery_viability_mask_full[:, n_orders + 1:2 * n_orders + 1] = delivery_viability_mask
             before_viability = service_mask.clone()
@@ -577,14 +732,15 @@ class StateMCVRPPDTW(NamedTuple):
             return mask.bool(), debug
         return mask.bool()
 
-    def update(self, selected):
+    def update(self, selected, current_mask=None):
         selected = selected[:, None]
         n_orders = self.n_orders
         DEPOT = 0
         reject_index = self.reject_index
 
         ids_flat, coords_active, node_type_active, time_windows_active, demand_p_active, demand_c_active = self._active_views()
-        current_mask = self.get_mask()
+        if current_mask is None:
+            current_mask = self.get_mask(skip_pickup_commitment=True)
         reject_targets = self._deterministic_reject_order(current_mask)
 
         is_reject = selected == reject_index
