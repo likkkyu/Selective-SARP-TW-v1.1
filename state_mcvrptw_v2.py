@@ -334,6 +334,68 @@ class StateMCVRPPDTW(NamedTuple):
             debug['diag_open_started_count'] = open_started_count.float()
             debug['diag_open_started_eq2'] = (open_started_count == 2).float()
 
+        if n_orders > 0:
+            order_indices = torch.arange(n_orders, device=device)
+            delivery_indices = order_indices + n_orders + 1
+            passenger_orders = (node_type_active[:, 1:n_orders + 1] == 1)
+            delivery_arrival = arrival_time.gather(1, delivery_indices.unsqueeze(0).expand(batch_size, -1))
+            pickup_finish_time = self.passenger_pickup_time.squeeze(1)
+            valid_pickup_time = pickup_finish_time >= 0
+            ride_time_hours = delivery_arrival - pickup_finish_time
+            direct_distance = torch.norm(
+                coords_active[:, 1:n_orders + 1, :] - coords_active[:, n_orders + 1:2 * n_orders + 1, :],
+                dim=-1
+            ) * self.AREA_SIZE
+            direct_ride_time_hours = direct_distance / self.VEHICLE_SPEED
+            excess_ride_time_hours = torch.clamp(ride_time_hours - direct_ride_time_hours, min=0.0)
+            passenger_total_ride_time_limit = Config.PASSENGER_MAX_RIDE_TIME_MINUTES / 60.0
+            passenger_excess_ride_time_limit = Config.PASSENGER_MAX_EXCESS_RIDE_TIME_MINUTES / 60.0
+            ride_time_violation = (
+                Config.HARD_PASSENGER_MAX_RIDE_TIME
+                & passenger_orders
+                & valid_pickup_time
+                & (
+                    (ride_time_hours > passenger_total_ride_time_limit + 1e-5)
+                    | (excess_ride_time_hours > passenger_excess_ride_time_limit + 1e-5)
+                )
+            )
+            ride_time_mask_full = torch.zeros(batch_size, coords_active.size(1), dtype=torch.bool, device=device)
+            ride_time_mask_full.scatter_(1, delivery_indices.unsqueeze(0).expand(batch_size, -1), ride_time_violation)
+        else:
+            ride_time_mask_full = torch.zeros(batch_size, coords_active.size(1), dtype=torch.bool, device=device)
+        before_mask = service_mask.clone()
+        service_mask |= ride_time_mask_full[:, 1:2 * n_orders + 1]
+        if return_debug:
+            debug['diag_mask_ride_time'] = (service_mask & ~before_mask).sum(1).float()
+
+        trip_mask_full = torch.zeros(batch_size, coords_active.size(1), dtype=torch.bool, device=device)
+        if Config.HARD_MAX_TRIP_TIME:
+            depot_coord = coords_active[:, 0:1, :]
+            dist_back = (coords_active - depot_coord).norm(p=2, dim=-1) * self.AREA_SIZE
+            time_back = dist_back / self.VEHICLE_SPEED
+            ongoing_trip_total = (arrival_time + self.SERVICE_TIME + time_back) - self.trip_start_time
+            fresh_trip_total = travel_time + self.SERVICE_TIME + time_back
+            predicted_total = torch.where(self.prev_a == 0, fresh_trip_total, ongoing_trip_total)
+            trip_mask_full = predicted_total > self.MAX_TRIP_TIME + 1e-5
+            trip_mask_full[:, 0] = False
+        before_mask = service_mask.clone()
+        service_mask |= trip_mask_full[:, 1:2 * n_orders + 1]
+        if return_debug:
+            debug['diag_mask_trip_time'] = (service_mask & ~before_mask).sum(1).float()
+
+        ops_end_mask_full = torch.zeros(batch_size, coords_active.size(1), dtype=torch.bool, device=device)
+        if Config.HARD_OPERATION_END:
+            depot_coord_v6 = coords_active[:, 0:1, :]
+            dist_back_v6 = (coords_active - depot_coord_v6).norm(p=2, dim=-1) * self.AREA_SIZE
+            time_back_v6 = dist_back_v6 / self.VEHICLE_SPEED
+            predicted_finish = arrival_time + self.SERVICE_TIME + time_back_v6
+            ops_end_mask_full = predicted_finish > self.OPERATION_END + 1e-5
+            ops_end_mask_full[:, 0] = False
+        before_mask = service_mask.clone()
+        service_mask |= ops_end_mask_full[:, 1:2 * n_orders + 1]
+        if return_debug:
+            debug['diag_mask_ops_end'] = (service_mask & ~before_mask).sum(1).float()
+
         pickup_commitment_mask = torch.zeros(batch_size, n_orders, dtype=torch.bool, device=device)
         if n_orders > 0:
             pickup_coords = coords_active[:, 1:n_orders + 1, :]
@@ -353,10 +415,10 @@ class StateMCVRPPDTW(NamedTuple):
             direct_ride_time = (
                 (pickup_coords - delivery_coords).norm(p=2, dim=-1) * self.AREA_SIZE / self.VEHICLE_SPEED
             )
-            pickup_blocked_before_commitment = service_mask[:, :n_orders].clone()
+            pickup_physical_feasible = ~service_mask[:, :n_orders]
 
             for batch_idx in range(batch_size):
-                candidate_indices = torch.nonzero(~pickup_blocked_before_commitment[batch_idx], as_tuple=False).squeeze(-1)
+                candidate_indices = torch.nonzero(pickup_physical_feasible[batch_idx], as_tuple=False).squeeze(-1)
                 if candidate_indices.numel() == 0:
                     continue
                 second_pickup_feasible = 0
@@ -405,56 +467,6 @@ class StateMCVRPPDTW(NamedTuple):
         if return_debug:
             debug['diag_mask_pickup_commitment'] = (service_mask & ~before_mask).sum(1).float()
 
-        if n_orders > 0:
-            order_indices = torch.arange(n_orders, device=device)
-            delivery_indices = order_indices + n_orders + 1
-            passenger_orders = (node_type_active[:, 1:n_orders + 1] == 1)
-            delivery_arrival = arrival_time.gather(1, delivery_indices.unsqueeze(0).expand(batch_size, -1))
-            pickup_finish_time = self.passenger_pickup_time.squeeze(1)
-            valid_pickup_time = pickup_finish_time >= 0
-            ride_time_hours = delivery_arrival - pickup_finish_time
-            direct_distance = torch.norm(
-                coords_active[:, 1:n_orders + 1, :] - coords_active[:, n_orders + 1:2 * n_orders + 1, :],
-                dim=-1
-            ) * self.AREA_SIZE
-            direct_ride_time_hours = direct_distance / self.VEHICLE_SPEED
-            excess_ride_time_hours = torch.clamp(ride_time_hours - direct_ride_time_hours, min=0.0)
-            passenger_total_ride_time_limit = Config.PASSENGER_MAX_RIDE_TIME_MINUTES / 60.0
-            passenger_excess_ride_time_limit = Config.PASSENGER_MAX_EXCESS_RIDE_TIME_MINUTES / 60.0
-            ride_time_violation = (
-                Config.HARD_PASSENGER_MAX_RIDE_TIME
-                & passenger_orders
-                & valid_pickup_time
-                & (
-                    (ride_time_hours > passenger_total_ride_time_limit + 1e-5)
-                    | (excess_ride_time_hours > passenger_excess_ride_time_limit + 1e-5)
-                )
-            )
-            ride_time_mask_full = torch.zeros(batch_size, coords_active.size(1), dtype=torch.bool, device=device)
-            ride_time_mask_full.scatter_(1, delivery_indices.unsqueeze(0).expand(batch_size, -1), ride_time_violation)
-
-        else:
-            ride_time_mask_full = torch.zeros(batch_size, coords_active.size(1), dtype=torch.bool, device=device)
-        before_mask = service_mask.clone()
-        service_mask |= ride_time_mask_full[:, 1:2 * n_orders + 1]
-        if return_debug:
-            debug['diag_mask_ride_time'] = (service_mask & ~before_mask).sum(1).float()
-
-        trip_mask_full = torch.zeros(batch_size, coords_active.size(1), dtype=torch.bool, device=device)
-        if Config.HARD_MAX_TRIP_TIME:
-            depot_coord = coords_active[:, 0:1, :]
-            dist_back = (coords_active - depot_coord).norm(p=2, dim=-1) * self.AREA_SIZE
-            time_back = dist_back / self.VEHICLE_SPEED
-            ongoing_trip_total = (arrival_time + self.SERVICE_TIME + time_back) - self.trip_start_time
-            fresh_trip_total = travel_time + self.SERVICE_TIME + time_back
-            predicted_total = torch.where(self.prev_a == 0, fresh_trip_total, ongoing_trip_total)
-            trip_mask_full = predicted_total > self.MAX_TRIP_TIME + 1e-5
-            trip_mask_full[:, 0] = False
-        before_mask = service_mask.clone()
-        service_mask |= trip_mask_full[:, 1:2 * n_orders + 1]
-        if return_debug:
-            debug['diag_mask_trip_time'] = (service_mask & ~before_mask).sum(1).float()
-
         if n_orders > 0 and self.enable_delivery_viability:
             delivery_viability_mask = torch.zeros(batch_size, n_orders, dtype=torch.bool, device=device)
             delivery_to_depot_time = (
@@ -464,13 +476,13 @@ class StateMCVRPPDTW(NamedTuple):
             delivery_earliest = time_windows_active[:, n_orders + 1:2 * n_orders + 1, 0]
             direct_ride_time = direct_distance / self.VEHICLE_SPEED
             open_mask_full = self.get_open_started_mask()
-            feasible_delivery_now = ~(service_mask[:, n_orders:] | ride_time_mask_full[:, n_orders + 1:2 * n_orders + 1] | trip_mask_full[:, n_orders + 1:2 * n_orders + 1])
+            physical_delivery_feasible = ~service_mask[:, n_orders:]
             for batch_idx in range(batch_size):
-                feasible_delivery_indices = torch.nonzero(feasible_delivery_now[batch_idx], as_tuple=False).squeeze(-1)
-                if feasible_delivery_indices.numel() == 0:
+                physical_delivery_indices = torch.nonzero(physical_delivery_feasible[batch_idx], as_tuple=False).squeeze(-1)
+                if physical_delivery_indices.numel() == 0:
                     continue
                 delivery_kept = False
-                for delivery_idx_tensor in feasible_delivery_indices:
+                for delivery_idx_tensor in physical_delivery_indices:
                     order_idx = int(delivery_idx_tensor.item())
                     open_after = open_mask_full[batch_idx].clone()
                     open_after[order_idx] = False
@@ -489,8 +501,8 @@ class StateMCVRPPDTW(NamedTuple):
                     delivery_viability_mask[batch_idx, order_idx] = not feasible_completion
                     if feasible_completion:
                         delivery_kept = True
-                if self.enable_viability_fallback and feasible_delivery_indices.numel() > 0 and not delivery_kept:
-                    delivery_viability_mask[batch_idx, feasible_delivery_indices] = False
+                if self.enable_viability_fallback and physical_delivery_indices.numel() > 0 and not delivery_kept:
+                    delivery_viability_mask[batch_idx, physical_delivery_indices] = False
                     if return_debug:
                         debug['diag_delivery_viability_fallback'][batch_idx] = 1.0
             delivery_viability_mask_full = torch.zeros(batch_size, coords_active.size(1), dtype=torch.bool, device=device)
@@ -499,19 +511,6 @@ class StateMCVRPPDTW(NamedTuple):
             service_mask |= delivery_viability_mask_full[:, 1:2 * n_orders + 1]
             if return_debug:
                 debug['diag_delivery_viability_masked'] = (service_mask & ~before_viability).sum(1).float()
-
-        ops_end_mask_full = torch.zeros(batch_size, coords_active.size(1), dtype=torch.bool, device=device)
-        if Config.HARD_OPERATION_END:
-            depot_coord_v6 = coords_active[:, 0:1, :]
-            dist_back_v6 = (coords_active - depot_coord_v6).norm(p=2, dim=-1) * self.AREA_SIZE
-            time_back_v6 = dist_back_v6 / self.VEHICLE_SPEED
-            predicted_finish = arrival_time + self.SERVICE_TIME + time_back_v6
-            ops_end_mask_full = predicted_finish > self.OPERATION_END + 1e-5
-            ops_end_mask_full[:, 0] = False
-        before_mask = service_mask.clone()
-        service_mask |= ops_end_mask_full[:, 1:2 * n_orders + 1]
-        if return_debug:
-            debug['diag_mask_ops_end'] = (service_mask & ~before_mask).sum(1).float()
 
         mask = self.visited.clone()
         if n_orders > 0:

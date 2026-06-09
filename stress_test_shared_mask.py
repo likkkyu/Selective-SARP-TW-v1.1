@@ -12,26 +12,41 @@ def parse_args():
     parser.add_argument('--graph-size', type=int, default=25)
     parser.add_argument('--num-samples', type=int, default=24)
     parser.add_argument('--seed', type=int, default=12345)
-    parser.add_argument('--policy', type=str, default='bad', choices=['bad', 'random'])
+    parser.add_argument('--policy', type=str, default='bad', choices=['bad', 'random', 'oracle'])
     parser.add_argument('--max-concurrent-open-orders', type=int, default=6)
     parser.add_argument('--enable-delivery-viability', action='store_true')
     parser.add_argument('--enable-viability-fallback', action='store_true')
     return parser.parse_args()
 
 
-def choose_action(mask, state, policy, rng):
+def _node_coord(batch, node_idx):
+    if node_idx == 0:
+        return batch['depot'][0]
+    return batch['loc'][0, node_idx - 1]
+
+
+def choose_action(mask, state, policy, rng, batch):
     feasible = (~mask[0, 0]).nonzero(as_tuple=False).squeeze(-1).tolist()
     pickups = [idx for idx in feasible if 1 <= idx <= state.n_orders]
     deliveries = [idx for idx in feasible if state.n_orders + 1 <= idx <= 2 * state.n_orders]
+    cur_coord = state.cur_coord[0, 0]
     if policy == 'bad':
         if pickups:
-            return max(pickups)
+            return max(pickups, key=lambda idx: torch.norm(_node_coord(batch, idx) - cur_coord).item())
         if deliveries:
-            return max(deliveries)
+            return max(deliveries, key=lambda idx: torch.norm(_node_coord(batch, idx) - cur_coord).item())
         if 0 in feasible:
             return 0
         if state.reject_index in feasible:
             return state.reject_index
+        return None
+    if policy == 'oracle':
+        if deliveries:
+            return min(deliveries, key=lambda idx: float(batch['time_windows'][0, idx - 1, 1].item()))
+        if pickups:
+            return min(pickups, key=lambda idx: float(batch['time_windows'][0, idx - 1, 1].item()))
+        if 0 in feasible:
+            return 0
         return None
     if feasible:
         return rng.choice(feasible)
@@ -62,7 +77,7 @@ def run_episode(sample, policy, args, rng):
             dead_end_count += 1.0
         if state.get_finished().all():
             break
-        selected = choose_action(mask, state, policy, rng)
+        selected = choose_action(mask, state, policy, rng, batch)
         if selected is None:
             no_move_count += 1.0
             break
