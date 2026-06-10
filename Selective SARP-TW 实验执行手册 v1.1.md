@@ -89,7 +89,7 @@
 | 乘客大组 | {3,4,5} | {3,4} | `randint(3,6)`→`randint(3,5)`（950） |
 | 货物需求 | 1–5 | 1–3 | `randint(1,6)`→`randint(1,4)`（939，且乘客被覆盖） |
 | 乘客占比 | 0.4/0.25 | 0.6 | `PASSENGER_RATIO=0.6`，复核 LARGE 档（99–100） |
-| 乘客 TW 宽 | 1.0 h | 0.5 h | `PASSENGER_TW_WIDTH=0.5`（57） |
+| 乘客 TW 宽 | 1.0 h | 1.0 h | `PASSENGER_TW_WIDTH=1.0`（58） |
 | 货物 TW 宽 | 2.0 h | 1.0 h | `CARGO_TW_WIDTH=1.0`（58） |
 
 # 第 3 章 · RL 环境与 5 层 mask
@@ -272,7 +272,7 @@ all_logits = torch.cat([node_logits, reject_logit], dim=-1) # N+1 -> N+2
 | CARGO_CAPACITY | 50 | **20** | 货物容量（单位） |
 | OPERATION_START/END | 10/16 | 同 | 运营时段 |
 | MAX_TRIP_TIME | 3.0 | 3.0 | 单趟上限(h) |
-| PASSENGER_TW_WIDTH | 1.0 | **0.5** | 乘客 TW(h) |
+| PASSENGER_TW_WIDTH | 1.0 | **1.0** | 乘客 TW(h) |
 | CARGO_TW_WIDTH | 2.0 | **1.0** | 货物 TW(h) |
 | SERVICE_TIME | 5/60 | **3/60** | 每节点服务(h) |
 | VEHICLE_SPEED | 25.0 | 25.0 | km/h |

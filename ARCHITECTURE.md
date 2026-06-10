@@ -109,7 +109,7 @@ class Config:
     PASSENGER_WEIGHT_KG  = 65.0
     CARGO_UNIT_WEIGHT_KG = 1.0
 
-    PASSENGER_TW_WIDTH = 0.5
+    PASSENGER_TW_WIDTH = 1.0
     CARGO_TW_WIDTH     = 1.0
     PASSENGER_RATIO    = 0.6
     PASSENGER_RATIO_LARGE = 0.6
@@ -241,7 +241,7 @@ class Config:
 |---|---|
 | Passenger Capacity | 15 |
 | Cargo Capacity | 20 |
-| Passenger TW Width | 0.5 h |
+| Passenger TW Width | 1.0 h |
 | Cargo TW Width | 1.0 h |
 | Service Time | 3 min |
 | Passenger Ratio | 0.6 |

@@ -10,6 +10,7 @@ Multi-Compartment VRP with Pickup-Delivery and Time Windows
 
 import argparse
 import json
+import math
 import os
 import time
 
@@ -97,6 +98,8 @@ class POMOTrainerOptimized:
         self.val_log = []
         self.start_epoch = 1
         self.best_val_objective = float('inf')
+        self.best_service_key = None
+        self.best_service_rate = float('-inf')
 
         if args.resume_path:
             self._load_checkpoint(args.resume_path)
@@ -114,6 +117,13 @@ class POMOTrainerOptimized:
         print(f"Device: {self.device}")
         print(f"Graph size: {self.args.graph_size} orders")
         print(f"Normalization profile: {json.dumps(self.normalization_profile, ensure_ascii=False)}")
+        print(f"Shared env defaults: max_open={self.args.max_concurrent_open_orders}, "
+              f"delivery_viability={self.args.enable_delivery_viability}, "
+              f"viability_fallback={self.args.enable_viability_fallback}")
+        print(f"Reward profile: energy={self.args.alpha_energy}, delay={self.args.alpha_delay}, "
+              f"vehicle={self.args.alpha_vehicle}, reject={self.args.alpha_reject}, "
+              f"unfulfilled={self.args.alpha_unfulfilled}, overtime={self.args.alpha_trip_overtime}")
+        print(f"Passenger pickup TW width: {Config.PASSENGER_TW_WIDTH:.1f} h")
         print(f"Model params: {sum(p.numel() for p in self.model.parameters()):,}")
 
     def _prepare_normalization_profile(self):
@@ -160,6 +170,76 @@ class POMOTrainerOptimized:
     def _to_device(self, batch):
         return {key: value.to(self.device) if torch.is_tensor(value) else value for key, value in batch.items()}
 
+    def _build_state_kwargs(self, allow_reject):
+        return {
+            'allow_reject': allow_reject,
+            'deadlock_limit': self.args.deadlock_limit,
+            'max_concurrent_open_orders': self.args.max_concurrent_open_orders,
+            'enable_delivery_viability': self.args.enable_delivery_viability,
+            'enable_viability_fallback': self.args.enable_viability_fallback,
+        }
+
+    def _build_curriculum_dataset_kwargs(self, epoch):
+        if not self.args.enable_rideshare_curriculum:
+            return {}
+
+        phase1_epochs = max(1, self.args.curriculum_warmup_epochs)
+        phase2_epochs = max(1, self.args.curriculum_mix_epochs)
+        if epoch <= phase1_epochs:
+            return {
+                'passenger_ratio_override': self.args.curriculum_phase1_passenger_ratio,
+                'passenger_distance_mix_override': (
+                    self.args.curriculum_phase1_short_ratio,
+                    self.args.curriculum_phase1_mid_ratio,
+                    self.args.curriculum_phase1_long_ratio,
+                ),
+                'passenger_tw_period_weights_override': (
+                    self.args.curriculum_phase1_passenger_tw_morning,
+                    self.args.curriculum_phase1_passenger_tw_midday,
+                    self.args.curriculum_phase1_passenger_tw_evening,
+                ),
+                'cargo_tw_period_weights_override': (
+                    self.args.curriculum_phase1_cargo_tw_morning,
+                    self.args.curriculum_phase1_cargo_tw_midday,
+                    self.args.curriculum_phase1_cargo_tw_evening,
+                ),
+            }
+
+        if epoch <= phase1_epochs + phase2_epochs:
+            return {
+                'passenger_ratio_override': self.args.curriculum_phase2_passenger_ratio,
+                'passenger_distance_mix_override': (
+                    self.args.curriculum_phase2_short_ratio,
+                    self.args.curriculum_phase2_mid_ratio,
+                    self.args.curriculum_phase2_long_ratio,
+                ),
+                'passenger_tw_period_weights_override': (
+                    self.args.curriculum_phase2_passenger_tw_morning,
+                    self.args.curriculum_phase2_passenger_tw_midday,
+                    self.args.curriculum_phase2_passenger_tw_evening,
+                ),
+                'cargo_tw_period_weights_override': (
+                    self.args.curriculum_phase2_cargo_tw_morning,
+                    self.args.curriculum_phase2_cargo_tw_midday,
+                    self.args.curriculum_phase2_cargo_tw_evening,
+                ),
+            }
+
+        return {}
+
+    def _describe_curriculum(self, epoch):
+        kwargs = self._build_curriculum_dataset_kwargs(epoch)
+        if not kwargs:
+            return 'default-distribution'
+        passenger_ratio = kwargs.get('passenger_ratio_override')
+        distance_mix = kwargs.get('passenger_distance_mix_override')
+        tw_mix = kwargs.get('passenger_tw_period_weights_override')
+        return (
+            f"curriculum(passenger_ratio={passenger_ratio:.2f}, "
+            f"distance_mix={tuple(round(v, 2) for v in distance_mix)}, "
+            f"passenger_tw={tuple(round(v, 2) for v in tw_mix)})"
+        )
+
     def _repeat_for_pomo(self, batch, pomo_size):
         return {
             key: value.repeat_interleave(pomo_size, dim=0) if torch.is_tensor(value) else value
@@ -188,14 +268,32 @@ class POMOTrainerOptimized:
         min_cost = costs.min(dim=1)[0].mean()
         return loss, min_cost
 
+    @staticmethod
+    def _service_priority_key(results):
+        return (
+            float(results.get('service_rate', 0.0)),
+            -float(results.get('unfulfilled_rate', 1.0)),
+            -float(results.get('rejected_rate', 1.0)),
+            -float(results.get('avg_objective', float('inf'))),
+        )
+
+    def _augment_service_metrics(self, results):
+        graph_size = max(int(self.args.graph_size), 1)
+        service_rate = float(results.get('avg_completed_orders', 0.0)) / graph_size
+        rejected_rate = float(results.get('avg_rejected_orders', 0.0)) / graph_size
+        unfulfilled_rate = float(results.get('avg_unfulfilled_orders', 0.0)) / graph_size
+        results['service_rate'] = service_rate
+        results['completed_rate'] = service_rate
+        results['rejected_rate'] = rejected_rate
+        results['unfulfilled_rate'] = unfulfilled_rate
+        results['non_service_rate'] = min(1.0, rejected_rate + unfulfilled_rate)
+        return results
+
     def train_epoch(self, epoch, train_loader):
         self.model.train()
         set_decode_type(self.model, 'sampling')
         allow_reject = epoch > self.args.reject_warmup_epochs
-        state_kwargs = {
-            'allow_reject': allow_reject,
-            'deadlock_limit': self.args.deadlock_limit,
-        }
+        state_kwargs = self._build_state_kwargs(allow_reject=allow_reject)
 
         epoch_loss = 0.0
         epoch_objective = 0.0
@@ -249,6 +347,7 @@ class POMOTrainerOptimized:
         }
         debug_buffers = {} if self.args.collect_mask_diagnostics else None
 
+        val_state_kwargs = self._build_state_kwargs(allow_reject=True)
         with torch.no_grad():
             for batch in tqdm(val_loader, desc='Validating'):
                 batch = self._to_device(batch)
@@ -256,7 +355,7 @@ class POMOTrainerOptimized:
                     objective_cost, _, pi, debug = self.model(
                         batch,
                         return_pi=True,
-                        state_kwargs={'allow_reject': True, 'deadlock_limit': self.args.deadlock_limit},
+                        state_kwargs=val_state_kwargs,
                         return_debug=True,
                     )
                     for key, value in debug.items():
@@ -265,7 +364,7 @@ class POMOTrainerOptimized:
                     objective_cost, _, pi = self.model(
                         batch,
                         return_pi=True,
-                        state_kwargs={'allow_reject': True, 'deadlock_limit': self.args.deadlock_limit}
+                        state_kwargs=val_state_kwargs
                     )
                 _, details = self.problem.get_costs(batch, pi, return_details=True)
 
@@ -308,6 +407,7 @@ class POMOTrainerOptimized:
             'avg_passenger_ride_time_violations': detail_buffers['passenger_total_ride_time_violations'].mean().item(),
             'avg_passenger_delay_cost': detail_buffers['passenger_delivery_delay_cost_raw'].mean().item(),
         }
+        results = self._augment_service_metrics(results)
         if debug_buffers is not None:
             for key, value in debug_buffers.items():
                 results[key] = value.mean().item()
@@ -323,6 +423,8 @@ class POMOTrainerOptimized:
         print(f"Epochs: {self.args.n_epochs}")
         print(f"Reject warmup epochs: {self.args.reject_warmup_epochs}")
         print(f"Reject init bias: {self.args.reject_init_bias}")
+        print(f"Shared env: {self._build_state_kwargs(allow_reject=True)}")
+        print(f"Curriculum enabled: {self.args.enable_rideshare_curriculum}")
         print('=' * 70)
 
         os.makedirs(self.args.save_dir, exist_ok=True)
@@ -339,11 +441,15 @@ class POMOTrainerOptimized:
         )
 
         best_val_objective = self.best_val_objective
+        best_service_key = self.best_service_key
+        best_service_rate = self.best_service_rate
         for epoch in range(self.start_epoch, self.args.n_epochs + 1):
+            curriculum_kwargs = self._build_curriculum_dataset_kwargs(epoch)
             train_dataset = MCVRPPDTWDataset(
                 num_samples=self.args.epoch_size,
                 graph_size=self.args.graph_size,
                 seed=epoch * 1000,
+                **curriculum_kwargs,
             )
             train_loader = DataLoader(
                 train_dataset,
@@ -362,6 +468,7 @@ class POMOTrainerOptimized:
             print(f"\nEpoch {epoch}/{self.args.n_epochs}:")
             print(f"  Train Loss: {train_loss:.4f}")
             print(f"  Train Objective: {train_objective:.2f}")
+            print(f"  Data Profile: {self._describe_curriculum(epoch)}")
             print(f"  Val Objective: {val_results['avg_objective']:.2f} +/- {val_results['std_objective']:.2f}")
             print(f"  Val Cost (CNY): {val_results['avg_cost']:.2f} +/- {val_results['std_cost']:.2f}")
             print(f"  Energy: {val_results['avg_energy_cost']:.2f} RMB")
@@ -376,6 +483,9 @@ class POMOTrainerOptimized:
             print(f"  Avg Completed Orders: {val_results['avg_completed_orders']:.2f}")
             print(f"  Avg Rejected Orders: {val_results['avg_rejected_orders']:.2f}")
             print(f"  Avg Unfulfilled Orders: {val_results['avg_unfulfilled_orders']:.2f}")
+            print(f"  Service Rate: {val_results['service_rate']:.3f}")
+            print(f"  Rejected Rate: {val_results['rejected_rate']:.3f}")
+            print(f"  Unfulfilled Rate: {val_results['unfulfilled_rate']:.3f}")
             print(f"  Avg Pickup-only Orders: {val_results['avg_pickup_only_orders']:.2f}")
             print(f"  Avg Started-not-completed Orders: {val_results['avg_started_not_completed_orders']:.2f}")
             print(f"  Vehicle Cost: {val_results['avg_vehicle_cost']:.2f} RMB")
@@ -394,13 +504,27 @@ class POMOTrainerOptimized:
                 print(f"    Mask by trip time         : {val_results.get('diag_mask_trip_time', 0.0):.2f}")
                 print(f"    Mask by ops end           : {val_results.get('diag_mask_ops_end', 0.0):.2f}")
                 print(f"    Mask by pickup commitment : {val_results.get('diag_mask_pickup_commitment', 0.0):.2f}")
+                print(f"    Open started count        : {val_results.get('diag_open_started_count', 0.0):.2f}")
+                print(f"    Second pickup feasible    : {val_results.get('diag_second_pickup_feasible', 0.0):.2f}")
+                print(f"    Delivery viability masked : {val_results.get('diag_delivery_viability_masked', 0.0):.2f}")
+                print(f"    Delivery fallback rate    : {val_results.get('diag_delivery_viability_fallback', 0.0):.2f}")
                 print(f"    Mask by vehicle limit     : {val_results.get('diag_mask_vehicle_limit', 0.0):.2f}")
                 print(f"    Reject predeparture rate  : {val_results.get('diag_reject_predeparture_available', 0.0):.2f}")
                 print(f"    Reject in-route rate      : {val_results.get('diag_reject_inroute_available', 0.0):.2f}")
 
+            service_key = self._service_priority_key(val_results)
+            if best_service_key is None or service_key > best_service_key:
+                best_service_key = service_key
+                best_service_rate = float(val_results['service_rate'])
+                self.best_service_key = best_service_key
+                self.best_service_rate = best_service_rate
+                self._save_model(epoch, val_results, 'best')
+                print('  [Saved best model by service rate]')
+
             if val_results['avg_objective'] < best_val_objective:
                 best_val_objective = val_results['avg_objective']
-                self._save_model(epoch, val_results, 'best')
+                self.best_val_objective = best_val_objective
+                self._save_model(epoch, val_results, 'best_objective')
                 print('  [Saved best model by objective]')
 
             if self.args.save_interval > 0 and epoch % self.args.save_interval == 0 and epoch != self.args.n_epochs:
@@ -409,11 +533,19 @@ class POMOTrainerOptimized:
         self._save_model(self.args.n_epochs, val_results, 'final')
         self._save_logs()
 
+        self.best_service_key = best_service_key
+        self.best_service_rate = best_service_rate
+        self.best_val_objective = best_val_objective
+
         print('\n' + '=' * 70)
         print('Training Complete!')
+        print(f"Best validation service rate: {best_service_rate:.3f}")
         print(f"Best validation objective: {best_val_objective:.2f}")
         print('=' * 70)
-        return best_val_objective
+        return {
+            'best_service_rate': best_service_rate,
+            'best_objective': best_val_objective,
+        }
 
     def _save_model(self, epoch, results, name):
         path = os.path.join(self.args.save_dir, f'model_{name}.pt')
@@ -436,15 +568,27 @@ class POMOTrainerOptimized:
                     'AREA_SIZE': Config.AREA_SIZE,
                     'PASSENGER_CAPACITY': Config.PASSENGER_CAPACITY,
                     'CARGO_CAPACITY': Config.CARGO_CAPACITY,
+                    'PASSENGER_TW_WIDTH': Config.PASSENGER_TW_WIDTH,
                     'MAX_TRIP_TIME': Config.MAX_TRIP_TIME,
                     'ELECTRICITY_PRICE': Config.ELECTRICITY_PRICE,
                     'PASSENGER_DELAY_COST': Config.PASSENGER_DELAY_COST,
                     'CARGO_DELAY_COST': Config.CARGO_DELAY_COST,
-                    'ALPHA_REJECT': Config.ALPHA_REJECT,
-                    'ALPHA_UNFULFILLED': Config.ALPHA_UNFULFILLED,
+                    'ALPHA_ENERGY': self.args.alpha_energy,
+                    'ALPHA_DELAY': self.args.alpha_delay,
+                    'ALPHA_VEHICLE': self.args.alpha_vehicle,
+                    'ALPHA_REJECT': self.args.alpha_reject,
+                    'ALPHA_UNFULFILLED': self.args.alpha_unfulfilled,
+                    'ALPHA_TRIP_OVERTIME': self.args.alpha_trip_overtime,
                     'VEHICLE_SPEED': Config.VEHICLE_SPEED,
                     'OPERATION_START': Config.OPERATION_START,
+                    'reject_warmup_epochs': self.args.reject_warmup_epochs,
+                    'reject_init_bias': self.args.reject_init_bias,
+                    'best_checkpoint_metric': 'service_rate',
                     'OPERATION_END': Config.OPERATION_END,
+                    'max_concurrent_open_orders': self.args.max_concurrent_open_orders,
+                    'enable_delivery_viability': self.args.enable_delivery_viability,
+                    'enable_viability_fallback': self.args.enable_viability_fallback,
+                    'enable_rideshare_curriculum': self.args.enable_rideshare_curriculum,
                 },
                 'normalization_profile': self.normalization_profile,
             }, log_file, indent=2, ensure_ascii=False)
@@ -464,10 +608,17 @@ class POMOTrainerOptimized:
         if saved_profile:
             self.normalization_profile = Config.set_normalization_profile(self.args.graph_size, saved_profile)
         self.start_epoch = int(checkpoint.get('epoch', 0)) + 1
-        self.best_val_objective = float(checkpoint.get('results', {}).get('avg_objective', float('inf')))
+        saved_results = checkpoint.get('results', {}) or {}
+        self.best_val_objective = float(saved_results.get('avg_objective', float('inf')))
+        if saved_results:
+            saved_results = self._augment_service_metrics(dict(saved_results))
+            self.best_service_key = self._service_priority_key(saved_results)
+            self.best_service_rate = float(saved_results.get('service_rate', float('-inf')))
         print(f"[Resume] Loaded checkpoint: {checkpoint_path}")
         print(f"[Resume] Start epoch: {self.start_epoch}")
         print(f"[Resume] Best objective so far: {self.best_val_objective:.2f}")
+        if self.best_service_key is not None:
+            print(f"[Resume] Best service rate so far: {self.best_service_rate:.3f}")
 
 
 def parse_args():
@@ -507,6 +658,39 @@ def parse_args():
     parser.add_argument('--reject-init-bias', type=float, default=-2.0, help='reject head 的初始 bias，负值用于抑制早期 reject')
     parser.add_argument('--collect-mask-diagnostics', action='store_true', help='在验证/评估中收集 mask 与动作可行性诊断指标')
     parser.add_argument('--deadlock-limit', type=int, default=2, help='连续回 depot 且无可服务节点时的终止阈值')
+    parser.add_argument('--max-concurrent-open-orders', type=int, default=6, help='共享主线：允许的最大并发 open 单数量')
+    parser.add_argument('--enable-delivery-viability', action='store_true', default=True, help='共享主线：启用 delivery viability')
+    parser.add_argument('--disable-delivery-viability', action='store_false', dest='enable_delivery_viability', help='关闭 delivery viability（仅对照实验）')
+    parser.add_argument('--enable-viability-fallback', action='store_true', default=False, help='启用 delivery viability fallback（仅对照实验）')
+    parser.add_argument('--alpha-energy', type=float, default=Config.ALPHA_ENERGY, help='训练 objective 中 energy 项的权重')
+    parser.add_argument('--alpha-delay', type=float, default=Config.ALPHA_DELAY, help='训练 objective 中 delay 项的权重')
+    parser.add_argument('--alpha-vehicle', type=float, default=Config.ALPHA_VEHICLE, help='训练 objective 中 vehicle 项的权重')
+    parser.add_argument('--alpha-reject', type=float, default=Config.ALPHA_REJECT, help='训练 objective 中 reject 惩罚')
+    parser.add_argument('--alpha-unfulfilled', type=float, default=Config.ALPHA_UNFULFILLED, help='训练 objective 中 unfulfilled 惩罚')
+    parser.add_argument('--alpha-trip-overtime', type=float, default=Config.ALPHA_TRIP_OVERTIME, help='训练 objective 中 trip overtime 惩罚')
+    parser.add_argument('--enable-rideshare-curriculum', action='store_true', help='按 epoch 使用轻量共享导向 curriculum')
+    parser.add_argument('--curriculum-warmup-epochs', type=int, default=5, help='curriculum 第 1 阶段持续 epoch 数')
+    parser.add_argument('--curriculum-mix-epochs', type=int, default=10, help='curriculum 第 2 阶段持续 epoch 数')
+    parser.add_argument('--curriculum-phase1-passenger-ratio', type=float, default=0.8, help='curriculum phase1 passenger ratio override')
+    parser.add_argument('--curriculum-phase1-short-ratio', type=float, default=0.75, help='curriculum phase1 passenger short-trip ratio')
+    parser.add_argument('--curriculum-phase1-mid-ratio', type=float, default=0.2, help='curriculum phase1 passenger mid-trip ratio')
+    parser.add_argument('--curriculum-phase1-long-ratio', type=float, default=0.05, help='curriculum phase1 passenger long-trip ratio')
+    parser.add_argument('--curriculum-phase1-passenger-tw-morning', type=float, default=0.7, help='curriculum phase1 passenger morning TW weight')
+    parser.add_argument('--curriculum-phase1-passenger-tw-midday', type=float, default=0.2, help='curriculum phase1 passenger midday TW weight')
+    parser.add_argument('--curriculum-phase1-passenger-tw-evening', type=float, default=0.1, help='curriculum phase1 passenger evening TW weight')
+    parser.add_argument('--curriculum-phase1-cargo-tw-morning', type=float, default=0.6, help='curriculum phase1 cargo morning TW weight')
+    parser.add_argument('--curriculum-phase1-cargo-tw-midday', type=float, default=0.25, help='curriculum phase1 cargo midday TW weight')
+    parser.add_argument('--curriculum-phase1-cargo-tw-evening', type=float, default=0.15, help='curriculum phase1 cargo evening TW weight')
+    parser.add_argument('--curriculum-phase2-passenger-ratio', type=float, default=0.7, help='curriculum phase2 passenger ratio override')
+    parser.add_argument('--curriculum-phase2-short-ratio', type=float, default=0.6, help='curriculum phase2 passenger short-trip ratio')
+    parser.add_argument('--curriculum-phase2-mid-ratio', type=float, default=0.3, help='curriculum phase2 passenger mid-trip ratio')
+    parser.add_argument('--curriculum-phase2-long-ratio', type=float, default=0.1, help='curriculum phase2 passenger long-trip ratio')
+    parser.add_argument('--curriculum-phase2-passenger-tw-morning', type=float, default=0.58, help='curriculum phase2 passenger morning TW weight')
+    parser.add_argument('--curriculum-phase2-passenger-tw-midday', type=float, default=0.27, help='curriculum phase2 passenger midday TW weight')
+    parser.add_argument('--curriculum-phase2-passenger-tw-evening', type=float, default=0.15, help='curriculum phase2 passenger evening TW weight')
+    parser.add_argument('--curriculum-phase2-cargo-tw-morning', type=float, default=0.55, help='curriculum phase2 cargo morning TW weight')
+    parser.add_argument('--curriculum-phase2-cargo-tw-midday', type=float, default=0.28, help='curriculum phase2 cargo midday TW weight')
+    parser.add_argument('--curriculum-phase2-cargo-tw-evening', type=float, default=0.17, help='curriculum phase2 cargo evening TW weight')
     parser.add_argument('--resume-path', type=str, default=None, help='从已有 checkpoint 继续训练/微调')
     parser.add_argument('--resume-weights-only', action='store_true', help='仅加载模型权重，不恢复优化器状态')
     parser.add_argument('--no-cuda', action='store_true')
@@ -514,11 +698,57 @@ def parse_args():
 
 
 
+def _normalize_ratio_triplet(values):
+    total = sum(max(float(v), 0.0) for v in values)
+    if total <= 0:
+        return tuple(1.0 / len(values) for _ in values)
+    return tuple(max(float(v), 0.0) / total for v in values)
+
+
+def apply_runtime_training_config(args):
+    Config.ALPHA_ENERGY = float(args.alpha_energy)
+    Config.ALPHA_DELAY = float(args.alpha_delay)
+    Config.ALPHA_VEHICLE = float(args.alpha_vehicle)
+    Config.ALPHA_REJECT = float(args.alpha_reject)
+    Config.ALPHA_UNFULFILLED = float(args.alpha_unfulfilled)
+    Config.ALPHA_TRIP_OVERTIME = float(args.alpha_trip_overtime)
+
+
 def build_phase_args(cli_args, graph_size):
     if graph_size not in PHASE_CONFIGS:
         raise ValueError(f'Unsupported graph size: {graph_size}')
 
     phase = PHASE_CONFIGS[graph_size].copy()
+    phase1_distance_mix = _normalize_ratio_triplet((
+        cli_args.curriculum_phase1_short_ratio,
+        cli_args.curriculum_phase1_mid_ratio,
+        cli_args.curriculum_phase1_long_ratio,
+    ))
+    phase2_distance_mix = _normalize_ratio_triplet((
+        cli_args.curriculum_phase2_short_ratio,
+        cli_args.curriculum_phase2_mid_ratio,
+        cli_args.curriculum_phase2_long_ratio,
+    ))
+    phase1_passenger_tw = _normalize_ratio_triplet((
+        cli_args.curriculum_phase1_passenger_tw_morning,
+        cli_args.curriculum_phase1_passenger_tw_midday,
+        cli_args.curriculum_phase1_passenger_tw_evening,
+    ))
+    phase1_cargo_tw = _normalize_ratio_triplet((
+        cli_args.curriculum_phase1_cargo_tw_morning,
+        cli_args.curriculum_phase1_cargo_tw_midday,
+        cli_args.curriculum_phase1_cargo_tw_evening,
+    ))
+    phase2_passenger_tw = _normalize_ratio_triplet((
+        cli_args.curriculum_phase2_passenger_tw_morning,
+        cli_args.curriculum_phase2_passenger_tw_midday,
+        cli_args.curriculum_phase2_passenger_tw_evening,
+    ))
+    phase2_cargo_tw = _normalize_ratio_triplet((
+        cli_args.curriculum_phase2_cargo_tw_morning,
+        cli_args.curriculum_phase2_cargo_tw_midday,
+        cli_args.curriculum_phase2_cargo_tw_evening,
+    ))
     return argparse.Namespace(
         embedding_dim=cli_args.embedding_dim,
         hidden_dim=cli_args.hidden_dim or phase['hidden_dim'],
@@ -530,6 +760,38 @@ def build_phase_args(cli_args, graph_size):
         max_consecutive_depot=cli_args.max_consecutive_depot,
         reject_warmup_epochs=cli_args.reject_warmup_epochs,
         reject_init_bias=cli_args.reject_init_bias,
+        max_concurrent_open_orders=cli_args.max_concurrent_open_orders,
+        enable_delivery_viability=cli_args.enable_delivery_viability,
+        enable_viability_fallback=cli_args.enable_viability_fallback,
+        alpha_energy=cli_args.alpha_energy,
+        alpha_delay=cli_args.alpha_delay,
+        alpha_vehicle=cli_args.alpha_vehicle,
+        alpha_reject=cli_args.alpha_reject,
+        alpha_unfulfilled=cli_args.alpha_unfulfilled,
+        alpha_trip_overtime=cli_args.alpha_trip_overtime,
+        enable_rideshare_curriculum=cli_args.enable_rideshare_curriculum,
+        curriculum_warmup_epochs=cli_args.curriculum_warmup_epochs,
+        curriculum_mix_epochs=cli_args.curriculum_mix_epochs,
+        curriculum_phase1_passenger_ratio=cli_args.curriculum_phase1_passenger_ratio,
+        curriculum_phase1_short_ratio=phase1_distance_mix[0],
+        curriculum_phase1_mid_ratio=phase1_distance_mix[1],
+        curriculum_phase1_long_ratio=phase1_distance_mix[2],
+        curriculum_phase1_passenger_tw_morning=phase1_passenger_tw[0],
+        curriculum_phase1_passenger_tw_midday=phase1_passenger_tw[1],
+        curriculum_phase1_passenger_tw_evening=phase1_passenger_tw[2],
+        curriculum_phase1_cargo_tw_morning=phase1_cargo_tw[0],
+        curriculum_phase1_cargo_tw_midday=phase1_cargo_tw[1],
+        curriculum_phase1_cargo_tw_evening=phase1_cargo_tw[2],
+        curriculum_phase2_passenger_ratio=cli_args.curriculum_phase2_passenger_ratio,
+        curriculum_phase2_short_ratio=phase2_distance_mix[0],
+        curriculum_phase2_mid_ratio=phase2_distance_mix[1],
+        curriculum_phase2_long_ratio=phase2_distance_mix[2],
+        curriculum_phase2_passenger_tw_morning=phase2_passenger_tw[0],
+        curriculum_phase2_passenger_tw_midday=phase2_passenger_tw[1],
+        curriculum_phase2_passenger_tw_evening=phase2_passenger_tw[2],
+        curriculum_phase2_cargo_tw_morning=phase2_cargo_tw[0],
+        curriculum_phase2_cargo_tw_midday=phase2_cargo_tw[1],
+        curriculum_phase2_cargo_tw_evening=phase2_cargo_tw[2],
         tanh_clipping=cli_args.tanh_clipping,
         normalization=cli_args.normalization,
         graph_size=graph_size,
@@ -591,15 +853,17 @@ def main():
     summary = {}
     for graph_size in cli_args.graph_sizes:
         phase_args = build_phase_args(cli_args, graph_size)
+        apply_runtime_training_config(phase_args)
         print(f"\n[Phase] Training on {graph_size} orders ({graph_size * 2} nodes)...")
         trainer = POMOTrainerOptimized(phase_args)
-        best_objective = trainer.train()
-        summary[graph_size] = best_objective
+        best_metrics = trainer.train()
+        summary[graph_size] = best_metrics
 
     print('\n' + '=' * 70)
     print('All requested training phases complete!')
     for graph_size in cli_args.graph_sizes:
-        print(f'N={graph_size}: best objective = {summary[graph_size]:.2f}')
+        metrics = summary[graph_size]
+        print(f"N={graph_size}: best service rate = {metrics['best_service_rate']:.3f}, best objective = {metrics['best_objective']:.2f}")
     print('=' * 70)
 
 

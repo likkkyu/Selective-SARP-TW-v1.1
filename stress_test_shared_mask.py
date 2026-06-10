@@ -14,7 +14,8 @@ def parse_args():
     parser.add_argument('--seed', type=int, default=12345)
     parser.add_argument('--policy', type=str, default='bad', choices=['bad', 'random', 'oracle'])
     parser.add_argument('--max-concurrent-open-orders', type=int, default=6)
-    parser.add_argument('--enable-delivery-viability', action='store_true')
+    parser.add_argument('--enable-delivery-viability', action='store_true', default=True)
+    parser.add_argument('--disable-delivery-viability', action='store_false', dest='enable_delivery_viability')
     parser.add_argument('--enable-viability-fallback', action='store_true')
     parser.add_argument('--trace-first-failure', action='store_true',
                         help='打印首个 no_move / orphan 样本的逐步轨迹')

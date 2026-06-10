@@ -37,7 +37,7 @@ Selective 的含义是：模型不再被动等待订单在后处理阶段“被�
 
 | 项 | v1.1 值 | 说明 |
 |---|---|---|
-| Passenger pickup TW 宽度 | 30 min | 硬时间窗 |
+| Passenger pickup TW 宽度 | 1 h | 硬时间窗 |
 | Cargo pickup TW 宽度 | 1 h | delivery 仍只计软迟到 |
 | Passenger : Cargo | 60 : 40 | 数据生成比例 |
 | Passenger demand | 80% 属于 {1,2}；20% 属于 {3,4} | group size |
@@ -95,7 +95,7 @@ $$
 当前代码对应：
 
 - `ALPHA_ENERGY = 1`
-- `ALPHA_DELAY = 2`
+- `ALPHA_DELAY = 2.5`
 - `ALPHA_VEHICLE = 3`
 - `ALPHA_REJECT = 500`
 - `ALPHA_UNFULFILLED = 600`

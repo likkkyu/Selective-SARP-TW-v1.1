@@ -93,6 +93,33 @@ def build_model_from_checkpoint(checkpoint, device):
     return model
 
 
+def _resolve_state_kwargs(args, checkpoint):
+    ckpt_args = checkpoint.get('args', {}) or {}
+    if not isinstance(ckpt_args, dict):
+        try:
+            ckpt_args = vars(ckpt_args)
+        except Exception:
+            ckpt_args = {}
+
+    max_open = args.max_concurrent_open_orders
+    if max_open == 1 and 'max_concurrent_open_orders' in ckpt_args:
+        max_open = ckpt_args['max_concurrent_open_orders']
+
+    enable_delivery_viability = args.enable_delivery_viability
+    if (not enable_delivery_viability) and ('enable_delivery_viability' in ckpt_args):
+        enable_delivery_viability = bool(ckpt_args['enable_delivery_viability'])
+
+    enable_viability_fallback = args.enable_viability_fallback
+    if (not enable_viability_fallback) and ('enable_viability_fallback' in ckpt_args):
+        enable_viability_fallback = bool(ckpt_args['enable_viability_fallback'])
+
+    return {
+        'max_concurrent_open_orders': max_open,
+        'enable_delivery_viability': enable_delivery_viability,
+        'enable_viability_fallback': enable_viability_fallback,
+    }
+
+
 def evaluate():
     args = parse_args()
 
@@ -129,6 +156,10 @@ def evaluate():
         # 旧版 PyTorch 不支持 weights_only 参数
         checkpoint = torch.load(args.checkpoint, map_location=device)
     print(f'  loaded epoch : {checkpoint.get("epoch", "?")}')
+    state_kwargs = _resolve_state_kwargs(args, checkpoint)
+    print(f"  shared env   : max_open={state_kwargs['max_concurrent_open_orders']}, "
+          f"delivery_viability={state_kwargs['enable_delivery_viability']}, "
+          f"viability_fallback={state_kwargs['enable_viability_fallback']}")
 
     model = build_model_from_checkpoint(checkpoint, device)
     model.load_state_dict(checkpoint['model_state_dict'])
@@ -169,11 +200,6 @@ def evaluate():
         for batch in test_loader:
             batch = {k: v.to(device) if torch.is_tensor(v) else v
                      for k, v in batch.items()}
-            state_kwargs = {
-                'max_concurrent_open_orders': args.max_concurrent_open_orders,
-                'enable_delivery_viability': args.enable_delivery_viability,
-                'enable_viability_fallback': args.enable_viability_fallback,
-            }
             if args.diagnostics:
                 cost, _, pi, debug = model(batch, return_pi=True, return_debug=True, state_kwargs=state_kwargs)
                 for key, value in debug.items():
@@ -235,6 +261,9 @@ def evaluate():
     _stats('  Trip Overtime Penalty', all_trip_overtime)
     print()
     print('【运营指标】')
+    service_rates = [value / args.graph_size for value in all_num_completed]
+    rejected_rates = [value / args.graph_size for value in all_num_rejected]
+    unfulfilled_rates = [value / args.graph_size for value in all_num_unfulfilled]
     _stats('Total Distance', all_distance, unit='km', fmt='{:.3f}')
     _stats('Passenger Pickup Hard Viol.', all_pickup_hard_violations, unit='', fmt='{:.2f}')
     _stats('Passenger Total Ride Viol.', all_total_ride_time_violations, unit='', fmt='{:.2f}')
@@ -243,6 +272,9 @@ def evaluate():
     _stats('# Completed Orders', all_num_completed, unit='', fmt='{:.2f}')
     _stats('# Rejected Orders', all_num_rejected, unit='', fmt='{:.2f}')
     _stats('# Unfulfilled Orders', all_num_unfulfilled, unit='', fmt='{:.2f}')
+    _stats('Service Rate', service_rates, unit='', fmt='{:.3f}')
+    _stats('Rejected Rate', rejected_rates, unit='', fmt='{:.3f}')
+    _stats('Unfulfilled Rate', unfulfilled_rates, unit='', fmt='{:.3f}')
     _stats('# Pickup-only Orders', all_num_pickup_only, unit='', fmt='{:.2f}')
     _stats('# Started-not-completed', all_num_started_not_completed, unit='', fmt='{:.2f}')
     if args.diagnostics and all_diagnostics:
@@ -281,6 +313,7 @@ def evaluate():
     print(f'  Operation Window     : {Config.OPERATION_START:.1f}:00 - {Config.OPERATION_END:.1f}:00')
     print(f'  Passenger Capacity   : {Config.PASSENGER_CAPACITY} 人')
     print(f'  Cargo Capacity       : {Config.CARGO_CAPACITY} 单位')
+    print(f'  Passenger Pickup TW  : {Config.PASSENGER_TW_WIDTH:.1f} h')
     print(f'  Max Trip Time        : {Config.MAX_TRIP_TIME} h')
     print(f'  Passenger Total Ride : {Config.PASSENGER_MAX_RIDE_TIME_MINUTES:.0f} min')
     print(f'  Passenger Excess Ride: {Config.PASSENGER_MAX_EXCESS_RIDE_TIME_MINUTES:.0f} min')

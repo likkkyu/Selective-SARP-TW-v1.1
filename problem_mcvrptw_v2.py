@@ -55,7 +55,7 @@ class Config:
     OPERATION_START = 10.0   # 10:00
     OPERATION_END = 16.0     # 16:00
     MAX_TRIP_TIME = 3.0      # 单趟最长 3h
-    PASSENGER_TW_WIDTH = 0.5 # 乘客 TW 宽度（30 min）
+    PASSENGER_TW_WIDTH = 1.0 # 乘客 TW 宽度（1 h）
     CARGO_TW_WIDTH = 1.0     # 货物 TW 宽度（1h）
     SERVICE_TIME = 3.0 / 60  # 3 min
 
@@ -74,7 +74,7 @@ class Config:
 
     # ---------- α 加权（仅训练目标使用，论文公式不出现） ----------
     ALPHA_ENERGY = 1.0
-    ALPHA_DELAY = 2.0
+    ALPHA_DELAY = 2.5
     ALPHA_VEHICLE = 3.0
     ALPHA_REJECT = 500.0          # 元/主动 reject 订单
     ALPHA_UNFULFILLED = 600.0     # 元/未显式 reject 但最终未完成订单（高于 reject，避免静默漏单）
@@ -822,7 +822,7 @@ class MCVRPPDTWDataset(Dataset):
     1. 50%节点随机均匀分布，50%节点聚类分布
     2. 乘客订单按 PASSENGER_RATIO=0.6 概率独立采样
     3. 每个订单包含一个pickup点和一个delivery点
-    4. 乘客时间窗 0.5 小时，货物时间窗 1.0 小时
+    4. 乘客时间窗 1.0 小时，货物时间窗 1.0 小时
     5. 需求量：乘客 80% 为 {1,2} / 20% 为 {3,4}；货物 1-3 单位
     """
     
@@ -832,6 +832,10 @@ class MCVRPPDTWDataset(Dataset):
         graph_size=50,  # 订单数量（实际节点数=2*graph_size）
         seed=1234,
         distribution='mixed',  # 'random', 'cluster', 'mixed'
+        passenger_ratio_override=None,
+        passenger_distance_mix_override=None,
+        passenger_tw_period_weights_override=None,
+        cargo_tw_period_weights_override=None,
     ):
         """初始化。
 
@@ -847,7 +851,11 @@ class MCVRPPDTWDataset(Dataset):
         self.graph_size = graph_size  # 订单数
         self.n_nodes = 2 * graph_size  # 实际节点数
         self.distribution = distribution
-        
+        self.passenger_ratio_override = passenger_ratio_override
+        self.passenger_distance_mix_override = passenger_distance_mix_override
+        self.passenger_tw_period_weights_override = passenger_tw_period_weights_override
+        self.cargo_tw_period_weights_override = cargo_tw_period_weights_override
+
         torch.manual_seed(seed)
         np.random.seed(seed)
         
@@ -899,8 +907,10 @@ class MCVRPPDTWDataset(Dataset):
             n_orders = self.graph_size
             pickup_locs = self._generate_locations(n_orders)
 
-            # 分配订单类型：v1.1 固定乘客 60% / 货物 40%
-            passenger_ratio = Config.PASSENGER_RATIO_LARGE if n_orders >= 50 else Config.PASSENGER_RATIO
+            # 分配订单类型：v1.1 固定乘客 60% / 货物 40%，curriculum 可覆盖 passenger ratio
+            default_passenger_ratio = Config.PASSENGER_RATIO_LARGE if n_orders >= 50 else Config.PASSENGER_RATIO
+            passenger_ratio = float(self.passenger_ratio_override) if self.passenger_ratio_override is not None else default_passenger_ratio
+            passenger_ratio = min(max(passenger_ratio, 0.0), 1.0)
             order_type = (torch.rand(n_orders) < passenger_ratio).float()
 
             cargo_short_distance_count = int(round(n_orders * Config.PD_SHORT_DISTANCE_RATIO))
@@ -919,8 +929,14 @@ class MCVRPPDTWDataset(Dataset):
             passenger_min_distance = torch.zeros(n_orders)
             if passenger_count > 0:
                 shuffled_passenger = passenger_indices[torch.randperm(passenger_count)]
-                long_count = int(round(passenger_count * Config.PASSENGER_PD_LONG_RATIO))
-                mid_count = int(round(passenger_count * Config.PASSENGER_PD_MID_RATIO))
+                if self.passenger_distance_mix_override is None:
+                    short_ratio = Config.PASSENGER_PD_SHORT_RATIO
+                    mid_ratio = Config.PASSENGER_PD_MID_RATIO
+                    long_ratio = Config.PASSENGER_PD_LONG_RATIO
+                else:
+                    short_ratio, mid_ratio, long_ratio = self.passenger_distance_mix_override
+                long_count = int(round(passenger_count * long_ratio))
+                mid_count = int(round(passenger_count * mid_ratio))
                 short_count = max(passenger_count - long_count - mid_count, 0)
                 long_indices = shuffled_passenger[:long_count]
                 mid_indices = shuffled_passenger[long_count:long_count + mid_count]
@@ -1031,8 +1047,10 @@ class MCVRPPDTWDataset(Dataset):
             (12.0, 14.0),
             (14.0, 16.0),
         )
-        passenger_probs = torch.tensor(Config.PASSENGER_TW_PERIOD_WEIGHTS, dtype=torch.float)
-        cargo_probs = torch.tensor(Config.CARGO_TW_PERIOD_WEIGHTS, dtype=torch.float)
+        passenger_tw_weights = self.passenger_tw_period_weights_override or Config.PASSENGER_TW_PERIOD_WEIGHTS
+        cargo_tw_weights = self.cargo_tw_period_weights_override or Config.CARGO_TW_PERIOD_WEIGHTS
+        passenger_probs = torch.tensor(passenger_tw_weights, dtype=torch.float)
+        cargo_probs = torch.tensor(cargo_tw_weights, dtype=torch.float)
         passenger_probs = passenger_probs / passenger_probs.sum()
         cargo_probs = cargo_probs / cargo_probs.sum()
 
