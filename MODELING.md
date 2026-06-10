@@ -51,8 +51,8 @@ Selective 的含义是：模型不再被动等待订单在后处理阶段“被�
 | $\omega_p$ | 0.6 元/min | Passenger delivery 延误单价 |
 | $\omega_c$ | 0.06 元/min | Cargo delivery 延误单价 |
 | $\omega_v$ | 20 元/车 | 固定派车成本（当前代码保留 20） |
-| $\omega_{rej}$ | 500 元/单 | 主动 reject 惩罚 |
-| $\omega_{unf}$ | 600 元/单 | 未显式 reject 但最终未完成订单惩罚 |
+| $\omega_{rej}$ | 575 元/单 | 主动 reject 惩罚（当前 best 默认） |
+| $\omega_{unf}$ | 750 元/单 | 未显式 reject 但最终未完成订单惩罚 |
 | $\omega_{trip}$ | 200 元/h | 单趟超时软兜底 |
 | $\eta(W)$ | $0.18\cdot(1+W/10000)$ kWh/km | 随载重增加的能耗系数 |
 | $p_e$ | 1.0 元/kWh | 电价 |
@@ -97,8 +97,8 @@ $$
 - `ALPHA_ENERGY = 1`
 - `ALPHA_DELAY = 2.5`
 - `ALPHA_VEHICLE = 3`
-- `ALPHA_REJECT = 500`
-- `ALPHA_UNFULFILLED = 600`
+- `ALPHA_REJECT = 575`
+- `ALPHA_UNFULFILLED = 750`
 - `ALPHA_TRIP_OVERTIME = 200`
 
 归一化 profile 仍需按 graph size 通过 `calibrate_normalization` 预先校准。
@@ -182,7 +182,7 @@ reject 动作被选中时，state 依据当前 mask 中**可达且 tw_late 最�
 | Passenger/Cargo 比例 | 0.6 / 0.4 |
 | Passenger demand | 1–2 / 3–4 混合 |
 | Cargo demand | 1–3 |
-| 时间窗 | 10-12 / 12-14 / 14-16 三时段混合采样 |
+| 时间窗 | 10-12 / 12-14 / 14-16 三时段混合采样；默认权重：乘客 `(0.56, 0.29, 0.15)`、货物 `(0.58, 0.28, 0.14)` |
 | Delivery TW | 基于 pickup TW + 直达行驶 + service 时间推导 |
 
 ### 5.2 节点输入特征与类型嵌入

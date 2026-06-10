@@ -179,14 +179,23 @@ class POMOTrainerOptimized:
             'enable_viability_fallback': self.args.enable_viability_fallback,
         }
 
+    def _build_default_dataset_kwargs(self):
+        kwargs = {}
+        if self.args.passenger_tw_period_weights_override is not None:
+            kwargs['passenger_tw_period_weights_override'] = self.args.passenger_tw_period_weights_override
+        if self.args.cargo_tw_period_weights_override is not None:
+            kwargs['cargo_tw_period_weights_override'] = self.args.cargo_tw_period_weights_override
+        return kwargs
+
     def _build_curriculum_dataset_kwargs(self, epoch):
+        kwargs = self._build_default_dataset_kwargs()
         if not self.args.enable_rideshare_curriculum:
-            return {}
+            return kwargs
 
         phase1_epochs = max(1, self.args.curriculum_warmup_epochs)
         phase2_epochs = max(1, self.args.curriculum_mix_epochs)
         if epoch <= phase1_epochs:
-            return {
+            kwargs.update({
                 'passenger_ratio_override': self.args.curriculum_phase1_passenger_ratio,
                 'passenger_distance_mix_override': (
                     self.args.curriculum_phase1_short_ratio,
@@ -203,10 +212,11 @@ class POMOTrainerOptimized:
                     self.args.curriculum_phase1_cargo_tw_midday,
                     self.args.curriculum_phase1_cargo_tw_evening,
                 ),
-            }
+            })
+            return kwargs
 
         if epoch <= phase1_epochs + phase2_epochs:
-            return {
+            kwargs.update({
                 'passenger_ratio_override': self.args.curriculum_phase2_passenger_ratio,
                 'passenger_distance_mix_override': (
                     self.args.curriculum_phase2_short_ratio,
@@ -223,14 +233,26 @@ class POMOTrainerOptimized:
                     self.args.curriculum_phase2_cargo_tw_midday,
                     self.args.curriculum_phase2_cargo_tw_evening,
                 ),
-            }
+            })
+            return kwargs
 
-        return {}
+        return kwargs
 
     def _describe_curriculum(self, epoch):
         kwargs = self._build_curriculum_dataset_kwargs(epoch)
         if not kwargs:
             return 'default-distribution'
+
+        if not self.args.enable_rideshare_curriculum:
+            parts = []
+            tw_mix = kwargs.get('passenger_tw_period_weights_override')
+            cargo_tw_mix = kwargs.get('cargo_tw_period_weights_override')
+            if tw_mix is not None:
+                parts.append(f"passenger_tw={tuple(round(v, 2) for v in tw_mix)}")
+            if cargo_tw_mix is not None:
+                parts.append(f"cargo_tw={tuple(round(v, 2) for v in cargo_tw_mix)}")
+            return 'dataset-override(' + ', '.join(parts) + ')'
+
         passenger_ratio = kwargs.get('passenger_ratio_override')
         distance_mix = kwargs.get('passenger_distance_mix_override')
         tw_mix = kwargs.get('passenger_tw_period_weights_override')
@@ -432,6 +454,7 @@ class POMOTrainerOptimized:
             num_samples=self.args.val_size,
             graph_size=self.args.graph_size,
             seed=12345,
+            **self._build_default_dataset_kwargs(),
         )
         val_loader = DataLoader(
             val_dataset,
@@ -668,6 +691,8 @@ def parse_args():
     parser.add_argument('--alpha-reject', type=float, default=Config.ALPHA_REJECT, help='训练 objective 中 reject 惩罚')
     parser.add_argument('--alpha-unfulfilled', type=float, default=Config.ALPHA_UNFULFILLED, help='训练 objective 中 unfulfilled 惩罚')
     parser.add_argument('--alpha-trip-overtime', type=float, default=Config.ALPHA_TRIP_OVERTIME, help='训练 objective 中 trip overtime 惩罚')
+    parser.add_argument('--passenger-tw-period-weights', nargs=3, type=float, default=None, metavar=('MORNING', 'MIDDAY', 'EVENING'), help='覆盖默认 passenger 三时段 TW 权重')
+    parser.add_argument('--cargo-tw-period-weights', nargs=3, type=float, default=None, metavar=('MORNING', 'MIDDAY', 'EVENING'), help='覆盖默认 cargo 三时段 TW 权重')
     parser.add_argument('--enable-rideshare-curriculum', action='store_true', help='按 epoch 使用轻量共享导向 curriculum')
     parser.add_argument('--curriculum-warmup-epochs', type=int, default=5, help='curriculum 第 1 阶段持续 epoch 数')
     parser.add_argument('--curriculum-mix-epochs', type=int, default=10, help='curriculum 第 2 阶段持续 epoch 数')
@@ -724,6 +749,8 @@ def build_phase_args(cli_args, graph_size):
         cli_args.curriculum_phase1_mid_ratio,
         cli_args.curriculum_phase1_long_ratio,
     ))
+    default_passenger_tw = None if cli_args.passenger_tw_period_weights is None else _normalize_ratio_triplet(cli_args.passenger_tw_period_weights)
+    default_cargo_tw = None if cli_args.cargo_tw_period_weights is None else _normalize_ratio_triplet(cli_args.cargo_tw_period_weights)
     phase2_distance_mix = _normalize_ratio_triplet((
         cli_args.curriculum_phase2_short_ratio,
         cli_args.curriculum_phase2_mid_ratio,
@@ -769,6 +796,8 @@ def build_phase_args(cli_args, graph_size):
         alpha_reject=cli_args.alpha_reject,
         alpha_unfulfilled=cli_args.alpha_unfulfilled,
         alpha_trip_overtime=cli_args.alpha_trip_overtime,
+        passenger_tw_period_weights_override=default_passenger_tw,
+        cargo_tw_period_weights_override=default_cargo_tw,
         enable_rideshare_curriculum=cli_args.enable_rideshare_curriculum,
         curriculum_warmup_epochs=cli_args.curriculum_warmup_epochs,
         curriculum_mix_epochs=cli_args.curriculum_mix_epochs,

@@ -48,6 +48,12 @@ def parse_args():
                         help='共享实验：对 delivery 也启用 viability 过滤')
     parser.add_argument('--enable-viability-fallback', action='store_true',
                         help='共享实验：若 delivery viability 全挡死则启用安全回退')
+    parser.add_argument('--passenger-tw-period-weights', nargs=3, type=float, default=None,
+                        metavar=('MORNING', 'MIDDAY', 'EVENING'),
+                        help='覆盖默认 passenger 三时段 TW 权重')
+    parser.add_argument('--cargo-tw-period-weights', nargs=3, type=float, default=None,
+                        metavar=('MORNING', 'MIDDAY', 'EVENING'),
+                        help='覆盖默认 cargo 三时段 TW 权重')
     return parser.parse_args()
 
 
@@ -58,6 +64,13 @@ def collate_fn(batch):
         if torch.is_tensor(batch[0][key]) else batch[0][key]
         for key in keys
     }
+
+
+def _normalize_ratio_triplet(values):
+    total = sum(max(float(v), 0.0) for v in values)
+    if total <= 0:
+        return tuple(1.0 / len(values) for _ in values)
+    return tuple(max(float(v), 0.0) / total for v in values)
 
 
 def build_model_from_checkpoint(checkpoint, device):
@@ -166,10 +179,17 @@ def evaluate():
     model.eval()
     set_decode_type(model, args.decode)
 
+    dataset_kwargs = {}
+    if args.passenger_tw_period_weights is not None:
+        dataset_kwargs['passenger_tw_period_weights_override'] = _normalize_ratio_triplet(args.passenger_tw_period_weights)
+    if args.cargo_tw_period_weights is not None:
+        dataset_kwargs['cargo_tw_period_weights_override'] = _normalize_ratio_triplet(args.cargo_tw_period_weights)
+
     test_dataset = MCVRPPDTWDataset(
         num_samples=args.num_samples,
         graph_size=args.graph_size,
         seed=args.seed,
+        **dataset_kwargs,
     )
     test_loader = DataLoader(
         test_dataset, batch_size=args.batch_size, collate_fn=collate_fn,

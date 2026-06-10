@@ -51,7 +51,7 @@ if [ -n "$ALPHA_UNFULFILLED" ]; then EXTRA_ARGS="$EXTRA_ARGS --alpha-unfulfilled
 if [ -n "$ALPHA_TRIP_OVERTIME" ]; then EXTRA_ARGS="$EXTRA_ARGS --alpha-trip-overtime $ALPHA_TRIP_OVERTIME"; fi
 
 echo "Mainline shared env: --enable-delivery-viability --max-concurrent-open-orders ${MAX_OPEN:-6} --enable-viability-fallback=${ENABLE_FALLBACK:-0}"
-echo "Service-first metrics + restored defaults: passenger_tw=1.0h alpha_delay=${ALPHA_DELAY:-2.5} reject_warmup=${REJECT_WARMUP_EPOCHS:-3} reject_init_bias=${REJECT_INIT_BIAS:--2.0}"
+echo "Service-first best defaults: passenger_tw=1.0h passenger_tw_mix=(0.56,0.29,0.15) cargo_tw_mix=(0.58,0.28,0.14) alpha_delay=${ALPHA_DELAY:-2.5} alpha_reject=${ALPHA_REJECT:-575} alpha_unfulfilled=${ALPHA_UNFULFILLED:-750} reject_warmup=${REJECT_WARMUP_EPOCHS:-3} reject_init_bias=${REJECT_INIT_BIAS:--2.0}"
 
 echo "Extra args: $EXTRA_ARGS"
 

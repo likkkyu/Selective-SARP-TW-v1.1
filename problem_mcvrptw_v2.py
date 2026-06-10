@@ -24,8 +24,8 @@ Multi-Compartment Vehicle Routing Problem with Pickup-Delivery and Time Windows
     - ω_p = 0.6 元/min（仅乘客 delivery）
     - ω_c = 0.06 元/min（仅货物 delivery）
     - ω_v = 20 元/车
-    - reject = 500 元/主动 reject 订单
-    - unfulfilled = 600 元/未显式 reject 但最终未完成订单
+    - reject = 575 元/主动 reject 订单
+    - unfulfilled = 750 元/未显式 reject 但最终未完成订单
     - trip_overtime = 200 元/h（safety net，合理解里 ≈ 0）
 """
 
@@ -76,8 +76,8 @@ class Config:
     ALPHA_ENERGY = 1.0
     ALPHA_DELAY = 2.5
     ALPHA_VEHICLE = 3.0
-    ALPHA_REJECT = 500.0          # 元/主动 reject 订单
-    ALPHA_UNFULFILLED = 600.0     # 元/未显式 reject 但最终未完成订单（高于 reject，避免静默漏单）
+    ALPHA_REJECT = 575.0          # 元/主动 reject 订单（当前 best 默认）
+    ALPHA_UNFULFILLED = 750.0     # 元/未显式 reject 但最终未完成订单（高于 reject，避免静默漏单）
     ALPHA_TRIP_OVERTIME = 200.0   # 元/h 单趟超时（safety net）
 
     # ---------- 约束开关（服务质量强化版） ----------
@@ -118,8 +118,8 @@ class Config:
 
     # ---------- 时间窗分布参数（按时段混合采样） ----------
     # 三个时段：[10,12), [12,14), [14,16)
-    PASSENGER_TW_PERIOD_WEIGHTS = (0.50, 0.32, 0.18)
-    CARGO_TW_PERIOD_WEIGHTS = (0.52, 0.30, 0.18)
+    PASSENGER_TW_PERIOD_WEIGHTS = (0.56, 0.29, 0.15)
+    CARGO_TW_PERIOD_WEIGHTS = (0.58, 0.28, 0.14)
 
     # ---------- 车队规模（50 单主线训练回到较宽松预算，先学服务，再收紧） ----------
     MIN_NUM_VEHICLES = 1

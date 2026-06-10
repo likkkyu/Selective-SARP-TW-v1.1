@@ -79,7 +79,7 @@
 - **乘客需求**（939–950 行）：80% 小组 `randint(1,3)`={1,2}；20% 大组 `randint(3,6)`={3,4,5}。
 - **货物需求**：`randint(1,6)`={1..5}。
 - **订单比例**：`PASSENGER_RATIO=0.4`（25 单主线客 40%）；n≥50 用 `PASSENGER_RATIO_LARGE=0.25`（874 行）。
-- **时间窗**：三时段 [10,12) / [12,14) / [14,16) 混合采样，权重见 Config；乘客 TW=1 h、货物=2 h。
+- **时间窗**：三时段 [10,12) / [12,14) / [14,16) 混合采样；当前默认权重为乘客 `(0.56, 0.29, 0.15)`、货物 `(0.58, 0.28, 0.14)`；乘客 TW=1 h、货物=2 h。
 - **空间**：50% 随机 + 50% 聚类（`NUM_CLUSTERS=3`）；PD 距离分档（短/中/长）。
 
 ## 2.4 v1.1 需要改动的数据生成项
@@ -220,7 +220,7 @@ all_logits = torch.cat([node_logits, reject_logit], dim=-1) # N+1 -> N+2
 
 ## 6.1 训练目标 vs 报告目标
 
-- **训练目标** `total_cost`（get_costs 580–586）：归一化+α 加权（`ALPHA_ENERGY=1` / `DELAY=2` / `VEHICLE=3` / `REJECT=500` / `TRIP_OVERTIME=200`）。
+- **训练目标** `total_cost`（get_costs 580–586）：归一化+α 加权（`ALPHA_ENERGY=1` / `DELAY=2.5` / `VEHICLE=3` / `REJECT=575` / `UNFULFILLED=750` / `TRIP_OVERTIME=200`）。
 - **报告目标** `total_cost_raw`（588–595）：纯 RMB 求和（能耗+延误+派车+拒单+超时），论文/评测用此口径。
 
 ## 6.2 成本分项与代码位置
@@ -230,7 +230,7 @@ all_logits = torch.cat([node_logits, reject_logit], dim=-1) # N+1 -> N+2
 | 能耗费 | η(W)=0.18·(1+W/10000) kWh/km × 1.0 元/kWh | `_compute_distance_energy`（250–307） |
 | 延误费 | 乘客 0.6、货物 0.06 元/min（仅 delivery） | `_compute_time_and_delay`（309–457） |
 | 派车费 | `VEHICLE_COST` 元/车 | `_compute_vehicle_and_penalty`（459–520） |
-| 拒单费 | `ALPHA_REJECT=500` | 同上；v1.1 改主动拒单 |
+| 拒单费 | `ALPHA_REJECT=575` | 同上；v1.1 改主动拒单 |
 | 超时费 | `ALPHA_TRIP_OVERTIME=200` 元/h | `get_costs`（508–509） |
 
 ## 6.3 ⚠️ 口径问题清单
@@ -280,8 +280,8 @@ all_logits = torch.cat([node_logits, reject_logit], dim=-1) # N+1 -> N+2
 | ELECTRICITY_PRICE | 1.0 | 1.0 | 元/kWh |
 | PASSENGER/CARGO_DELAY_COST | 0.6 / 0.06 | 同 | 延误 元/min |
 | VEHICLE_COST | 20.0 ⚠️ | 待确认 | 派车 元/车（MODELING=5） |
-| ALPHA_ENERGY/DELAY/VEHICLE | 1/2/3 | 同 | 训练加权 |
-| ALPHA_REJECT / TRIP_OVERTIME | 500 / 200 | 同/调 | 拒单/超时惩罚 |
+| ALPHA_ENERGY/DELAY/VEHICLE | 1/2.5/3 | 同 | 训练加权 |
+| ALPHA_REJECT / ALPHA_UNFULFILLED / TRIP_OVERTIME | 575 / 750 / 200 | 同/调 | 拒单 / 未履约 / 超时惩罚 |
 | REJECT_TIME / REJECT_DELAY_HOURS | 16:00 / 1.0 ⚠️ | 移除/改写 | 被动拒单触发 |
 | PASSENGER_RATIO / _LARGE | 0.4 / 0.25 | **0.6** | 乘客订单占比 |
 | DEMAND_MIN/MAX | 1/5 | 见 2.4 | 需求范围 |
