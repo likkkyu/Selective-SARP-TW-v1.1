@@ -1,0 +1,87 @@
+================================================================
+Selective SARP-TW 模型评估
+================================================================
+  device       : cpu
+  checkpoint   : /Users/bytedance/Downloads/project-vrp-v6-4-main/outputs_smoke/reject_acceptance_sweep_tw1_v1/suppress_w3_b25/pomo_n25_optimized/model_best.pt
+  graph_size   : 25
+  num_samples  : 500
+  batch_size   : 32
+  seed         : 99999
+  decode       : greedy
+----------------------------------------------------------------
+  loaded epoch : 9
+  shared env   : max_open=6, delivery_viability=True, viability_fallback=False
+  embedding_dim=256, hidden_dim=256, n_encode_layers=6, n_heads=8, tanh_clipping=10.0, normalization=batch
+----------------------------------------------------------------
+测试结果 (500 个实例, graph_size=25)
+----------------------------------------------------------------
+【主指标 - 论文比较口径】
+  Total Cost (raw, RMB)       : 5409.106 ± 1236.855 RMB
+
+【成本分项 (RMB)】
+    Energy Cost               : 28.821 ± 4.561 RMB
+    Passenger Delivery Delay Cost: 0.000 ± 0.000 RMB
+    Cargo Delay Cost          : 0.245 ± 0.513 RMB
+    Vehicle Fixed Cost        : 90.040 ± 12.943 RMB
+    Reject Penalty            : 5290.000 ± 1247.288 RMB
+    Unfulfilled Penalty       : 0.000 ± 0.000 RMB
+    Trip Overtime Penalty     : 0.000 ± 0.000 RMB
+
+【运营指标】
+  Total Distance              : 159.236 ± 25.194 km
+  Passenger Pickup Hard Viol. : 0.00 ± 0.00 
+  Passenger Total Ride Viol.  : 0.00 ± 0.00 
+  Passenger Excess Ride Viol. : 0.00 ± 0.00 
+  # Vehicles Used             : 4.50 ± 0.65 
+  # Completed Orders          : 15.80 ± 2.17 
+  # Rejected Orders           : 9.20 ± 2.17 
+  # Unfulfilled Orders        : 0.00 ± 0.00 
+  Service Rate                : 0.632 ± 0.087 
+  Rejected Rate               : 0.368 ± 0.087 
+  Unfulfilled Rate            : 0.000 ± 0.000 
+  # Pickup-only Orders        : 0.00 ± 0.00 
+  # Started-not-completed     : 0.00 ± 0.00 
+
+【Mask / 可行性诊断】
+  Feasible pickups/step       : 1.87 ± 0.52 
+  Feasible deliveries/step    : 0.58 ± 0.15 
+  Any service feasible rate   : 0.63 ± 0.09 
+  Depot-only rate             : 0.18 ± 0.05 
+  Reject available rate       : 0.27 ± 0.04 
+  Feasible->depot rate        : 0.00 ± 0.00 
+  Feasible->reject rate       : 0.00 ± 0.00 
+  Mask by pickup TW           : 0.79 ± 0.47 
+  Mask by ride time           : 0.00 ± 0.00 
+  Mask by trip time           : 1.06 ± 0.36 
+  Mask by ops end             : 0.00 ± 0.00 
+  Mask by pickup commitment   : 8.98 ± 0.67 
+  Open started count          : 0.73 ± 0.24 
+  Open started eq2 rate       : 0.13 ± 0.04 
+  Second pickup feasible      : 0.58 ± 0.28 
+  Second pickup blocked       : 6.20 ± 0.66 
+  Delivery viability masked   : 0.15 ± 0.11 
+  Delivery viability fallback : 0.00 ± 0.00 
+  Mask by vehicle limit       : 0.01 ± 0.03 
+  Reject predeparture rate    : 0.27 ± 0.04 
+  Reject in-route rate        : 0.00 ± 0.00 
+
+【训练目标 (归一化, 仅供参考)】
+  Total Cost (train)          : 5589.5530 ± 1223.5673 
+
+【问题配置 (Config)】
+  Area Size            : 10.0 km × 10.0 km
+  Operation Window     : 10.0:00 - 16.0:00
+  Passenger Capacity   : 15 人
+  Cargo Capacity       : 20 单位
+  Passenger Pickup TW  : 1.0 h
+  Max Trip Time        : 3.0 h
+  Passenger Total Ride : 70 min
+  Passenger Excess Ride: 30 min
+  Electricity Price    : 1.0 RMB/kWh
+  Passenger Delivery Delay Cost : 0.6 RMB/min
+  Cargo Delay Cost     : 0.06 RMB/min
+  Vehicle Fixed Cost   : 20.0 RMB/车
+  Reject Penalty (α)   : 575.0 RMB/主动 reject 单
+  Unfulfilled (α)      : 750.0 RMB/未履约单
+  Trip Overtime (α)    : 200.0 RMB/h
+================================================================

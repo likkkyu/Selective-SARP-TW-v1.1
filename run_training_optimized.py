@@ -678,7 +678,7 @@ def parse_args():
     parser.add_argument('--max-decode-steps', type=int, default=None, help='decoder 最大步数上限，默认按节点数自动推断')
     parser.add_argument('--max-consecutive-depot', type=int, default=8, help='连续 depot 选择上限，超过后强制终止当前 rollout')
     parser.add_argument('--reject-warmup-epochs', type=int, default=3, help='训练前若干 epoch 屏蔽 reject 动作，先学习服务')
-    parser.add_argument('--reject-init-bias', type=float, default=-2.0, help='reject head 的初始 bias，负值用于抑制早期 reject')
+    parser.add_argument('--reject-init-bias', type=float, default=-2.5, help='reject head 的初始 bias，负值用于抑制早期 reject')
     parser.add_argument('--collect-mask-diagnostics', action='store_true', help='在验证/评估中收集 mask 与动作可行性诊断指标')
     parser.add_argument('--deadlock-limit', type=int, default=2, help='连续回 depot 且无可服务节点时的终止阈值')
     parser.add_argument('--max-concurrent-open-orders', type=int, default=6, help='共享主线：允许的最大并发 open 单数量')

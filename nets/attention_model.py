@@ -60,7 +60,7 @@ class AttentionModel(nn.Module):
                  shrink_size=None,
                  max_decode_steps=None,
                  max_consecutive_depot=8,
-                 reject_init_bias=-2.0):
+                 reject_init_bias=-2.5):
         super(AttentionModel, self).__init__()
 
         self.embedding_dim = embedding_dim

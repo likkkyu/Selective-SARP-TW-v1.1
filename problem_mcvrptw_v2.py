@@ -396,7 +396,7 @@ class MCVRPPDTW:
 
             earliest = tw_in_order[:, t, 0]
             start_service = torch.max(current_time, earliest)
-            current_time = start_service + Config.SERVICE_TIME
+            current_time = is_depot * current_time + (1 - is_depot) * (start_service + Config.SERVICE_TIME)
 
             if n_orders > 0:
                 pickup_order_idx = (node_idx - 1).clamp(min=0, max=n_orders - 1)

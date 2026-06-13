@@ -1,0 +1,1202 @@
+{
+  "rollout": {
+    "cargo_delay_cost_raw": {
+      "mean": 0.21433986751071643,
+      "std": 0.03516626198033348
+    },
+    "completed_orders": {
+      "mean": 15.740625,
+      "std": 0.11206513173150692
+    },
+    "diag_any_service_feasible": {
+      "mean": 0.6298246041871607,
+      "std": 0.006459955769405671
+    },
+    "diag_delivery_viability_fallback": {
+      "mean": 0.0,
+      "std": 0.0
+    },
+    "diag_delivery_viability_masked": {
+      "mean": 0.1485271932790056,
+      "std": 0.004990356064053924
+    },
+    "diag_delivery_viability_masked_pct_of_service_slots": {
+      "mean": 0.2970543865580112,
+      "std": 0.009980712128107848
+    },
+    "diag_depot_carry_block": {
+      "mean": 0.45323121435940267,
+      "std": 0.0034370475706030847
+    },
+    "diag_depot_fallback_used": {
+      "mean": 0.12881356172729283,
+      "std": 0.012679167521359017
+    },
+    "diag_depot_no_work_block": {
+      "mean": 0.020006310008466244,
+      "std": 0.00017557806013052317
+    },
+    "diag_depot_only": {
+      "mean": 0.1849605835042894,
+      "std": 0.007080176814769597
+    },
+    "diag_feasible_deliveries": {
+      "mean": 0.564862200524658,
+      "std": 0.008556997204074216
+    },
+    "diag_feasible_pickups": {
+      "mean": 1.8639077881351114,
+      "std": 0.042277632363015884
+    },
+    "diag_feasible_service": {
+      "mean": 2.428769987821579,
+      "std": 0.04237113216823445
+    },
+    "diag_mask_cap_cargo": {
+      "mean": 0.0,
+      "std": 0.0
+    },
+    "diag_mask_cap_cargo_pct_of_service_slots": {
+      "mean": 0.0,
+      "std": 0.0
+    },
+    "diag_mask_cap_passenger": {
+      "mean": 0.0,
+      "std": 0.0
+    },
+    "diag_mask_cap_passenger_pct_of_service_slots": {
+      "mean": 0.0,
+      "std": 0.0
+    },
+    "diag_mask_ops_end": {
+      "mean": 0.0,
+      "std": 0.0
+    },
+    "diag_mask_ops_end_pct_of_service_slots": {
+      "mean": 0.0,
+      "std": 0.0
+    },
+    "diag_mask_pickup_commitment": {
+      "mean": 9.017019721865655,
+      "std": 0.0865367193587424
+    },
+    "diag_mask_pickup_commitment_pct_of_service_slots": {
+      "mean": 18.03403944373131,
+      "std": 0.1730734387174848
+    },
+    "diag_mask_pickup_tw": {
+      "mean": 0.7879108261258807,
+      "std": 0.03341631535614397
+    },
+    "diag_mask_pickup_tw_pct_of_service_slots": {
+      "mean": 1.5758216522517614,
+      "std": 0.06683263071228794
+    },
+    "diag_mask_precedence": {
+      "mean": 12.725029996037483,
+      "std": 0.12750286143647058
+    },
+    "diag_mask_precedence_pct_of_service_slots": {
+      "mean": 25.450059992074966,
+      "std": 0.25500572287294115
+    },
+    "diag_mask_ride_time": {
+      "mean": 0.0,
+      "std": 0.0
+    },
+    "diag_mask_ride_time_pct_of_service_slots": {
+      "mean": 0.0,
+      "std": 0.0
+    },
+    "diag_mask_trip_time": {
+      "mean": 1.0465921216644347,
+      "std": 0.04594193526663047
+    },
+    "diag_mask_trip_time_pct_of_service_slots": {
+      "mean": 2.0931842433288694,
+      "std": 0.09188387053326094
+    },
+    "diag_mask_vehicle_limit": {
+      "mean": 0.009599507023813203,
+      "std": 0.0013364358548538487
+    },
+    "diag_mask_vehicle_limit_pct_of_service_slots": {
+      "mean": 0.019199014047626407,
+      "std": 0.0026728717097076974
+    },
+    "diag_mask_visited": {
+      "mean": 23.836550623178482,
+      "std": 0.24964359357859514
+    },
+    "diag_mask_visited_pct_of_service_slots": {
+      "mean": 47.673101246356964,
+      "std": 0.4992871871571903
+    },
+    "diag_open_started_count": {
+      "mean": 0.7133893912658096,
+      "std": 0.008326471768401674
+    },
+    "diag_open_started_eq2": {
+      "mean": 0.12546428377972915,
+      "std": 0.0041849180242504655
+    },
+    "diag_reject_allowed": {
+      "mean": 0.2759208066854626,
+      "std": 0.004134193416585498
+    },
+    "diag_reject_available_rate": {
+      "mean": 0.2759208066854626,
+      "std": 0.004134193416585498
+    },
+    "diag_reject_candidate_available": {
+      "mean": 0.9056841295212508,
+      "std": 0.008702847657557874
+    },
+    "diag_reject_inroute_available": {
+      "mean": 0.0,
+      "std": 0.0
+    },
+    "diag_reject_predeparture_available": {
+      "mean": 0.2759208066854626,
+      "std": 0.004134193416585498
+    },
+    "diag_second_pickup_blocked_by_commitment": {
+      "mean": 6.186458045244217,
+      "std": 0.05581262792437309
+    },
+    "diag_second_pickup_feasible": {
+      "mean": 0.568769873806741,
+      "std": 0.021383881993482227
+    },
+    "diag_selected_delivery": {
+      "mean": 0.3148816648405045,
+      "std": 0.003230657063200329
+    },
+    "diag_selected_depot": {
+      "mean": 0.1849605835042894,
+      "std": 0.007080176814769597
+    },
+    "diag_selected_pickup": {
+      "mean": 0.3148816648405045,
+      "std": 0.003230657063200329
+    },
+    "diag_selected_reject": {
+      "mean": 0.18527609466109424,
+      "std": 0.003046320180899737
+    },
+    "diag_service_feasible_but_selected_depot": {
+      "mean": 0.0,
+      "std": 0.0
+    },
+    "diag_service_feasible_but_selected_reject": {
+      "mean": 6.127451197244227e-05,
+      "std": 0.00012254902394488455
+    },
+    "diag_steps": {
+      "mean": 50.0,
+      "std": 0.4472135954999579
+    },
+    "energy_cost_raw": {
+      "mean": 29.110333222150803,
+      "std": 0.3082181495519846
+    },
+    "objective_total": {
+      "mean": 5625.661799621582,
+      "std": 63.71326614203711
+    },
+    "passenger_delivery_delay_cost_raw": {
+      "mean": 0.0,
+      "std": 0.0
+    },
+    "passenger_excess_ride_time_violations": {
+      "mean": 0.0,
+      "std": 0.0
+    },
+    "passenger_pickup_hard_violations": {
+      "mean": 0.0,
+      "std": 0.0
+    },
+    "passenger_total_ride_time_violations": {
+      "mean": 0.0,
+      "std": 0.0
+    },
+    "pickup_only_orders": {
+      "mean": 0.0,
+      "std": 0.0
+    },
+    "pickup_only_rate": {
+      "mean": 0.0,
+      "std": 0.0
+    },
+    "reject_penalty": {
+      "mean": 5324.140625,
+      "std": 64.43745074561649
+    },
+    "rejected_orders": {
+      "mean": 9.259375,
+      "std": 0.11206513173150692
+    },
+    "rejected_rate": {
+      "mean": 0.370375,
+      "std": 0.004482605269260283
+    },
+    "served_plus_rejected_orders": {
+      "mean": 25.0,
+      "std": 0.0
+    },
+    "served_plus_rejected_rate": {
+      "mean": 1.0,
+      "std": 0.0
+    },
+    "service_rate": {
+      "mean": 0.629625,
+      "std": 0.004482605269260288
+    },
+    "started_not_completed_orders": {
+      "mean": 0.0,
+      "std": 0.0
+    },
+    "started_not_completed_rate": {
+      "mean": 0.0,
+      "std": 0.0
+    },
+    "total_cost_raw": {
+      "mean": 5444.090297317505,
+      "std": 64.02781941668309
+    },
+    "total_distance": {
+      "mean": 160.83802835941316,
+      "std": 1.7204573698665784
+    },
+    "trip_overtime_penalty": {
+      "mean": 0.0,
+      "std": 0.0
+    },
+    "unfulfilled_orders": {
+      "mean": 0.0,
+      "std": 0.0
+    },
+    "unfulfilled_penalty": {
+      "mean": 0.0,
+      "std": 0.0
+    },
+    "unfulfilled_rate": {
+      "mean": 0.0,
+      "std": 0.0
+    },
+    "used_vehicles": {
+      "mean": 4.53125,
+      "std": 0.055021302692684404
+    },
+    "vehicle_cost_raw": {
+      "mean": 90.625,
+      "std": 1.100426053853688
+    }
+  },
+  "oracle_style": {
+    "cargo_delay_cost_raw": {
+      "mean": 0.00011112928623333574,
+      "std": 0.00022225857246667148
+    },
+    "completed_orders": {
+      "mean": 15.484375,
+      "std": 0.1284675299443404
+    },
+    "delivery_viability_fallback_count": {
+      "mean": 0.0,
+      "std": 0.0
+    },
+    "diag_any_service_feasible": {
+      "mean": 0.6355775117814444,
+      "std": 0.017938203858884286
+    },
+    "diag_delivery_viability_fallback": {
+      "mean": 0.0,
+      "std": 0.0
+    },
+    "diag_delivery_viability_masked": {
+      "mean": 0.0,
+      "std": 0.0
+    },
+    "diag_delivery_viability_masked_pct_of_service_slots": {
+      "mean": 0.0,
+      "std": 0.0
+    },
+    "diag_depot_carry_block": {
+      "mean": 0.3177887558907222,
+      "std": 0.008969101929442143
+    },
+    "diag_depot_fallback_used": {
+      "mean": 0.24685937500000002,
+      "std": 0.022283813842675134
+    },
+    "diag_depot_no_work_block": {
+      "mean": 0.020127706369759264,
+      "std": 0.0006948981470681684
+    },
+    "diag_depot_only": {
+      "mean": 0.0989041568487963,
+      "std": 0.0036323384977632518
+    },
+    "diag_feasible_deliveries": {
+      "mean": 0.3177887558907222,
+      "std": 0.008969101929442143
+    },
+    "diag_feasible_pickups": {
+      "mean": 3.434646398182587,
+      "std": 0.07282420572957199
+    },
+    "diag_feasible_service": {
+      "mean": 3.7524351540733094,
+      "std": 0.08053412094133777
+    },
+    "diag_mask_cap_cargo": {
+      "mean": 0.0,
+      "std": 0.0
+    },
+    "diag_mask_cap_cargo_pct_of_service_slots": {
+      "mean": 0.0,
+      "std": 0.0
+    },
+    "diag_mask_cap_passenger": {
+      "mean": 0.0,
+      "std": 0.0
+    },
+    "diag_mask_cap_passenger_pct_of_service_slots": {
+      "mean": 0.0,
+      "std": 0.0
+    },
+    "diag_mask_ops_end": {
+      "mean": 0.0,
+      "std": 0.0
+    },
+    "diag_mask_ops_end_pct_of_service_slots": {
+      "mean": 0.0,
+      "std": 0.0
+    },
+    "diag_mask_pickup_commitment": {
+      "mean": 9.926170291081206,
+      "std": 0.14272570268949233
+    },
+    "diag_mask_pickup_commitment_pct_of_service_slots": {
+      "mean": 19.852340582162412,
+      "std": 0.28545140537898467
+    },
+    "diag_mask_pickup_tw": {
+      "mean": 0.6129083779571611,
+      "std": 0.020286115374604924
+    },
+    "diag_mask_pickup_tw_pct_of_service_slots": {
+      "mean": 1.2258167559143223,
+      "std": 0.04057223074920985
+    },
+    "diag_mask_precedence": {
+      "mean": 15.027281985729484,
+      "std": 0.2117712323661526
+    },
+    "diag_mask_precedence_pct_of_service_slots": {
+      "mean": 30.05456397145897,
+      "std": 0.4235424647323052
+    },
+    "diag_mask_ride_time": {
+      "mean": 0.0,
+      "std": 0.0
+    },
+    "diag_mask_ride_time_pct_of_service_slots": {
+      "mean": 0.0,
+      "std": 0.0
+    },
+    "diag_mask_trip_time": {
+      "mean": 1.037323247743987,
+      "std": 0.035619051421755116
+    },
+    "diag_mask_trip_time_pct_of_service_slots": {
+      "mean": 2.074646495487974,
+      "std": 0.07123810284351023
+    },
+    "diag_mask_vehicle_limit": {
+      "mean": 0.01623367076454481,
+      "std": 0.0024290760870594908
+    },
+    "diag_mask_vehicle_limit_pct_of_service_slots": {
+      "mean": 0.03246734152908962,
+      "std": 0.0048581521741189815
+    },
+    "diag_mask_visited": {
+      "mean": 19.627647272650307,
+      "std": 0.43075391085845277
+    },
+    "diag_mask_visited_pct_of_service_slots": {
+      "mean": 39.255294545300615,
+      "std": 0.8615078217169055
+    },
+    "diag_open_started_count": {
+      "mean": 0.3177887558907222,
+      "std": 0.008969101929442143
+    },
+    "diag_open_started_eq2": {
+      "mean": 0.0,
+      "std": 0.0
+    },
+    "diag_reject_allowed": {
+      "mean": 0.36442248821855555,
+      "std": 0.017938203858884283
+    },
+    "diag_reject_available_rate": {
+      "mean": 0.36442248821855555,
+      "std": 0.017938203858884283
+    },
+    "diag_reject_candidate_available": {
+      "mean": 1.0,
+      "std": 0.0
+    },
+    "diag_reject_inroute_available": {
+      "mean": 0.0,
+      "std": 0.0
+    },
+    "diag_reject_predeparture_available": {
+      "mean": 0.36442248821855555,
+      "std": 0.017938203858884283
+    },
+    "diag_second_pickup_blocked_by_commitment": {
+      "mean": 3.9497638803712056,
+      "std": 0.16361935889090184
+    },
+    "diag_second_pickup_feasible": {
+      "mean": 0.7940828382742998,
+      "std": 0.024911091420670595
+    },
+    "diag_selected_delivery": {
+      "mean": 0.3177887558907222,
+      "std": 0.008969101929442143
+    },
+    "diag_selected_depot": {
+      "mean": 0.34576353184879627,
+      "std": 0.018746487620126196
+    },
+    "diag_selected_pickup": {
+      "mean": 0.3177887558907222,
+      "std": 0.008969101929442143
+    },
+    "diag_selected_reject": {
+      "mean": 0.0,
+      "std": 0.0
+    },
+    "diag_service_feasible_but_selected_depot": {
+      "mean": 0.0,
+      "std": 0.0
+    },
+    "diag_service_feasible_but_selected_reject": {
+      "mean": 0.0,
+      "std": 0.0
+    },
+    "diag_steps": {
+      "mean": 85.7,
+      "std": 4.494206339833542
+    },
+    "energy_cost_raw": {
+      "mean": 29.96706206202507,
+      "std": 0.19206978538947836
+    },
+    "no_move_count": {
+      "mean": 0.0,
+      "std": 0.0
+    },
+    "objective_total": {
+      "mean": 7445.873611450195,
+      "std": 95.99033378753612
+    },
+    "passenger_delivery_delay_cost_raw": {
+      "mean": 0.0,
+      "std": 0.0
+    },
+    "passenger_excess_ride_time_violations": {
+      "mean": 0.0,
+      "std": 0.0
+    },
+    "passenger_pickup_hard_violations": {
+      "mean": 0.0,
+      "std": 0.0
+    },
+    "passenger_total_ride_time_violations": {
+      "mean": 0.0,
+      "std": 0.0
+    },
+    "pickup_only_orders": {
+      "mean": 0.0,
+      "std": 0.0
+    },
+    "pickup_only_rate": {
+      "mean": 0.0,
+      "std": 0.0
+    },
+    "reject_penalty": {
+      "mean": 0.0,
+      "std": 0.0
+    },
+    "rejected_orders": {
+      "mean": 0.0,
+      "std": 0.0
+    },
+    "rejected_rate": {
+      "mean": 0.0,
+      "std": 0.0
+    },
+    "served_plus_rejected_orders": {
+      "mean": 15.484375,
+      "std": 0.1284675299443404
+    },
+    "served_plus_rejected_rate": {
+      "mean": 0.619375,
+      "std": 0.0051387011977736125
+    },
+    "service_rate": {
+      "mean": 0.619375,
+      "std": 0.0051387011977736125
+    },
+    "started_not_completed_orders": {
+      "mean": 0.0,
+      "std": 0.0
+    },
+    "started_not_completed_rate": {
+      "mean": 0.0,
+      "std": 0.0
+    },
+    "total_cost_raw": {
+      "mean": 7259.74845123291,
+      "std": 96.11937010618362
+    },
+    "total_distance": {
+      "mean": 165.8971599817276,
+      "std": 1.0715516502656057
+    },
+    "trip_overtime_penalty": {
+      "mean": 0.0,
+      "std": 0.0
+    },
+    "unfulfilled_orders": {
+      "mean": 9.515625,
+      "std": 0.1284675299443404
+    },
+    "unfulfilled_penalty": {
+      "mean": 7136.71875,
+      "std": 96.35064745825531
+    },
+    "unfulfilled_rate": {
+      "mean": 0.380625,
+      "std": 0.005138701197773623
+    },
+    "used_vehicles": {
+      "mean": 4.653125,
+      "std": 0.03617449032121946
+    },
+    "vehicle_cost_raw": {
+      "mean": 93.0625,
+      "std": 0.7234898064243891
+    }
+  },
+  "random": {
+    "cargo_delay_cost_raw": {
+      "mean": 0.20165155968570617,
+      "std": 0.03239001590897426
+    },
+    "completed_orders": {
+      "mean": 13.975,
+      "std": 0.4095538731351469
+    },
+    "delivery_viability_fallback_count": {
+      "mean": 0.0,
+      "std": 0.0
+    },
+    "diag_any_service_feasible": {
+      "mean": 0.7739427334227306,
+      "std": 0.02219335773315199
+    },
+    "diag_delivery_viability_fallback": {
+      "mean": 0.0,
+      "std": 0.0
+    },
+    "diag_delivery_viability_masked": {
+      "mean": 0.10127353414049187,
+      "std": 0.008303890451443002
+    },
+    "diag_delivery_viability_masked_pct_of_service_slots": {
+      "mean": 0.20254706828098373,
+      "std": 0.016607780902886008
+    },
+    "diag_depot_carry_block": {
+      "mean": 0.5327799431994842,
+      "std": 0.018136532092802898
+    },
+    "diag_depot_fallback_used": {
+      "mean": 0.05871875,
+      "std": 0.02619495717213525
+    },
+    "diag_depot_no_work_block": {
+      "mean": 0.028004336096211578,
+      "std": 0.0010016702378529863
+    },
+    "diag_depot_only": {
+      "mean": 0.1396779304810579,
+      "std": 0.005115967700930337
+    },
+    "diag_feasible_deliveries": {
+      "mean": 0.6558469742842081,
+      "std": 0.02833496815425436
+    },
+    "diag_feasible_pickups": {
+      "mean": 2.796187373260286,
+      "std": 0.0435077831353288
+    },
+    "diag_feasible_service": {
+      "mean": 3.452034347544494,
+      "std": 0.051998576911928725
+    },
+    "diag_mask_cap_cargo": {
+      "mean": 0.0,
+      "std": 0.0
+    },
+    "diag_mask_cap_cargo_pct_of_service_slots": {
+      "mean": 0.0,
+      "std": 0.0
+    },
+    "diag_mask_cap_passenger": {
+      "mean": 0.0,
+      "std": 0.0
+    },
+    "diag_mask_cap_passenger_pct_of_service_slots": {
+      "mean": 0.0,
+      "std": 0.0
+    },
+    "diag_mask_ops_end": {
+      "mean": 0.0,
+      "std": 0.0
+    },
+    "diag_mask_ops_end_pct_of_service_slots": {
+      "mean": 0.0,
+      "std": 0.0
+    },
+    "diag_mask_pickup_commitment": {
+      "mean": 10.300851935552085,
+      "std": 0.054457978988046066
+    },
+    "diag_mask_pickup_commitment_pct_of_service_slots": {
+      "mean": 20.60170387110417,
+      "std": 0.10891595797609292
+    },
+    "diag_mask_pickup_tw": {
+      "mean": 2.3174294385390795,
+      "std": 0.13697600450218334
+    },
+    "diag_mask_pickup_tw_pct_of_service_slots": {
+      "mean": 4.634858877078159,
+      "std": 0.27395200900436667
+    },
+    "diag_mask_precedence": {
+      "mean": 17.013882838698215,
+      "std": 0.2423343239359831
+    },
+    "diag_mask_precedence_pct_of_service_slots": {
+      "mean": 34.02776567739643,
+      "std": 0.4846686478719662
+    },
+    "diag_mask_ride_time": {
+      "mean": 0.0,
+      "std": 0.0
+    },
+    "diag_mask_ride_time_pct_of_service_slots": {
+      "mean": 0.0,
+      "std": 0.0
+    },
+    "diag_mask_trip_time": {
+      "mean": 1.5326793320292862,
+      "std": 0.08851566932703643
+    },
+    "diag_mask_trip_time_pct_of_service_slots": {
+      "mean": 3.0653586640585724,
+      "std": 0.17703133865407275
+    },
+    "diag_mask_vehicle_limit": {
+      "mean": 0.06673475931747991,
+      "std": 0.01440557405131693
+    },
+    "diag_mask_vehicle_limit_pct_of_service_slots": {
+      "mean": 0.1334695186349598,
+      "std": 0.02881114810263385
+    },
+    "diag_mask_visited": {
+      "mean": 15.215113814178867,
+      "std": 0.4778491891717976
+    },
+    "diag_mask_visited_pct_of_service_slots": {
+      "mean": 30.430227628357734,
+      "std": 0.9556983783435941
+    },
+    "diag_open_started_count": {
+      "mean": 0.7571205084247,
+      "std": 0.03635357936250617
+    },
+    "diag_open_started_eq2": {
+      "mean": 0.14125192032286168,
+      "std": 0.006856872453428739
+    },
+    "diag_reject_allowed": {
+      "mean": 0.22605726657726946,
+      "std": 0.022193357733151984
+    },
+    "diag_reject_available_rate": {
+      "mean": 0.22605726657726946,
+      "std": 0.022193357733151984
+    },
+    "diag_reject_candidate_available": {
+      "mean": 1.0,
+      "std": 0.0
+    },
+    "diag_reject_inroute_available": {
+      "mean": 0.0,
+      "std": 0.0
+    },
+    "diag_reject_predeparture_available": {
+      "mean": 0.22605726657726946,
+      "std": 0.022193357733151984
+    },
+    "diag_second_pickup_blocked_by_commitment": {
+      "mean": 6.61232125990866,
+      "std": 0.23722520747500567
+    },
+    "diag_second_pickup_feasible": {
+      "mean": 0.886207141851419,
+      "std": 0.06003578699656477
+    },
+    "diag_selected_delivery": {
+      "mean": 0.3869713667113653,
+      "std": 0.011096678866575995
+    },
+    "diag_selected_depot": {
+      "mean": 0.1983966804810579,
+      "std": 0.022891608660360545
+    },
+    "diag_selected_pickup": {
+      "mean": 0.3869713667113653,
+      "std": 0.011096678866575995
+    },
+    "diag_selected_reject": {
+      "mean": 0.0,
+      "std": 0.0
+    },
+    "diag_service_feasible_but_selected_depot": {
+      "mean": 0.0,
+      "std": 0.0
+    },
+    "diag_service_feasible_but_selected_reject": {
+      "mean": 0.0,
+      "std": 0.0
+    },
+    "diag_steps": {
+      "mean": 45.55625,
+      "std": 5.044001697561173
+    },
+    "energy_cost_raw": {
+      "mean": 26.6336098998785,
+      "std": 0.7249884325626951
+    },
+    "no_move_count": {
+      "mean": 0.0,
+      "std": 0.0
+    },
+    "objective_total": {
+      "mean": 8591.762756347656,
+      "std": 305.9816952818907
+    },
+    "passenger_delivery_delay_cost_raw": {
+      "mean": 0.0,
+      "std": 0.0
+    },
+    "passenger_excess_ride_time_violations": {
+      "mean": 0.0,
+      "std": 0.0
+    },
+    "passenger_pickup_hard_violations": {
+      "mean": 0.0,
+      "std": 0.0
+    },
+    "passenger_total_ride_time_violations": {
+      "mean": 0.0,
+      "std": 0.0
+    },
+    "pickup_only_orders": {
+      "mean": 0.0,
+      "std": 0.0
+    },
+    "pickup_only_rate": {
+      "mean": 0.0,
+      "std": 0.0
+    },
+    "reject_penalty": {
+      "mean": 0.0,
+      "std": 0.0
+    },
+    "rejected_orders": {
+      "mean": 0.0,
+      "std": 0.0
+    },
+    "rejected_rate": {
+      "mean": 0.0,
+      "std": 0.0
+    },
+    "served_plus_rejected_orders": {
+      "mean": 13.975,
+      "std": 0.4095538731351469
+    },
+    "served_plus_rejected_rate": {
+      "mean": 0.5589999999999999,
+      "std": 0.01638215492540586
+    },
+    "service_rate": {
+      "mean": 0.5589999999999999,
+      "std": 0.01638215492540586
+    },
+    "started_not_completed_orders": {
+      "mean": 0.0,
+      "std": 0.0
+    },
+    "started_not_completed_rate": {
+      "mean": 0.0,
+      "std": 0.0
+    },
+    "total_cost_raw": {
+      "mean": 8394.210273742676,
+      "std": 306.28819153039666
+    },
+    "total_distance": {
+      "mean": 147.2770501613617,
+      "std": 4.000821823961823
+    },
+    "trip_overtime_penalty": {
+      "mean": 0.0,
+      "std": 0.0
+    },
+    "unfulfilled_orders": {
+      "mean": 11.025,
+      "std": 0.4095538731351469
+    },
+    "unfulfilled_penalty": {
+      "mean": 8268.75,
+      "std": 307.16540485136017
+    },
+    "unfulfilled_rate": {
+      "mean": 0.441,
+      "std": 0.016382154925405876
+    },
+    "used_vehicles": {
+      "mean": 4.93125,
+      "std": 0.030618621784789725
+    },
+    "vehicle_cost_raw": {
+      "mean": 98.625,
+      "std": 0.6123724356957945
+    }
+  },
+  "bad": {
+    "cargo_delay_cost_raw": {
+      "mean": 0.3643100535904523,
+      "std": 0.027257784638837868
+    },
+    "completed_orders": {
+      "mean": 13.778125,
+      "std": 0.19699896890593108
+    },
+    "delivery_viability_fallback_count": {
+      "mean": 0.0,
+      "std": 0.0
+    },
+    "diag_any_service_feasible": {
+      "mean": 0.7614444866520863,
+      "std": 0.014859774592265255
+    },
+    "diag_delivery_viability_fallback": {
+      "mean": 0.0,
+      "std": 0.0
+    },
+    "diag_delivery_viability_masked": {
+      "mean": 0.1816882754154063,
+      "std": 0.008728318822013983
+    },
+    "diag_delivery_viability_masked_pct_of_service_slots": {
+      "mean": 0.36337655083081266,
+      "std": 0.017456637644027953
+    },
+    "diag_depot_carry_block": {
+      "mean": 0.5572509161160477,
+      "std": 0.013587563890124978
+    },
+    "diag_depot_fallback_used": {
+      "mean": 0.072234375,
+      "std": 0.018320577356827485
+    },
+    "diag_depot_no_work_block": {
+      "mean": 0.027868627224652283,
+      "std": 0.000624349148999468
+    },
+    "diag_depot_only": {
+      "mean": 0.13887438612326142,
+      "std": 0.003205670843425269
+    },
+    "diag_feasible_deliveries": {
+      "mean": 0.6796727836630604,
+      "std": 0.018103821563300364
+    },
+    "diag_feasible_pickups": {
+      "mean": 2.4641638586087113,
+      "std": 0.046954209665679585
+    },
+    "diag_feasible_service": {
+      "mean": 3.143836642271772,
+      "std": 0.06028824563191728
+    },
+    "diag_mask_cap_cargo": {
+      "mean": 0.0,
+      "std": 0.0
+    },
+    "diag_mask_cap_cargo_pct_of_service_slots": {
+      "mean": 0.0,
+      "std": 0.0
+    },
+    "diag_mask_cap_passenger": {
+      "mean": 0.0,
+      "std": 0.0
+    },
+    "diag_mask_cap_passenger_pct_of_service_slots": {
+      "mean": 0.0,
+      "std": 0.0
+    },
+    "diag_mask_ops_end": {
+      "mean": 0.0,
+      "std": 0.0
+    },
+    "diag_mask_ops_end_pct_of_service_slots": {
+      "mean": 0.0,
+      "std": 0.0
+    },
+    "diag_mask_pickup_commitment": {
+      "mean": 10.302624750975987,
+      "std": 0.05371359690209624
+    },
+    "diag_mask_pickup_commitment_pct_of_service_slots": {
+      "mean": 20.605249501951974,
+      "std": 0.10742719380419281
+    },
+    "diag_mask_pickup_tw": {
+      "mean": 2.432650135387703,
+      "std": 0.04461560435311609
+    },
+    "diag_mask_pickup_tw_pct_of_service_slots": {
+      "mean": 4.865300270775406,
+      "std": 0.08923120870623218
+    },
+    "diag_mask_precedence": {
+      "mean": 16.994957027979922,
+      "std": 0.14869939226473042
+    },
+    "diag_mask_precedence_pct_of_service_slots": {
+      "mean": 33.989914055959844,
+      "std": 0.29739878452946084
+    },
+    "diag_mask_ride_time": {
+      "mean": 0.0,
+      "std": 0.0
+    },
+    "diag_mask_ride_time_pct_of_service_slots": {
+      "mean": 0.0,
+      "std": 0.0
+    },
+    "diag_mask_trip_time": {
+      "mean": 1.722409951670062,
+      "std": 0.11419331427605274
+    },
+    "diag_mask_trip_time_pct_of_service_slots": {
+      "mean": 3.444819903340124,
+      "std": 0.22838662855210548
+    },
+    "diag_mask_vehicle_limit": {
+      "mean": 0.07310833133745769,
+      "std": 0.005962733661104921
+    },
+    "diag_mask_vehicle_limit_pct_of_service_slots": {
+      "mean": 0.14621666267491537,
+      "std": 0.011925467322209842
+    },
+    "diag_mask_visited": {
+      "mean": 15.148724884961691,
+      "std": 0.31012797435542644
+    },
+    "diag_mask_visited_pct_of_service_slots": {
+      "mean": 30.297449769923382,
+      "std": 0.6202559487108539
+    },
+    "diag_open_started_count": {
+      "mean": 0.8613610590784667,
+      "std": 0.02431947569074741
+    },
+    "diag_open_started_eq2": {
+      "mean": 0.16768577828072556,
+      "std": 0.005903052952813256
+    },
+    "diag_reject_allowed": {
+      "mean": 0.23855551334791372,
+      "std": 0.014859774592265267
+    },
+    "diag_reject_available_rate": {
+      "mean": 0.23855551334791372,
+      "std": 0.014859774592265267
+    },
+    "diag_reject_candidate_available": {
+      "mean": 1.0,
+      "std": 0.0
+    },
+    "diag_reject_inroute_available": {
+      "mean": 0.0,
+      "std": 0.0
+    },
+    "diag_reject_predeparture_available": {
+      "mean": 0.23855551334791372,
+      "std": 0.014859774592265267
+    },
+    "diag_second_pickup_blocked_by_commitment": {
+      "mean": 6.930270351369906,
+      "std": 0.19558332697954858
+    },
+    "diag_second_pickup_feasible": {
+      "mean": 0.7416622237129807,
+      "std": 0.03359303038924172
+    },
+    "diag_selected_delivery": {
+      "mean": 0.38072224332604315,
+      "std": 0.007429887296132628
+    },
+    "diag_selected_depot": {
+      "mean": 0.21110876112326143,
+      "std": 0.015492964648519993
+    },
+    "diag_selected_pickup": {
+      "mean": 0.38072224332604315,
+      "std": 0.007429887296132628
+    },
+    "diag_selected_reject": {
+      "mean": 0.0,
+      "std": 0.0
+    },
+    "diag_service_feasible_but_selected_depot": {
+      "mean": 0.0,
+      "std": 0.0
+    },
+    "diag_service_feasible_but_selected_reject": {
+      "mean": 0.0,
+      "std": 0.0
+    },
+    "diag_steps": {
+      "mean": 47.825,
+      "std": 3.563958034966181
+    },
+    "energy_cost_raw": {
+      "mean": 29.262604624032974,
+      "std": 0.34056278184671557
+    },
+    "no_move_count": {
+      "mean": 0.0,
+      "std": 0.0
+    },
+    "objective_total": {
+      "mean": 8740.954631042481,
+      "std": 146.99687629877033
+    },
+    "passenger_delivery_delay_cost_raw": {
+      "mean": 0.0,
+      "std": 0.0
+    },
+    "passenger_excess_ride_time_violations": {
+      "mean": 0.0,
+      "std": 0.0
+    },
+    "passenger_pickup_hard_violations": {
+      "mean": 0.0,
+      "std": 0.0
+    },
+    "passenger_total_ride_time_violations": {
+      "mean": 0.0,
+      "std": 0.0
+    },
+    "pickup_only_orders": {
+      "mean": 0.0,
+      "std": 0.0
+    },
+    "pickup_only_rate": {
+      "mean": 0.0,
+      "std": 0.0
+    },
+    "reject_penalty": {
+      "mean": 0.0,
+      "std": 0.0
+    },
+    "rejected_orders": {
+      "mean": 0.0,
+      "std": 0.0
+    },
+    "rejected_rate": {
+      "mean": 0.0,
+      "std": 0.0
+    },
+    "served_plus_rejected_orders": {
+      "mean": 13.778125,
+      "std": 0.19699896890593108
+    },
+    "served_plus_rejected_rate": {
+      "mean": 0.5511250000000001,
+      "std": 0.007879958756237222
+    },
+    "service_rate": {
+      "mean": 0.5511250000000001,
+      "std": 0.007879958756237222
+    },
+    "started_not_completed_orders": {
+      "mean": 0.0,
+      "std": 0.0
+    },
+    "started_not_completed_rate": {
+      "mean": 0.0,
+      "std": 0.0
+    },
+    "total_cost_raw": {
+      "mean": 8544.158157348633,
+      "std": 147.29564342487146
+    },
+    "total_distance": {
+      "mean": 161.79087686538696,
+      "std": 1.8898305055814013
+    },
+    "trip_overtime_penalty": {
+      "mean": 0.0,
+      "std": 0.0
+    },
+    "unfulfilled_orders": {
+      "mean": 11.221875,
+      "std": 0.19699896890593108
+    },
+    "unfulfilled_penalty": {
+      "mean": 8416.40625,
+      "std": 147.7492266794483
+    },
+    "unfulfilled_rate": {
+      "mean": 0.448875,
+      "std": 0.007879958756237239
+    },
+    "used_vehicles": {
+      "mean": 4.90625,
+      "std": 0.02614562582918986
+    },
+    "vehicle_cost_raw": {
+      "mean": 98.125,
+      "std": 0.5229125165837972
+    }
+  }
+}

@@ -2,6 +2,14 @@ outputs/*
 !outputs/normalization_profiles/
 !outputs/normalization_profiles/*.json
 outputs_smoke/
+outputs_eval/*
+!outputs_eval/formal_compare_suppress_w3_b25/
+!outputs_eval/formal_compare_suppress_w3_b25/**
+outputs_rootcause/*
+!outputs_rootcause/main_5seed_64/
+!outputs_rootcause/main_5seed_64/**
+!outputs_rootcause/suppress_w3_b25_main_5seed_64/
+!outputs_rootcause/suppress_w3_b25_main_5seed_64/**
 __pycache__/
 *.pyc
 *.pt

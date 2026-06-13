@@ -1,0 +1,42 @@
+{
+  "generated_at": "2026-06-13T09:43:06.102871Z",
+  "command": "/Users/bytedance/Downloads/project-vrp-v6-4-main/rootcause_oracle_vs_rollout.py --graph-size 25 --num-samples 64 --batch-size 32 --seeds 101 202 303 404 505 --policies rollout oracle_style random bad --checkpoint /Users/bytedance/Downloads/project-vrp-v6-4-main/outputs_smoke/reject_acceptance_sweep_tw1_v1/suppress_w3_b25/pomo_n25_optimized/model_best.pt --passenger-tw-period-weights 0.56 0.29 0.15 --cargo-tw-period-weights 0.58 0.28 0.14 --output-dir /Users/bytedance/Downloads/project-vrp-v6-4-main/outputs_rootcause/suppress_w3_b25_main_5seed_64",
+  "graph_size": 25,
+  "num_samples": 64,
+  "batch_size": 32,
+  "seeds": [
+    101,
+    202,
+    303,
+    404,
+    505
+  ],
+  "policies": [
+    "rollout",
+    "oracle_style",
+    "random",
+    "bad"
+  ],
+  "checkpoint": "/Users/bytedance/Downloads/project-vrp-v6-4-main/outputs_smoke/reject_acceptance_sweep_tw1_v1/suppress_w3_b25/pomo_n25_optimized/model_best.pt",
+  "decode": "greedy",
+  "device": "cpu",
+  "state_kwargs": {
+    "max_concurrent_open_orders": 6,
+    "enable_delivery_viability": true,
+    "enable_viability_fallback": false
+  },
+  "deadlock_limit": 2,
+  "dataset_kwargs": {
+    "passenger_tw_period_weights_override": [
+      0.56,
+      0.29,
+      0.15
+    ],
+    "cargo_tw_period_weights_override": [
+      0.58,
+      0.28,
+      0.14
+    ]
+  },
+  "note": "oracle_style is a heuristic comparator, not a globally optimal oracle."
+}
