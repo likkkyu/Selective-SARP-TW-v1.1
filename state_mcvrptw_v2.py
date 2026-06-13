@@ -81,7 +81,8 @@ class StateMCVRPPDTW(NamedTuple):
 
     def _delivery_sequence_feasible(self, start_coord, start_time, trip_start_time, delivery_sequence,
                                     delivery_coords, delivery_earliest, delivery_to_depot_time,
-                                    passenger_orders, passenger_pickup_times, direct_ride_time):
+                                    passenger_orders, passenger_pickup_times, direct_ride_time,
+                                    return_reason=False):
         current_coord = start_coord
         current_time = float(start_time)
         trip_start = float(trip_start_time)
@@ -93,49 +94,66 @@ class StateMCVRPPDTW(NamedTuple):
             if passenger_orders[order_idx].item():
                 pickup_time = float(passenger_pickup_times[order_idx].item())
                 if pickup_time < 0:
-                    return False
+                    return (False, 'missing_pickup_time') if return_reason else False
                 ride_time = arrival_time - pickup_time
                 excess_ride_time = max(ride_time - float(direct_ride_time[order_idx].item()), 0.0)
                 if Config.HARD_PASSENGER_MAX_RIDE_TIME and (
                     ride_time > Config.PASSENGER_MAX_RIDE_TIME_MINUTES / 60.0 + 1e-5
                     or excess_ride_time > Config.PASSENGER_MAX_EXCESS_RIDE_TIME_MINUTES / 60.0 + 1e-5
                 ):
-                    return False
+                    return (False, 'ride_time') if return_reason else False
             service_start = max(arrival_time, float(delivery_earliest[order_idx].item()))
             finish_time = service_start + self.SERVICE_TIME
             finish_with_return = finish_time + float(delivery_to_depot_time[order_idx].item())
             if Config.HARD_MAX_TRIP_TIME and (finish_with_return - trip_start > self.MAX_TRIP_TIME + 1e-5):
-                return False
+                return (False, 'trip_time') if return_reason else False
             if Config.HARD_OPERATION_END and (finish_with_return > self.OPERATION_END + 1e-5):
-                return False
+                return (False, 'ops_end') if return_reason else False
             current_coord = delivery_coord
             current_time = finish_time
-        return True
+        return (True, None) if return_reason else True
 
     def _has_feasible_open_completion(self, start_coord, start_time, trip_start_time, open_mask,
                                       delivery_coords, delivery_earliest, delivery_to_depot_time,
-                                      passenger_orders, passenger_pickup_times, direct_ride_time):
+                                      passenger_orders, passenger_pickup_times, direct_ride_time,
+                                      return_reason=False):
         open_indices = torch.nonzero(open_mask, as_tuple=False).squeeze(-1)
         if open_indices.numel() == 0:
-            return True
+            return (True, None) if return_reason else True
         if open_indices.numel() > 6:
-            return False
+            return (False, 'open_over_6') if return_reason else False
+        order_list = open_indices.tolist()
         if open_indices.numel() == 1:
             return self._delivery_sequence_feasible(
-                start_coord, start_time, trip_start_time, open_indices.tolist(),
+                start_coord, start_time, trip_start_time, order_list,
                 delivery_coords, delivery_earliest, delivery_to_depot_time,
                 passenger_orders, passenger_pickup_times, direct_ride_time,
+                return_reason=return_reason,
             )
-        order_list = open_indices.tolist()
         from itertools import permutations
+        failure_reasons = set()
         for sequence in permutations(order_list):
-            if self._delivery_sequence_feasible(
+            result = self._delivery_sequence_feasible(
                 start_coord, start_time, trip_start_time, sequence,
                 delivery_coords, delivery_earliest, delivery_to_depot_time,
                 passenger_orders, passenger_pickup_times, direct_ride_time,
-            ):
+                return_reason=return_reason,
+            )
+            if return_reason:
+                feasible, reason = result
+                if feasible:
+                    return True, None
+                if reason is not None:
+                    failure_reasons.add(reason)
+            elif result:
                 return True
-        return False
+        if not return_reason:
+            return False
+        if not failure_reasons:
+            return False, 'unknown'
+        if len(failure_reasons) == 1:
+            return False, next(iter(failure_reasons))
+        return False, 'mixed'
 
     def _delivery_step_feasible(self, start_coord, start_time, trip_start_time, order_idx,
                                 delivery_coords, delivery_earliest, delivery_to_depot_time,
@@ -381,6 +399,15 @@ class StateMCVRPPDTW(NamedTuple):
                 'diag_open_started_eq2',
                 'diag_second_pickup_feasible',
                 'diag_second_pickup_blocked_by_commitment',
+                'diag_pickup_commitment_block_by_k',
+                'diag_pickup_commitment_block_by_completion',
+                'diag_pickup_commitment_block_by_completion_ride_time',
+                'diag_pickup_commitment_block_by_completion_trip_time',
+                'diag_pickup_commitment_block_by_completion_ops_end',
+                'diag_pickup_commitment_block_by_completion_open_over_6',
+                'diag_pickup_commitment_block_by_completion_other',
+                'diag_pickup_commitment_block_by_next_state',
+                'diag_pickup_commitment_block_by_fallback',
                 'diag_delivery_viability_masked',
                 'diag_delivery_viability_fallback',
                 'diag_mask_vehicle_limit',
@@ -546,6 +573,8 @@ class StateMCVRPPDTW(NamedTuple):
                 if open_started_count[batch_idx].item() >= self.max_concurrent_open_orders:
                     pickup_commitment_mask[batch_idx, candidate_indices] = True
                     second_pickup_blocked = int(candidate_indices.numel())
+                    if return_debug:
+                        debug['diag_pickup_commitment_block_by_k'][batch_idx] += float(candidate_indices.numel())
                 else:
                     batch_state = self[batch_idx:batch_idx + 1]
                     batch_mask = batch_state.get_mask(skip_pickup_commitment=True)
@@ -556,12 +585,14 @@ class StateMCVRPPDTW(NamedTuple):
                         if open_after.sum().item() > self.max_concurrent_open_orders:
                             pickup_commitment_mask[batch_idx, candidate_idx] = True
                             second_pickup_blocked += 1
+                            if return_debug:
+                                debug['diag_pickup_commitment_block_by_k'][batch_idx] += 1.0
                             continue
 
                         passenger_pickup_times_after = passenger_pickup_times_before[batch_idx].clone()
                         if passenger_orders[batch_idx, candidate_idx].item():
                             passenger_pickup_times_after[candidate_idx] = pickup_finish[batch_idx, candidate_idx]
-                        completion_feasible = self._has_feasible_open_completion(
+                        completion_feasible, completion_block_reason = self._has_feasible_open_completion(
                             pickup_coords[batch_idx, candidate_idx],
                             pickup_finish[batch_idx, candidate_idx],
                             trip_start_after_pickup[batch_idx],
@@ -572,6 +603,21 @@ class StateMCVRPPDTW(NamedTuple):
                             passenger_orders[batch_idx],
                             passenger_pickup_times_after,
                             direct_ride_time[batch_idx],
+                            return_reason=return_debug,
+                        ) if return_debug else (
+                            self._has_feasible_open_completion(
+                                pickup_coords[batch_idx, candidate_idx],
+                                pickup_finish[batch_idx, candidate_idx],
+                                trip_start_after_pickup[batch_idx],
+                                open_after,
+                                delivery_coords[batch_idx],
+                                delivery_earliest[batch_idx],
+                                delivery_to_depot_time[batch_idx],
+                                passenger_orders[batch_idx],
+                                passenger_pickup_times_after,
+                                direct_ride_time[batch_idx],
+                            ),
+                            None,
                         )
 
                         candidate_node = candidate_idx + 1
@@ -616,6 +662,23 @@ class StateMCVRPPDTW(NamedTuple):
                             second_pickup_feasible += 1
                         else:
                             second_pickup_blocked += 1
+                            if return_debug:
+                                if not completion_feasible:
+                                    debug['diag_pickup_commitment_block_by_completion'][batch_idx] += 1.0
+                                    if completion_block_reason == 'ride_time':
+                                        debug['diag_pickup_commitment_block_by_completion_ride_time'][batch_idx] += 1.0
+                                    elif completion_block_reason == 'trip_time':
+                                        debug['diag_pickup_commitment_block_by_completion_trip_time'][batch_idx] += 1.0
+                                    elif completion_block_reason == 'ops_end':
+                                        debug['diag_pickup_commitment_block_by_completion_ops_end'][batch_idx] += 1.0
+                                    elif completion_block_reason == 'open_over_6':
+                                        debug['diag_pickup_commitment_block_by_completion_open_over_6'][batch_idx] += 1.0
+                                    else:
+                                        debug['diag_pickup_commitment_block_by_completion_other'][batch_idx] += 1.0
+                                elif not next_state_feasible:
+                                    debug['diag_pickup_commitment_block_by_next_state'][batch_idx] += 1.0
+                                elif not fallback_safe:
+                                    debug['diag_pickup_commitment_block_by_fallback'][batch_idx] += 1.0
                 if return_debug and open_started_count[batch_idx].item() >= 1:
                     debug['diag_second_pickup_feasible'][batch_idx] = float(second_pickup_feasible)
                     debug['diag_second_pickup_blocked_by_commitment'][batch_idx] = float(second_pickup_blocked)
