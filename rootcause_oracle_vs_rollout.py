@@ -122,6 +122,8 @@ def parse_args():
     parser.add_argument('--enable-viability-fallback', dest='enable_viability_fallback', action='store_true')
     parser.add_argument('--disable-viability-fallback', dest='enable_viability_fallback', action='store_false')
     parser.set_defaults(enable_viability_fallback=None)
+    parser.add_argument('--relax-pickup-commitment-trip-time', action='store_true',
+                        help='仅对 pickup_commitment 的 completion proof 放松 trip_time gate')
     parser.add_argument('--deadlock-limit', type=int, default=2)
     parser.add_argument('--passenger-tw-period-weights', nargs=3, type=float, default=None,
                         metavar=('MORNING', 'MIDDAY', 'EVENING'))
@@ -515,6 +517,7 @@ def _resolve_shared_state_kwargs(args, checkpoint):
         'max_concurrent_open_orders': max_open,
         'enable_delivery_viability': enable_delivery_viability,
         'enable_viability_fallback': enable_viability_fallback,
+        'relax_pickup_commitment_trip_time': bool(getattr(args, 'relax_pickup_commitment_trip_time', False)),
     }
 
 

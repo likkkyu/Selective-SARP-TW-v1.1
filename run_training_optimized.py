@@ -177,6 +177,7 @@ class POMOTrainerOptimized:
             'max_concurrent_open_orders': self.args.max_concurrent_open_orders,
             'enable_delivery_viability': self.args.enable_delivery_viability,
             'enable_viability_fallback': self.args.enable_viability_fallback,
+            'relax_pickup_commitment_trip_time': self.args.relax_pickup_commitment_trip_time,
         }
 
     def _build_default_dataset_kwargs(self):
@@ -685,6 +686,7 @@ def parse_args():
     parser.add_argument('--enable-delivery-viability', action='store_true', default=True, help='共享主线：启用 delivery viability')
     parser.add_argument('--disable-delivery-viability', action='store_false', dest='enable_delivery_viability', help='关闭 delivery viability（仅对照实验）')
     parser.add_argument('--enable-viability-fallback', action='store_true', default=False, help='启用 delivery viability fallback（仅对照实验）')
+    parser.add_argument('--relax-pickup-commitment-trip-time', action='store_true', default=False, help='仅对 pickup_commitment 的 completion proof 放松 trip_time gate（实验开关）')
     parser.add_argument('--alpha-energy', type=float, default=Config.ALPHA_ENERGY, help='训练 objective 中 energy 项的权重')
     parser.add_argument('--alpha-delay', type=float, default=Config.ALPHA_DELAY, help='训练 objective 中 delay 项的权重')
     parser.add_argument('--alpha-vehicle', type=float, default=Config.ALPHA_VEHICLE, help='训练 objective 中 vehicle 项的权重')

@@ -48,6 +48,8 @@ def parse_args():
                         help='共享实验：对 delivery 也启用 viability 过滤')
     parser.add_argument('--enable-viability-fallback', action='store_true',
                         help='共享实验：若 delivery viability 全挡死则启用安全回退')
+    parser.add_argument('--relax-pickup-commitment-trip-time', action='store_true',
+                        help='仅对 pickup_commitment 的 completion proof 放松 trip_time gate')
     parser.add_argument('--passenger-tw-period-weights', nargs=3, type=float, default=None,
                         metavar=('MORNING', 'MIDDAY', 'EVENING'),
                         help='覆盖默认 passenger 三时段 TW 权重')
@@ -130,6 +132,7 @@ def _resolve_state_kwargs(args, checkpoint):
         'max_concurrent_open_orders': max_open,
         'enable_delivery_viability': enable_delivery_viability,
         'enable_viability_fallback': enable_viability_fallback,
+        'relax_pickup_commitment_trip_time': bool(getattr(args, 'relax_pickup_commitment_trip_time', False)),
     }
 
 
@@ -172,7 +175,8 @@ def evaluate():
     state_kwargs = _resolve_state_kwargs(args, checkpoint)
     print(f"  shared env   : max_open={state_kwargs['max_concurrent_open_orders']}, "
           f"delivery_viability={state_kwargs['enable_delivery_viability']}, "
-          f"viability_fallback={state_kwargs['enable_viability_fallback']}")
+          f"viability_fallback={state_kwargs['enable_viability_fallback']}, "
+          f"relax_commitment_trip_time={state_kwargs['relax_pickup_commitment_trip_time']}")
 
     model = build_model_from_checkpoint(checkpoint, device)
     model.load_state_dict(checkpoint['model_state_dict'])

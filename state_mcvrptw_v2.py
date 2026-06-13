@@ -41,6 +41,7 @@ class StateMCVRPPDTW(NamedTuple):
     max_concurrent_open_orders: int
     enable_delivery_viability: bool
     enable_viability_fallback: bool
+    relax_pickup_commitment_trip_time: bool
     lengths: torch.Tensor
     cur_coord: torch.Tensor
     deadlock_count: torch.Tensor
@@ -82,7 +83,7 @@ class StateMCVRPPDTW(NamedTuple):
     def _delivery_sequence_feasible(self, start_coord, start_time, trip_start_time, delivery_sequence,
                                     delivery_coords, delivery_earliest, delivery_to_depot_time,
                                     passenger_orders, passenger_pickup_times, direct_ride_time,
-                                    return_reason=False):
+                                    return_reason=False, ignore_trip_time=False):
         current_coord = start_coord
         current_time = float(start_time)
         trip_start = float(trip_start_time)
@@ -105,7 +106,7 @@ class StateMCVRPPDTW(NamedTuple):
             service_start = max(arrival_time, float(delivery_earliest[order_idx].item()))
             finish_time = service_start + self.SERVICE_TIME
             finish_with_return = finish_time + float(delivery_to_depot_time[order_idx].item())
-            if Config.HARD_MAX_TRIP_TIME and (finish_with_return - trip_start > self.MAX_TRIP_TIME + 1e-5):
+            if (not ignore_trip_time) and Config.HARD_MAX_TRIP_TIME and (finish_with_return - trip_start > self.MAX_TRIP_TIME + 1e-5):
                 return (False, 'trip_time') if return_reason else False
             if Config.HARD_OPERATION_END and (finish_with_return > self.OPERATION_END + 1e-5):
                 return (False, 'ops_end') if return_reason else False
@@ -116,7 +117,7 @@ class StateMCVRPPDTW(NamedTuple):
     def _has_feasible_open_completion(self, start_coord, start_time, trip_start_time, open_mask,
                                       delivery_coords, delivery_earliest, delivery_to_depot_time,
                                       passenger_orders, passenger_pickup_times, direct_ride_time,
-                                      return_reason=False):
+                                      return_reason=False, ignore_trip_time=False):
         open_indices = torch.nonzero(open_mask, as_tuple=False).squeeze(-1)
         if open_indices.numel() == 0:
             return (True, None) if return_reason else True
@@ -129,6 +130,7 @@ class StateMCVRPPDTW(NamedTuple):
                 delivery_coords, delivery_earliest, delivery_to_depot_time,
                 passenger_orders, passenger_pickup_times, direct_ride_time,
                 return_reason=return_reason,
+                ignore_trip_time=ignore_trip_time,
             )
         from itertools import permutations
         failure_reasons = set()
@@ -138,6 +140,7 @@ class StateMCVRPPDTW(NamedTuple):
                 delivery_coords, delivery_earliest, delivery_to_depot_time,
                 passenger_orders, passenger_pickup_times, direct_ride_time,
                 return_reason=return_reason,
+                ignore_trip_time=ignore_trip_time,
             )
             if return_reason:
                 feasible, reason = result
@@ -284,6 +287,7 @@ class StateMCVRPPDTW(NamedTuple):
         max_concurrent_open_orders=1,
         enable_delivery_viability=False,
         enable_viability_fallback=False,
+        relax_pickup_commitment_trip_time=False,
     ):
         depot = input_data['depot']
         loc = input_data['loc']
@@ -335,6 +339,7 @@ class StateMCVRPPDTW(NamedTuple):
             max_concurrent_open_orders=max(int(max_concurrent_open_orders), 1),
             enable_delivery_viability=bool(enable_delivery_viability),
             enable_viability_fallback=bool(enable_viability_fallback),
+            relax_pickup_commitment_trip_time=bool(relax_pickup_commitment_trip_time),
             lengths=torch.zeros(batch_size, 1, device=device),
             cur_coord=depot[:, None, :],
             deadlock_count=torch.zeros(batch_size, 1, dtype=torch.long, device=device),
@@ -604,6 +609,7 @@ class StateMCVRPPDTW(NamedTuple):
                             passenger_pickup_times_after,
                             direct_ride_time[batch_idx],
                             return_reason=return_debug,
+                            ignore_trip_time=self.relax_pickup_commitment_trip_time,
                         ) if return_debug else (
                             self._has_feasible_open_completion(
                                 pickup_coords[batch_idx, candidate_idx],
@@ -616,6 +622,7 @@ class StateMCVRPPDTW(NamedTuple):
                                 passenger_orders[batch_idx],
                                 passenger_pickup_times_after,
                                 direct_ride_time[batch_idx],
+                                ignore_trip_time=self.relax_pickup_commitment_trip_time,
                             ),
                             None,
                         )
@@ -969,6 +976,7 @@ class StateMCVRPPDTW(NamedTuple):
                 max_concurrent_open_orders=self.max_concurrent_open_orders,
                 enable_delivery_viability=self.enable_delivery_viability,
                 enable_viability_fallback=self.enable_viability_fallback,
+                relax_pickup_commitment_trip_time=self.relax_pickup_commitment_trip_time,
                 lengths=self.lengths[key],
                 cur_coord=self.cur_coord[key],
                 deadlock_count=self.deadlock_count[key],
