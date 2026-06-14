@@ -381,6 +381,157 @@ class StateMCVRPPDTW(NamedTuple):
         order_idx = torch.where(has_candidate, order_idx, torch.full_like(order_idx, -1))
         return order_idx
 
+    def _classify_next_state_delivery_block(self, next_state):
+        n_orders = next_state.n_orders
+        if n_orders == 0:
+            return 'other'
+
+        ids_flat = next_state.ids.squeeze(-1)
+        coords_active = next_state.coords[ids_flat]
+        node_type_active = next_state.node_type[ids_flat]
+        time_windows_active = next_state.time_windows[ids_flat]
+        demand_p_full = next_state.demand_passenger[ids_flat]
+        demand_c_full = next_state.demand_cargo[ids_flat]
+        device = next_state.coords.device
+
+        open_mask = next_state.get_open_started_mask()[0]
+        open_indices = torch.nonzero(open_mask, as_tuple=False).squeeze(-1)
+        if open_indices.numel() == 0:
+            return 'other'
+
+        delivery_indices = open_indices + n_orders + 1
+        node_positions = torch.arange(coords_active.size(1), device=device)[None, :]
+        pickup_not_done = (next_state.picked_up_ == 0).squeeze(1).bool()
+        rejected = next_state.rejected_.squeeze(1).bool()
+        precedence_mask = torch.zeros(1, 2 * n_orders, dtype=torch.bool, device=device)
+        precedence_mask[:, :n_orders] = rejected
+        precedence_mask[:, n_orders:] = pickup_not_done | rejected
+
+        remaining_cap_p = next_state.PASSENGER_CAPACITY - next_state.used_capacity_passenger
+        remaining_cap_c = next_state.CARGO_CAPACITY - next_state.used_capacity_cargo
+        node_type_real = node_type_active[:, 1:2 * n_orders + 1]
+        demand_p_real = demand_p_full[:, 1:2 * n_orders + 1]
+        demand_c_real = demand_c_full[:, 1:2 * n_orders + 1]
+        cap_mask_p = (node_type_real == 1) & (demand_p_real > remaining_cap_p + 1e-5)
+        cap_mask_c = (node_type_real == 0) & (demand_c_real > remaining_cap_c + 1e-5)
+
+        dist_to_nodes = (coords_active - next_state.cur_coord).norm(p=2, dim=-1) * next_state.AREA_SIZE
+        travel_time = dist_to_nodes / next_state.VEHICLE_SPEED
+        arrival_time = next_state.current_time + travel_time
+
+        tw_end = time_windows_active[:, :, 1]
+        is_passenger_node = node_type_active == 1
+        is_pickup_node = (node_positions >= 1) & (node_positions <= n_orders)
+        passenger_pickup_mask_full = (
+            Config.HARD_PASSENGER_PICKUP_TIMEWINDOW
+            & is_passenger_node
+            & is_pickup_node
+            & (arrival_time > tw_end + 1e-5)
+        )
+
+        order_indices = torch.arange(n_orders, device=device)
+        delivery_node_indices = order_indices + n_orders + 1
+        passenger_orders = (node_type_active[:, 1:n_orders + 1] == 1)
+        delivery_arrival = arrival_time.gather(1, delivery_node_indices.unsqueeze(0))
+        pickup_finish_time = next_state.passenger_pickup_time.squeeze(1)
+        valid_pickup_time = pickup_finish_time >= 0
+        ride_time_hours = delivery_arrival - pickup_finish_time
+        direct_distance = torch.norm(
+            coords_active[:, 1:n_orders + 1, :] - coords_active[:, n_orders + 1:2 * n_orders + 1, :],
+            dim=-1
+        ) * next_state.AREA_SIZE
+        direct_ride_time_hours = direct_distance / next_state.VEHICLE_SPEED
+        excess_ride_time_hours = torch.clamp(ride_time_hours - direct_ride_time_hours, min=0.0)
+        passenger_total_ride_time_limit = Config.PASSENGER_MAX_RIDE_TIME_MINUTES / 60.0
+        passenger_excess_ride_time_limit = Config.PASSENGER_MAX_EXCESS_RIDE_TIME_MINUTES / 60.0
+        ride_time_violation = (
+            Config.HARD_PASSENGER_MAX_RIDE_TIME
+            & passenger_orders
+            & valid_pickup_time
+            & (
+                (ride_time_hours > passenger_total_ride_time_limit + 1e-5)
+                | (excess_ride_time_hours > passenger_excess_ride_time_limit + 1e-5)
+            )
+        )
+
+        depot_coord = coords_active[:, 0:1, :]
+        dist_back = (coords_active - depot_coord).norm(p=2, dim=-1) * next_state.AREA_SIZE
+        time_back = dist_back / next_state.VEHICLE_SPEED
+        ongoing_trip_total = (arrival_time + next_state.SERVICE_TIME + time_back) - next_state.trip_start_time
+        fresh_trip_total = travel_time + next_state.SERVICE_TIME + time_back
+        predicted_total = torch.where(next_state.prev_a == 0, fresh_trip_total, ongoing_trip_total)
+        trip_violation = Config.HARD_MAX_TRIP_TIME & (predicted_total > next_state.MAX_TRIP_TIME + 1e-5)
+        predicted_finish = arrival_time + next_state.SERVICE_TIME + time_back
+        ops_end_violation = Config.HARD_OPERATION_END & (predicted_finish > next_state.OPERATION_END + 1e-5)
+
+        delivery_viability_mask = torch.zeros(n_orders, dtype=torch.bool, device=device)
+        if n_orders > 0 and next_state.enable_delivery_viability:
+            delivery_to_depot_time = (
+                (coords_active[:, n_orders + 1:2 * n_orders + 1, :] - coords_active[:, 0:1, :]).norm(p=2, dim=-1)
+                * next_state.AREA_SIZE / next_state.VEHICLE_SPEED
+            )[0]
+            delivery_earliest = time_windows_active[:, n_orders + 1:2 * n_orders + 1, 0][0]
+            direct_ride_time = direct_distance[0] / next_state.VEHICLE_SPEED
+            trip_start = next_state.trip_start_time[0, 0] if next_state.prev_a[0, 0].item() != 0 else next_state.current_time[0, 0]
+            legal_orders, physical_orders, _ = next_state._get_legal_delivery_orders(
+                next_state.cur_coord[0, 0],
+                next_state.current_time[0, 0],
+                trip_start,
+                next_state.get_open_started_mask()[0],
+                coords_active[0, n_orders + 1:2 * n_orders + 1, :],
+                delivery_earliest,
+                delivery_to_depot_time,
+                passenger_orders[0],
+                next_state.passenger_pickup_time.squeeze(1)[0],
+                direct_ride_time,
+                allow_fallback=next_state.enable_viability_fallback,
+            )
+            legal_set = set(legal_orders)
+            for order_idx in physical_orders:
+                if order_idx not in legal_set:
+                    delivery_viability_mask[order_idx] = True
+
+        vehicle_limit_mask = torch.zeros(n_orders, dtype=torch.bool, device=device)
+        if Config.HARD_VEHICLE_LIMIT:
+            import math as _math
+            k_max = max(1, _math.ceil(n_orders * Config.DEFAULT_NUM_VEHICLE_RATIO))
+            at_capacity = bool((next_state.used_vehicles >= k_max)[0, 0].item())
+            at_depot = bool((next_state.prev_a == 0)[0, 0].item())
+            all_done = bool((((next_state.visited_[:, :, 1:2 * n_orders + 1].sum(-1) == 2 * n_orders)
+                              | (next_state.rejected_.sum(-1) == n_orders)).to(torch.uint8))[0, 0].item())
+            if at_capacity and at_depot and (not all_done):
+                vehicle_limit_mask[:] = True
+
+        delivery_slice = delivery_indices - (n_orders + 1)
+        precedence_block = precedence_mask[0, n_orders + delivery_slice]
+        ride_block = ride_time_violation[0, delivery_slice]
+        trip_block = trip_violation[0, delivery_indices]
+        ops_block = ops_end_violation[0, delivery_indices]
+        viability_block = delivery_viability_mask[delivery_slice]
+        vehicle_limit_block = vehicle_limit_mask[delivery_slice]
+
+        reason_masks = {
+            'precedence': precedence_block,
+            'ride_time': ride_block,
+            'trip_time': trip_block,
+            'ops_end': ops_block,
+            'delivery_viability': viability_block,
+            'vehicle_limit': vehicle_limit_block,
+        }
+
+        covering = [name for name, mask in reason_masks.items() if bool(mask.all().item())]
+        if len(covering) == 1:
+            return covering[0]
+        if len(covering) > 1:
+            return 'mixed'
+
+        combined = torch.zeros_like(precedence_block)
+        for mask in reason_masks.values():
+            combined |= mask
+        if bool(combined.all().item()):
+            return 'mixed'
+        return 'other'
+
     def get_mask(self, return_debug=False, skip_pickup_commitment=False):
         batch_size = self.ids.size(0)
         n_orders = self.n_orders
@@ -412,6 +563,14 @@ class StateMCVRPPDTW(NamedTuple):
                 'diag_pickup_commitment_block_by_completion_open_over_6',
                 'diag_pickup_commitment_block_by_completion_other',
                 'diag_pickup_commitment_block_by_next_state',
+                'diag_pickup_commitment_block_by_next_state_precedence',
+                'diag_pickup_commitment_block_by_next_state_ride_time',
+                'diag_pickup_commitment_block_by_next_state_trip_time',
+                'diag_pickup_commitment_block_by_next_state_ops_end',
+                'diag_pickup_commitment_block_by_next_state_delivery_viability',
+                'diag_pickup_commitment_block_by_next_state_vehicle_limit',
+                'diag_pickup_commitment_block_by_next_state_mixed',
+                'diag_pickup_commitment_block_by_next_state_other',
                 'diag_pickup_commitment_block_by_fallback',
                 'diag_delivery_viability_masked',
                 'diag_delivery_viability_fallback',
@@ -684,6 +843,23 @@ class StateMCVRPPDTW(NamedTuple):
                                         debug['diag_pickup_commitment_block_by_completion_other'][batch_idx] += 1.0
                                 elif not next_state_feasible:
                                     debug['diag_pickup_commitment_block_by_next_state'][batch_idx] += 1.0
+                                    next_state_reason = self._classify_next_state_delivery_block(next_state)
+                                    if next_state_reason == 'precedence':
+                                        debug['diag_pickup_commitment_block_by_next_state_precedence'][batch_idx] += 1.0
+                                    elif next_state_reason == 'ride_time':
+                                        debug['diag_pickup_commitment_block_by_next_state_ride_time'][batch_idx] += 1.0
+                                    elif next_state_reason == 'trip_time':
+                                        debug['diag_pickup_commitment_block_by_next_state_trip_time'][batch_idx] += 1.0
+                                    elif next_state_reason == 'ops_end':
+                                        debug['diag_pickup_commitment_block_by_next_state_ops_end'][batch_idx] += 1.0
+                                    elif next_state_reason == 'delivery_viability':
+                                        debug['diag_pickup_commitment_block_by_next_state_delivery_viability'][batch_idx] += 1.0
+                                    elif next_state_reason == 'vehicle_limit':
+                                        debug['diag_pickup_commitment_block_by_next_state_vehicle_limit'][batch_idx] += 1.0
+                                    elif next_state_reason == 'mixed':
+                                        debug['diag_pickup_commitment_block_by_next_state_mixed'][batch_idx] += 1.0
+                                    else:
+                                        debug['diag_pickup_commitment_block_by_next_state_other'][batch_idx] += 1.0
                                 elif not fallback_safe:
                                     debug['diag_pickup_commitment_block_by_fallback'][batch_idx] += 1.0
                 if return_debug and open_started_count[batch_idx].item() >= 1:
