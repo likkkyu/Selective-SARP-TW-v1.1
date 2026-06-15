@@ -85,6 +85,8 @@ DETAIL_KEYS = [
     'rejected_orders',
     'unfulfilled_orders',
     'completed_orders',
+    'untouched_orders',
+    'untouched_unrejected_orders',
     'pickup_only_orders',
     'started_not_completed_orders',
     'passenger_pickup_hard_violations',
@@ -137,6 +139,10 @@ def parse_args():
                         metavar=('MORNING', 'MIDDAY', 'EVENING'))
     parser.add_argument('--cargo-tw-period-weights', nargs=3, type=float, default=None,
                         metavar=('MORNING', 'MIDDAY', 'EVENING'))
+    parser.add_argument('--passenger-tw-period-bounds', nargs=6, type=float, default=None,
+                        metavar=('MORNING_START', 'MORNING_END', 'MIDDAY_START', 'MIDDAY_END', 'EVENING_START', 'EVENING_END'))
+    parser.add_argument('--cargo-tw-period-bounds', nargs=6, type=float, default=None,
+                        metavar=('MORNING_START', 'MORNING_END', 'MIDDAY_START', 'MIDDAY_END', 'EVENING_START', 'EVENING_END'))
     parser.add_argument('--output-dir', type=str, required=True)
     parser.add_argument('--trace-first-failure', action='store_true',
                         help='For heuristic policies, save the first failure trace in the per-seed JSON.')
@@ -159,12 +165,31 @@ def _normalize_ratio_triplet(values):
     return tuple(max(float(v), 0.0) / total for v in values)
 
 
+def _parse_period_bounds(values):
+    if values is None:
+        return None
+    if len(values) != 6:
+        raise ValueError('TW period bounds must provide exactly 6 numbers: s1 e1 s2 e2 s3 e3')
+    bounds = []
+    for idx in range(0, 6, 2):
+        start = float(values[idx])
+        end = float(values[idx + 1])
+        if end <= start:
+            raise ValueError(f'Invalid TW bounds pair #{idx // 2 + 1}: end must be greater than start')
+        bounds.append((start, end))
+    return tuple(bounds)
+
+
 def _build_dataset_kwargs(args):
     kwargs = {}
     if args.passenger_tw_period_weights is not None:
         kwargs['passenger_tw_period_weights_override'] = _normalize_ratio_triplet(args.passenger_tw_period_weights)
     if args.cargo_tw_period_weights is not None:
         kwargs['cargo_tw_period_weights_override'] = _normalize_ratio_triplet(args.cargo_tw_period_weights)
+    if args.passenger_tw_period_bounds is not None:
+        kwargs['passenger_tw_period_bounds_override'] = _parse_period_bounds(args.passenger_tw_period_bounds)
+    if args.cargo_tw_period_bounds is not None:
+        kwargs['cargo_tw_period_bounds_override'] = _parse_period_bounds(args.cargo_tw_period_bounds)
     return kwargs
 
 
@@ -308,6 +333,8 @@ def _summarize_details(details, graph_size):
     summary['service_rate'] = summary['completed_orders'] / float(graph_size)
     summary['rejected_rate'] = summary['rejected_orders'] / float(graph_size)
     summary['unfulfilled_rate'] = summary['unfulfilled_orders'] / float(graph_size)
+    summary['untouched_rate'] = summary['untouched_orders'] / float(graph_size)
+    summary['untouched_unrejected_rate'] = summary['untouched_unrejected_orders'] / float(graph_size)
     summary['pickup_only_rate'] = summary['pickup_only_orders'] / float(graph_size)
     summary['started_not_completed_rate'] = summary['started_not_completed_orders'] / float(graph_size)
     summary['served_plus_rejected_orders'] = summary['completed_orders'] + summary['rejected_orders']

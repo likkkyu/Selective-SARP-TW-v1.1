@@ -589,7 +589,7 @@ class AttentionModel(nn.Module):
                         embeddings[:, 0:1, :].expand(batch_size, num_steps, embeddings.size(-1)),
                         self.problem.PASSENGER_CAPACITY - torch.zeros_like(state.used_capacity_passenger[:, :, None]),
                         self.problem.CARGO_CAPACITY - torch.zeros_like(state.used_capacity_cargo[:, :, None]),
-                        torch.zeros_like(state.current_time[:, :, None]),
+                        normalized_time[:, :, None],
                         remaining_vehicle_budget
                     ),
                     -1

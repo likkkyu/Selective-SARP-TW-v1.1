@@ -965,7 +965,12 @@ class StateMCVRPPDTW(NamedTuple):
             & (self.used_capacity_cargo <= 1e-5)
             & (~self.has_open_started_orders())
         ).squeeze(1)
-        reject_allowed = reject_candidate_available & (~all_done.squeeze(-1).bool()) & bool(self.allow_reject) & pre_departure_gate
+        reject_allowed = (
+            reject_candidate_available
+            & (~all_done.squeeze(-1).bool())
+            & bool(self.allow_reject)
+            & pre_departure_gate
+        )
         mask[:, :, reject_index] = (~reject_allowed).view(-1, 1).to(torch.uint8)
         if return_debug:
             reject_available = mask[:, :, reject_index].eq(0).view(-1)
@@ -1011,7 +1016,15 @@ class StateMCVRPPDTW(NamedTuple):
         leaving_depot = (self.prev_a == DEPOT) & (actual_selected != DEPOT) & (~is_reject)
 
         new_time = torch.where(is_reject, self.current_time, is_depot * self.OPERATION_START + (1 - is_depot) * arrival_time)
-        dispatch_time = torch.where(is_reject, self.current_time, torch.where(leaving_depot, self.current_time, self.trip_start_time))
+        dispatch_time = torch.where(
+            is_reject,
+            self.current_time,
+            torch.where(
+                leaving_depot,
+                torch.maximum(self.current_time, time_windows_active.gather(1, actual_selected[:, :, None].expand(-1, -1, 2))[:, :, 0] - travel_time),
+                self.trip_start_time,
+            ),
+        )
         new_used_vehicles = self.used_vehicles + leaving_depot.float()
 
         tw = time_windows_active.gather(1, actual_selected[:, :, None].expand(-1, -1, 2))

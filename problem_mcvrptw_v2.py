@@ -117,7 +117,9 @@ class Config:
     PASSENGER_SMALL_GROUP_RATIO = 0.8  # 80% 乘客订单为 1-2 人
 
     # ---------- 时间窗分布参数（按时段混合采样） ----------
-    # 三个时段：[10,12), [12,14), [14,16)
+    # 默认将 evening pickup 整体前移，避免晚单系统性挤到 16:00 边界。
+    PASSENGER_TW_PERIOD_BOUNDS = ((10.0, 11.5), (11.5, 13.5), (12.5, 14.5))
+    CARGO_TW_PERIOD_BOUNDS = ((10.0, 11.5), (11.5, 13.5), (12.5, 14.5))
     PASSENGER_TW_PERIOD_WEIGHTS = (0.56, 0.29, 0.15)
     CARGO_TW_PERIOD_WEIGHTS = (0.58, 0.28, 0.14)
 
@@ -316,6 +318,7 @@ class MCVRPPDTW:
         batch_size, seq_len = pi.size()
         device = pi.device
         loc_from_dataset = dataset['loc']
+        coords_with_depot = torch.cat((dataset['depot'][:, None, :], loc_from_dataset), dim=1)
 
         travel_times = segment_distances / Config.VEHICLE_SPEED
         current_time = torch.full((batch_size,), Config.OPERATION_START, device=device)
@@ -395,6 +398,16 @@ class MCVRPPDTW:
             cargo_delay_minutes = cargo_delay_minutes + (cargo_delivery_mask.float() * delay_minutes)
 
             earliest = tw_in_order[:, t, 0]
+            if t > 0:
+                prev_node = pi[:, t - 1]
+                leaving_depot = (prev_node == depot_node) & (node_idx != depot_node)
+                if leaving_depot.any():
+                    target_coord = coords_with_depot.gather(1, node_idx[:, None, None].expand(-1, 1, 2)).squeeze(1)
+                    depot_coord = coords_with_depot[:, 0, :]
+                    depart_travel = (target_coord - depot_coord).norm(p=2, dim=-1) * Config.AREA_SIZE / Config.VEHICLE_SPEED
+                    dispatch_time = torch.maximum(earliest - depart_travel, torch.full_like(earliest, Config.OPERATION_START))
+                    current_time = torch.where(leaving_depot, dispatch_time, current_time)
+                    trip_start_time = torch.where(leaving_depot, dispatch_time, trip_start_time)
             start_service = torch.max(current_time, earliest)
             current_time = is_depot * current_time + (1 - is_depot) * (start_service + Config.SERVICE_TIME)
 
@@ -494,8 +507,8 @@ class MCVRPPDTW:
         trip_overtime_penalty = trip_overtime_total * Config.ALPHA_TRIP_OVERTIME
 
         reject_count = time_dict.get('reject_count', torch.zeros_like(unserved_orders))
-        explicit_reject_mask = (~pickup_visit) & (~delivery_visit)
-        rejected_orders = explicit_reject_mask.float().sum(1).clamp(max=reject_count)
+        untouched_mask = (~pickup_visit) & (~delivery_visit)
+        untouched_orders = untouched_mask.float().sum(1)
         pickup_only_mask = pickup_visit & (~delivery_visit)
         delivery_without_pickup_mask = delivery_visit & (~pickup_visit)
         started_not_completed_mask = pickup_only_mask | delivery_without_pickup_mask
@@ -503,6 +516,7 @@ class MCVRPPDTW:
         delivery_without_pickup_orders = delivery_without_pickup_mask.float().sum(1)
         started_not_completed_orders = started_not_completed_mask.float().sum(1)
         active_rejected_orders = torch.minimum(reject_count, unserved_orders)
+        untouched_unrejected_orders = torch.clamp(untouched_orders - active_rejected_orders, min=0.0)
         unfulfilled_orders = torch.clamp(unserved_orders - active_rejected_orders, min=0.0)
         reject_penalty = active_rejected_orders * Config.ALPHA_REJECT
         unfulfilled_penalty = unfulfilled_orders * Config.ALPHA_UNFULFILLED
@@ -517,6 +531,8 @@ class MCVRPPDTW:
             'rejected_orders': active_rejected_orders,
             'completed_orders': completed_orders,
             'unserved_orders': unserved_orders,
+            'untouched_orders': untouched_orders,
+            'untouched_unrejected_orders': untouched_unrejected_orders,
             'unfulfilled_orders': unfulfilled_orders,
             'pickup_only_orders': pickup_only_orders,
             'delivery_without_pickup_orders': delivery_without_pickup_orders,
@@ -635,6 +651,8 @@ class MCVRPPDTW:
                 'rejected_orders': vp_dict['rejected_orders'],
                 'completed_orders': vp_dict['completed_orders'],
                 'unserved_orders': vp_dict['unserved_orders'],
+                'untouched_orders': vp_dict['untouched_orders'],
+                'untouched_unrejected_orders': vp_dict['untouched_unrejected_orders'],
                 'unfulfilled_orders': vp_dict['unfulfilled_orders'],
                 'pickup_only_orders': vp_dict['pickup_only_orders'],
                 'delivery_without_pickup_orders': vp_dict['delivery_without_pickup_orders'],
@@ -836,6 +854,8 @@ class MCVRPPDTWDataset(Dataset):
         passenger_distance_mix_override=None,
         passenger_tw_period_weights_override=None,
         cargo_tw_period_weights_override=None,
+        passenger_tw_period_bounds_override=None,
+        cargo_tw_period_bounds_override=None,
     ):
         """初始化。
 
@@ -855,12 +875,35 @@ class MCVRPPDTWDataset(Dataset):
         self.passenger_distance_mix_override = passenger_distance_mix_override
         self.passenger_tw_period_weights_override = passenger_tw_period_weights_override
         self.cargo_tw_period_weights_override = cargo_tw_period_weights_override
+        self.passenger_tw_period_bounds_override = self._normalize_period_bounds(
+            passenger_tw_period_bounds_override,
+            Config.PASSENGER_TW_PERIOD_BOUNDS,
+        )
+        self.cargo_tw_period_bounds_override = self._normalize_period_bounds(
+            cargo_tw_period_bounds_override,
+            Config.CARGO_TW_PERIOD_BOUNDS,
+        )
 
         torch.manual_seed(seed)
         np.random.seed(seed)
         
         self.data = self._generate_data()
-    
+
+    @staticmethod
+    def _normalize_period_bounds(bounds_override, default_bounds):
+        bounds = default_bounds if bounds_override is None else bounds_override
+        if len(bounds) != 3:
+            raise ValueError('TW period bounds must contain exactly 3 (start, end) buckets')
+        normalized = []
+        for idx, pair in enumerate(bounds):
+            if len(pair) != 2:
+                raise ValueError(f'TW period bucket #{idx + 1} must contain exactly 2 values')
+            start, end = float(pair[0]), float(pair[1])
+            if end <= start:
+                raise ValueError(f'TW period bucket #{idx + 1} must satisfy end > start')
+            normalized.append((start, end))
+        return tuple(normalized)
+
     def _generate_locations(self, n_points):
         """生成节点位置（50%随机 + 50%聚类）。
 
@@ -1042,11 +1085,8 @@ class MCVRPPDTWDataset(Dataset):
         dist_from_depot = (loc - depot).norm(p=2, dim=1) * Config.AREA_SIZE  # km
         travel_time_from_depot = dist_from_depot / Config.VEHICLE_SPEED  # 小时
 
-        period_bounds = (
-            (10.0, 12.0),
-            (12.0, 14.0),
-            (14.0, 16.0),
-        )
+        passenger_period_bounds = self.passenger_tw_period_bounds_override
+        cargo_period_bounds = self.cargo_tw_period_bounds_override
         passenger_tw_weights = self.passenger_tw_period_weights_override or Config.PASSENGER_TW_PERIOD_WEIGHTS
         cargo_tw_weights = self.cargo_tw_period_weights_override or Config.CARGO_TW_PERIOD_WEIGHTS
         passenger_probs = torch.tensor(passenger_tw_weights, dtype=torch.float)
@@ -1061,7 +1101,9 @@ class MCVRPPDTWDataset(Dataset):
             feasible_start_low = max(Config.OPERATION_START, float(earliest_arrival))
             feasible_start_high = Config.OPERATION_END - tw_width
 
-            probs = passenger_probs if node_type[i] == 1 else cargo_probs
+            is_passenger = bool(node_type[i].item() == 1)
+            probs = passenger_probs if is_passenger else cargo_probs
+            period_bounds = passenger_period_bounds if is_passenger else cargo_period_bounds
             period_idx = int(torch.multinomial(probs, 1).item())
 
             period_low_raw, period_high_raw = period_bounds[period_idx]

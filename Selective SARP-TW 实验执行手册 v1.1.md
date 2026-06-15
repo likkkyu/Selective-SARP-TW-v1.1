@@ -79,7 +79,7 @@
 - **乘客需求**（939–950 行）：80% 小组 `randint(1,3)`={1,2}；20% 大组 `randint(3,6)`={3,4,5}。
 - **货物需求**：`randint(1,6)`={1..5}。
 - **订单比例**：`PASSENGER_RATIO=0.4`（25 单主线客 40%）；n≥50 用 `PASSENGER_RATIO_LARGE=0.25`（874 行）。
-- **时间窗**：三时段 [10,12) / [12,14) / [14,16) 混合采样；当前默认权重为乘客 `(0.56, 0.29, 0.15)`、货物 `(0.58, 0.28, 0.14)`；乘客 TW=1 h、货物=2 h。
+- **时间窗**：三时段混合采样；当前默认 pickup 区间为 passenger/cargo 共用 `[(10,11.5), (11.5,13.5), (12.5,14.5)]`，默认权重为乘客 `(0.56, 0.29, 0.15)`、货物 `(0.58, 0.28, 0.14)`；乘客 TW=1 h、货物=1 h。训练/评估 CLI 现已支持覆盖三时段区间与权重。
 - **空间**：50% 随机 + 50% 聚类（`NUM_CLUSTERS=3`）；PD 距离分档（短/中/长）。
 
 ## 2.4 v1.1 需要改动的数据生成项
@@ -115,7 +115,7 @@
 
 ## 3.3 状态转移 update()
 
-关键逻辑：① depot 重置（回 depot 时 time→OPERATION_START、容量重置、trip_start 重置）；② 服务时刻 `start_service = max(new_time, earliest)`；③ deadlock_count / terminal 终止判定。当前实现采用标准等待机制，不额外引入 depot 端延迟出发决策。
+关键逻辑：① 回 depot 时容量重置，时间保留当前到达时刻；新路线从 depot 发车时仍采用 `start_service = max(current_time, earliest)` 的标准等待语义，不再把每辆车硬重置到 `OPERATION_START`；② 服务时刻 `start_service = max(new_time, earliest)`；③ deadlock_count / terminal 终止判定。
 
 # 第 4 章 · 网络架构：v6 现状 + 三项必做改造
 

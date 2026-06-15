@@ -56,6 +56,12 @@ def parse_args():
     parser.add_argument('--cargo-tw-period-weights', nargs=3, type=float, default=None,
                         metavar=('MORNING', 'MIDDAY', 'EVENING'),
                         help='覆盖默认 cargo 三时段 TW 权重')
+    parser.add_argument('--passenger-tw-period-bounds', nargs=6, type=float, default=None,
+                        metavar=('MORNING_START', 'MORNING_END', 'MIDDAY_START', 'MIDDAY_END', 'EVENING_START', 'EVENING_END'),
+                        help='覆盖默认 passenger 三时段 pickup TW 区间')
+    parser.add_argument('--cargo-tw-period-bounds', nargs=6, type=float, default=None,
+                        metavar=('MORNING_START', 'MORNING_END', 'MIDDAY_START', 'MIDDAY_END', 'EVENING_START', 'EVENING_END'),
+                        help='覆盖默认 cargo 三时段 pickup TW 区间')
     return parser.parse_args()
 
 
@@ -73,6 +79,21 @@ def _normalize_ratio_triplet(values):
     if total <= 0:
         return tuple(1.0 / len(values) for _ in values)
     return tuple(max(float(v), 0.0) / total for v in values)
+
+
+def _parse_period_bounds(values):
+    if values is None:
+        return None
+    if len(values) != 6:
+        raise ValueError('TW period bounds must provide exactly 6 numbers: s1 e1 s2 e2 s3 e3')
+    bounds = []
+    for idx in range(0, 6, 2):
+        start = float(values[idx])
+        end = float(values[idx + 1])
+        if end <= start:
+            raise ValueError(f'Invalid TW bounds pair #{idx // 2 + 1}: end must be greater than start')
+        bounds.append((start, end))
+    return tuple(bounds)
 
 
 def build_model_from_checkpoint(checkpoint, device):
@@ -188,6 +209,10 @@ def evaluate():
         dataset_kwargs['passenger_tw_period_weights_override'] = _normalize_ratio_triplet(args.passenger_tw_period_weights)
     if args.cargo_tw_period_weights is not None:
         dataset_kwargs['cargo_tw_period_weights_override'] = _normalize_ratio_triplet(args.cargo_tw_period_weights)
+    if args.passenger_tw_period_bounds is not None:
+        dataset_kwargs['passenger_tw_period_bounds_override'] = _parse_period_bounds(args.passenger_tw_period_bounds)
+    if args.cargo_tw_period_bounds is not None:
+        dataset_kwargs['cargo_tw_period_bounds_override'] = _parse_period_bounds(args.cargo_tw_period_bounds)
 
     test_dataset = MCVRPPDTWDataset(
         num_samples=args.num_samples,
@@ -213,6 +238,8 @@ def evaluate():
     all_num_rejected = []
     all_num_unfulfilled = []
     all_num_completed = []
+    all_num_untouched = []
+    all_num_untouched_unrejected = []
     all_num_pickup_only = []
     all_num_started_not_completed = []
     all_pickup_hard_violations = []
@@ -256,6 +283,8 @@ def evaluate():
             _maybe('rejected_orders', all_num_rejected)
             _maybe('unfulfilled_orders', all_num_unfulfilled)
             _maybe('completed_orders', all_num_completed)
+            _maybe('untouched_orders', all_num_untouched)
+            _maybe('untouched_unrejected_orders', all_num_untouched_unrejected)
             _maybe('pickup_only_orders', all_num_pickup_only)
             _maybe('started_not_completed_orders', all_num_started_not_completed)
 
@@ -288,6 +317,8 @@ def evaluate():
     service_rates = [value / args.graph_size for value in all_num_completed]
     rejected_rates = [value / args.graph_size for value in all_num_rejected]
     unfulfilled_rates = [value / args.graph_size for value in all_num_unfulfilled]
+    untouched_unrejected_rates = [value / args.graph_size for value in all_num_untouched_unrejected]
+    served_plus_rejected_rates = [min(1.0, s + r) for s, r in zip(service_rates, rejected_rates)]
     _stats('Total Distance', all_distance, unit='km', fmt='{:.3f}')
     _stats('Passenger Pickup Hard Viol.', all_pickup_hard_violations, unit='', fmt='{:.2f}')
     _stats('Passenger Total Ride Viol.', all_total_ride_time_violations, unit='', fmt='{:.2f}')
@@ -296,9 +327,13 @@ def evaluate():
     _stats('# Completed Orders', all_num_completed, unit='', fmt='{:.2f}')
     _stats('# Rejected Orders', all_num_rejected, unit='', fmt='{:.2f}')
     _stats('# Unfulfilled Orders', all_num_unfulfilled, unit='', fmt='{:.2f}')
+    _stats('# Untouched Orders', all_num_untouched, unit='', fmt='{:.2f}')
+    _stats('# Untouched-Unrejected', all_num_untouched_unrejected, unit='', fmt='{:.2f}')
     _stats('Service Rate', service_rates, unit='', fmt='{:.3f}')
     _stats('Rejected Rate', rejected_rates, unit='', fmt='{:.3f}')
     _stats('Unfulfilled Rate', unfulfilled_rates, unit='', fmt='{:.3f}')
+    _stats('Served+Rejected Rate', served_plus_rejected_rates, unit='', fmt='{:.3f}')
+    _stats('Untouched-Unrejected Rate', untouched_unrejected_rates, unit='', fmt='{:.3f}')
     _stats('# Pickup-only Orders', all_num_pickup_only, unit='', fmt='{:.2f}')
     _stats('# Started-not-completed', all_num_started_not_completed, unit='', fmt='{:.2f}')
     if args.diagnostics and all_diagnostics:

@@ -186,6 +186,10 @@ class POMOTrainerOptimized:
             kwargs['passenger_tw_period_weights_override'] = self.args.passenger_tw_period_weights_override
         if self.args.cargo_tw_period_weights_override is not None:
             kwargs['cargo_tw_period_weights_override'] = self.args.cargo_tw_period_weights_override
+        if self.args.passenger_tw_period_bounds_override is not None:
+            kwargs['passenger_tw_period_bounds_override'] = self.args.passenger_tw_period_bounds_override
+        if self.args.cargo_tw_period_bounds_override is not None:
+            kwargs['cargo_tw_period_bounds_override'] = self.args.cargo_tw_period_bounds_override
         return kwargs
 
     def _build_curriculum_dataset_kwargs(self, epoch):
@@ -252,6 +256,12 @@ class POMOTrainerOptimized:
                 parts.append(f"passenger_tw={tuple(round(v, 2) for v in tw_mix)}")
             if cargo_tw_mix is not None:
                 parts.append(f"cargo_tw={tuple(round(v, 2) for v in cargo_tw_mix)}")
+            passenger_tw_bounds = kwargs.get('passenger_tw_period_bounds_override')
+            cargo_tw_bounds = kwargs.get('cargo_tw_period_bounds_override')
+            if passenger_tw_bounds is not None:
+                parts.append(f"passenger_bounds={tuple((round(s, 2), round(e, 2)) for s, e in passenger_tw_bounds)}")
+            if cargo_tw_bounds is not None:
+                parts.append(f"cargo_bounds={tuple((round(s, 2), round(e, 2)) for s, e in cargo_tw_bounds)}")
             return 'dataset-override(' + ', '.join(parts) + ')'
 
         passenger_ratio = kwargs.get('passenger_ratio_override')
@@ -305,10 +315,14 @@ class POMOTrainerOptimized:
         service_rate = float(results.get('avg_completed_orders', 0.0)) / graph_size
         rejected_rate = float(results.get('avg_rejected_orders', 0.0)) / graph_size
         unfulfilled_rate = float(results.get('avg_unfulfilled_orders', 0.0)) / graph_size
+        untouched_unrejected_rate = float(results.get('avg_untouched_unrejected_orders', 0.0)) / graph_size
+        served_plus_rejected_rate = min(1.0, service_rate + rejected_rate)
         results['service_rate'] = service_rate
         results['completed_rate'] = service_rate
         results['rejected_rate'] = rejected_rate
         results['unfulfilled_rate'] = unfulfilled_rate
+        results['untouched_unrejected_rate'] = untouched_unrejected_rate
+        results['served_plus_rejected_rate'] = served_plus_rejected_rate
         results['non_service_rate'] = min(1.0, rejected_rate + unfulfilled_rate)
         return results
 
@@ -360,6 +374,8 @@ class POMOTrainerOptimized:
             'rejected_orders': [],
             'unfulfilled_orders': [],
             'completed_orders': [],
+            'untouched_orders': [],
+            'untouched_unrejected_orders': [],
             'pickup_only_orders': [],
             'started_not_completed_orders': [],
             'vehicle_cost_raw': [],
@@ -420,6 +436,8 @@ class POMOTrainerOptimized:
             'avg_rejected_orders': detail_buffers['rejected_orders'].mean().item(),
             'avg_unfulfilled_orders': detail_buffers['unfulfilled_orders'].mean().item(),
             'avg_completed_orders': detail_buffers['completed_orders'].mean().item() if 'completed_orders' in detail_buffers else 0.0,
+            'avg_untouched_orders': detail_buffers['untouched_orders'].mean().item() if 'untouched_orders' in detail_buffers else 0.0,
+            'avg_untouched_unrejected_orders': detail_buffers['untouched_unrejected_orders'].mean().item() if 'untouched_unrejected_orders' in detail_buffers else 0.0,
             'avg_pickup_only_orders': detail_buffers['pickup_only_orders'].mean().item() if 'pickup_only_orders' in detail_buffers else 0.0,
             'avg_started_not_completed_orders': detail_buffers['started_not_completed_orders'].mean().item() if 'started_not_completed_orders' in detail_buffers else 0.0,
             'avg_vehicle_cost': detail_buffers['vehicle_cost_raw'].mean().item(),
@@ -507,9 +525,13 @@ class POMOTrainerOptimized:
             print(f"  Avg Completed Orders: {val_results['avg_completed_orders']:.2f}")
             print(f"  Avg Rejected Orders: {val_results['avg_rejected_orders']:.2f}")
             print(f"  Avg Unfulfilled Orders: {val_results['avg_unfulfilled_orders']:.2f}")
+            print(f"  Avg Untouched Orders: {val_results['avg_untouched_orders']:.2f}")
+            print(f"  Avg Untouched-Unrejected Orders: {val_results['avg_untouched_unrejected_orders']:.2f}")
             print(f"  Service Rate: {val_results['service_rate']:.3f}")
             print(f"  Rejected Rate: {val_results['rejected_rate']:.3f}")
             print(f"  Unfulfilled Rate: {val_results['unfulfilled_rate']:.3f}")
+            print(f"  Served+Rejected Rate: {val_results['served_plus_rejected_rate']:.3f}")
+            print(f"  Untouched-Unrejected Rate: {val_results['untouched_unrejected_rate']:.3f}")
             print(f"  Avg Pickup-only Orders: {val_results['avg_pickup_only_orders']:.2f}")
             print(f"  Avg Started-not-completed Orders: {val_results['avg_started_not_completed_orders']:.2f}")
             print(f"  Vehicle Cost: {val_results['avg_vehicle_cost']:.2f} RMB")
@@ -695,6 +717,12 @@ def parse_args():
     parser.add_argument('--alpha-trip-overtime', type=float, default=Config.ALPHA_TRIP_OVERTIME, help='训练 objective 中 trip overtime 惩罚')
     parser.add_argument('--passenger-tw-period-weights', nargs=3, type=float, default=None, metavar=('MORNING', 'MIDDAY', 'EVENING'), help='覆盖默认 passenger 三时段 TW 权重')
     parser.add_argument('--cargo-tw-period-weights', nargs=3, type=float, default=None, metavar=('MORNING', 'MIDDAY', 'EVENING'), help='覆盖默认 cargo 三时段 TW 权重')
+    parser.add_argument('--passenger-tw-period-bounds', nargs=6, type=float, default=None,
+                        metavar=('MORNING_START', 'MORNING_END', 'MIDDAY_START', 'MIDDAY_END', 'EVENING_START', 'EVENING_END'),
+                        help='覆盖默认 passenger 三时段 pickup TW 区间')
+    parser.add_argument('--cargo-tw-period-bounds', nargs=6, type=float, default=None,
+                        metavar=('MORNING_START', 'MORNING_END', 'MIDDAY_START', 'MIDDAY_END', 'EVENING_START', 'EVENING_END'),
+                        help='覆盖默认 cargo 三时段 pickup TW 区间')
     parser.add_argument('--enable-rideshare-curriculum', action='store_true', help='按 epoch 使用轻量共享导向 curriculum')
     parser.add_argument('--curriculum-warmup-epochs', type=int, default=5, help='curriculum 第 1 阶段持续 epoch 数')
     parser.add_argument('--curriculum-mix-epochs', type=int, default=10, help='curriculum 第 2 阶段持续 epoch 数')
@@ -732,6 +760,21 @@ def _normalize_ratio_triplet(values):
     return tuple(max(float(v), 0.0) / total for v in values)
 
 
+def _parse_period_bounds(values):
+    if values is None:
+        return None
+    if len(values) != 6:
+        raise ValueError('TW period bounds must provide exactly 6 numbers: s1 e1 s2 e2 s3 e3')
+    bounds = []
+    for idx in range(0, 6, 2):
+        start = float(values[idx])
+        end = float(values[idx + 1])
+        if end <= start:
+            raise ValueError(f'Invalid TW bounds pair #{idx // 2 + 1}: end must be greater than start')
+        bounds.append((start, end))
+    return tuple(bounds)
+
+
 def apply_runtime_training_config(args):
     Config.ALPHA_ENERGY = float(args.alpha_energy)
     Config.ALPHA_DELAY = float(args.alpha_delay)
@@ -753,6 +796,8 @@ def build_phase_args(cli_args, graph_size):
     ))
     default_passenger_tw = None if cli_args.passenger_tw_period_weights is None else _normalize_ratio_triplet(cli_args.passenger_tw_period_weights)
     default_cargo_tw = None if cli_args.cargo_tw_period_weights is None else _normalize_ratio_triplet(cli_args.cargo_tw_period_weights)
+    default_passenger_tw_bounds = _parse_period_bounds(cli_args.passenger_tw_period_bounds)
+    default_cargo_tw_bounds = _parse_period_bounds(cli_args.cargo_tw_period_bounds)
     phase2_distance_mix = _normalize_ratio_triplet((
         cli_args.curriculum_phase2_short_ratio,
         cli_args.curriculum_phase2_mid_ratio,
@@ -792,6 +837,7 @@ def build_phase_args(cli_args, graph_size):
         max_concurrent_open_orders=cli_args.max_concurrent_open_orders,
         enable_delivery_viability=cli_args.enable_delivery_viability,
         enable_viability_fallback=cli_args.enable_viability_fallback,
+        relax_pickup_commitment_trip_time=cli_args.relax_pickup_commitment_trip_time,
         alpha_energy=cli_args.alpha_energy,
         alpha_delay=cli_args.alpha_delay,
         alpha_vehicle=cli_args.alpha_vehicle,
@@ -800,6 +846,8 @@ def build_phase_args(cli_args, graph_size):
         alpha_trip_overtime=cli_args.alpha_trip_overtime,
         passenger_tw_period_weights_override=default_passenger_tw,
         cargo_tw_period_weights_override=default_cargo_tw,
+        passenger_tw_period_bounds_override=default_passenger_tw_bounds,
+        cargo_tw_period_bounds_override=default_cargo_tw_bounds,
         enable_rideshare_curriculum=cli_args.enable_rideshare_curriculum,
         curriculum_warmup_epochs=cli_args.curriculum_warmup_epochs,
         curriculum_mix_epochs=cli_args.curriculum_mix_epochs,
