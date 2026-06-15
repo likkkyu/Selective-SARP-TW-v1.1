@@ -12,8 +12,10 @@ import argparse
 import json
 import math
 import os
+import random
 import time
 
+import numpy as np
 import torch
 import torch.optim as optim
 from torch.utils.data import DataLoader
@@ -64,6 +66,19 @@ PHASE_CONFIGS = {
 }
 
 
+def set_global_seed(seed):
+    seed = int(seed)
+    random.seed(seed)
+    np.random.seed(seed)
+    torch.manual_seed(seed)
+    if torch.cuda.is_available():
+        torch.cuda.manual_seed(seed)
+        torch.cuda.manual_seed_all(seed)
+    if hasattr(torch.backends, 'cudnn'):
+        torch.backends.cudnn.deterministic = True
+        torch.backends.cudnn.benchmark = False
+
+
 def collate_fn(batch):
     keys = batch[0].keys()
     return {
@@ -78,6 +93,7 @@ class POMOTrainerOptimized:
 
     def __init__(self, args):
         self.args = args
+        set_global_seed(self.args.seed)
         self.device = torch.device('cuda' if torch.cuda.is_available() and not args.no_cuda else 'cpu')
         self.problem = MCVRPPDTW
         self.normalization_profile = self._prepare_normalization_profile()
@@ -124,6 +140,7 @@ class POMOTrainerOptimized:
               f"vehicle={self.args.alpha_vehicle}, reject={self.args.alpha_reject}, "
               f"unfulfilled={self.args.alpha_unfulfilled}, overtime={self.args.alpha_trip_overtime}")
         print(f"Passenger pickup TW width: {Config.PASSENGER_TW_WIDTH:.1f} h")
+        print(f"Global seed: {self.args.seed}")
         print(f"Model params: {sum(p.numel() for p in self.model.parameters()):,}")
 
     def _prepare_normalization_profile(self):
@@ -462,6 +479,7 @@ class POMOTrainerOptimized:
         print(f"Batch size: {self.args.batch_size}")
         print(f"POMO size: {self.args.pomo_size}")
         print(f"Epochs: {self.args.n_epochs}")
+        print(f"Seed: {self.args.seed}")
         print(f"Reject warmup epochs: {self.args.reject_warmup_epochs}")
         print(f"Reject init bias: {self.args.reject_init_bias}")
         print(f"Shared env: {self._build_state_kwargs(allow_reject=True)}")
@@ -626,6 +644,7 @@ class POMOTrainerOptimized:
                     'ALPHA_UNFULFILLED': self.args.alpha_unfulfilled,
                     'ALPHA_TRIP_OVERTIME': self.args.alpha_trip_overtime,
                     'VEHICLE_SPEED': Config.VEHICLE_SPEED,
+                    'seed': self.args.seed,
                     'OPERATION_START': Config.OPERATION_START,
                     'reject_warmup_epochs': self.args.reject_warmup_epochs,
                     'reject_init_bias': self.args.reject_init_bias,
@@ -692,6 +711,7 @@ def parse_args():
     parser.add_argument('--max-grad-norm', type=float, default=1.0)
     parser.add_argument('--save-interval', type=int, default=20)
     parser.add_argument('--log-interval', type=int, default=20, help='tqdm 刷新间隔（按 batch）')
+    parser.add_argument('--seed', type=int, default=1234, help='全局随机种子（模型初始化、DataLoader shuffle、采样 rollout）')
     parser.add_argument('--num-workers', type=int, default=4, help='DataLoader worker 数')
     parser.add_argument('--prefetch-factor', type=int, default=2, help='DataLoader prefetch 因子 (num_workers>0 时生效)')
     parser.add_argument('--disable-persistent-workers', action='store_true', help='禁用 DataLoader persistent_workers')
@@ -882,6 +902,7 @@ def build_phase_args(cli_args, graph_size):
         lr=phase['lr'],
         weight_decay=cli_args.weight_decay,
         max_grad_norm=cli_args.max_grad_norm,
+        seed=cli_args.seed,
         no_cuda=cli_args.no_cuda,
         save_dir=os.path.join(cli_args.output_root, f'pomo_n{graph_size}_optimized'),
         save_interval=cli_args.save_interval,
