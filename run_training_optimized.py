@@ -209,6 +209,12 @@ class POMOTrainerOptimized:
             kwargs['cargo_tw_period_bounds_override'] = self.args.cargo_tw_period_bounds_override
         return kwargs
 
+    def _validation_dataset_seed(self):
+        return int(self.args.seed)
+
+    def _training_dataset_seed(self, epoch):
+        return int(self.args.seed + epoch * 1000)
+
     def _build_curriculum_dataset_kwargs(self, epoch):
         kwargs = self._build_default_dataset_kwargs()
         if not self.args.enable_rideshare_curriculum:
@@ -487,10 +493,12 @@ class POMOTrainerOptimized:
         print('=' * 70)
 
         os.makedirs(self.args.save_dir, exist_ok=True)
+        val_seed = self._validation_dataset_seed()
+        print(f"Validation dataset seed: {val_seed}")
         val_dataset = MCVRPPDTWDataset(
             num_samples=self.args.val_size,
             graph_size=self.args.graph_size,
-            seed=12345,
+            seed=val_seed,
             **self._build_default_dataset_kwargs(),
         )
         val_loader = DataLoader(
@@ -505,10 +513,12 @@ class POMOTrainerOptimized:
         best_service_rate = self.best_service_rate
         for epoch in range(self.start_epoch, self.args.n_epochs + 1):
             curriculum_kwargs = self._build_curriculum_dataset_kwargs(epoch)
+            train_seed = self._training_dataset_seed(epoch)
+            print(f"Epoch {epoch} training dataset seed: {train_seed}")
             train_dataset = MCVRPPDTWDataset(
                 num_samples=self.args.epoch_size,
                 graph_size=self.args.graph_size,
-                seed=epoch * 1000,
+                seed=train_seed,
                 **curriculum_kwargs,
             )
             train_loader = DataLoader(
@@ -645,6 +655,8 @@ class POMOTrainerOptimized:
                     'ALPHA_TRIP_OVERTIME': self.args.alpha_trip_overtime,
                     'VEHICLE_SPEED': Config.VEHICLE_SPEED,
                     'seed': self.args.seed,
+                    'validation_dataset_seed': self._validation_dataset_seed(),
+                    'training_dataset_seed_formula': 'seed + epoch * 1000',
                     'OPERATION_START': Config.OPERATION_START,
                     'reject_warmup_epochs': self.args.reject_warmup_epochs,
                     'reject_init_bias': self.args.reject_init_bias,
