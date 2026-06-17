@@ -953,24 +953,34 @@ class StateMCVRPPDTW(NamedTuple):
             allow_depot_fallback = all_order_nodes_masked & can_start_new_vehicle
         else:
             allow_depot_fallback = all_order_nodes_masked
-        if return_debug:
-            debug['diag_depot_fallback_used'] = allow_depot_fallback.squeeze(-1).float()
-        mask[:, :, 0] = mask[:, :, 0] & (~allow_depot_fallback).to(torch.uint8)
 
         reject_candidates = self._deterministic_reject_order(mask)
         reject_candidate_available = reject_candidates >= 0
+        no_open_started_orders = (~self.has_open_started_orders()).squeeze(1)
         pre_departure_gate = (
             (self.prev_a == 0)
             & (self.used_capacity_passenger <= 1e-5)
             & (self.used_capacity_cargo <= 1e-5)
             & (~self.has_open_started_orders())
         ).squeeze(1)
+        at_depot = (self.prev_a == 0).squeeze(1)
+        depot_dead_end_reject_gate = at_depot & no_open_started_orders & all_order_nodes_masked.squeeze(-1).bool()
+        dead_end_reject_gate = depot_dead_end_reject_gate
         reject_allowed = (
             reject_candidate_available
             & (~all_done.squeeze(-1).bool())
             & bool(self.allow_reject)
-            & pre_departure_gate
+            & (pre_departure_gate | dead_end_reject_gate)
         )
+
+        depot_cleanup_forces_reject = allow_depot_fallback.squeeze(-1).bool() & reject_allowed
+        allow_depot_fallback = allow_depot_fallback & (~depot_cleanup_forces_reject).view(-1, 1)
+        if return_debug:
+            debug['diag_depot_fallback_used'] = allow_depot_fallback.squeeze(-1).float()
+        mask[:, :, 0] = mask[:, :, 0] & (~allow_depot_fallback).to(torch.uint8)
+        if depot_cleanup_forces_reject.any():
+            mask[:, :, 0] = mask[:, :, 0] | depot_cleanup_forces_reject.view(-1, 1).to(torch.uint8)
+
         mask[:, :, reject_index] = (~reject_allowed).view(-1, 1).to(torch.uint8)
         if return_debug:
             reject_available = mask[:, :, reject_index].eq(0).view(-1)

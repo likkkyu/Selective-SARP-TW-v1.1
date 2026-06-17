@@ -13,6 +13,7 @@ Selective SARP-TW 模型评估脚本（通用 CLI）
     python evaluate_model.py --graph-size 100 --num-samples 200 --batch-size 16
 """
 import argparse
+import json
 import os
 import statistics
 
@@ -21,6 +22,7 @@ from torch.utils.data import DataLoader
 
 from problem_mcvrptw_v2 import MCVRPPDTWDataset, MCVRPPDTW, Config
 from nets.attention_model import AttentionModel, set_decode_type
+from state_mcvrptw_v2 import StateMCVRPPDTW
 
 
 def parse_args():
@@ -62,6 +64,10 @@ def parse_args():
     parser.add_argument('--cargo-tw-period-bounds', nargs=6, type=float, default=None,
                         metavar=('MORNING_START', 'MORNING_END', 'MIDDAY_START', 'MIDDAY_END', 'EVENING_START', 'EVENING_END'),
                         help='覆盖默认 cargo 三时段 pickup TW 区间')
+    parser.add_argument('--trace-first-untouched-unrejected', action='store_true',
+                        help='导出第一个 untouched_unrejected>0 的 rollout 样本末尾轨迹')
+    parser.add_argument('--trace-output', type=str, default=None,
+                        help='轨迹 JSON 输出路径 (default: <checkpoint_dir>/residual_trace.json)')
     return parser.parse_args()
 
 
@@ -157,6 +163,110 @@ def _resolve_state_kwargs(args, checkpoint):
     }
 
 
+def _summarize_order_set(order_indices):
+    return [int(idx) + 1 for idx in order_indices]
+
+
+def _trace_snapshot(state, mask, debug, step, selected=None, note=''):
+    def _debug_scalar(key, default=0.0):
+        value = debug.get(key)
+        if torch.is_tensor(value):
+            return float(value[0].item())
+        if value is None:
+            return float(default)
+        return float(value)
+
+    n_orders = state.n_orders
+    open_orders = torch.nonzero(state.get_open_started_mask()[0], as_tuple=False).squeeze(-1).tolist()
+    pickup_mask = mask[0, 0, 1:1 + n_orders]
+    delivery_mask = mask[0, 0, 1 + n_orders:1 + 2 * n_orders]
+    feasible_pickups = torch.nonzero(~pickup_mask, as_tuple=False).squeeze(-1).tolist()
+    feasible_deliveries = torch.nonzero(~delivery_mask, as_tuple=False).squeeze(-1).tolist()
+    untouched_mask = (~state.visited[0, 0, 1:n_orders + 1].bool()) & (~state.visited[0, 0, n_orders + 1:2 * n_orders + 1].bool())
+    untouched_unrejected_mask = untouched_mask & (~state.rejected_[0, 0].bool())
+    any_service_feasible = float((~mask[0, 0, 1:1 + 2 * n_orders]).any().item())
+    depot_only = float((~mask[0, 0, 0]).item() and bool(mask[0, 0, 1:1 + 2 * n_orders].all().item()) and bool(mask[0, 0, state.reject_index].item()))
+    snapshot = {
+        'step': int(step),
+        'note': note,
+        'selected': None if selected is None else int(selected),
+        'prev_node': int(state.prev_a[0, 0].item()),
+        'current_time': float(state.current_time[0, 0].item()),
+        'trip_start_time': float(state.trip_start_time[0, 0].item()),
+        'used_vehicles': float(state.used_vehicles[0, 0].item()),
+        'deadlock_count': int(state.deadlock_count[0, 0].item()),
+        'deadlock_limit': int(state.deadlock_limit[0, 0].item()),
+        'terminal': bool(state.terminal_[0, 0].item()),
+        'finished': bool(state.get_finished()[0].item()),
+        'depot_available': bool((~mask[0, 0, 0]).item()),
+        'reject_available': bool((~mask[0, 0, state.reject_index]).item()),
+        'open_orders': _summarize_order_set(open_orders),
+        'feasible_pickups': _summarize_order_set(feasible_pickups),
+        'feasible_deliveries': _summarize_order_set(feasible_deliveries),
+        'untouched_unrejected_orders': _summarize_order_set(torch.nonzero(untouched_unrejected_mask, as_tuple=False).squeeze(-1).tolist()),
+        'diag_open_started_count': _debug_scalar('diag_open_started_count', len(open_orders)),
+        'diag_any_service_feasible': _debug_scalar('diag_any_service_feasible', any_service_feasible),
+        'diag_depot_only': _debug_scalar('diag_depot_only', depot_only),
+        'diag_reject_allowed': _debug_scalar('diag_reject_allowed', float((~mask[0, 0, state.reject_index]).item())),
+        'diag_reject_predeparture_available': _debug_scalar('diag_reject_predeparture_available', 0.0),
+        'diag_reject_inroute_available': _debug_scalar('diag_reject_inroute_available', 0.0),
+        'diag_depot_fallback_used': _debug_scalar('diag_depot_fallback_used', 0.0),
+        'diag_mask_precedence': _debug_scalar('diag_mask_precedence', 0.0),
+        'diag_mask_pickup_tw': _debug_scalar('diag_mask_pickup_tw', 0.0),
+        'diag_mask_trip_time': _debug_scalar('diag_mask_trip_time', 0.0),
+        'diag_mask_pickup_commitment': _debug_scalar('diag_mask_pickup_commitment', 0.0),
+        'diag_delivery_viability_masked': _debug_scalar('diag_delivery_viability_masked', 0.0),
+    }
+    return snapshot
+
+
+def _trace_rollout_case(model, sample, state_kwargs, device):
+    batch = {k: (v.unsqueeze(0).to(device) if torch.is_tensor(v) else v) for k, v in sample.items()}
+    embeddings, _ = model.embedder(model._init_embed(batch), pd_pair_mask=model._build_pd_pair_mask(batch))
+    fixed = model._precompute(embeddings)
+    state = StateMCVRPPDTW.initialize(batch, **state_kwargs)
+    sequences = []
+    trace = []
+    consecutive_depot = torch.zeros(1, dtype=torch.long, device=device)
+    max_steps = model.max_decode_steps or max(embeddings.size(1) * 3, 8)
+
+    for step in range(max_steps):
+        if state.all_finished():
+            break
+        log_p, mask, debug = model._get_log_p(
+            fixed,
+            state,
+            consecutive_depot=consecutive_depot,
+            return_debug=True,
+        )
+        selected = model._select_node(log_p.exp()[:, 0, :], mask[:, 0, :])
+        trace.append(_trace_snapshot(state, mask, debug, step, selected=int(selected[0].item()), note='before_update'))
+        sequences.append(selected)
+        consecutive_depot = torch.where(selected == 0, consecutive_depot + 1, torch.zeros_like(consecutive_depot))
+        state = state.update(selected, current_mask=mask)
+
+    if sequences:
+        pi = torch.stack(sequences, 1)
+    else:
+        pi = torch.zeros((1, 1), dtype=torch.long, device=device)
+    _, details = MCVRPPDTW.get_costs(batch, pi, return_details=True)
+    final_mask, final_debug = state.get_mask(return_debug=True)
+    trace.append(_trace_snapshot(state, final_mask, final_debug, len(trace), note='final_state'))
+    return {
+        'pi': pi[0].tolist(),
+        'trace': trace,
+        'final_details': {
+            'completed_orders': float(details['completed_orders'][0].item()),
+            'rejected_orders': float(details['rejected_orders'][0].item()),
+            'unfulfilled_orders': float(details['unfulfilled_orders'][0].item()),
+            'untouched_orders': float(details['untouched_orders'][0].item()),
+            'untouched_unrejected_orders': float(details['untouched_unrejected_orders'][0].item()),
+            'pickup_only_orders': float(details['pickup_only_orders'][0].item()),
+            'started_not_completed_orders': float(details['started_not_completed_orders'][0].item()),
+        },
+    }
+
+
 def evaluate():
     args = parse_args()
 
@@ -246,6 +356,8 @@ def evaluate():
     all_total_ride_time_violations = []
     all_excess_ride_time_violations = []
     all_diagnostics = {}
+    residual_trace_payload = None
+    sample_offset = 0
 
     with torch.no_grad():
         for batch in test_loader:
@@ -287,6 +399,27 @@ def evaluate():
             _maybe('untouched_unrejected_orders', all_num_untouched_unrejected)
             _maybe('pickup_only_orders', all_num_pickup_only)
             _maybe('started_not_completed_orders', all_num_started_not_completed)
+
+            if args.trace_first_untouched_unrejected and residual_trace_payload is None:
+                untouched_unrejected = details.get('untouched_unrejected_orders')
+                if torch.is_tensor(untouched_unrejected):
+                    hit_indices = torch.nonzero(untouched_unrejected > 0, as_tuple=False).squeeze(-1)
+                    if hit_indices.numel() > 0:
+                        local_idx = int(hit_indices[0].item())
+                        sample = {
+                            key: (value[local_idx].detach().cpu() if torch.is_tensor(value) else value)
+                            for key, value in batch.items()
+                        }
+                        trace_result = _trace_rollout_case(model, sample, state_kwargs, device)
+                        residual_trace_payload = {
+                            'sample_index': sample_offset + local_idx,
+                            'checkpoint': args.checkpoint,
+                            'graph_size': args.graph_size,
+                            'seed': args.seed,
+                            'state_kwargs': state_kwargs,
+                            **trace_result,
+                        }
+            sample_offset += batch['loc'].size(0)
 
     def _stats(label, data, unit='RMB', fmt='{:.3f}'):
         if not data:
@@ -380,6 +513,18 @@ def evaluate():
             ('Reject in-route rate', 'diag_reject_inroute_available', '{:.2f}'),
         ]:
             _stats(label, all_diagnostics.get(key, []), unit='', fmt=fmt)
+    if args.trace_first_untouched_unrejected:
+        print()
+        print('【Residual trace】')
+        if residual_trace_payload is None:
+            print('  No untouched-unrejected sample found.')
+        else:
+            trace_output = args.trace_output or os.path.join(os.path.dirname(args.checkpoint), 'residual_trace.json')
+            with open(trace_output, 'w', encoding='utf-8') as trace_file:
+                json.dump(residual_trace_payload, trace_file, ensure_ascii=False, indent=2)
+            print(f'  Saved trace to: {trace_output}')
+            print(f"  Sample index : {residual_trace_payload['sample_index']}")
+            print(f"  Final untouched-unrejected: {residual_trace_payload['final_details']['untouched_unrejected_orders']:.0f}")
     print()
     print('【训练目标 (归一化, 仅供参考)】')
     _stats('Total Cost (train)', all_cost_train, unit='', fmt='{:.4f}')

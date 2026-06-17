@@ -387,7 +387,7 @@ class AttentionModel(nn.Module):
                         debug_totals[key] += step_debug[key]
             consecutive_depot = torch.where(selected == 0, consecutive_depot + 1, torch.zeros_like(consecutive_depot))
 
-            state = state.update(selected)
+            state = state.update(selected, current_mask=mask)
 
             if self.shrink_size is not None and state.ids.size(0) < batch_size:
                 log_p_, selected_, consecutive_depot_ = log_p, selected, consecutive_depot
