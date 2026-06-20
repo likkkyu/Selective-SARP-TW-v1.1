@@ -220,6 +220,119 @@ def _trace_snapshot(state, mask, debug, step, selected=None, note=''):
     return snapshot
 
 
+def _order_audit_from_state(state):
+    batch_size = state.ids.size(0)
+    n_orders = state.n_orders
+    device = state.coords.device
+
+    if n_orders == 0:
+        empty_mask = torch.zeros(batch_size, 0, dtype=torch.bool, device=device)
+        zero = torch.zeros(batch_size, device=device)
+        return {
+            'completed_mask': empty_mask,
+            'rejected_mask': empty_mask,
+            'untouched_mask': empty_mask,
+            'pickup_only_mask': empty_mask,
+            'delivery_without_pickup_mask': empty_mask,
+            'started_not_completed_mask': empty_mask,
+            'untouched_unrejected_mask': empty_mask,
+            'unfulfilled_mask': empty_mask,
+            'completed_orders': zero,
+            'rejected_orders': zero,
+            'untouched_orders': zero,
+            'pickup_only_orders': zero,
+            'delivery_without_pickup_orders': zero,
+            'started_not_completed_orders': zero,
+            'untouched_unrejected_orders': zero,
+            'unfulfilled_orders': zero,
+            'partition_ok': torch.ones(batch_size, dtype=torch.bool, device=device),
+        }
+
+    visited = state.visited[:, 0, :].bool()
+    pickup_visited = visited[:, 1:n_orders + 1]
+    delivery_visited = visited[:, n_orders + 1:2 * n_orders + 1]
+    rejected_mask = state.rejected_.squeeze(1).bool()
+
+    completed_mask = pickup_visited & delivery_visited & (~rejected_mask)
+    untouched_mask = (~pickup_visited) & (~delivery_visited)
+    pickup_only_mask = pickup_visited & (~delivery_visited)
+    delivery_without_pickup_mask = delivery_visited & (~pickup_visited)
+    started_not_completed_mask = pickup_only_mask | delivery_without_pickup_mask
+    untouched_unrejected_mask = untouched_mask & (~rejected_mask)
+    unfulfilled_mask = started_not_completed_mask | untouched_unrejected_mask
+
+    partition_sum = (
+        completed_mask.to(torch.int64)
+        + rejected_mask.to(torch.int64)
+        + started_not_completed_mask.to(torch.int64)
+        + untouched_unrejected_mask.to(torch.int64)
+    )
+
+    return {
+        'completed_mask': completed_mask,
+        'rejected_mask': rejected_mask,
+        'untouched_mask': untouched_mask,
+        'pickup_only_mask': pickup_only_mask,
+        'delivery_without_pickup_mask': delivery_without_pickup_mask,
+        'started_not_completed_mask': started_not_completed_mask,
+        'untouched_unrejected_mask': untouched_unrejected_mask,
+        'unfulfilled_mask': unfulfilled_mask,
+        'completed_orders': completed_mask.float().sum(1),
+        'rejected_orders': rejected_mask.float().sum(1),
+        'untouched_orders': untouched_mask.float().sum(1),
+        'pickup_only_orders': pickup_only_mask.float().sum(1),
+        'delivery_without_pickup_orders': delivery_without_pickup_mask.float().sum(1),
+        'started_not_completed_orders': started_not_completed_mask.float().sum(1),
+        'untouched_unrejected_orders': untouched_unrejected_mask.float().sum(1),
+        'unfulfilled_orders': unfulfilled_mask.float().sum(1),
+        'partition_ok': partition_sum.eq(1).all(dim=1),
+    }
+
+
+def _mask_to_order_ids(mask_row):
+    return _summarize_order_set(torch.nonzero(mask_row, as_tuple=False).squeeze(-1).tolist())
+
+
+def _audit_sample_payload(audit, sample_idx):
+    return {
+        'completed_orders': float(audit['completed_orders'][sample_idx].item()),
+        'rejected_orders': float(audit['rejected_orders'][sample_idx].item()),
+        'untouched_orders': float(audit['untouched_orders'][sample_idx].item()),
+        'pickup_only_orders': float(audit['pickup_only_orders'][sample_idx].item()),
+        'delivery_without_pickup_orders': float(audit['delivery_without_pickup_orders'][sample_idx].item()),
+        'started_not_completed_orders': float(audit['started_not_completed_orders'][sample_idx].item()),
+        'untouched_unrejected_orders': float(audit['untouched_unrejected_orders'][sample_idx].item()),
+        'unfulfilled_orders': float(audit['unfulfilled_orders'][sample_idx].item()),
+        'partition_ok': bool(audit['partition_ok'][sample_idx].item()),
+        'completed_order_ids': _mask_to_order_ids(audit['completed_mask'][sample_idx]),
+        'rejected_order_ids': _mask_to_order_ids(audit['rejected_mask'][sample_idx]),
+        'untouched_order_ids': _mask_to_order_ids(audit['untouched_mask'][sample_idx]),
+        'pickup_only_order_ids': _mask_to_order_ids(audit['pickup_only_mask'][sample_idx]),
+        'delivery_without_pickup_order_ids': _mask_to_order_ids(audit['delivery_without_pickup_mask'][sample_idx]),
+        'started_not_completed_order_ids': _mask_to_order_ids(audit['started_not_completed_mask'][sample_idx]),
+        'untouched_unrejected_order_ids': _mask_to_order_ids(audit['untouched_unrejected_mask'][sample_idx]),
+        'unfulfilled_order_ids': _mask_to_order_ids(audit['unfulfilled_mask'][sample_idx]),
+    }
+
+
+def _replay_order_audit(batch, pi, state_kwargs):
+    state = StateMCVRPPDTW.initialize(batch, **state_kwargs)
+
+    if pi.dim() == 1:
+        pi = pi[:, None]
+
+    for step in range(pi.size(1)):
+        if state.all_finished():
+            break
+        selected = pi[:, step]
+        mask = state.get_mask()
+        state = state.update(selected, current_mask=mask)
+
+    audit = _order_audit_from_state(state)
+    audit['final_state'] = state
+    return audit
+
+
 def _trace_rollout_case(model, sample, state_kwargs, device):
     batch = {k: (v.unsqueeze(0).to(device) if torch.is_tensor(v) else v) for k, v in sample.items()}
     embeddings, _ = model.embedder(model._init_embed(batch), pd_pair_mask=model._build_pd_pair_mask(batch))
@@ -250,6 +363,7 @@ def _trace_rollout_case(model, sample, state_kwargs, device):
     else:
         pi = torch.zeros((1, 1), dtype=torch.long, device=device)
     _, details = MCVRPPDTW.get_costs(batch, pi, return_details=True)
+    audit = _order_audit_from_state(state)
     final_mask, final_debug = state.get_mask(return_debug=True)
     trace.append(_trace_snapshot(state, final_mask, final_debug, len(trace), note='final_state'))
     return {
@@ -263,6 +377,23 @@ def _trace_rollout_case(model, sample, state_kwargs, device):
             'untouched_unrejected_orders': float(details['untouched_unrejected_orders'][0].item()),
             'pickup_only_orders': float(details['pickup_only_orders'][0].item()),
             'started_not_completed_orders': float(details['started_not_completed_orders'][0].item()),
+            'audited_completed_orders': float(audit['completed_orders'][0].item()),
+            'audited_rejected_orders': float(audit['rejected_orders'][0].item()),
+            'audited_unfulfilled_orders': float(audit['unfulfilled_orders'][0].item()),
+            'audited_untouched_orders': float(audit['untouched_orders'][0].item()),
+            'audited_untouched_unrejected_orders': float(audit['untouched_unrejected_orders'][0].item()),
+            'audited_pickup_only_orders': float(audit['pickup_only_orders'][0].item()),
+            'audited_delivery_without_pickup_orders': float(audit['delivery_without_pickup_orders'][0].item()),
+            'audited_started_not_completed_orders': float(audit['started_not_completed_orders'][0].item()),
+            'partition_ok': bool(audit['partition_ok'][0].item()),
+            'completed_order_ids': _mask_to_order_ids(audit['completed_mask'][0]),
+            'rejected_order_ids': _mask_to_order_ids(audit['rejected_mask'][0]),
+            'untouched_order_ids': _mask_to_order_ids(audit['untouched_mask'][0]),
+            'untouched_unrejected_order_ids': _mask_to_order_ids(audit['untouched_unrejected_mask'][0]),
+            'pickup_only_order_ids': _mask_to_order_ids(audit['pickup_only_mask'][0]),
+            'delivery_without_pickup_order_ids': _mask_to_order_ids(audit['delivery_without_pickup_mask'][0]),
+            'started_not_completed_order_ids': _mask_to_order_ids(audit['started_not_completed_mask'][0]),
+            'unfulfilled_order_ids': _mask_to_order_ids(audit['unfulfilled_mask'][0]),
         },
     }
 
@@ -356,6 +487,19 @@ def evaluate():
     all_total_ride_time_violations = []
     all_excess_ride_time_violations = []
     all_diagnostics = {}
+    all_audited_completed = []
+    all_audited_rejected = []
+    all_audited_untouched = []
+    all_audited_untouched_unrejected = []
+    all_audited_pickup_only = []
+    all_audited_delivery_without_pickup = []
+    all_audited_started_not_completed = []
+    all_audited_unfulfilled = []
+    partition_ok_count = 0
+    aggregate_match_count = 0
+    legacy_untouched_match_count = 0
+    first_audit_mismatch = None
+    first_legacy_untouched_mismatch = None
     residual_trace_payload = None
     sample_offset = 0
 
@@ -371,6 +515,7 @@ def evaluate():
             else:
                 cost, _, pi = model(batch, return_pi=True, state_kwargs=state_kwargs)
             _, details = MCVRPPDTW.get_costs(batch, pi, return_details=True)
+            audit = _replay_order_audit(batch, pi, state_kwargs)
 
             all_cost_train.extend(cost.tolist())
 
@@ -400,8 +545,64 @@ def evaluate():
             _maybe('pickup_only_orders', all_num_pickup_only)
             _maybe('started_not_completed_orders', all_num_started_not_completed)
 
+            all_audited_completed.extend(audit['completed_orders'].tolist())
+            all_audited_rejected.extend(audit['rejected_orders'].tolist())
+            all_audited_untouched.extend(audit['untouched_orders'].tolist())
+            all_audited_untouched_unrejected.extend(audit['untouched_unrejected_orders'].tolist())
+            all_audited_pickup_only.extend(audit['pickup_only_orders'].tolist())
+            all_audited_delivery_without_pickup.extend(audit['delivery_without_pickup_orders'].tolist())
+            all_audited_started_not_completed.extend(audit['started_not_completed_orders'].tolist())
+            all_audited_unfulfilled.extend(audit['unfulfilled_orders'].tolist())
+            partition_ok_count += int(audit['partition_ok'].sum().item())
+
+            batch_size = pi.size(0)
+            sample_match_mask = audit['partition_ok'].clone()
+            for detail_key, audit_key in [
+                ('completed_orders', 'completed_orders'),
+                ('rejected_orders', 'rejected_orders'),
+                ('unfulfilled_orders', 'unfulfilled_orders'),
+                ('untouched_unrejected_orders', 'untouched_unrejected_orders'),
+                ('pickup_only_orders', 'pickup_only_orders'),
+                ('started_not_completed_orders', 'started_not_completed_orders'),
+            ]:
+                sample_match_mask &= torch.isclose(details[detail_key].float(), audit[audit_key].float())
+            aggregate_match_count += int(sample_match_mask.sum().item())
+            legacy_untouched_match_mask = torch.isclose(details['untouched_orders'].float(), audit['untouched_orders'].float())
+            legacy_untouched_match_count += int(legacy_untouched_match_mask.sum().item())
+
+            if first_audit_mismatch is None:
+                mismatch_indices = torch.nonzero(~sample_match_mask, as_tuple=False).squeeze(-1)
+                if mismatch_indices.numel() > 0:
+                    local_idx = int(mismatch_indices[0].item())
+                    first_audit_mismatch = {
+                        'sample_index': sample_offset + local_idx,
+                        'pi': pi[local_idx].detach().cpu().tolist(),
+                        'aggregate_details': {
+                            'completed_orders': float(details['completed_orders'][local_idx].item()),
+                            'rejected_orders': float(details['rejected_orders'][local_idx].item()),
+                            'unfulfilled_orders': float(details['unfulfilled_orders'][local_idx].item()),
+                            'untouched_orders': float(details['untouched_orders'][local_idx].item()),
+                            'untouched_unrejected_orders': float(details['untouched_unrejected_orders'][local_idx].item()),
+                            'pickup_only_orders': float(details['pickup_only_orders'][local_idx].item()),
+                            'started_not_completed_orders': float(details['started_not_completed_orders'][local_idx].item()),
+                        },
+                        'audited_details': _audit_sample_payload(audit, local_idx),
+                    }
+
+            if first_legacy_untouched_mismatch is None:
+                mismatch_indices = torch.nonzero(~legacy_untouched_match_mask, as_tuple=False).squeeze(-1)
+                if mismatch_indices.numel() > 0:
+                    local_idx = int(mismatch_indices[0].item())
+                    first_legacy_untouched_mismatch = {
+                        'sample_index': sample_offset + local_idx,
+                        'pi': pi[local_idx].detach().cpu().tolist(),
+                        'legacy_untouched_orders': float(details['untouched_orders'][local_idx].item()),
+                        'audited_untouched_orders': float(audit['untouched_orders'][local_idx].item()),
+                        'audited_details': _audit_sample_payload(audit, local_idx),
+                    }
+
             if args.trace_first_untouched_unrejected and residual_trace_payload is None:
-                untouched_unrejected = details.get('untouched_unrejected_orders')
+                untouched_unrejected = audit['untouched_unrejected_orders']
                 if torch.is_tensor(untouched_unrejected):
                     hit_indices = torch.nonzero(untouched_unrejected > 0, as_tuple=False).squeeze(-1)
                     if hit_indices.numel() > 0:
@@ -458,17 +659,47 @@ def evaluate():
     _stats('Passenger Excess Ride Viol.', all_excess_ride_time_violations, unit='', fmt='{:.2f}')
     _stats('# Vehicles Used', all_num_vehicles, unit='', fmt='{:.2f}')
     _stats('# Completed Orders', all_num_completed, unit='', fmt='{:.2f}')
-    _stats('# Rejected Orders', all_num_rejected, unit='', fmt='{:.2f}')
-    _stats('# Unfulfilled Orders', all_num_unfulfilled, unit='', fmt='{:.2f}')
-    _stats('# Untouched Orders', all_num_untouched, unit='', fmt='{:.2f}')
-    _stats('# Untouched-Unrejected', all_num_untouched_unrejected, unit='', fmt='{:.2f}')
+    _stats('# Rejected Before Service', all_num_rejected, unit='', fmt='{:.2f}')
+    _stats('# Residual Unfulfilled Orders', all_num_unfulfilled, unit='', fmt='{:.2f}')
+    _stats('# Untouched Orders (legacy accounting; includes explicit rejects)', all_num_untouched, unit='', fmt='{:.2f}')
+    _stats('# Untouched, Not Explicitly Rejected', all_num_untouched_unrejected, unit='', fmt='{:.2f}')
     _stats('Service Rate', service_rates, unit='', fmt='{:.3f}')
-    _stats('Rejected Rate', rejected_rates, unit='', fmt='{:.3f}')
-    _stats('Unfulfilled Rate', unfulfilled_rates, unit='', fmt='{:.3f}')
+    _stats('Rejected Before Service Rate', rejected_rates, unit='', fmt='{:.3f}')
+    _stats('Residual Unfulfilled Rate', unfulfilled_rates, unit='', fmt='{:.3f}')
     _stats('Served+Rejected Rate', served_plus_rejected_rates, unit='', fmt='{:.3f}')
-    _stats('Untouched-Unrejected Rate', untouched_unrejected_rates, unit='', fmt='{:.3f}')
+    _stats('Untouched, Not Explicitly Rejected Rate', untouched_unrejected_rates, unit='', fmt='{:.3f}')
     _stats('# Pickup-only Orders', all_num_pickup_only, unit='', fmt='{:.2f}')
-    _stats('# Started-not-completed', all_num_started_not_completed, unit='', fmt='{:.2f}')
+    _stats('# Started but Not Completed', all_num_started_not_completed, unit='', fmt='{:.2f}')
+    print()
+    print('【Order-level replay audit】')
+    audited_service_rates = [value / args.graph_size for value in all_audited_completed]
+    audited_rejected_rates = [value / args.graph_size for value in all_audited_rejected]
+    audited_unfulfilled_rates = [value / args.graph_size for value in all_audited_unfulfilled]
+    audited_untouched_unrejected_rates = [value / args.graph_size for value in all_audited_untouched_unrejected]
+    _stats('Audited Completed Orders', all_audited_completed, unit='', fmt='{:.2f}')
+    _stats('Audited Rejected Before Service', all_audited_rejected, unit='', fmt='{:.2f}')
+    _stats('Audited Untouched Orders (legacy accounting view)', all_audited_untouched, unit='', fmt='{:.2f}')
+    _stats('Audited Untouched, Not Explicitly Rejected', all_audited_untouched_unrejected, unit='', fmt='{:.2f}')
+    _stats('Audited Pickup-only Orders', all_audited_pickup_only, unit='', fmt='{:.2f}')
+    _stats('Audited Delivery Without Pickup', all_audited_delivery_without_pickup, unit='', fmt='{:.2f}')
+    _stats('Audited Started but Not Completed', all_audited_started_not_completed, unit='', fmt='{:.2f}')
+    _stats('Audited Residual Unfulfilled Orders', all_audited_unfulfilled, unit='', fmt='{:.2f}')
+    _stats('Audited Service Rate', audited_service_rates, unit='', fmt='{:.3f}')
+    _stats('Audited Rejected Before Service Rate', audited_rejected_rates, unit='', fmt='{:.3f}')
+    _stats('Audited Residual Unfulfilled Rate', audited_unfulfilled_rates, unit='', fmt='{:.3f}')
+    _stats('Audited Untouched, Not Explicitly Rejected Rate', audited_untouched_unrejected_rates, unit='', fmt='{:.3f}')
+    print(f'  Partition-consistent samples   : {partition_ok_count}/{args.num_samples}')
+    print(f'  Core aggregate-match samples  : {aggregate_match_count}/{args.num_samples}')
+    print(f'  Legacy untouched-match samples: {legacy_untouched_match_count}/{args.num_samples}')
+    if first_audit_mismatch is not None:
+        print('  First core aggregate mismatch : sample #{sample_index}'.format(**first_audit_mismatch))
+        print('    aggregate details           : ' + json.dumps(first_audit_mismatch['aggregate_details'], ensure_ascii=False))
+        print('    audited details             : ' + json.dumps(first_audit_mismatch['audited_details'], ensure_ascii=False))
+    if first_legacy_untouched_mismatch is not None:
+        print('  First legacy untouched gap    : sample #{sample_index}'.format(**first_legacy_untouched_mismatch))
+        print('    legacy untouched_orders     : {legacy_untouched_orders} (legacy accounting count)'.format(**first_legacy_untouched_mismatch))
+        print('    audited untouched_orders    : {audited_untouched_orders} (true untouched-after-replay count)'.format(**first_legacy_untouched_mismatch))
+        print('    audited details             : ' + json.dumps(first_legacy_untouched_mismatch['audited_details'], ensure_ascii=False))
     if args.diagnostics and all_diagnostics:
         print()
         print('【Mask / 可行性诊断】')

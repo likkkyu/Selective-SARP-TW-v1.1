@@ -70,22 +70,50 @@ Formal evaluation result (`outputs_eval/formal_compare_suppress_w3_b25/current_b
 
 - `Total Cost (raw) = 1494.071 ± 1048.812 RMB`
 - `Completed Orders = 22.70 ± 1.84`
-- `Rejected Orders = 2.30 ± 1.84`
-- `Unfulfilled Orders = 0.00 ± 0.00`
-- `Untouched-Unrejected = 0.00 ± 0.00`
+- `Rejected Before Service = 2.30 ± 1.84`
+- `Residual Unfulfilled Orders = 0.00 ± 0.00`
+- `Untouched Orders (legacy accounting; includes explicit rejects) = 2.30 ± 1.84`
+- `Untouched, Not Explicitly Rejected = 0.00 ± 0.00`
 - `Service Rate = 0.908 ± 0.073`
-- `Rejected Rate = 0.092 ± 0.073`
-- `Unfulfilled Rate = 0.000 ± 0.000`
+- `Rejected Before Service Rate = 0.092 ± 0.073`
+- `Residual Unfulfilled Rate = 0.000 ± 0.000`
 - `Served+Rejected Rate = 1.000 ± 0.000`
 - `Pickup-only Orders = 0.00 ± 0.00`
-- `Started-not-completed = 0.00 ± 0.00`
+- `Started but Not Completed = 0.00 ± 0.00`
 
 Additional formal-eval observations:
 - no passenger pickup hard violations
 - no passenger ride-time violations
 - `Reject predeparture rate = 0.13 ± 0.03`
 - `Reject in-route rate = 0.00 ± 0.00`
-- the rollout is clean because terminal leftovers are no longer leaking into residual `unfulfilled`
+
+### Replay-audit conclusion
+
+The evaluator now includes a replay-based order audit that replays the decoded `pi` through `StateMCVRPPDTW` and reconstructs the final per-order partition from state semantics rather than only from count-level accounting.
+
+On the 500-instance formal run, that replay audit reports:
+
+- `Partition-consistent samples = 500 / 500`
+- `Core aggregate-match samples = 500 / 500`
+- `Audited Rejected Before Service = 2.30 ± 1.84`
+- `Audited Residual Unfulfilled Orders = 0.00 ± 0.00`
+- `Audited Pickup-only Orders = 0.00 ± 0.00`
+- `Audited Started but Not Completed = 0.00 ± 0.00`
+- `Audited Untouched, Not Explicitly Rejected = 0.00 ± 0.00`
+
+This directly matches the target business semantics for the current best checkpoint:
+
+- every non-served order is rejected **before service**
+- no order is picked up and then left incomplete
+- no untouched-but-unrejected residuals remain
+
+Important wording note:
+
+- `Untouched Orders` is now treated as a **legacy accounting metric** only; it is not the business-semantic failure bucket because it can still include orders that were explicitly rejected before service
+- the business-semantic residual buckets are instead:
+  - `Untouched, Not Explicitly Rejected`
+  - `Started but Not Completed`
+  - `Residual Unfulfilled Orders`
 
 ## Comparison against recent checkpoints
 
