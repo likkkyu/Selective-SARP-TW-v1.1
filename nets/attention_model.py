@@ -294,6 +294,14 @@ class AttentionModel(nn.Module):
         node_count = embeddings.size(1)
         max_steps = self.max_decode_steps or max(node_count * 3, 8)
         consecutive_depot = torch.zeros(batch_size, dtype=torch.long, device=embeddings.device)
+
+        def _restore_to_full_batch(tensor, active_ids, fill_value=0):
+            if tensor is None or tensor.size(0) == batch_size:
+                return tensor
+            restored = tensor.new_full((batch_size, *tensor.size()[1:]), fill_value)
+            restored[active_ids] = tensor
+            return restored
+
         debug_totals = None
         if return_debug:
             debug_totals = {
@@ -367,6 +375,7 @@ class AttentionModel(nn.Module):
                     fixed = fixed[unfinished]
                     consecutive_depot = consecutive_depot[unfinished]
 
+            active_ids = state.ids[:, 0]
             log_p, mask, step_debug = self._get_log_p(
                 fixed,
                 state,
@@ -375,32 +384,30 @@ class AttentionModel(nn.Module):
             )
             selected = self._select_node(log_p.exp()[:, 0, :], mask[:, 0, :])
             if return_debug:
+                active_debug_updates = {
+                    'diag_selected_depot': (selected == 0).float(),
+                    'diag_selected_reject': (selected == state.reject_index).float(),
+                    'diag_selected_pickup': ((selected >= 1) & (selected <= state.n_orders)).float(),
+                    'diag_selected_delivery': ((selected >= state.n_orders + 1) & (selected <= 2 * state.n_orders)).float(),
+                }
                 service_feasible = step_debug['diag_any_service_feasible'] > 0
-                debug_totals['diag_selected_depot'] += (selected == 0).float()
-                debug_totals['diag_selected_reject'] += (selected == state.reject_index).float()
-                debug_totals['diag_selected_pickup'] += ((selected >= 1) & (selected <= state.n_orders)).float()
-                debug_totals['diag_selected_delivery'] += ((selected >= state.n_orders + 1) & (selected <= 2 * state.n_orders)).float()
-                debug_totals['diag_service_feasible_but_selected_depot'] += (service_feasible & (selected == 0)).float()
-                debug_totals['diag_service_feasible_but_selected_reject'] += (service_feasible & (selected == state.reject_index)).float()
+                active_debug_updates['diag_service_feasible_but_selected_depot'] = (
+                    service_feasible & (selected == 0)
+                ).float()
+                active_debug_updates['diag_service_feasible_but_selected_reject'] = (
+                    service_feasible & (selected == state.reject_index)
+                ).float()
                 for key in debug_totals:
                     if key in step_debug:
-                        debug_totals[key] += step_debug[key]
+                        active_debug_updates[key] = step_debug[key]
+                for key, value in active_debug_updates.items():
+                    debug_totals[key] += _restore_to_full_batch(value, active_ids, fill_value=0)
             consecutive_depot = torch.where(selected == 0, consecutive_depot + 1, torch.zeros_like(consecutive_depot))
 
             state = state.update(selected, current_mask=mask)
 
-            if self.shrink_size is not None and state.ids.size(0) < batch_size:
-                log_p_, selected_, consecutive_depot_ = log_p, selected, consecutive_depot
-                log_p = log_p_.new_zeros(batch_size, *log_p_.size()[1:])
-                selected = selected_.new_zeros(batch_size)
-                consecutive_depot = consecutive_depot_.new_zeros(batch_size)
-
-                log_p[state.ids[:, 0]] = log_p_
-                selected[state.ids[:, 0]] = selected_
-                consecutive_depot[state.ids[:, 0]] = consecutive_depot_
-
-            outputs.append(log_p[:, 0, :])
-            sequences.append(selected)
+            outputs.append(_restore_to_full_batch(log_p, active_ids, fill_value=0)[:, 0, :])
+            sequences.append(_restore_to_full_batch(selected, active_ids, fill_value=0))
 
             i += 1
 

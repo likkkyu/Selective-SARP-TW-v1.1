@@ -6,6 +6,7 @@ import torch
 # Add current directory to path
 sys.path.append(os.getcwd())
 
+from nets.attention_model import AttentionModel, set_decode_type
 from problem_mcvrptw_v2 import MCVRPPDTW, MCVRPPDTWDataset, Config
 from state_mcvrptw_v2 import StateMCVRPPDTW
 
@@ -77,6 +78,39 @@ def _build_three_order_case():
         'demand_cargo': demand_cargo,
         'time_windows': time_windows,
     }
+
+
+def _collate_dataset(dataset, batch_size):
+    sample0 = dataset[0]
+    return {
+        key: torch.stack([dataset[i][key] for i in range(batch_size)], dim=0)
+        if torch.is_tensor(sample0[key]) else sample0[key]
+        for key in sample0.keys()
+    }
+
+
+def _repeat_for_pomo(batch, pomo_size):
+    return {
+        key: value.repeat_interleave(pomo_size, dim=0) if torch.is_tensor(value) else value
+        for key, value in batch.items()
+    }
+
+
+def _build_test_attention_model(shrink_size):
+    model = AttentionModel(
+        embedding_dim=64,
+        hidden_dim=64,
+        problem=MCVRPPDTW,
+        n_encode_layers=2,
+        n_heads=8,
+        tanh_clipping=10.0,
+        normalization='batch',
+        shrink_size=shrink_size,
+        reject_init_bias=-2.5,
+    )
+    model.eval()
+    set_decode_type(model, 'greedy')
+    return model
 
 
 def basic_dry_run():
@@ -190,10 +224,142 @@ def viability_fallback_regression():
     assert feasible_deliveries >= 1, 'delivery viability 不应把所有出口都锁死'
 
 
+def pickup_commitment_next_delivery_equivalence_regression():
+    print('\n' + '=' * 60)
+    print('pickup_commitment next-delivery 等价测试')
+    print('=' * 60)
+
+    input_data = _build_shared_ride_case()
+    state = StateMCVRPPDTW.initialize(
+        input_data,
+        max_concurrent_open_orders=6,
+        enable_delivery_viability=True,
+        enable_viability_fallback=True,
+    )
+    state = state.update(torch.tensor([1]))
+
+    mask = state.get_mask(skip_pickup_commitment=True)
+    n_orders = state.n_orders
+    ids_flat, coords_active, node_type_active, time_windows_active, _, _ = state._active_views()
+    arrival_time = state.current_time + (coords_active - state.cur_coord).norm(p=2, dim=-1) * state.AREA_SIZE / state.VEHICLE_SPEED
+    pickup_coords = coords_active[:, 1:n_orders + 1, :]
+    delivery_coords = coords_active[:, n_orders + 1:2 * n_orders + 1, :]
+    delivery_earliest = time_windows_active[:, n_orders + 1:2 * n_orders + 1, 0]
+    pickup_finish = torch.maximum(
+        arrival_time[:, 1:n_orders + 1],
+        time_windows_active[:, 1:n_orders + 1, 0]
+    ) + state.SERVICE_TIME
+    delivery_to_depot_time = (
+        (delivery_coords - coords_active[:, 0:1, :]).norm(p=2, dim=-1) * state.AREA_SIZE / state.VEHICLE_SPEED
+    )
+    trip_start_after_pickup = torch.where(state.prev_a == 0, state.current_time, state.trip_start_time).squeeze(1)
+    passenger_orders = (node_type_active[:, 1:n_orders + 1] == 1)
+    passenger_pickup_times_before = state.passenger_pickup_time.squeeze(1)
+    direct_ride_time = (
+        (pickup_coords - delivery_coords).norm(p=2, dim=-1) * state.AREA_SIZE / state.VEHICLE_SPEED
+    )
+    candidate_indices = torch.nonzero((~mask[0, 0, 1:n_orders + 1]), as_tuple=False).squeeze(-1).tolist()
+    assert candidate_indices, '测试状态下应存在可选 pickup 候选'
+
+    for candidate_slot in candidate_indices:
+        candidate_idx = int(candidate_slot)
+        open_after = state.get_open_started_mask()[0].clone()
+        open_after[candidate_idx] = True
+        passenger_pickup_times_after = passenger_pickup_times_before[0].clone()
+        if bool(passenger_orders[0, candidate_idx].item()):
+            passenger_pickup_times_after[candidate_idx] = pickup_finish[0, candidate_idx]
+
+        helper_has_delivery = state._has_post_pickup_next_delivery(
+            pickup_coords[0, candidate_idx],
+            pickup_finish[0, candidate_idx],
+            trip_start_after_pickup[0],
+            open_after,
+            delivery_coords[0],
+            delivery_earliest[0],
+            delivery_to_depot_time[0],
+            passenger_orders[0],
+            passenger_pickup_times_after,
+            direct_ride_time[0],
+        )
+
+        candidate_node = candidate_idx + 1
+        next_state = state.update(torch.tensor([candidate_node]), current_mask=mask)
+        next_mask = next_state.get_mask(skip_pickup_commitment=True)
+        next_feasible_deliveries = int((~next_mask[0, 0, n_orders + 1:2 * n_orders + 1]).sum().item())
+        full_mask_has_delivery = next_feasible_deliveries > 0
+        print(
+            f'candidate pickup={candidate_node} helper_has_delivery={helper_has_delivery} '
+            f'full_mask_has_delivery={full_mask_has_delivery}'
+        )
+        assert helper_has_delivery == full_mask_has_delivery, (
+            f'pickup {candidate_node} 的 next-delivery helper 与 full next_mask 不一致'
+        )
+
+
+def attention_shrink_pomo_regression():
+    print('\n' + '=' * 60)
+    print('attention shrink + POMO 回归测试')
+    print('=' * 60)
+
+    base_batch_size = 16
+    pomo_size = 2
+    dataset = MCVRPPDTWDataset(num_samples=base_batch_size, graph_size=8, seed=2026)
+    batch = _collate_dataset(dataset, base_batch_size)
+    repeated_batch = _repeat_for_pomo(batch, pomo_size)
+    state_kwargs = {
+        'max_concurrent_open_orders': 6,
+        'enable_delivery_viability': True,
+        'enable_viability_fallback': False,
+    }
+
+    torch.manual_seed(1234)
+    model_no_shrink = _build_test_attention_model(shrink_size=None)
+    model_shrink = _build_test_attention_model(shrink_size=4)
+    model_shrink.load_state_dict(model_no_shrink.state_dict())
+
+    with torch.no_grad():
+        cost_no_shrink, ll_no_shrink, pi_no_shrink, debug_no_shrink = model_no_shrink(
+            repeated_batch,
+            return_pi=True,
+            state_kwargs=state_kwargs,
+            return_debug=True,
+        )
+        cost_shrink, ll_shrink, pi_shrink, debug_shrink = model_shrink(
+            repeated_batch,
+            return_pi=True,
+            state_kwargs=state_kwargs,
+            return_debug=True,
+        )
+
+    print(f'no_shrink pi shape={tuple(pi_no_shrink.shape)}, shrink pi shape={tuple(pi_shrink.shape)}')
+    assert pi_no_shrink.shape == pi_shrink.shape, 'shrink/no-shrink 的 pi shape 不一致'
+    assert torch.equal(pi_no_shrink, pi_shrink), 'shrink/no-shrink greedy decode 序列不一致'
+    assert torch.allclose(cost_no_shrink, cost_shrink), 'shrink/no-shrink cost 不一致'
+    assert torch.allclose(ll_no_shrink, ll_shrink), 'shrink/no-shrink log likelihood 不一致'
+
+    debug_keys = [
+        'diag_steps',
+        'diag_any_service_feasible',
+        'diag_selected_depot',
+        'diag_selected_pickup',
+        'diag_selected_delivery',
+        'diag_selected_reject',
+        'diag_mask_pickup_commitment',
+        'diag_delivery_viability_masked',
+    ]
+    for key in debug_keys:
+        assert key in debug_no_shrink and key in debug_shrink, f'缺少 shrink debug key: {key}'
+        assert debug_no_shrink[key].shape == debug_shrink[key].shape, f'shrink/no-shrink debug[{key}] shape 不一致'
+        assert torch.isfinite(debug_no_shrink[key]).all(), f'no-shrink debug[{key}] 出现非有限值'
+        assert torch.isfinite(debug_shrink[key]).all(), f'shrink debug[{key}] 出现非有限值'
+
+
 def dry_run():
     basic_dry_run()
     shared_mask_regression()
     viability_fallback_regression()
+    pickup_commitment_next_delivery_equivalence_regression()
+    attention_shrink_pomo_regression()
     print('\nDry-run 验证完成！')
 
 

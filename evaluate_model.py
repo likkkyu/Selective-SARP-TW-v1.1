@@ -68,6 +68,8 @@ def parse_args():
                         help='导出第一个 untouched_unrejected>0 的 rollout 样本末尾轨迹')
     parser.add_argument('--trace-output', type=str, default=None,
                         help='轨迹 JSON 输出路径 (default: <checkpoint_dir>/residual_trace.json)')
+    parser.add_argument('--shrink-size', type=int, default=None,
+                        help='覆盖模型 shrink_size；0 表示禁用，默认沿用 checkpoint / AttentionModel 默认值')
     return parser.parse_args()
 
 
@@ -102,7 +104,7 @@ def _parse_period_bounds(values):
     return tuple(bounds)
 
 
-def build_model_from_checkpoint(checkpoint, device):
+def build_model_from_checkpoint(checkpoint, device, shrink_size_override=None):
     """从 checkpoint['args'] 恢复模型超参数；缺省时回退到当前默认值 (256/256/6/8)。"""
     args_dict = checkpoint.get('args', {}) or {}
     if not isinstance(args_dict, dict):
@@ -117,6 +119,13 @@ def build_model_from_checkpoint(checkpoint, device):
     n_heads = args_dict.get('n_heads', 8)
     tanh_clipping = args_dict.get('tanh_clipping', 10.0)
     normalization = args_dict.get('normalization', 'batch')
+    checkpoint_shrink_size = args_dict.get('shrink_size', None)
+    if shrink_size_override is None:
+        shrink_size = checkpoint_shrink_size
+    elif shrink_size_override <= 0:
+        shrink_size = None
+    else:
+        shrink_size = shrink_size_override
 
     model = AttentionModel(
         embedding_dim=embedding_dim,
@@ -126,11 +135,13 @@ def build_model_from_checkpoint(checkpoint, device):
         n_heads=n_heads,
         tanh_clipping=tanh_clipping,
         normalization=normalization,
+        shrink_size=shrink_size,
     ).to(device)
 
     print(f'  embedding_dim={embedding_dim}, hidden_dim={hidden_dim}, '
           f'n_encode_layers={n_encode_layers}, n_heads={n_heads}, '
-          f'tanh_clipping={tanh_clipping}, normalization={normalization}')
+          f'tanh_clipping={tanh_clipping}, normalization={normalization}, '
+          f'shrink_size={shrink_size}')
 
     return model
 
@@ -440,7 +451,12 @@ def evaluate():
           f"viability_fallback={state_kwargs['enable_viability_fallback']}, "
           f"relax_commitment_trip_time={state_kwargs['relax_pickup_commitment_trip_time']}")
 
-    model = build_model_from_checkpoint(checkpoint, device)
+    shrink_size_override = args.shrink_size
+    model = build_model_from_checkpoint(
+        checkpoint,
+        device,
+        shrink_size_override=shrink_size_override,
+    )
     model.load_state_dict(checkpoint['model_state_dict'])
     model.eval()
     set_decode_type(model, args.decode)
