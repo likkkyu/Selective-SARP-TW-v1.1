@@ -8,6 +8,7 @@ sys.path.append(os.getcwd())
 
 from nets.attention_model import AttentionModel, set_decode_type
 from problem_mcvrptw_v2 import MCVRPPDTW, MCVRPPDTWDataset, Config
+from run_training_optimized import POMOTrainerOptimized
 from state_mcvrptw_v2 import StateMCVRPPDTW
 
 
@@ -354,12 +355,43 @@ def attention_shrink_pomo_regression():
         assert torch.isfinite(debug_shrink[key]).all(), f'shrink debug[{key}] 出现非有限值'
 
 
+def pomo_baseline_mode_regression():
+    print('\n' + '=' * 60)
+    print('POMO baseline mode 回归测试')
+    print('=' * 60)
+
+    costs_single = torch.tensor([[1.0], [3.0]], dtype=torch.float)
+    log_probs_single = torch.tensor([[0.2], [0.4]], dtype=torch.float)
+    loss_auto_single, min_cost_single = POMOTrainerOptimized._pomo_loss(costs_single, log_probs_single, baseline_mode='auto')
+    loss_batch_single, min_cost_batch_single = POMOTrainerOptimized._pomo_loss(costs_single, log_probs_single, baseline_mode='batch_mean')
+    assert torch.allclose(loss_auto_single, loss_batch_single), 'pomo=1 时 auto 应等价于 batch_mean'
+    assert torch.allclose(min_cost_single, min_cost_batch_single), 'min_cost 不应受 baseline_mode 影响'
+
+    costs_multi = torch.tensor([[1.0, 3.0], [5.0, 9.0]], dtype=torch.float)
+    log_probs_multi = torch.tensor([[0.2, 0.4], [0.6, 0.8]], dtype=torch.float)
+    loss_auto_multi, min_cost_auto_multi = POMOTrainerOptimized._pomo_loss(costs_multi, log_probs_multi, baseline_mode='auto')
+    loss_instance_multi, min_cost_instance_multi = POMOTrainerOptimized._pomo_loss(costs_multi, log_probs_multi, baseline_mode='instance_mean')
+    assert torch.allclose(loss_auto_multi, loss_instance_multi), 'pomo>1 时 auto 应等价于 instance_mean'
+    assert torch.allclose(min_cost_auto_multi, min_cost_instance_multi), 'min_cost 不应受 baseline_mode 影响'
+
+    loss_batch_multi, _ = POMOTrainerOptimized._pomo_loss(costs_multi, log_probs_multi, baseline_mode='batch_mean')
+    assert not torch.allclose(loss_batch_multi, loss_instance_multi), 'batch_mean 与 instance_mean 在多 POMO 下应可区分'
+
+    try:
+        POMOTrainerOptimized._pomo_loss(costs_single, log_probs_single, baseline_mode='instance_mean')
+    except ValueError as exc:
+        assert 'requires pomo_size > 1' in str(exc)
+    else:
+        raise AssertionError('pomo=1 + instance_mean 应显式报错，避免静默退化')
+
+
 def dry_run():
     basic_dry_run()
     shared_mask_regression()
     viability_fallback_regression()
     pickup_commitment_next_delivery_equivalence_regression()
     attention_shrink_pomo_regression()
+    pomo_baseline_mode_regression()
     print('\nDry-run 验证完成！')
 
 

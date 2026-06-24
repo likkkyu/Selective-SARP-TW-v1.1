@@ -313,13 +313,21 @@ class POMOTrainerOptimized:
         return cost.reshape(batch_size, self.args.pomo_size), log_likelihood.reshape(batch_size, self.args.pomo_size)
 
     @staticmethod
-    def _pomo_loss(costs, log_probs):
-        if costs.size(1) <= 1:
+    def _pomo_loss(costs, log_probs, baseline_mode='auto'):
+        if baseline_mode == 'auto':
+            if costs.size(1) <= 1:
+                baseline = costs.mean().detach()
+            else:
+                baseline = costs.mean(dim=1, keepdim=True)
+        elif baseline_mode == 'batch_mean':
             baseline = costs.mean().detach()
-            advantage = costs - baseline
+        elif baseline_mode == 'instance_mean':
+            if costs.size(1) <= 1:
+                raise ValueError('baseline_mode=instance_mean requires pomo_size > 1')
+            baseline = costs.mean(dim=1, keepdim=True).detach()
         else:
-            baseline = costs.mean(dim=1, keepdim=True)
-            advantage = costs - baseline
+            raise ValueError(f'Unsupported baseline_mode: {baseline_mode}')
+        advantage = costs - baseline
         loss = (advantage * log_probs).mean()
         min_cost = costs.min(dim=1)[0].mean()
         return loss, min_cost
@@ -364,7 +372,11 @@ class POMOTrainerOptimized:
         for batch_idx, batch in enumerate(progress, start=1):
             batch = self._to_device(batch)
             costs, log_probs = self._pomo_forward(batch, state_kwargs=state_kwargs)
-            loss, mean_objective = self._pomo_loss(costs, log_probs)
+            loss, mean_objective = self._pomo_loss(
+                costs,
+                log_probs,
+                baseline_mode=self.args.baseline_mode,
+            )
 
             self.optimizer.zero_grad()
             loss.backward()
@@ -488,6 +500,7 @@ class POMOTrainerOptimized:
         print(f"Seed: {self.args.seed}")
         print(f"Reject warmup epochs: {self.args.reject_warmup_epochs}")
         print(f"Reject init bias: {self.args.reject_init_bias}")
+        print(f"Baseline mode: {self.args.baseline_mode}")
         print(f"Shared env: {self._build_state_kwargs(allow_reject=True)}")
         print(f"Curriculum enabled: {self.args.enable_rideshare_curriculum}")
         print('=' * 70)
@@ -660,6 +673,7 @@ class POMOTrainerOptimized:
                     'OPERATION_START': Config.OPERATION_START,
                     'reject_warmup_epochs': self.args.reject_warmup_epochs,
                     'reject_init_bias': self.args.reject_init_bias,
+                    'baseline_mode': self.args.baseline_mode,
                     'best_checkpoint_metric': 'service_rate',
                     'OPERATION_END': Config.OPERATION_END,
                     'max_concurrent_open_orders': self.args.max_concurrent_open_orders,
@@ -734,6 +748,8 @@ def parse_args():
     parser.add_argument('--max-consecutive-depot', type=int, default=8, help='连续 depot 选择上限，超过后强制终止当前 rollout')
     parser.add_argument('--reject-warmup-epochs', type=int, default=3, help='训练前若干 epoch 屏蔽 reject 动作，先学习服务')
     parser.add_argument('--reject-init-bias', type=float, default=-2.5, help='reject head 的初始 bias，负值用于抑制早期 reject')
+    parser.add_argument('--baseline-mode', choices=['auto', 'batch_mean', 'instance_mean'], default='auto',
+                        help='训练 advantage 的 baseline 模式；auto 保持当前默认行为，batch_mean / instance_mean 用于解耦 POMO 对比')
     parser.add_argument('--collect-mask-diagnostics', action='store_true', help='在验证/评估中收集 mask 与动作可行性诊断指标')
     parser.add_argument('--deadlock-limit', type=int, default=2, help='连续回 depot 且无可服务节点时的终止阈值')
     parser.add_argument('--max-concurrent-open-orders', type=int, default=6, help='共享主线：允许的最大并发 open 单数量')
@@ -866,6 +882,7 @@ def build_phase_args(cli_args, graph_size):
         max_consecutive_depot=cli_args.max_consecutive_depot,
         reject_warmup_epochs=cli_args.reject_warmup_epochs,
         reject_init_bias=cli_args.reject_init_bias,
+        baseline_mode=cli_args.baseline_mode,
         max_concurrent_open_orders=cli_args.max_concurrent_open_orders,
         enable_delivery_viability=cli_args.enable_delivery_viability,
         enable_viability_fallback=cli_args.enable_viability_fallback,
