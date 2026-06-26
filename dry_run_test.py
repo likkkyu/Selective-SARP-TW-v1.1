@@ -385,6 +385,57 @@ def pomo_baseline_mode_regression():
         raise AssertionError('pomo=1 + instance_mean 应显式报错，避免静默退化')
 
 
+def business_priority_regression():
+    print('\n' + '=' * 60)
+    print('Business priority checkpoint 回归测试')
+    print('=' * 60)
+
+    clean = {
+        'service_rate': 0.80,
+        'avg_objective': 1500.0,
+        'avg_unfulfilled_orders': 0.0,
+        'avg_pickup_only_orders': 0.0,
+        'avg_started_not_completed_orders': 0.0,
+        'avg_untouched_unrejected_orders': 0.0,
+    }
+    dirty_higher_service = {
+        'service_rate': 0.90,
+        'avg_objective': 1200.0,
+        'avg_unfulfilled_orders': 0.1,
+        'avg_pickup_only_orders': 0.0,
+        'avg_started_not_completed_orders': 0.0,
+        'avg_untouched_unrejected_orders': 0.0,
+    }
+    cleaner_better_service = {
+        'service_rate': 0.82,
+        'avg_objective': 1600.0,
+        'avg_unfulfilled_orders': 0.0,
+        'avg_pickup_only_orders': 0.0,
+        'avg_started_not_completed_orders': 0.0,
+        'avg_untouched_unrejected_orders': 0.0,
+    }
+    cleaner_better_objective = {
+        'service_rate': 0.82,
+        'avg_objective': 1400.0,
+        'avg_unfulfilled_orders': 0.0,
+        'avg_pickup_only_orders': 0.0,
+        'avg_started_not_completed_orders': 0.0,
+        'avg_untouched_unrejected_orders': 0.0,
+    }
+
+    assert POMOTrainerOptimized._is_business_clean(clean) is True, '全零业务桶应视为 clean'
+    assert POMOTrainerOptimized._is_business_clean(dirty_higher_service) is False, '存在 silent-miss 桶时不应视为 clean'
+    assert POMOTrainerOptimized._business_priority_key(clean) > POMOTrainerOptimized._business_priority_key(dirty_higher_service), (
+        'clean checkpoint 应优先于更高 service 但不 clean 的 checkpoint'
+    )
+    assert POMOTrainerOptimized._business_priority_key(cleaner_better_service) > POMOTrainerOptimized._business_priority_key(clean), (
+        '在 clean 集合内应优先选择更高 service_rate'
+    )
+    assert POMOTrainerOptimized._business_priority_key(cleaner_better_objective) > POMOTrainerOptimized._business_priority_key(cleaner_better_service), (
+        '在 clean 且 service 相同的情况下应优先选择更低 objective'
+    )
+
+
 def dry_run():
     basic_dry_run()
     shared_mask_regression()
@@ -392,6 +443,7 @@ def dry_run():
     pickup_commitment_next_delivery_equivalence_regression()
     attention_shrink_pomo_regression()
     pomo_baseline_mode_regression()
+    business_priority_regression()
     print('\nDry-run 验证完成！')
 
 

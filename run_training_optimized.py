@@ -114,6 +114,8 @@ class POMOTrainerOptimized:
         self.val_log = []
         self.start_epoch = 1
         self.best_val_objective = float('inf')
+        self.best_business_key = None
+        self.best_business_rate = float('-inf')
         self.best_service_key = None
         self.best_service_rate = float('-inf')
 
@@ -341,20 +343,46 @@ class POMOTrainerOptimized:
             -float(results.get('avg_objective', float('inf'))),
         )
 
+    @staticmethod
+    def _is_zero_metric(value, tol=1e-9):
+        return abs(float(value)) <= tol
+
+    @classmethod
+    def _is_business_clean(cls, results):
+        return (
+            cls._is_zero_metric(results.get('avg_unfulfilled_orders', 0.0))
+            and cls._is_zero_metric(results.get('avg_pickup_only_orders', 0.0))
+            and cls._is_zero_metric(results.get('avg_started_not_completed_orders', 0.0))
+            and cls._is_zero_metric(results.get('avg_untouched_unrejected_orders', 0.0))
+        )
+
+    @classmethod
+    def _business_priority_key(cls, results):
+        return (
+            1.0 if cls._is_business_clean(results) else 0.0,
+            float(results.get('service_rate', 0.0)),
+            -float(results.get('avg_objective', float('inf'))),
+        )
+
     def _augment_service_metrics(self, results):
         graph_size = max(int(self.args.graph_size), 1)
         service_rate = float(results.get('avg_completed_orders', 0.0)) / graph_size
         rejected_rate = float(results.get('avg_rejected_orders', 0.0)) / graph_size
         unfulfilled_rate = float(results.get('avg_unfulfilled_orders', 0.0)) / graph_size
         untouched_unrejected_rate = float(results.get('avg_untouched_unrejected_orders', 0.0)) / graph_size
+        pickup_only_rate = float(results.get('avg_pickup_only_orders', 0.0)) / graph_size
+        started_not_completed_rate = float(results.get('avg_started_not_completed_orders', 0.0)) / graph_size
         served_plus_rejected_rate = min(1.0, service_rate + rejected_rate)
         results['service_rate'] = service_rate
         results['completed_rate'] = service_rate
         results['rejected_rate'] = rejected_rate
         results['unfulfilled_rate'] = unfulfilled_rate
         results['untouched_unrejected_rate'] = untouched_unrejected_rate
+        results['pickup_only_rate'] = pickup_only_rate
+        results['started_not_completed_rate'] = started_not_completed_rate
         results['served_plus_rejected_rate'] = served_plus_rejected_rate
         results['non_service_rate'] = min(1.0, rejected_rate + unfulfilled_rate)
+        results['business_clean'] = self._is_business_clean(results)
         return results
 
     def train_epoch(self, epoch, train_loader):
@@ -522,6 +550,8 @@ class POMOTrainerOptimized:
         )
 
         best_val_objective = self.best_val_objective
+        best_business_key = self.best_business_key
+        best_business_rate = self.best_business_rate
         best_service_key = self.best_service_key
         best_service_rate = self.best_service_rate
         for epoch in range(self.start_epoch, self.args.n_epochs + 1):
@@ -599,42 +629,55 @@ class POMOTrainerOptimized:
                 print(f"    Reject predeparture rate  : {val_results.get('diag_reject_predeparture_available', 0.0):.2f}")
                 print(f"    Reject in-route rate      : {val_results.get('diag_reject_inroute_available', 0.0):.2f}")
 
+            business_key = self._business_priority_key(val_results)
+            if best_business_key is None or business_key > best_business_key:
+                best_business_key = business_key
+                best_business_rate = float(val_results['service_rate'])
+                self.best_business_key = best_business_key
+                self.best_business_rate = best_business_rate
+                self._save_model(epoch, val_results, 'best', selection_rule='business_first')
+                print('  [Saved best model by business priority]')
+
             service_key = self._service_priority_key(val_results)
             if best_service_key is None or service_key > best_service_key:
                 best_service_key = service_key
                 best_service_rate = float(val_results['service_rate'])
                 self.best_service_key = best_service_key
                 self.best_service_rate = best_service_rate
-                self._save_model(epoch, val_results, 'best')
-                print('  [Saved best model by service rate]')
+                self._save_model(epoch, val_results, 'best_service', selection_rule='service_priority')
+                print('  [Saved best model by service priority]')
 
             if val_results['avg_objective'] < best_val_objective:
                 best_val_objective = val_results['avg_objective']
                 self.best_val_objective = best_val_objective
-                self._save_model(epoch, val_results, 'best_objective')
+                self._save_model(epoch, val_results, 'best_objective', selection_rule='objective_min')
                 print('  [Saved best model by objective]')
 
             if self.args.save_interval > 0 and epoch % self.args.save_interval == 0 and epoch != self.args.n_epochs:
-                self._save_model(epoch, val_results, f'epoch_{epoch}')
+                self._save_model(epoch, val_results, f'epoch_{epoch}', selection_rule='periodic')
 
-        self._save_model(self.args.n_epochs, val_results, 'final')
+        self._save_model(self.args.n_epochs, val_results, 'final', selection_rule='final_epoch')
         self._save_logs()
 
+        self.best_business_key = best_business_key
+        self.best_business_rate = best_business_rate
         self.best_service_key = best_service_key
         self.best_service_rate = best_service_rate
         self.best_val_objective = best_val_objective
 
         print('\n' + '=' * 70)
         print('Training Complete!')
-        print(f"Best validation service rate: {best_service_rate:.3f}")
+        print(f"Best validation business-clean service rate: {best_business_rate:.3f}")
+        print(f"Best validation service-priority rate: {best_service_rate:.3f}")
         print(f"Best validation objective: {best_val_objective:.2f}")
         print('=' * 70)
         return {
+            'best_business_rate': best_business_rate,
             'best_service_rate': best_service_rate,
             'best_objective': best_val_objective,
         }
 
-    def _save_model(self, epoch, results, name):
+    def _save_model(self, epoch, results, name, selection_rule=None):
         path = os.path.join(self.args.save_dir, f'model_{name}.pt')
         torch.save({
             'epoch': epoch,
@@ -643,6 +686,11 @@ class POMOTrainerOptimized:
             'results': results,
             'args': vars(self.args),
             'normalization_profile': self.normalization_profile,
+            'checkpoint_role': name,
+            'selection_rule': selection_rule,
+            'business_clean': bool(results.get('business_clean', False)),
+            'business_priority_key': list(self._business_priority_key(results)),
+            'service_priority_key': list(self._service_priority_key(results)),
         }, path)
 
     def _save_logs(self):
@@ -674,7 +722,8 @@ class POMOTrainerOptimized:
                     'reject_warmup_epochs': self.args.reject_warmup_epochs,
                     'reject_init_bias': self.args.reject_init_bias,
                     'baseline_mode': self.args.baseline_mode,
-                    'best_checkpoint_metric': 'service_rate',
+                    'best_checkpoint_metric': 'business_first(clean -> service_rate -> avg_objective)',
+                    'service_checkpoint_metric': 'service_priority(service_rate -> unfulfilled_rate -> rejected_rate -> avg_objective)',
                     'OPERATION_END': Config.OPERATION_END,
                     'max_concurrent_open_orders': self.args.max_concurrent_open_orders,
                     'enable_delivery_viability': self.args.enable_delivery_viability,
@@ -703,13 +752,17 @@ class POMOTrainerOptimized:
         self.best_val_objective = float(saved_results.get('avg_objective', float('inf')))
         if saved_results:
             saved_results = self._augment_service_metrics(dict(saved_results))
-            self.best_service_key = self._service_priority_key(saved_results)
+            self.best_business_key = tuple(checkpoint.get('business_priority_key', self._business_priority_key(saved_results)))
+            self.best_business_rate = float(saved_results.get('service_rate', float('-inf')))
+            self.best_service_key = tuple(checkpoint.get('service_priority_key', self._service_priority_key(saved_results)))
             self.best_service_rate = float(saved_results.get('service_rate', float('-inf')))
         print(f"[Resume] Loaded checkpoint: {checkpoint_path}")
         print(f"[Resume] Start epoch: {self.start_epoch}")
         print(f"[Resume] Best objective so far: {self.best_val_objective:.2f}")
+        if self.best_business_key is not None:
+            print(f"[Resume] Best business-clean service rate so far: {self.best_business_rate:.3f}")
         if self.best_service_key is not None:
-            print(f"[Resume] Best service rate so far: {self.best_service_rate:.3f}")
+            print(f"[Resume] Best service-priority rate so far: {self.best_service_rate:.3f}")
 
 
 def parse_args():

@@ -5,6 +5,60 @@
 
 ---
 
+## 2026-06-25：checkpoint 业务验收口径更新
+
+### 新增：formal eval JSON 摘要输出
+
+`evaluate_model.py` 新增可选 JSON 输出：
+
+- `--json-output <path>`
+
+该摘要复用现有 replay-audit 结果，显式写出：
+
+- aggregate 指标
+- audited 指标
+- `partition_consistent_samples`
+- `core_aggregate_match_samples`
+- `business_acceptance`
+
+其中 `business_acceptance.clean` 的判定口径是：
+
+- audited `unfulfilled == 0`
+- audited `pickup_only == 0`
+- audited `started_not_completed == 0`
+- audited `untouched_unrejected == 0`
+
+这样可以对多个已保存 checkpoint 做机器可读的正式验收比较，而不必只靠控制台日志人工抄表。
+
+### 更新：默认 best checkpoint 改为 business-first
+
+`run_training_optimized.py` 中默认 `model_best.pt` 的选择规则已从 service-first 改为 business-first：
+
+1. 先满足业务硬门槛：
+   - `avg_unfulfilled_orders == 0`
+   - `avg_pickup_only_orders == 0`
+   - `avg_started_not_completed_orders == 0`
+   - `avg_untouched_unrejected_orders == 0`
+2. 在 clean checkpoint 中，再比较：
+   - 更高 `service_rate`
+   - 更低 `avg_objective`
+
+同时保留：
+
+- `model_best_service.pt`：旧 service-priority 对照口径
+- `model_best_objective.pt`
+- `model_final.pt`
+
+### 说明：关于“clean checkpoint”的稳定性
+
+单个 clean checkpoint 只说明训练方向**能够到达**业务可接受点，
+不说明该方向已经稳定收敛到“持续零 residual buckets”。
+
+因此后续正式验收仍应采用：
+
+- 先对已保存 checkpoint 做 formal eval
+- 再基于更长训练 / 多 seed 判断是否稳定可复现
+
 ## 2026-06-07：v1.1 整改第一阶段（第 11 章执行）
 
 ### 1.1 低风险废弃代码清理

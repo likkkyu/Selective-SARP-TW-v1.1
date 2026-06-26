@@ -70,6 +70,8 @@ def parse_args():
                         help='轨迹 JSON 输出路径 (default: <checkpoint_dir>/residual_trace.json)')
     parser.add_argument('--shrink-size', type=int, default=None,
                         help='覆盖模型 shrink_size；0 表示禁用，默认沿用 checkpoint / AttentionModel 默认值')
+    parser.add_argument('--json-output', type=str, default=None,
+                        help='将评估摘要写入 JSON 文件，便于多 checkpoint 正式对比')
     return parser.parse_args()
 
 
@@ -407,6 +409,211 @@ def _trace_rollout_case(model, sample, state_kwargs, device):
             'unfulfilled_order_ids': _mask_to_order_ids(audit['unfulfilled_mask'][0]),
         },
     }
+
+
+def _mean_or_none(values):
+    return None if not values else float(statistics.mean(values))
+
+
+
+def _is_effectively_zero(value, tol=1e-9):
+    return value is not None and abs(float(value)) <= tol
+
+
+
+def _stdev_or_none(values):
+    if not values:
+        return None
+    if len(values) == 1:
+        return 0.0
+    return float(statistics.stdev(values))
+
+
+
+def _build_eval_summary(args, checkpoint, device, state_kwargs,
+                        all_cost_train, all_cost_raw, all_energy_raw, all_pax_delay, all_cargo_delay,
+                        all_vehicle_cost, all_reject_penalty, all_unfulfilled_penalty, all_trip_overtime,
+                        all_distance, all_num_vehicles, all_num_rejected, all_num_unfulfilled,
+                        all_num_completed, all_num_untouched, all_num_untouched_unrejected,
+                        all_num_pickup_only, all_num_started_not_completed,
+                        all_pickup_hard_violations, all_total_ride_time_violations, all_excess_ride_time_violations,
+                        all_audited_completed, all_audited_rejected, all_audited_untouched,
+                        all_audited_untouched_unrejected, all_audited_pickup_only,
+                        all_audited_delivery_without_pickup, all_audited_started_not_completed,
+                        all_audited_unfulfilled, partition_ok_count, aggregate_match_count,
+                        legacy_untouched_match_count, first_audit_mismatch, first_legacy_untouched_mismatch,
+                        all_diagnostics=None):
+    service_rates = [value / args.graph_size for value in all_num_completed]
+    rejected_rates = [value / args.graph_size for value in all_num_rejected]
+    unfulfilled_rates = [value / args.graph_size for value in all_num_unfulfilled]
+    untouched_unrejected_rates = [value / args.graph_size for value in all_num_untouched_unrejected]
+    served_plus_rejected_rates = [min(1.0, s + r) for s, r in zip(service_rates, rejected_rates)]
+
+    audited_service_rates = [value / args.graph_size for value in all_audited_completed]
+    audited_rejected_rates = [value / args.graph_size for value in all_audited_rejected]
+    audited_unfulfilled_rates = [value / args.graph_size for value in all_audited_unfulfilled]
+    audited_untouched_unrejected_rates = [value / args.graph_size for value in all_audited_untouched_unrejected]
+
+    train_cost_mean = _mean_or_none(all_cost_train)
+    total_cost_raw_mean = _mean_or_none(all_cost_raw)
+    completed_orders_mean = _mean_or_none(all_num_completed)
+    rejected_orders_mean = _mean_or_none(all_num_rejected)
+    unfulfilled_orders_mean = _mean_or_none(all_num_unfulfilled)
+    untouched_orders_mean = _mean_or_none(all_num_untouched)
+    untouched_unrejected_orders_mean = _mean_or_none(all_num_untouched_unrejected)
+    pickup_only_orders_mean = _mean_or_none(all_num_pickup_only)
+    started_not_completed_orders_mean = _mean_or_none(all_num_started_not_completed)
+
+    audited_completed_orders_mean = _mean_or_none(all_audited_completed)
+    audited_rejected_orders_mean = _mean_or_none(all_audited_rejected)
+    audited_unfulfilled_orders_mean = _mean_or_none(all_audited_unfulfilled)
+    audited_untouched_orders_mean = _mean_or_none(all_audited_untouched)
+    audited_untouched_unrejected_orders_mean = _mean_or_none(all_audited_untouched_unrejected)
+    audited_pickup_only_orders_mean = _mean_or_none(all_audited_pickup_only)
+    audited_delivery_without_pickup_orders_mean = _mean_or_none(all_audited_delivery_without_pickup)
+    audited_started_not_completed_orders_mean = _mean_or_none(all_audited_started_not_completed)
+
+    service_rate_mean = _mean_or_none(service_rates)
+    rejected_rate_mean = _mean_or_none(rejected_rates)
+    unfulfilled_rate_mean = _mean_or_none(unfulfilled_rates)
+    untouched_unrejected_rate_mean = _mean_or_none(untouched_unrejected_rates)
+    served_plus_rejected_rate_mean = _mean_or_none(served_plus_rejected_rates)
+
+    audited_service_rate_mean = _mean_or_none(audited_service_rates)
+    audited_rejected_rate_mean = _mean_or_none(audited_rejected_rates)
+    audited_unfulfilled_rate_mean = _mean_or_none(audited_unfulfilled_rates)
+    audited_untouched_unrejected_rate_mean = _mean_or_none(audited_untouched_unrejected_rates)
+
+    business_acceptance = {
+        'gate_unfulfilled_zero': _is_effectively_zero(audited_unfulfilled_orders_mean),
+        'gate_pickup_only_zero': _is_effectively_zero(audited_pickup_only_orders_mean),
+        'gate_started_not_completed_zero': _is_effectively_zero(audited_started_not_completed_orders_mean),
+        'gate_untouched_unrejected_zero': _is_effectively_zero(audited_untouched_unrejected_orders_mean),
+    }
+    business_acceptance['clean'] = all(business_acceptance.values())
+    business_acceptance['ranking_key'] = [
+        1 if business_acceptance['clean'] else 0,
+        service_rate_mean or 0.0,
+        -((train_cost_mean if train_cost_mean is not None else float('inf'))),
+    ]
+
+    aggregate = {
+        'train_cost_mean': train_cost_mean,
+        'train_cost_std': _stdev_or_none(all_cost_train),
+        'total_cost_raw_mean': total_cost_raw_mean,
+        'total_cost_raw_std': _stdev_or_none(all_cost_raw),
+        'energy_cost_mean': _mean_or_none(all_energy_raw),
+        'energy_cost_std': _stdev_or_none(all_energy_raw),
+        'passenger_delivery_delay_cost_mean': _mean_or_none(all_pax_delay),
+        'passenger_delivery_delay_cost_std': _stdev_or_none(all_pax_delay),
+        'cargo_delay_cost_mean': _mean_or_none(all_cargo_delay),
+        'cargo_delay_cost_std': _stdev_or_none(all_cargo_delay),
+        'vehicle_cost_mean': _mean_or_none(all_vehicle_cost),
+        'vehicle_cost_std': _stdev_or_none(all_vehicle_cost),
+        'reject_penalty_mean': _mean_or_none(all_reject_penalty),
+        'reject_penalty_std': _stdev_or_none(all_reject_penalty),
+        'unfulfilled_penalty_mean': _mean_or_none(all_unfulfilled_penalty),
+        'unfulfilled_penalty_std': _stdev_or_none(all_unfulfilled_penalty),
+        'trip_overtime_penalty_mean': _mean_or_none(all_trip_overtime),
+        'trip_overtime_penalty_std': _stdev_or_none(all_trip_overtime),
+        'distance_mean': _mean_or_none(all_distance),
+        'distance_std': _stdev_or_none(all_distance),
+        'used_vehicles_mean': _mean_or_none(all_num_vehicles),
+        'used_vehicles_std': _stdev_or_none(all_num_vehicles),
+        'completed_orders_mean': completed_orders_mean,
+        'completed_orders_std': _stdev_or_none(all_num_completed),
+        'rejected_orders_mean': rejected_orders_mean,
+        'rejected_orders_std': _stdev_or_none(all_num_rejected),
+        'unfulfilled_orders_mean': unfulfilled_orders_mean,
+        'unfulfilled_orders_std': _stdev_or_none(all_num_unfulfilled),
+        'untouched_orders_mean': untouched_orders_mean,
+        'untouched_orders_std': _stdev_or_none(all_num_untouched),
+        'untouched_unrejected_orders_mean': untouched_unrejected_orders_mean,
+        'untouched_unrejected_orders_std': _stdev_or_none(all_num_untouched_unrejected),
+        'pickup_only_orders_mean': pickup_only_orders_mean,
+        'pickup_only_orders_std': _stdev_or_none(all_num_pickup_only),
+        'started_not_completed_orders_mean': started_not_completed_orders_mean,
+        'started_not_completed_orders_std': _stdev_or_none(all_num_started_not_completed),
+        'service_rate_mean': service_rate_mean,
+        'service_rate_std': _stdev_or_none(service_rates),
+        'rejected_rate_mean': rejected_rate_mean,
+        'rejected_rate_std': _stdev_or_none(rejected_rates),
+        'unfulfilled_rate_mean': unfulfilled_rate_mean,
+        'unfulfilled_rate_std': _stdev_or_none(unfulfilled_rates),
+        'untouched_unrejected_rate_mean': untouched_unrejected_rate_mean,
+        'untouched_unrejected_rate_std': _stdev_or_none(untouched_unrejected_rates),
+        'served_plus_rejected_rate_mean': served_plus_rejected_rate_mean,
+        'served_plus_rejected_rate_std': _stdev_or_none(served_plus_rejected_rates),
+        'passenger_pickup_hard_violations_mean': _mean_or_none(all_pickup_hard_violations),
+        'passenger_pickup_hard_violations_std': _stdev_or_none(all_pickup_hard_violations),
+        'passenger_total_ride_time_violations_mean': _mean_or_none(all_total_ride_time_violations),
+        'passenger_total_ride_time_violations_std': _stdev_or_none(all_total_ride_time_violations),
+        'passenger_excess_ride_time_violations_mean': _mean_or_none(all_excess_ride_time_violations),
+        'passenger_excess_ride_time_violations_std': _stdev_or_none(all_excess_ride_time_violations),
+    }
+
+    audit = {
+        'completed_orders_mean': audited_completed_orders_mean,
+        'completed_orders_std': _stdev_or_none(all_audited_completed),
+        'rejected_orders_mean': audited_rejected_orders_mean,
+        'rejected_orders_std': _stdev_or_none(all_audited_rejected),
+        'untouched_orders_mean': audited_untouched_orders_mean,
+        'untouched_orders_std': _stdev_or_none(all_audited_untouched),
+        'untouched_unrejected_orders_mean': audited_untouched_unrejected_orders_mean,
+        'untouched_unrejected_orders_std': _stdev_or_none(all_audited_untouched_unrejected),
+        'pickup_only_orders_mean': audited_pickup_only_orders_mean,
+        'pickup_only_orders_std': _stdev_or_none(all_audited_pickup_only),
+        'delivery_without_pickup_orders_mean': audited_delivery_without_pickup_orders_mean,
+        'delivery_without_pickup_orders_std': _stdev_or_none(all_audited_delivery_without_pickup),
+        'started_not_completed_orders_mean': audited_started_not_completed_orders_mean,
+        'started_not_completed_orders_std': _stdev_or_none(all_audited_started_not_completed),
+        'unfulfilled_orders_mean': audited_unfulfilled_orders_mean,
+        'unfulfilled_orders_std': _stdev_or_none(all_audited_unfulfilled),
+        'service_rate_mean': audited_service_rate_mean,
+        'service_rate_std': _stdev_or_none(audited_service_rates),
+        'rejected_rate_mean': audited_rejected_rate_mean,
+        'rejected_rate_std': _stdev_or_none(audited_rejected_rates),
+        'unfulfilled_rate_mean': audited_unfulfilled_rate_mean,
+        'unfulfilled_rate_std': _stdev_or_none(audited_unfulfilled_rates),
+        'untouched_unrejected_rate_mean': audited_untouched_unrejected_rate_mean,
+        'untouched_unrejected_rate_std': _stdev_or_none(audited_untouched_unrejected_rates),
+        'partition_consistent_samples': partition_ok_count,
+        'core_aggregate_match_samples': aggregate_match_count,
+        'legacy_untouched_match_samples': legacy_untouched_match_count,
+        'total_samples': args.num_samples,
+        'first_audit_mismatch': first_audit_mismatch,
+        'first_legacy_untouched_mismatch': first_legacy_untouched_mismatch,
+    }
+
+    summary = {
+        'run': {
+            'checkpoint': args.checkpoint,
+            'loaded_epoch': checkpoint.get('epoch'),
+            'graph_size': args.graph_size,
+            'num_samples': args.num_samples,
+            'batch_size': args.batch_size,
+            'seed': args.seed,
+            'decode': args.decode,
+            'device': str(device),
+            'state_kwargs': state_kwargs,
+            'checkpoint_role': checkpoint.get('checkpoint_role'),
+            'selection_rule': checkpoint.get('selection_rule'),
+            'business_clean': checkpoint.get('business_clean'),
+        },
+        'aggregate': aggregate,
+        'audit': audit,
+        'business_acceptance': business_acceptance,
+    }
+    if all_diagnostics:
+        summary['diagnostics'] = {
+            key: {
+                'mean': _mean_or_none(values),
+                'std': _stdev_or_none(values),
+            }
+            for key, values in all_diagnostics.items()
+        }
+    return summary
+
 
 
 def evaluate():
@@ -773,6 +980,53 @@ def evaluate():
             print(f"  Sample index : {residual_trace_payload['sample_index']}")
             print(f"  Final untouched-unrejected: {residual_trace_payload['final_details']['untouched_unrejected_orders']:.0f}")
     print()
+    summary_payload = _build_eval_summary(
+        args,
+        checkpoint,
+        device,
+        state_kwargs,
+        all_cost_train,
+        all_cost_raw,
+        all_energy_raw,
+        all_pax_delay,
+        all_cargo_delay,
+        all_vehicle_cost,
+        all_reject_penalty,
+        all_unfulfilled_penalty,
+        all_trip_overtime,
+        all_distance,
+        all_num_vehicles,
+        all_num_rejected,
+        all_num_unfulfilled,
+        all_num_completed,
+        all_num_untouched,
+        all_num_untouched_unrejected,
+        all_num_pickup_only,
+        all_num_started_not_completed,
+        all_pickup_hard_violations,
+        all_total_ride_time_violations,
+        all_excess_ride_time_violations,
+        all_audited_completed,
+        all_audited_rejected,
+        all_audited_untouched,
+        all_audited_untouched_unrejected,
+        all_audited_pickup_only,
+        all_audited_delivery_without_pickup,
+        all_audited_started_not_completed,
+        all_audited_unfulfilled,
+        partition_ok_count,
+        aggregate_match_count,
+        legacy_untouched_match_count,
+        first_audit_mismatch,
+        first_legacy_untouched_mismatch,
+        all_diagnostics,
+    )
+    if args.json_output:
+        with open(args.json_output, 'w', encoding='utf-8') as json_file:
+            json.dump(summary_payload, json_file, ensure_ascii=False, indent=2)
+        print(f'JSON summary saved to: {args.json_output}')
+        print()
+
     print('【训练目标 (归一化, 仅供参考)】')
     _stats('Total Cost (train)', all_cost_train, unit='', fmt='{:.4f}')
     print()

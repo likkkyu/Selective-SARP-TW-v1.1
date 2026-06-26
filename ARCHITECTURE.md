@@ -196,17 +196,29 @@ class Config:
 - **可工作版 POMO-style 多 rollout**
 - 但**并非强制不同首步**的完全经典 POMO
 
-### 6.2 validate 口径
+### 6.2 validate 与 checkpoint 选择口径
 
 `validate()` 当前聚合：
 - energy / passenger delay / cargo delay
 - trip overtime
 - reject penalty / unfulfilled penalty
-- completed / rejected / unfulfilled / used vehicles
+- completed / rejected / unfulfilled / untouched_unrejected
+- pickup_only / started_not_completed / used vehicles
 - passenger pickup hard violations
 - passenger ride-time violations
 
 不再保留旧的 `service_shortfall_penalty`。
+
+当前 checkpoint 语义：
+- `model_best.pt`：**business-first** 默认主 checkpoint
+  - 先要求：`unfulfilled=0`、`pickup_only=0`、`started_not_completed=0`、`untouched_unrejected=0`
+  - 在满足上述硬门槛的 checkpoint 中，再按 `service_rate` 更高优先
+  - 若 `service_rate` 相同，再按 `avg_objective` 更低优先
+- `model_best_service.pt`：保留旧的 service-priority 对照口径
+- `model_best_objective.pt`：按 `avg_objective` 最低保存
+- `model_final.pt`：最后一个 epoch
+
+评估器 `evaluate_model.py` 现在还支持将正式评估摘要写成 JSON，用于对多个已保存 checkpoint 做机器可读的业务验收对比。
 
 ---
 

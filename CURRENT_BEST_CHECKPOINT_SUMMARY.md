@@ -8,8 +8,10 @@ This note consolidates the current best 25-order DRL checkpoint after the depot 
   - `outputs/depot_deadend_cleanup_seed1234_10ep/pomo_n25_optimized/model_best.pt`
 - training run directory:
   - `outputs/depot_deadend_cleanup_seed1234_10ep/pomo_n25_optimized/`
-- selection rule:
-  - `model_best.pt` = best checkpoint by `service_rate`
+- selection rule (historical note for this run):
+  - this specific checkpoint was selected under the older `service_rate`-first rule that existed at the time of the run
+  - going forward, `model_best.pt` is reserved for the business-first selector: clean residual buckets first, then `service_rate`, then `avg_objective`
+  - service-priority snapshots are now kept separately as `model_best_service.pt`
 - loaded epoch in the formal evaluation:
   - `10`
 
@@ -106,6 +108,12 @@ This directly matches the target business semantics for the current best checkpo
 - every non-served order is rejected **before service**
 - no order is picked up and then left incomplete
 - no untouched-but-unrejected residuals remain
+
+Important stability caveat:
+
+- one clean checkpoint proves this training direction can reach an acceptable point
+- it does **not** by itself prove that later epochs or other seeds will keep the residual buckets locked at zero
+- formal comparison across saved checkpoints, and then longer-run confirmation, is still required before treating a direction as stably converged
 
 Important wording note:
 
