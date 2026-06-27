@@ -10,6 +10,8 @@ State for Multi-Compartment VRP with Pickup-Delivery and Time Windows
 5. 新增可学习 reject 动作：动作空间扩展为 N+2，state 负责确定性标记被拒订单
 """
 
+import time
+
 import torch
 from typing import NamedTuple
 
@@ -114,50 +116,194 @@ class StateMCVRPPDTW(NamedTuple):
             current_time = finish_time
         return (True, None) if return_reason else True
 
-    def _completion_search_cache_key(self, start_coord, start_time, trip_start_time, open_indices,
-                                     passenger_orders, passenger_pickup_times, ignore_trip_time=False):
-        open_key = tuple(int(order_idx) for order_idx in open_indices)
-        passenger_pickup_key = tuple(
-            float(passenger_pickup_times[order_idx].item()) if bool(passenger_orders[order_idx].item()) else None
-            for order_idx in open_key
-        )
+    @staticmethod
+    def _memo_bucket(memo, name):
+        if memo is None:
+            return None
+        bucket = memo.get(name)
+        if bucket is None:
+            bucket = {}
+            memo[name] = bucket
+        return bucket
+
+    @staticmethod
+    def _record_benchmark_timing(benchmark_stats, name, seconds, calls=1):
+        if benchmark_stats is None:
+            return
+        seconds_bucket = benchmark_stats.get('seconds')
+        calls_bucket = benchmark_stats.get('calls')
+        if seconds_bucket is None or calls_bucket is None:
+            return
+        seconds_bucket[name] = seconds_bucket.get(name, 0.0) + float(seconds)
+        calls_bucket[name] = calls_bucket.get(name, 0) + int(calls)
+
+    @staticmethod
+    def _record_benchmark_count(benchmark_stats, name, value=1):
+        if benchmark_stats is None:
+            return
+        calls_bucket = benchmark_stats.get('calls')
+        if calls_bucket is None:
+            return
+        calls_bucket[name] = calls_bucket.get(name, 0) + int(value)
+
+    @staticmethod
+    def _record_benchmark_max(benchmark_stats, name, value):
+        if benchmark_stats is None:
+            return
+        calls_bucket = benchmark_stats.get('calls')
+        if calls_bucket is None:
+            return
+        calls_bucket[name] = max(calls_bucket.get(name, 0), int(value))
+
+    @staticmethod
+    def _open_mask_to_bits(open_mask):
+        open_bits = 0
+        if open_mask is None:
+            return open_bits
+        for order_idx in torch.nonzero(open_mask, as_tuple=False).squeeze(-1).tolist():
+            open_bits |= 1 << int(order_idx)
+        return open_bits
+
+    @staticmethod
+    def _iter_open_bits(open_bits):
+        remaining = int(open_bits)
+        while remaining:
+            lowest_bit = remaining & -remaining
+            yield lowest_bit.bit_length() - 1
+            remaining ^= lowest_bit
+
+    @staticmethod
+    def _count_open_bits(open_bits):
+        return sum(1 for _ in StateMCVRPPDTW._iter_open_bits(open_bits))
+
+    @staticmethod
+    def _stable_time_key(value):
+        value = float(value)
+        return int(round(value * 1000000.0))
+
+    def _trip_elapsed_key(self, start_time, trip_start_time):
+        return self._stable_time_key(float(start_time) - float(trip_start_time))
+
+    def _ride_elapsed_key(self, start_time, pickup_time):
+        pickup_time = float(pickup_time)
+        if pickup_time < 0:
+            return -1
+        return self._stable_time_key(float(start_time) - pickup_time)
+
+    def _pickup_node_key(self, order_idx):
+        return int(order_idx) + 1
+
+    def _delivery_node_key(self, order_idx):
+        return int(order_idx) + self.n_orders + 1
+
+    def _current_start_node_key(self, prev_node):
+        prev_node = int(prev_node)
+        return None if prev_node == self.reject_index else prev_node
+
+    def _completion_search_cache_key(self, start_coord, start_time, trip_start_time, open_bits,
+                                     passenger_orders, passenger_pickup_times, ignore_trip_time=False,
+                                     start_node=None, scalar_cache=None):
+        if scalar_cache is not None:
+            passenger_flags = scalar_cache['passenger_orders']
+            pickup_times = scalar_cache['pickup_times']
+            passenger_pickup_key = tuple(
+                self._ride_elapsed_key(start_time, pickup_times[order_idx]) if passenger_flags[order_idx] else None
+                for order_idx in self._iter_open_bits(open_bits)
+            )
+        else:
+            passenger_pickup_key = tuple(
+                self._ride_elapsed_key(start_time, passenger_pickup_times[order_idx].item()) if bool(passenger_orders[order_idx].item()) else None
+                for order_idx in self._iter_open_bits(open_bits)
+            )
+        start_key = start_node if start_node is not None else tuple(self._stable_time_key(v) for v in start_coord.tolist())
         return (
-            tuple(float(v) for v in start_coord.tolist()),
-            float(start_time),
-            float(trip_start_time),
-            open_key,
+            start_key,
+            self._stable_time_key(start_time),
+            self._trip_elapsed_key(start_time, trip_start_time),
+            int(open_bits),
             passenger_pickup_key,
+            bool(ignore_trip_time),
+        )
+
+    def _step_feasibility_cache_key(self, start_coord, start_time, trip_start_time, order_idx,
+                                    passenger_orders, passenger_pickup_times, ignore_trip_time=False,
+                                    start_node=None, scalar_cache=None):
+        start_key = start_node if start_node is not None else tuple(self._stable_time_key(v) for v in start_coord.tolist())
+        if scalar_cache is not None:
+            passenger_flags = scalar_cache['passenger_orders']
+            pickup_times = scalar_cache['pickup_times']
+            ride_key = self._ride_elapsed_key(start_time, pickup_times[order_idx]) if passenger_flags[order_idx] else None
+        else:
+            ride_key = self._ride_elapsed_key(start_time, passenger_pickup_times[order_idx].item()) if bool(passenger_orders[order_idx].item()) else None
+        return (
+            start_key,
+            self._stable_time_key(start_time),
+            self._trip_elapsed_key(start_time, trip_start_time),
+            int(order_idx),
+            ride_key,
             bool(ignore_trip_time),
         )
 
     def _has_feasible_open_completion(self, start_coord, start_time, trip_start_time, open_mask,
                                       delivery_coords, delivery_earliest, delivery_to_depot_time,
                                       passenger_orders, passenger_pickup_times, direct_ride_time,
-                                      return_reason=False, ignore_trip_time=False, memo=None):
-        open_indices = torch.nonzero(open_mask, as_tuple=False).squeeze(-1)
-        if open_indices.numel() == 0:
-            return (True, None) if return_reason else True
-        if open_indices.numel() > 6:
-            return (False, 'open_over_6') if return_reason else False
+                                      return_reason=False, ignore_trip_time=False, memo=None,
+                                      open_bits=None, start_node=None, benchmark_stats=None, recursion_depth=0,
+                                      scalar_cache=None):
+        helper_start = time.perf_counter() if benchmark_stats is not None else None
+        if benchmark_stats is not None:
+            self._record_benchmark_count(benchmark_stats, 'pc_has_feasible_open_completion_calls')
+            self._record_benchmark_count(benchmark_stats, 'pc_completion_recursion_depth_sum', recursion_depth)
+            self._record_benchmark_max(benchmark_stats, 'pc_completion_max_recursion_depth', recursion_depth)
 
-        open_index_list = open_indices.tolist()
+        def _finalize(result):
+            if helper_start is not None:
+                self._record_benchmark_timing(
+                    benchmark_stats,
+                    'pc_has_feasible_open_completion',
+                    time.perf_counter() - helper_start,
+                )
+            return result
+
+        if open_bits is None:
+            open_bits = self._open_mask_to_bits(open_mask)
+        if benchmark_stats is not None:
+            self._record_benchmark_count(benchmark_stats, 'pc_completion_open_bits_sum', self._count_open_bits(open_bits))
+        if open_bits == 0:
+            if benchmark_stats is not None:
+                self._record_benchmark_count(benchmark_stats, 'pc_completion_terminal_success')
+            return _finalize((True, None) if return_reason else True)
+        if self._count_open_bits(open_bits) > 6:
+            if benchmark_stats is not None:
+                self._record_benchmark_count(benchmark_stats, 'pc_completion_pruned_open_over_6')
+            return _finalize((False, 'open_over_6') if return_reason else False)
+
+        completion_memo = self._memo_bucket(memo, 'completion')
         cache_key = None
-        if memo is not None:
+        if completion_memo is not None:
             cache_key = self._completion_search_cache_key(
                 start_coord,
                 start_time,
                 trip_start_time,
-                open_index_list,
+                open_bits,
                 passenger_orders,
                 passenger_pickup_times,
                 ignore_trip_time=ignore_trip_time,
+                start_node=start_node,
+                scalar_cache=scalar_cache,
             )
-            cached = memo.get(cache_key)
+        if completion_memo is not None:
+            self._record_benchmark_count(benchmark_stats, 'pc_completion_memo_lookups')
+            cached = completion_memo.get(cache_key)
             if cached is not None:
-                return cached if return_reason else cached[0]
+                self._record_benchmark_count(benchmark_stats, 'pc_completion_memo_hits')
+                return _finalize(cached if return_reason else cached[0])
+            self._record_benchmark_count(benchmark_stats, 'pc_completion_memo_misses')
 
-        if open_indices.numel() == 1:
-            order_idx = open_index_list[0]
+        if open_bits & (open_bits - 1) == 0:
+            if benchmark_stats is not None:
+                self._record_benchmark_count(benchmark_stats, 'pc_completion_single_open_cases')
+            order_idx = open_bits.bit_length() - 1
             result = self._delivery_step_feasible(
                 start_coord,
                 start_time,
@@ -171,15 +317,31 @@ class StateMCVRPPDTW(NamedTuple):
                 direct_ride_time,
                 return_reason=True,
                 ignore_trip_time=ignore_trip_time,
+                memo=memo,
+                start_node=start_node,
+                benchmark_stats=benchmark_stats,
+                scalar_cache=scalar_cache,
             )
             feasible, _, _, reason = result
             final_result = (feasible, reason)
-            if memo is not None and cache_key is not None:
-                memo[cache_key] = final_result
-            return final_result if return_reason else feasible
+            if completion_memo is not None and cache_key is not None:
+                completion_memo[cache_key] = final_result
+                self._record_benchmark_count(benchmark_stats, 'pc_completion_memo_stores')
+            if benchmark_stats is not None:
+                self._record_benchmark_count(
+                    benchmark_stats,
+                    'pc_completion_terminal_success' if feasible else 'pc_completion_terminal_failure',
+                )
+            return _finalize(final_result if return_reason else feasible)
 
+        ordered_open = list(self._iter_open_bits(open_bits))
         failure_reasons = set()
-        for order_idx in open_index_list:
+        branch_attempts = 0
+        for order_idx in ordered_open:
+            branch_attempts += 1
+            child_open_bits = open_bits & ~(1 << order_idx)
+            child_start_node = self._delivery_node_key(order_idx)
+
             step_result = self._delivery_step_feasible(
                 start_coord,
                 start_time,
@@ -193,6 +355,10 @@ class StateMCVRPPDTW(NamedTuple):
                 direct_ride_time,
                 return_reason=True,
                 ignore_trip_time=ignore_trip_time,
+                memo=memo,
+                start_node=start_node,
+                benchmark_stats=benchmark_stats,
+                scalar_cache=scalar_cache,
             )
             step_feasible, next_coord, finish_time, step_reason = step_result
             if not step_feasible:
@@ -200,13 +366,11 @@ class StateMCVRPPDTW(NamedTuple):
                     failure_reasons.add(step_reason)
                 continue
 
-            open_after = open_mask.clone()
-            open_after[order_idx] = False
             recursive_result = self._has_feasible_open_completion(
                 next_coord,
                 finish_time,
                 trip_start_time,
-                open_after,
+                None,
                 delivery_coords,
                 delivery_earliest,
                 delivery_to_depot_time,
@@ -216,13 +380,22 @@ class StateMCVRPPDTW(NamedTuple):
                 return_reason=True,
                 ignore_trip_time=ignore_trip_time,
                 memo=memo,
+                open_bits=child_open_bits,
+                start_node=child_start_node,
+                benchmark_stats=benchmark_stats,
+                recursion_depth=recursion_depth + 1,
+                scalar_cache=scalar_cache,
             )
             recursive_feasible, recursive_reason = recursive_result
             if recursive_feasible:
                 final_result = (True, None)
-                if memo is not None and cache_key is not None:
-                    memo[cache_key] = final_result
-                return final_result if return_reason else True
+                if completion_memo is not None and cache_key is not None:
+                    completion_memo[cache_key] = final_result
+                    self._record_benchmark_count(benchmark_stats, 'pc_completion_memo_stores')
+                if benchmark_stats is not None:
+                    self._record_benchmark_count(benchmark_stats, 'pc_completion_success_paths')
+                    self._record_benchmark_count(benchmark_stats, 'pc_completion_branch_attempts', branch_attempts)
+                return _finalize(final_result if return_reason else True)
             if recursive_reason is not None:
                 failure_reasons.add(recursive_reason)
 
@@ -232,46 +405,136 @@ class StateMCVRPPDTW(NamedTuple):
             final_result = (False, next(iter(failure_reasons)))
         else:
             final_result = (False, 'mixed')
-        if memo is not None and cache_key is not None:
-            memo[cache_key] = final_result
-        return final_result if return_reason else final_result[0]
+        if completion_memo is not None and cache_key is not None:
+            completion_memo[cache_key] = final_result
+            self._record_benchmark_count(benchmark_stats, 'pc_completion_memo_stores')
+        if benchmark_stats is not None:
+            self._record_benchmark_count(benchmark_stats, 'pc_completion_failure_paths')
+            self._record_benchmark_count(benchmark_stats, 'pc_completion_branch_attempts', branch_attempts)
+        return _finalize(final_result if return_reason else final_result[0])
 
     def _delivery_step_feasible(self, start_coord, start_time, trip_start_time, order_idx,
                                 delivery_coords, delivery_earliest, delivery_to_depot_time,
                                 passenger_orders, passenger_pickup_times, direct_ride_time,
-                                return_reason=False, ignore_trip_time=False):
+                                return_reason=False, ignore_trip_time=False, memo=None,
+                                start_node=None, benchmark_stats=None, scalar_cache=None):
+        helper_start = time.perf_counter() if benchmark_stats is not None else None
+        if benchmark_stats is not None:
+            self._record_benchmark_count(benchmark_stats, 'pc_delivery_step_feasible_calls')
+
+        def _finalize(result):
+            if helper_start is not None:
+                self._record_benchmark_timing(
+                    benchmark_stats,
+                    'pc_delivery_step_feasible',
+                    time.perf_counter() - helper_start,
+                )
+            return result
+
+        step_memo = self._memo_bucket(memo, 'delivery_step')
+        cache_key = None
+        if step_memo is not None:
+            self._record_benchmark_count(benchmark_stats, 'pc_step_memo_lookups')
+            cache_key = self._step_feasibility_cache_key(
+                start_coord,
+                start_time,
+                trip_start_time,
+                order_idx,
+                passenger_orders,
+                passenger_pickup_times,
+                ignore_trip_time=ignore_trip_time,
+                start_node=start_node,
+                scalar_cache=scalar_cache,
+            )
+            cached = step_memo.get(cache_key)
+            if cached is not None:
+                self._record_benchmark_count(benchmark_stats, 'pc_step_memo_hits')
+                self._record_benchmark_count(benchmark_stats, 'pc_step_reason_' + ('ok' if cached[0] else str(cached[3] or 'unknown')))
+                return _finalize(cached if return_reason else cached[:3])
+            self._record_benchmark_count(benchmark_stats, 'pc_step_memo_misses')
+
         delivery_coord = delivery_coords[order_idx]
         current_time = float(start_time)
         trip_start = float(trip_start_time)
         travel_time = float(((delivery_coord - start_coord).norm(p=2) * self.AREA_SIZE / self.VEHICLE_SPEED).item())
         arrival_time = current_time + travel_time
-        if passenger_orders[order_idx].item():
-            pickup_time = float(passenger_pickup_times[order_idx].item())
+        if scalar_cache is not None:
+            passenger_flag = scalar_cache['passenger_orders'][order_idx]
+            pickup_time = scalar_cache['pickup_times'][order_idx] if passenger_flag else None
+            direct_ride_limit = scalar_cache['direct_ride_time'][order_idx]
+            delivery_earliest_value = scalar_cache['delivery_earliest'][order_idx]
+            delivery_to_depot_value = scalar_cache['delivery_to_depot_time'][order_idx]
+        else:
+            passenger_flag = bool(passenger_orders[order_idx].item())
+            pickup_time = float(passenger_pickup_times[order_idx].item()) if passenger_flag else None
+            direct_ride_limit = float(direct_ride_time[order_idx].item())
+            delivery_earliest_value = float(delivery_earliest[order_idx].item())
+            delivery_to_depot_value = float(delivery_to_depot_time[order_idx].item())
+        if passenger_flag:
             if pickup_time < 0:
-                return (False, None, None, 'missing_pickup_time') if return_reason else (False, None, None)
+                result = (False, None, None, 'missing_pickup_time')
+                if step_memo is not None and cache_key is not None:
+                    step_memo[cache_key] = result
+                    self._record_benchmark_count(benchmark_stats, 'pc_step_memo_stores')
+                self._record_benchmark_count(benchmark_stats, 'pc_step_reason_missing_pickup_time')
+                return _finalize(result if return_reason else result[:3])
             ride_time = arrival_time - pickup_time
-            excess_ride_time = max(ride_time - float(direct_ride_time[order_idx].item()), 0.0)
+            excess_ride_time = max(ride_time - direct_ride_limit, 0.0)
             if Config.HARD_PASSENGER_MAX_RIDE_TIME and (
                 ride_time > Config.PASSENGER_MAX_RIDE_TIME_MINUTES / 60.0 + 1e-5
                 or excess_ride_time > Config.PASSENGER_MAX_EXCESS_RIDE_TIME_MINUTES / 60.0 + 1e-5
             ):
-                return (False, None, None, 'ride_time') if return_reason else (False, None, None)
-        service_start = max(arrival_time, float(delivery_earliest[order_idx].item()))
+                result = (False, None, None, 'ride_time')
+                if step_memo is not None and cache_key is not None:
+                    step_memo[cache_key] = result
+                    self._record_benchmark_count(benchmark_stats, 'pc_step_memo_stores')
+                self._record_benchmark_count(benchmark_stats, 'pc_step_reason_ride_time')
+                return _finalize(result if return_reason else result[:3])
+        service_start = max(arrival_time, delivery_earliest_value)
         finish_time = service_start + self.SERVICE_TIME
-        finish_with_return = finish_time + float(delivery_to_depot_time[order_idx].item())
+        finish_with_return = finish_time + delivery_to_depot_value
         if (not ignore_trip_time) and Config.HARD_MAX_TRIP_TIME and (finish_with_return - trip_start > self.MAX_TRIP_TIME + 1e-5):
-            return (False, None, None, 'trip_time') if return_reason else (False, None, None)
+            result = (False, None, None, 'trip_time')
+            if step_memo is not None and cache_key is not None:
+                step_memo[cache_key] = result
+                self._record_benchmark_count(benchmark_stats, 'pc_step_memo_stores')
+            self._record_benchmark_count(benchmark_stats, 'pc_step_reason_trip_time')
+            return _finalize(result if return_reason else result[:3])
         if Config.HARD_OPERATION_END and (finish_with_return > self.OPERATION_END + 1e-5):
-            return (False, None, None, 'ops_end') if return_reason else (False, None, None)
-        return (True, delivery_coord, finish_time, None) if return_reason else (True, delivery_coord, finish_time)
+            result = (False, None, None, 'ops_end')
+            if step_memo is not None and cache_key is not None:
+                step_memo[cache_key] = result
+                self._record_benchmark_count(benchmark_stats, 'pc_step_memo_stores')
+            self._record_benchmark_count(benchmark_stats, 'pc_step_reason_ops_end')
+            return _finalize(result if return_reason else result[:3])
+        result = (True, delivery_coord, finish_time, None)
+        if step_memo is not None and cache_key is not None:
+            step_memo[cache_key] = result
+            self._record_benchmark_count(benchmark_stats, 'pc_step_memo_stores')
+        self._record_benchmark_count(benchmark_stats, 'pc_step_reason_ok')
+        return _finalize(result if return_reason else result[:3])
 
     def _has_any_physical_delivery_step(self, start_coord, start_time, trip_start_time, open_mask,
                                         delivery_coords, delivery_earliest, delivery_to_depot_time,
-                                        passenger_orders, passenger_pickup_times, direct_ride_time):
-        open_indices = torch.nonzero(open_mask, as_tuple=False).squeeze(-1)
-        if open_indices.numel() == 0:
-            return True
-        for order_idx in open_indices.tolist():
+                                        passenger_orders, passenger_pickup_times, direct_ride_time,
+                                        memo=None, open_bits=None, start_node=None, benchmark_stats=None,
+                                        scalar_cache=None):
+        helper_start = time.perf_counter() if benchmark_stats is not None else None
+
+        def _finalize(result):
+            if helper_start is not None:
+                self._record_benchmark_timing(
+                    benchmark_stats,
+                    'pc_has_any_physical_delivery_step',
+                    time.perf_counter() - helper_start,
+                )
+            return result
+
+        if open_bits is None:
+            open_bits = self._open_mask_to_bits(open_mask)
+        if open_bits == 0:
+            return _finalize(True)
+        for order_idx in self._iter_open_bits(open_bits):
             feasible_step, _, _ = self._delivery_step_feasible(
                 start_coord,
                 start_time,
@@ -283,23 +546,36 @@ class StateMCVRPPDTW(NamedTuple):
                 passenger_orders,
                 passenger_pickup_times,
                 direct_ride_time,
+                memo=memo,
+                start_node=start_node,
+                benchmark_stats=benchmark_stats,
+                scalar_cache=scalar_cache,
             )
             if feasible_step:
-                return True
-        return False
+                return _finalize(True)
+        return _finalize(False)
 
-    def _delivery_search_cache_key(self, start_coord, start_time, trip_start_time, open_indices,
-                                   passenger_orders, passenger_pickup_times, allow_fallback=False):
-        open_key = tuple(int(order_idx) for order_idx in open_indices)
-        passenger_pickup_key = tuple(
-            float(passenger_pickup_times[order_idx].item()) if bool(passenger_orders[order_idx].item()) else None
-            for order_idx in open_key
-        )
+    def _delivery_search_cache_key(self, start_coord, start_time, trip_start_time, open_bits,
+                                   passenger_orders, passenger_pickup_times, allow_fallback=False,
+                                   start_node=None, scalar_cache=None):
+        if scalar_cache is not None:
+            passenger_flags = scalar_cache['passenger_orders']
+            pickup_times = scalar_cache['pickup_times']
+            passenger_pickup_key = tuple(
+                self._ride_elapsed_key(start_time, pickup_times[order_idx]) if passenger_flags[order_idx] else None
+                for order_idx in self._iter_open_bits(open_bits)
+            )
+        else:
+            passenger_pickup_key = tuple(
+                self._ride_elapsed_key(start_time, passenger_pickup_times[order_idx].item()) if bool(passenger_orders[order_idx].item()) else None
+                for order_idx in self._iter_open_bits(open_bits)
+            )
+        start_key = start_node if start_node is not None else tuple(self._stable_time_key(v) for v in start_coord.tolist())
         return (
-            tuple(float(v) for v in start_coord.tolist()),
-            float(start_time),
-            float(trip_start_time),
-            open_key,
+            start_key,
+            self._stable_time_key(start_time),
+            self._trip_elapsed_key(start_time, trip_start_time),
+            int(open_bits),
             passenger_pickup_key,
             bool(allow_fallback),
         )
@@ -307,30 +583,45 @@ class StateMCVRPPDTW(NamedTuple):
     def _get_legal_delivery_orders(self, start_coord, start_time, trip_start_time, open_mask,
                                    delivery_coords, delivery_earliest, delivery_to_depot_time,
                                    passenger_orders, passenger_pickup_times, direct_ride_time,
-                                   allow_fallback=False, memo=None):
-        open_indices = torch.nonzero(open_mask, as_tuple=False).squeeze(-1)
-        if open_indices.numel() == 0:
-            return [], [], False
+                                   allow_fallback=False, memo=None, open_bits=None, start_node=None,
+                                   benchmark_stats=None, scalar_cache=None):
+        helper_start = time.perf_counter() if benchmark_stats is not None else None
 
-        open_index_list = open_indices.tolist()
+        def _finalize(result):
+            if helper_start is not None:
+                self._record_benchmark_timing(
+                    benchmark_stats,
+                    'pc_get_legal_delivery_orders',
+                    time.perf_counter() - helper_start,
+                )
+            return result
+
+        if open_bits is None:
+            open_bits = self._open_mask_to_bits(open_mask)
+        if open_bits == 0:
+            return _finalize(([], [], False))
+
+        delivery_memo = self._memo_bucket(memo, 'delivery_search')
         cache_key = None
-        if memo is not None:
+        if delivery_memo is not None:
             cache_key = self._delivery_search_cache_key(
                 start_coord,
                 start_time,
                 trip_start_time,
-                open_index_list,
+                open_bits,
                 passenger_orders,
                 passenger_pickup_times,
                 allow_fallback=allow_fallback,
+                start_node=start_node,
+                scalar_cache=scalar_cache,
             )
-            cached = memo.get(cache_key)
+            cached = delivery_memo.get(cache_key)
             if cached is not None:
-                return cached
+                return _finalize(cached)
 
         physical_orders = []
         viable_orders = []
-        for order_idx in open_index_list:
+        for order_idx in self._iter_open_bits(open_bits):
             feasible_step, next_coord, finish_time = self._delivery_step_feasible(
                 start_coord,
                 start_time,
@@ -342,17 +633,19 @@ class StateMCVRPPDTW(NamedTuple):
                 passenger_orders,
                 passenger_pickup_times,
                 direct_ride_time,
+                memo=memo,
+                start_node=start_node,
+                benchmark_stats=benchmark_stats,
+                scalar_cache=scalar_cache,
             )
             if not feasible_step:
                 continue
             physical_orders.append(order_idx)
-            open_after = open_mask.clone()
-            open_after[order_idx] = False
             if self._has_legal_delivery_path(
                 next_coord,
                 finish_time,
                 trip_start_time,
-                open_after,
+                None,
                 delivery_coords,
                 delivery_earliest,
                 delivery_to_depot_time,
@@ -360,27 +653,44 @@ class StateMCVRPPDTW(NamedTuple):
                 passenger_pickup_times,
                 direct_ride_time,
                 memo=memo,
+                open_bits=open_bits & ~(1 << order_idx),
+                start_node=self._delivery_node_key(order_idx),
+                benchmark_stats=benchmark_stats,
+                scalar_cache=scalar_cache,
             ):
                 viable_orders.append(order_idx)
 
         used_fallback = bool(allow_fallback and len(viable_orders) == 0 and len(physical_orders) > 0)
         result = (physical_orders if used_fallback else viable_orders, physical_orders, used_fallback)
-        if memo is not None and cache_key is not None:
-            memo[cache_key] = result
-        return result
+        if delivery_memo is not None and cache_key is not None:
+            delivery_memo[cache_key] = result
+        return _finalize(result)
 
     def _has_legal_delivery_path(self, start_coord, start_time, trip_start_time, open_mask,
                                  delivery_coords, delivery_earliest, delivery_to_depot_time,
                                  passenger_orders, passenger_pickup_times, direct_ride_time,
-                                 memo=None):
-        open_indices = torch.nonzero(open_mask, as_tuple=False).squeeze(-1)
-        if open_indices.numel() == 0:
-            return True
+                                 memo=None, open_bits=None, start_node=None, benchmark_stats=None,
+                                 scalar_cache=None):
+        helper_start = time.perf_counter() if benchmark_stats is not None else None
+
+        def _finalize(result):
+            if helper_start is not None:
+                self._record_benchmark_timing(
+                    benchmark_stats,
+                    'pc_has_legal_delivery_path',
+                    time.perf_counter() - helper_start,
+                )
+            return result
+
+        if open_bits is None:
+            open_bits = self._open_mask_to_bits(open_mask)
+        if open_bits == 0:
+            return _finalize(True)
         legal_orders, _, _ = self._get_legal_delivery_orders(
             start_coord,
             start_time,
             trip_start_time,
-            open_mask,
+            None,
             delivery_coords,
             delivery_earliest,
             delivery_to_depot_time,
@@ -389,23 +699,39 @@ class StateMCVRPPDTW(NamedTuple):
             direct_ride_time,
             allow_fallback=False,
             memo=memo,
+            open_bits=open_bits,
+            start_node=start_node,
+            benchmark_stats=benchmark_stats,
+            scalar_cache=scalar_cache,
         )
-        return len(legal_orders) > 0
+        return _finalize(len(legal_orders) > 0)
 
     def _evaluate_post_pickup_open_delivery(self, start_coord, start_time, trip_start_time, open_mask,
                                             delivery_coords, delivery_earliest, delivery_to_depot_time,
                                             passenger_orders, passenger_pickup_times, direct_ride_time,
-                                            memo=None):
-        open_indices = torch.nonzero(open_mask, as_tuple=False).squeeze(-1)
-        if open_indices.numel() == 0:
-            return True, True
+                                            memo=None, open_bits=None, start_node=None, benchmark_stats=None,
+                                            scalar_cache=None):
+        helper_start = time.perf_counter() if benchmark_stats is not None else None
+
+        def _finalize(result):
+            if helper_start is not None:
+                self._record_benchmark_timing(
+                    benchmark_stats,
+                    'pc_evaluate_post_pickup_open_delivery',
+                    time.perf_counter() - helper_start,
+                )
+            return result
+
+        if open_bits is None:
+            open_bits = self._open_mask_to_bits(open_mask)
+        if open_bits == 0:
+            return _finalize((True, True))
         if self.enable_delivery_viability:
-            delivery_search_memo = memo if memo is not None else {}
             legal_orders, physical_orders, used_fallback = self._get_legal_delivery_orders(
                 start_coord,
                 start_time,
                 trip_start_time,
-                open_mask,
+                None,
                 delivery_coords,
                 delivery_earliest,
                 delivery_to_depot_time,
@@ -413,10 +739,14 @@ class StateMCVRPPDTW(NamedTuple):
                 passenger_pickup_times,
                 direct_ride_time,
                 allow_fallback=self.enable_viability_fallback,
-                memo=delivery_search_memo,
+                memo=memo,
+                open_bits=open_bits,
+                start_node=start_node,
+                benchmark_stats=benchmark_stats,
+                scalar_cache=scalar_cache,
             )
             feasible_orders = physical_orders if used_fallback else legal_orders
-            return len(feasible_orders) > 0, len(physical_orders) > 0
+            return _finalize((len(feasible_orders) > 0, len(physical_orders) > 0))
 
         has_physical = self._has_any_physical_delivery_step(
             start_coord,
@@ -429,12 +759,18 @@ class StateMCVRPPDTW(NamedTuple):
             passenger_orders,
             passenger_pickup_times,
             direct_ride_time,
+            memo=memo,
+            open_bits=open_bits,
+            start_node=start_node,
+            benchmark_stats=benchmark_stats,
+            scalar_cache=scalar_cache,
         )
-        return has_physical, has_physical
+        return _finalize((has_physical, has_physical))
 
     def _has_post_pickup_next_delivery(self, start_coord, start_time, trip_start_time, open_mask,
                                        delivery_coords, delivery_earliest, delivery_to_depot_time,
-                                       passenger_orders, passenger_pickup_times, direct_ride_time):
+                                       passenger_orders, passenger_pickup_times, direct_ride_time,
+                                       open_bits=None, start_node=None):
         has_feasible, _ = self._evaluate_post_pickup_open_delivery(
             start_coord,
             start_time,
@@ -446,6 +782,8 @@ class StateMCVRPPDTW(NamedTuple):
             passenger_orders,
             passenger_pickup_times,
             direct_ride_time,
+            open_bits=open_bits,
+            start_node=start_node,
         )
         return has_feasible
 
@@ -745,12 +1083,19 @@ class StateMCVRPPDTW(NamedTuple):
             return 'mixed'
         return 'other'
 
-    def get_mask(self, return_debug=False, skip_pickup_commitment=False):
+    def get_mask(self, return_debug=False, skip_pickup_commitment=False, benchmark_stats=None):
         batch_size = self.ids.size(0)
         n_orders = self.n_orders
         device = self.coords.device
 
+        def _record(name, start_time):
+            if benchmark_stats is None or start_time is None:
+                return
+            self._record_benchmark_timing(benchmark_stats, name, time.perf_counter() - start_time)
+
+        phase_start = time.perf_counter() if benchmark_stats is not None else None
         ids_flat, coords_active, node_type_active, time_windows_active, demand_p_full, demand_c_full = self._active_views()
+        _record('mask_active_views', phase_start)
 
         debug = None
         if return_debug:
@@ -798,10 +1143,13 @@ class StateMCVRPPDTW(NamedTuple):
             ]
             debug = {key: torch.zeros(batch_size, device=device) for key in debug_keys}
 
+        phase_start = time.perf_counter() if benchmark_stats is not None else None
         service_mask = self.visited[:, :, 1:2 * n_orders + 1].bool().squeeze(1).clone()
         if return_debug:
             debug['diag_mask_visited'] = service_mask.sum(1).float()
+        _record('mask_init_visited', phase_start)
 
+        phase_start = time.perf_counter() if benchmark_stats is not None else None
         pickup_not_done = (self.picked_up_ == 0).squeeze(1).bool()
         rejected = self.rejected_.squeeze(1).bool()
         precedence_mask = torch.zeros_like(service_mask)
@@ -812,7 +1160,9 @@ class StateMCVRPPDTW(NamedTuple):
         service_mask |= precedence_mask
         if return_debug:
             debug['diag_mask_precedence'] = (service_mask & ~before_mask).sum(1).float()
+        _record('mask_precedence', phase_start)
 
+        phase_start = time.perf_counter() if benchmark_stats is not None else None
         remaining_cap_p = self.PASSENGER_CAPACITY - self.used_capacity_passenger
         remaining_cap_c = self.CARGO_CAPACITY - self.used_capacity_cargo
         node_type_real = node_type_active[:, 1:2 * n_orders + 1]
@@ -830,7 +1180,9 @@ class StateMCVRPPDTW(NamedTuple):
         service_mask |= cap_mask_c
         if return_debug:
             debug['diag_mask_cap_cargo'] = (service_mask & ~before_mask).sum(1).float()
+        _record('mask_capacity', phase_start)
 
+        phase_start = time.perf_counter() if benchmark_stats is not None else None
         dist_to_nodes = (coords_active - self.cur_coord).norm(p=2, dim=-1) * self.AREA_SIZE
         travel_time = dist_to_nodes / self.VEHICLE_SPEED
         arrival_time = self.current_time + travel_time
@@ -850,14 +1202,18 @@ class StateMCVRPPDTW(NamedTuple):
         service_mask |= passenger_pickup_mask_full[:, 1:2 * n_orders + 1]
         if return_debug:
             debug['diag_mask_pickup_tw'] = (service_mask & ~before_mask).sum(1).float()
+        _record('mask_pickup_tw', phase_start)
 
+        phase_start = time.perf_counter() if benchmark_stats is not None else None
         open_started_mask = self.get_open_started_mask()
         open_started_count = self.get_open_started_count().squeeze(1)
         open_started = open_started_count > 0
         if return_debug:
             debug['diag_open_started_count'] = open_started_count.float()
             debug['diag_open_started_eq2'] = (open_started_count == 2).float()
+        _record('mask_open_started', phase_start)
 
+        phase_start = time.perf_counter() if benchmark_stats is not None else None
         if n_orders > 0:
             order_indices = torch.arange(n_orders, device=device)
             delivery_indices = order_indices + n_orders + 1
@@ -891,7 +1247,9 @@ class StateMCVRPPDTW(NamedTuple):
         service_mask |= ride_time_mask_full[:, 1:2 * n_orders + 1]
         if return_debug:
             debug['diag_mask_ride_time'] = (service_mask & ~before_mask).sum(1).float()
+        _record('mask_ride_time', phase_start)
 
+        phase_start = time.perf_counter() if benchmark_stats is not None else None
         trip_mask_full = torch.zeros(batch_size, coords_active.size(1), dtype=torch.bool, device=device)
         if Config.HARD_MAX_TRIP_TIME:
             depot_coord = coords_active[:, 0:1, :]
@@ -906,7 +1264,9 @@ class StateMCVRPPDTW(NamedTuple):
         service_mask |= trip_mask_full[:, 1:2 * n_orders + 1]
         if return_debug:
             debug['diag_mask_trip_time'] = (service_mask & ~before_mask).sum(1).float()
+        _record('mask_trip_time', phase_start)
 
+        phase_start = time.perf_counter() if benchmark_stats is not None else None
         ops_end_mask_full = torch.zeros(batch_size, coords_active.size(1), dtype=torch.bool, device=device)
         if Config.HARD_OPERATION_END:
             depot_coord_v6 = coords_active[:, 0:1, :]
@@ -919,9 +1279,11 @@ class StateMCVRPPDTW(NamedTuple):
         service_mask |= ops_end_mask_full[:, 1:2 * n_orders + 1]
         if return_debug:
             debug['diag_mask_ops_end'] = (service_mask & ~before_mask).sum(1).float()
+        _record('mask_ops_end', phase_start)
 
+        phase_start = time.perf_counter() if benchmark_stats is not None else None
         pickup_commitment_mask = torch.zeros(batch_size, n_orders, dtype=torch.bool, device=device)
-        if n_orders > 0 and (not skip_pickup_commitment):
+        if n_orders > 0:
             pickup_coords = coords_active[:, 1:n_orders + 1, :]
             delivery_coords = coords_active[:, n_orders + 1:2 * n_orders + 1, :]
             delivery_earliest = time_windows_active[:, n_orders + 1:2 * n_orders + 1, 0]
@@ -934,11 +1296,16 @@ class StateMCVRPPDTW(NamedTuple):
                 (delivery_coords - coords_active[:, 0:1, :]).norm(p=2, dim=-1) * self.AREA_SIZE / self.VEHICLE_SPEED
             )
             trip_start_after_pickup = torch.where(self.prev_a == 0, self.current_time, self.trip_start_time).squeeze(1)
-            passenger_orders = (node_type_active[:, 1:n_orders + 1] == 1)
             passenger_pickup_times_before = self.passenger_pickup_time.squeeze(1)
-            direct_ride_time = (
-                (pickup_coords - delivery_coords).norm(p=2, dim=-1) * self.AREA_SIZE / self.VEHICLE_SPEED
-            )
+            direct_ride_time = direct_distance / self.VEHICLE_SPEED
+            current_time_flat = self.current_time.squeeze(1)
+            trip_start_time_flat = self.trip_start_time.squeeze(1)
+            prev_a_flat = self.prev_a.squeeze(1)
+            cur_coord_flat = self.cur_coord.squeeze(1)
+            open_mask_full = open_started_mask
+            shared_search_memo = {}
+
+        if n_orders > 0 and (not skip_pickup_commitment):
             pickup_physical_feasible = ~service_mask[:, :n_orders]
 
             for batch_idx in range(batch_size):
@@ -956,7 +1323,7 @@ class StateMCVRPPDTW(NamedTuple):
                     if return_debug:
                         debug['diag_pickup_commitment_block_by_k'][batch_idx] += float(len(candidate_index_list))
                 else:
-                    batch_open_before = open_before[batch_idx]
+                    batch_open_bits = self._open_mask_to_bits(open_before[batch_idx])
                     batch_pickup_coords = pickup_coords[batch_idx]
                     batch_pickup_finish = pickup_finish[batch_idx]
                     batch_trip_start_after_pickup = trip_start_after_pickup[batch_idx]
@@ -966,10 +1333,22 @@ class StateMCVRPPDTW(NamedTuple):
                     batch_passenger_orders = passenger_orders[batch_idx]
                     batch_passenger_pickup_times_before = passenger_pickup_times_before[batch_idx]
                     batch_direct_ride_time = direct_ride_time[batch_idx]
-                    batch_completion_memo = {}
-                    batch_state = self[batch_idx:batch_idx + 1]
-                    batch_mask = batch_state.get_mask(skip_pickup_commitment=True)
+                    batch_prev_node = self._current_start_node_key(prev_a_flat[batch_idx].item())
+                    batch_scalar_cache = {
+                        'passenger_orders': [bool(v) for v in batch_passenger_orders.tolist()],
+                        'pickup_times': [float(v) for v in batch_passenger_pickup_times_before.tolist()],
+                        'direct_ride_time': [float(v) for v in batch_direct_ride_time.tolist()],
+                        'delivery_earliest': [float(v) for v in batch_delivery_earliest.tolist()],
+                        'delivery_to_depot_time': [float(v) for v in batch_delivery_to_depot_time.tolist()],
+                    }
+                    batch_completion_memo = shared_search_memo
+                    batch_state = None
+                    batch_mask = None
                     batch_over_k = batch_open_count + 1 > self.max_concurrent_open_orders
+
+                    if return_debug:
+                        batch_state = self[batch_idx:batch_idx + 1]
+                        batch_mask = batch_state.get_mask(skip_pickup_commitment=True)
 
                     for candidate_idx in candidate_index_list:
                         if batch_over_k:
@@ -979,17 +1358,21 @@ class StateMCVRPPDTW(NamedTuple):
                                 debug['diag_pickup_commitment_block_by_k'][batch_idx] += 1.0
                             continue
 
-                        open_after = batch_open_before.clone()
-                        open_after[candidate_idx] = True
+                        open_after_bits = batch_open_bits | (1 << candidate_idx)
                         passenger_pickup_times_after = batch_passenger_pickup_times_before.clone()
                         candidate_is_passenger = bool(batch_passenger_orders[candidate_idx].item())
+                        candidate_scalar_cache = batch_scalar_cache
                         if candidate_is_passenger:
                             passenger_pickup_times_after[candidate_idx] = batch_pickup_finish[candidate_idx]
+                            candidate_scalar_cache = dict(batch_scalar_cache)
+                            candidate_scalar_cache['pickup_times'] = list(batch_scalar_cache['pickup_times'])
+                            candidate_scalar_cache['pickup_times'][candidate_idx] = float(batch_pickup_finish[candidate_idx].item())
+                        start_node_key = self._pickup_node_key(candidate_idx)
                         completion_feasible, completion_block_reason = self._has_feasible_open_completion(
                             batch_pickup_coords[candidate_idx],
                             batch_pickup_finish[candidate_idx],
                             batch_trip_start_after_pickup,
-                            open_after,
+                            None,
                             batch_delivery_coords,
                             batch_delivery_earliest,
                             batch_delivery_to_depot_time,
@@ -999,12 +1382,16 @@ class StateMCVRPPDTW(NamedTuple):
                             return_reason=return_debug,
                             ignore_trip_time=self.relax_pickup_commitment_trip_time,
                             memo=batch_completion_memo,
+                            open_bits=open_after_bits,
+                            start_node=start_node_key,
+                            benchmark_stats=benchmark_stats,
+                            scalar_cache=candidate_scalar_cache,
                         ) if return_debug else (
                             self._has_feasible_open_completion(
                                 batch_pickup_coords[candidate_idx],
                                 batch_pickup_finish[candidate_idx],
                                 batch_trip_start_after_pickup,
-                                open_after,
+                                None,
                                 batch_delivery_coords,
                                 batch_delivery_earliest,
                                 batch_delivery_to_depot_time,
@@ -1013,18 +1400,34 @@ class StateMCVRPPDTW(NamedTuple):
                                 batch_direct_ride_time,
                                 ignore_trip_time=self.relax_pickup_commitment_trip_time,
                                 memo=batch_completion_memo,
-                            ),
+                                open_bits=open_after_bits,
+                                start_node=start_node_key,
+                                benchmark_stats=benchmark_stats,
+                                scalar_cache=candidate_scalar_cache,
+                                ),
                             None,
                         )
 
-                        candidate_node = candidate_idx + 1
-                        selected = torch.tensor([candidate_node], dtype=torch.long, device=device)
-                        next_state = batch_state.update(selected, current_mask=batch_mask)
-                        next_open_count = int(next_state.get_open_started_count()[0, 0].item())
                         next_state_feasible = True
                         fallback_safe = True
-                        if next_open_count > 0:
-                            next_state_feasible, fallback_safe = next_state._has_feasible_open_delivery_from_state()
+                        if completion_feasible:
+                            next_state_feasible, fallback_safe = self._evaluate_post_pickup_open_delivery(
+                                batch_pickup_coords[candidate_idx],
+                                batch_pickup_finish[candidate_idx],
+                                batch_trip_start_after_pickup,
+                                None,
+                                batch_delivery_coords,
+                                batch_delivery_earliest,
+                                batch_delivery_to_depot_time,
+                                batch_passenger_orders,
+                                passenger_pickup_times_after,
+                                batch_direct_ride_time,
+                                memo=shared_search_memo,
+                                open_bits=open_after_bits,
+                                start_node=start_node_key,
+                                benchmark_stats=benchmark_stats,
+                                scalar_cache=candidate_scalar_cache,
+                                )
 
                         candidate_feasible = completion_feasible and next_state_feasible and fallback_safe
                         pickup_commitment_mask[batch_idx, candidate_idx] = not candidate_feasible
@@ -1047,7 +1450,13 @@ class StateMCVRPPDTW(NamedTuple):
                                         debug['diag_pickup_commitment_block_by_completion_other'][batch_idx] += 1.0
                                 elif not next_state_feasible:
                                     debug['diag_pickup_commitment_block_by_next_state'][batch_idx] += 1.0
-                                    next_state_reason = self._classify_next_state_delivery_block(next_state)
+                                    if batch_state is not None and batch_mask is not None:
+                                        candidate_node = candidate_idx + 1
+                                        selected = torch.tensor([candidate_node], dtype=torch.long, device=device)
+                                        next_state = batch_state.update(selected, current_mask=batch_mask)
+                                        next_state_reason = self._classify_next_state_delivery_block(next_state)
+                                    else:
+                                        next_state_reason = 'other'
                                     if next_state_reason == 'precedence':
                                         debug['diag_pickup_commitment_block_by_next_state_precedence'][batch_idx] += 1.0
                                     elif next_state_reason == 'ride_time':
@@ -1077,37 +1486,34 @@ class StateMCVRPPDTW(NamedTuple):
         service_mask |= commitment_mask_full[:, 1:2 * n_orders + 1]
         if return_debug:
             debug['diag_mask_pickup_commitment'] = (service_mask & ~before_mask).sum(1).float()
+        _record('mask_pickup_commitment', phase_start)
 
+        phase_start = time.perf_counter() if benchmark_stats is not None else None
         if n_orders > 0 and self.enable_delivery_viability:
             delivery_viability_mask = torch.zeros(batch_size, n_orders, dtype=torch.bool, device=device)
-            delivery_to_depot_time = (
-                (coords_active[:, n_orders + 1:2 * n_orders + 1, :] - coords_active[:, 0:1, :]).norm(p=2, dim=-1)
-                * self.AREA_SIZE / self.VEHICLE_SPEED
-            )
-            delivery_earliest = time_windows_active[:, n_orders + 1:2 * n_orders + 1, 0]
-            direct_ride_time = direct_distance / self.VEHICLE_SPEED
-            open_mask_full = self.get_open_started_mask()
-            delivery_search_memo = {}
-            passenger_pickup_time_full = self.passenger_pickup_time.squeeze(1)
-            current_time_flat = self.current_time.squeeze(1)
-            trip_start_time_flat = self.trip_start_time.squeeze(1)
-            prev_a_flat = self.prev_a.squeeze(1)
-            cur_coord_flat = self.cur_coord.squeeze(1)
             for batch_idx in range(batch_size):
                 trip_start = current_time_flat[batch_idx] if int(prev_a_flat[batch_idx].item()) == 0 else trip_start_time_flat[batch_idx]
+                scalar_cache = {
+                    'passenger_orders': [bool(v) for v in passenger_orders[batch_idx].tolist()],
+                    'pickup_times': [float(v) for v in passenger_pickup_times_before[batch_idx].tolist()],
+                    'direct_ride_time': [float(v) for v in direct_ride_time[batch_idx].tolist()],
+                    'delivery_earliest': [float(v) for v in delivery_earliest[batch_idx].tolist()],
+                    'delivery_to_depot_time': [float(v) for v in delivery_to_depot_time[batch_idx].tolist()],
+                }
                 legal_orders, physical_orders, used_fallback = self._get_legal_delivery_orders(
                     cur_coord_flat[batch_idx],
                     current_time_flat[batch_idx],
                     trip_start,
                     open_mask_full[batch_idx],
-                    coords_active[batch_idx, n_orders + 1:2 * n_orders + 1, :],
+                    delivery_coords[batch_idx],
                     delivery_earliest[batch_idx],
                     delivery_to_depot_time[batch_idx],
                     passenger_orders[batch_idx],
-                    passenger_pickup_time_full[batch_idx],
+                    passenger_pickup_times_before[batch_idx],
                     direct_ride_time[batch_idx],
                     allow_fallback=self.enable_viability_fallback,
-                    memo=delivery_search_memo,
+                    memo=shared_search_memo,
+                    scalar_cache=scalar_cache,
                 )
                 if len(physical_orders) == 0:
                     continue
@@ -1123,7 +1529,9 @@ class StateMCVRPPDTW(NamedTuple):
             service_mask |= delivery_viability_mask_full[:, 1:2 * n_orders + 1]
             if return_debug:
                 debug['diag_delivery_viability_masked'] = (service_mask & ~before_viability).sum(1).float()
+        _record('mask_delivery_viability', phase_start)
 
+        phase_start = time.perf_counter() if benchmark_stats is not None else None
         mask = self.visited.clone()
         if n_orders > 0:
             mask[:, :, 1:2 * n_orders + 1] = service_mask.unsqueeze(1).to(torch.uint8)
@@ -1199,6 +1607,7 @@ class StateMCVRPPDTW(NamedTuple):
             debug['diag_reject_allowed'] = reject_allowed.float()
             debug['diag_reject_predeparture_available'] = (reject_available & pre_departure_gate).float()
             debug['diag_reject_inroute_available'] = (reject_available & (~pre_departure_gate)).float()
+        _record('mask_finalize', phase_start)
 
         if return_debug:
             return mask.bool(), debug

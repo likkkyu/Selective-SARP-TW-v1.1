@@ -88,6 +88,42 @@ def collate_fn(batch):
     }
 
 
+class BenchmarkAccumulator:
+    def __init__(self):
+        self.seconds = {}
+        self.calls = {}
+
+    def add(self, name, seconds, calls=1):
+        self.seconds[name] = self.seconds.get(name, 0.0) + float(seconds)
+        self.calls[name] = self.calls.get(name, 0) + int(calls)
+
+    def merge(self, other):
+        if other is None:
+            return
+        for name, seconds in other.seconds.items():
+            self.seconds[name] = self.seconds.get(name, 0.0) + float(seconds)
+        for name, calls in other.calls.items():
+            self.calls[name] = self.calls.get(name, 0) + int(calls)
+
+    def total(self, name):
+        return float(self.seconds.get(name, 0.0))
+
+    def count(self, name):
+        return int(self.calls.get(name, 0))
+
+    def mean_ms(self, name):
+        calls = self.count(name)
+        if calls <= 0:
+            return 0.0
+        return self.total(name) * 1000.0 / calls
+
+    def snapshot(self):
+        return {
+            'seconds': dict(self.seconds),
+            'calls': dict(self.calls),
+        }
+
+
 class POMOTrainerOptimized:
     """POMO Trainer with graph-size-aware normalization calibration."""
 
@@ -118,6 +154,8 @@ class POMOTrainerOptimized:
         self.best_business_rate = float('-inf')
         self.best_service_key = None
         self.best_service_rate = float('-inf')
+        self.benchmark = BenchmarkAccumulator() if self.args.benchmark_mode else None
+        self.benchmark_epoch_summaries = []
 
         if args.resume_path:
             self._load_checkpoint(args.resume_path)
@@ -144,6 +182,12 @@ class POMOTrainerOptimized:
         print(f"Passenger pickup TW width: {Config.PASSENGER_TW_WIDTH:.1f} h")
         print(f"Global seed: {self.args.seed}")
         print(f"Model params: {sum(p.numel() for p in self.model.parameters()):,}")
+        if self.args.benchmark_mode:
+            print(f"Benchmark mode: warmup_epochs={self.args.benchmark_warmup_epochs}, "
+                  f"skip_validation={self.args.benchmark_skip_validation}, "
+                  f"disable_checkpoint={self.args.benchmark_disable_checkpoint}, "
+                  f"disable_log_save={self.args.benchmark_disable_log_save}, "
+                  f"batch_timing={self.args.benchmark_batch_timing}")
 
     def _prepare_normalization_profile(self):
         if self.args.calibrate_before_train:
@@ -189,7 +233,7 @@ class POMOTrainerOptimized:
     def _to_device(self, batch):
         return {key: value.to(self.device) if torch.is_tensor(value) else value for key, value in batch.items()}
 
-    def _build_state_kwargs(self, allow_reject):
+    def _build_state_kwargs(self, allow_reject, benchmark_timing=False):
         return {
             'allow_reject': allow_reject,
             'deadlock_limit': self.args.deadlock_limit,
@@ -197,6 +241,7 @@ class POMOTrainerOptimized:
             'enable_delivery_viability': self.args.enable_delivery_viability,
             'enable_viability_fallback': self.args.enable_viability_fallback,
             'relax_pickup_commitment_trip_time': self.args.relax_pickup_commitment_trip_time,
+            'benchmark_timing': bool(benchmark_timing),
         }
 
     def _build_default_dataset_kwargs(self):
@@ -216,6 +261,145 @@ class POMOTrainerOptimized:
 
     def _training_dataset_seed(self, epoch):
         return int(self.args.seed + epoch * 1000)
+
+    def _sync_if_needed(self):
+        if self.args.benchmark_mode and self.device.type == 'cuda':
+            torch.cuda.synchronize(self.device)
+
+    def _emit_benchmark_summary(self, payload):
+        if not self.args.benchmark_mode:
+            return
+        print("  [Benchmark]")
+        print(f"    epoch_total_s           : {payload['epoch_total_s']:.3f}")
+        print(f"    train_s                : {payload['train_s']:.3f}")
+        print(f"    validate_s             : {payload['validate_s']:.3f}")
+        print(f"    checkpoint_s           : {payload['checkpoint_s']:.3f}")
+        print(f"    dataset_build_s        : {payload['dataset_build_s']:.3f}")
+        print(f"    dataloader_build_s     : {payload['dataloader_build_s']:.3f}")
+        print(f"    mean_batch_total_ms    : {payload['mean_batch_total_ms']:.2f}")
+        print(f"    mean_batch_forward_ms  : {payload['mean_batch_forward_ms']:.2f}")
+        print(f"    mean_batch_backward_ms : {payload['mean_batch_backward_ms']:.2f}")
+        print(f"    mean_batch_optim_ms    : {payload['mean_batch_optimizer_ms']:.2f}")
+        print(f"    mean_model_init_ms     : {payload['mean_model_init_embed_ms']:.2f}")
+        print(f"    mean_model_encoder_ms  : {payload['mean_model_encoder_ms']:.2f}")
+        print(f"    mean_decode_inner_ms   : {payload['mean_model_decode_inner_ms']:.2f}")
+        print(f"    mean_decode_state_ms   : {payload['mean_decode_make_state_ms']:.2f}")
+        print(f"    mean_decode_fixed_ms   : {payload['mean_decode_precompute_fixed_ms']:.2f}")
+        print(f"    mean_decode_logp_ms    : {payload['mean_decode_get_log_p_total_ms']:.2f}")
+        print(f"    mean_decode_mask_ms    : {payload['mean_decode_get_mask_ms']:.2f}")
+        print(f"    mean_mask_pickup_tw_ms : {payload['mean_mask_pickup_tw_ms']:.2f}")
+        print(f"    mean_mask_ride_ms      : {payload['mean_mask_ride_time_ms']:.2f}")
+        print(f"    mean_mask_trip_ms      : {payload['mean_mask_trip_time_ms']:.2f}")
+        print(f"    mean_mask_ops_end_ms   : {payload['mean_mask_ops_end_ms']:.2f}")
+        print(f"    mean_mask_commit_ms    : {payload['mean_mask_pickup_commitment_ms']:.2f}")
+        print(f"    mean_pc_complete_ms    : {payload['mean_pc_has_feasible_open_completion_ms']:.2f}")
+        print(f"    mean_pc_step_ms        : {payload['mean_pc_delivery_step_feasible_ms']:.2f}")
+        print(f"    mean_pc_eval_open_ms   : {payload['mean_pc_evaluate_post_pickup_open_delivery_ms']:.2f}")
+        print(f"    mean_pc_legal_ms       : {payload['mean_pc_get_legal_delivery_orders_ms']:.2f}")
+        print(f"    mean_pc_path_ms        : {payload['mean_pc_has_legal_delivery_path_ms']:.2f}")
+        print(f"    mean_pc_phys_ms        : {payload['mean_pc_has_any_physical_delivery_step_ms']:.2f}")
+        print(f"    mean_pc_comp_calls     : {payload['mean_pc_has_feasible_open_completion_calls']:.2f}")
+        print(f"    mean_pc_comp_hit_rate  : {payload['mean_pc_completion_memo_hit_rate']:.3f}")
+        print(f"    mean_pc_comp_branches  : {payload['mean_pc_completion_branch_attempts']:.2f}")
+        print(f"    mean_pc_comp_open_bits : {payload['mean_pc_completion_open_bits']:.2f}")
+        print(f"    mean_pc_comp_avg_depth : {payload['mean_pc_completion_avg_recursion_depth']:.2f}")
+        print(f"    mean_pc_comp_max_depth : {payload['mean_pc_completion_max_recursion_depth']:.2f}")
+        print(f"    mean_pc_step_calls     : {payload['mean_pc_delivery_step_feasible_calls']:.2f}")
+        print(f"    mean_pc_step_hit_rate  : {payload['mean_pc_step_memo_hit_rate']:.3f}")
+        print(f"    mean_pc_step_ok_calls  : {payload['mean_pc_step_reason_ok']:.2f}")
+        print(f"    mean_pc_step_trip_calls: {payload['mean_pc_step_reason_trip_time']:.2f}")
+        print(f"    mean_pc_step_ride_calls: {payload['mean_pc_step_reason_ride_time']:.2f}")
+        print(f"    mean_pc_step_ops_calls : {payload['mean_pc_step_reason_ops_end']:.2f}")
+        print(f"    mean_mask_viability_ms : {payload['mean_mask_delivery_viability_ms']:.2f}")
+        print(f"    mean_mask_final_ms     : {payload['mean_mask_finalize_ms']:.2f}")
+        print(f"    mean_decode_update_ms  : {payload['mean_decode_state_update_ms']:.2f}")
+        print(f"    mean_decode_logits_ms  : {payload['mean_decode_logits_ms']:.2f}")
+        print(f"    mean_decode_softmax_ms : {payload['mean_decode_log_softmax_ms']:.2f}")
+        print(f"    mean_decode_select_ms  : {payload['mean_decode_select_node_ms']:.2f}")
+        print(f"    mean_get_costs_ms      : {payload['mean_model_get_costs_ms']:.2f}")
+        print(f"    mean_val_forward_ms    : {payload['mean_validate_model_forward_ms']:.2f}")
+        print(f"    mean_val_costs_ms      : {payload['mean_validate_get_costs_ms']:.2f}")
+        print(f"    batches_per_s          : {payload['batches_per_s']:.3f}")
+        print(f"    samples_per_s          : {payload['samples_per_s']:.3f}")
+        if self.args.benchmark_json:
+            print(json.dumps({'type': 'benchmark_epoch', **payload}, ensure_ascii=False))
+
+    def _emit_benchmark_final_summary(self):
+        if not self.args.benchmark_mode:
+            return
+        warmup_epochs = max(0, int(self.args.benchmark_warmup_epochs))
+        measured = [item for item in self.benchmark_epoch_summaries if item['epoch'] > warmup_epochs]
+        if not measured:
+            measured = list(self.benchmark_epoch_summaries)
+        if not measured:
+            return
+
+        def _avg(key):
+            return sum(item[key] for item in measured) / len(measured)
+
+        summary = {
+            'measured_epochs': len(measured),
+            'warmup_epochs': warmup_epochs,
+            'avg_epoch_total_s': _avg('epoch_total_s'),
+            'avg_train_s': _avg('train_s'),
+            'avg_validate_s': _avg('validate_s'),
+            'avg_checkpoint_s': _avg('checkpoint_s'),
+            'avg_dataset_build_s': _avg('dataset_build_s'),
+            'avg_dataloader_build_s': _avg('dataloader_build_s'),
+            'avg_mean_batch_total_ms': _avg('mean_batch_total_ms'),
+            'avg_mean_batch_forward_ms': _avg('mean_batch_forward_ms'),
+            'avg_mean_batch_backward_ms': _avg('mean_batch_backward_ms'),
+            'avg_mean_batch_optimizer_ms': _avg('mean_batch_optimizer_ms'),
+            'avg_mean_model_init_embed_ms': _avg('mean_model_init_embed_ms'),
+            'avg_mean_model_encoder_ms': _avg('mean_model_encoder_ms'),
+            'avg_mean_model_decode_inner_ms': _avg('mean_model_decode_inner_ms'),
+            'avg_mean_decode_make_state_ms': _avg('mean_decode_make_state_ms'),
+            'avg_mean_decode_precompute_fixed_ms': _avg('mean_decode_precompute_fixed_ms'),
+            'avg_mean_decode_get_log_p_total_ms': _avg('mean_decode_get_log_p_total_ms'),
+            'avg_mean_decode_get_mask_ms': _avg('mean_decode_get_mask_ms'),
+            'avg_mean_mask_pickup_tw_ms': _avg('mean_mask_pickup_tw_ms'),
+            'avg_mean_mask_ride_time_ms': _avg('mean_mask_ride_time_ms'),
+            'avg_mean_mask_trip_time_ms': _avg('mean_mask_trip_time_ms'),
+            'avg_mean_mask_ops_end_ms': _avg('mean_mask_ops_end_ms'),
+            'avg_mean_mask_pickup_commitment_ms': _avg('mean_mask_pickup_commitment_ms'),
+            'avg_mean_pc_has_feasible_open_completion_ms': _avg('mean_pc_has_feasible_open_completion_ms'),
+            'avg_mean_pc_delivery_step_feasible_ms': _avg('mean_pc_delivery_step_feasible_ms'),
+            'avg_mean_pc_evaluate_post_pickup_open_delivery_ms': _avg('mean_pc_evaluate_post_pickup_open_delivery_ms'),
+            'avg_mean_pc_get_legal_delivery_orders_ms': _avg('mean_pc_get_legal_delivery_orders_ms'),
+            'avg_mean_pc_has_legal_delivery_path_ms': _avg('mean_pc_has_legal_delivery_path_ms'),
+            'avg_mean_pc_has_any_physical_delivery_step_ms': _avg('mean_pc_has_any_physical_delivery_step_ms'),
+            'avg_mean_pc_has_feasible_open_completion_calls': _avg('mean_pc_has_feasible_open_completion_calls'),
+            'avg_mean_pc_completion_memo_hit_rate': _avg('mean_pc_completion_memo_hit_rate'),
+            'avg_mean_pc_completion_branch_attempts': _avg('mean_pc_completion_branch_attempts'),
+            'avg_mean_pc_completion_open_bits': _avg('mean_pc_completion_open_bits'),
+            'avg_mean_pc_completion_avg_recursion_depth': _avg('mean_pc_completion_avg_recursion_depth'),
+            'avg_mean_pc_completion_max_recursion_depth': _avg('mean_pc_completion_max_recursion_depth'),
+            'avg_mean_pc_delivery_step_feasible_calls': _avg('mean_pc_delivery_step_feasible_calls'),
+            'avg_mean_pc_step_memo_hit_rate': _avg('mean_pc_step_memo_hit_rate'),
+            'avg_mean_pc_step_reason_ok': _avg('mean_pc_step_reason_ok'),
+            'avg_mean_pc_step_reason_trip_time': _avg('mean_pc_step_reason_trip_time'),
+            'avg_mean_pc_step_reason_ride_time': _avg('mean_pc_step_reason_ride_time'),
+            'avg_mean_pc_step_reason_ops_end': _avg('mean_pc_step_reason_ops_end'),
+            'avg_mean_mask_delivery_viability_ms': _avg('mean_mask_delivery_viability_ms'),
+            'avg_mean_mask_finalize_ms': _avg('mean_mask_finalize_ms'),
+            'avg_mean_decode_state_update_ms': _avg('mean_decode_state_update_ms'),
+            'avg_mean_decode_logits_ms': _avg('mean_decode_logits_ms'),
+            'avg_mean_model_get_costs_ms': _avg('mean_model_get_costs_ms'),
+            'avg_mean_validate_model_forward_ms': _avg('mean_validate_model_forward_ms'),
+            'avg_mean_validate_get_costs_ms': _avg('mean_validate_get_costs_ms'),
+            'avg_batches_per_s': _avg('batches_per_s'),
+            'avg_samples_per_s': _avg('samples_per_s'),
+        }
+        print('\n' + '=' * 70)
+        print('Benchmark Summary')
+        print('=' * 70)
+        for key, value in summary.items():
+            if isinstance(value, float):
+                print(f"{key}: {value:.3f}")
+            else:
+                print(f"{key}: {value}")
+        if self.args.benchmark_json:
+            print(json.dumps({'type': 'benchmark_final', **summary}, ensure_ascii=False))
 
     def _build_curriculum_dataset_kwargs(self, epoch):
         kwargs = self._build_default_dataset_kwargs()
@@ -304,14 +488,61 @@ class POMOTrainerOptimized:
             for key, value in batch.items()
         }
 
-    def _pomo_forward(self, batch, state_kwargs=None):
+    def _add_benchmark_payload(self, timing, payload):
+        if timing is None or payload is None:
+            return
+        seconds_map = payload.get('seconds', {})
+        calls_map = payload.get('calls', {})
+        for name, seconds in seconds_map.items():
+            calls = calls_map.get(name, 1)
+            timing.add(name, seconds, calls=calls)
+        for name, calls in calls_map.items():
+            if name not in seconds_map:
+                timing.add(name, 0.0, calls=calls)
+
+    @staticmethod
+    def _per_batch_ms(timing, name, batch_count):
+        if timing is None or batch_count <= 0:
+            return 0.0
+        return timing.total(name) * 1000.0 / batch_count
+
+    @staticmethod
+    def _per_batch_count(timing, name, batch_count):
+        if timing is None or batch_count <= 0:
+            return 0.0
+        return timing.count(name) / batch_count
+
+    @staticmethod
+    def _safe_ratio(numerator, denominator):
+        if denominator <= 0:
+            return 0.0
+        return float(numerator) / float(denominator)
+
+    def _pomo_forward(self, batch, state_kwargs=None, timing=None):
+        return_benchmark = timing is not None
         if self.args.pomo_size <= 1:
-            cost, log_likelihood = self.model(batch, state_kwargs=state_kwargs)
+            if return_benchmark:
+                cost, log_likelihood, benchmark_payload = self.model(
+                    batch,
+                    state_kwargs=state_kwargs,
+                    return_benchmark=True,
+                )
+                self._add_benchmark_payload(timing, benchmark_payload)
+            else:
+                cost, log_likelihood = self.model(batch, state_kwargs=state_kwargs)
             return cost.unsqueeze(1), log_likelihood.unsqueeze(1)
 
         batch_size = batch['loc'].size(0)
         repeated_batch = self._repeat_for_pomo(batch, self.args.pomo_size)
-        cost, log_likelihood = self.model(repeated_batch, state_kwargs=state_kwargs)
+        if return_benchmark:
+            cost, log_likelihood, benchmark_payload = self.model(
+                repeated_batch,
+                state_kwargs=state_kwargs,
+                return_benchmark=True,
+            )
+            self._add_benchmark_payload(timing, benchmark_payload)
+        else:
+            cost, log_likelihood = self.model(repeated_batch, state_kwargs=state_kwargs)
         return cost.reshape(batch_size, self.args.pomo_size), log_likelihood.reshape(batch_size, self.args.pomo_size)
 
     @staticmethod
@@ -389,27 +620,69 @@ class POMOTrainerOptimized:
         self.model.train()
         set_decode_type(self.model, 'sampling')
         allow_reject = epoch > self.args.reject_warmup_epochs
-        state_kwargs = self._build_state_kwargs(allow_reject=allow_reject)
+        state_kwargs = self._build_state_kwargs(
+            allow_reject=allow_reject,
+            benchmark_timing=self.args.benchmark_batch_timing,
+        )
 
         epoch_loss = 0.0
         epoch_objective = 0.0
         n_batches = 0
+        timing = BenchmarkAccumulator() if self.args.benchmark_mode else None
 
         current_lr = self.optimizer.param_groups[0]['lr']
         progress = tqdm(train_loader, desc=f"Epoch {epoch} (lr={current_lr:.2e})")
+        epoch_train_start = time.perf_counter() if self.args.benchmark_mode else None
         for batch_idx, batch in enumerate(progress, start=1):
+            batch_start = time.perf_counter() if self.args.benchmark_mode else None
+
+            to_device_start = time.perf_counter() if self.args.benchmark_batch_timing else None
             batch = self._to_device(batch)
-            costs, log_probs = self._pomo_forward(batch, state_kwargs=state_kwargs)
+            if self.args.benchmark_batch_timing:
+                timing.add('batch_to_device', time.perf_counter() - to_device_start)
+
+            forward_start = time.perf_counter() if self.args.benchmark_batch_timing else None
+            costs, log_probs = self._pomo_forward(
+                batch,
+                state_kwargs=state_kwargs,
+                timing=timing if self.args.benchmark_batch_timing else None,
+            )
+            if self.args.benchmark_batch_timing:
+                self._sync_if_needed()
+                timing.add('batch_forward', time.perf_counter() - forward_start)
+
+            loss_start = time.perf_counter() if self.args.benchmark_batch_timing else None
             loss, mean_objective = self._pomo_loss(
                 costs,
                 log_probs,
                 baseline_mode=self.args.baseline_mode,
             )
+            if self.args.benchmark_batch_timing:
+                timing.add('batch_loss', time.perf_counter() - loss_start)
 
+            zero_grad_start = time.perf_counter() if self.args.benchmark_batch_timing else None
             self.optimizer.zero_grad()
+            if self.args.benchmark_batch_timing:
+                timing.add('batch_zero_grad', time.perf_counter() - zero_grad_start)
+
+            backward_start = time.perf_counter() if self.args.benchmark_batch_timing else None
             loss.backward()
+            if self.args.benchmark_batch_timing:
+                self._sync_if_needed()
+                timing.add('batch_backward', time.perf_counter() - backward_start)
+
+            clip_start = time.perf_counter() if self.args.benchmark_batch_timing else None
             torch.nn.utils.clip_grad_norm_(self.model.parameters(), self.args.max_grad_norm)
+            if self.args.benchmark_batch_timing:
+                timing.add('batch_grad_clip', time.perf_counter() - clip_start)
+
+            step_start = time.perf_counter() if self.args.benchmark_batch_timing else None
             self.optimizer.step()
+            if self.args.benchmark_batch_timing:
+                self._sync_if_needed()
+                timing.add('batch_optimizer_step', time.perf_counter() - step_start)
+            if self.args.benchmark_mode:
+                timing.add('batch_total', time.perf_counter() - batch_start)
 
             epoch_loss += loss.item()
             epoch_objective += mean_objective.item()
@@ -419,12 +692,16 @@ class POMOTrainerOptimized:
                 progress.set_postfix({'loss': f'{loss.item():.4f}', 'objective': f'{mean_objective.item():.2f}'})
 
         self.lr_scheduler.step()
-        return epoch_loss / max(n_batches, 1), epoch_objective / max(n_batches, 1)
+        if self.args.benchmark_mode:
+            timing.add('epoch_train', time.perf_counter() - epoch_train_start)
+        return epoch_loss / max(n_batches, 1), epoch_objective / max(n_batches, 1), timing
 
     def validate(self, val_loader):
         self.model.eval()
         set_decode_type(self.model, 'greedy')
 
+        timing = BenchmarkAccumulator() if self.args.benchmark_mode else None
+        validate_start = time.perf_counter() if self.args.benchmark_mode else None
         all_objectives = []
         raw_total_costs = []
         detail_buffers = {
@@ -449,10 +726,14 @@ class POMOTrainerOptimized:
         }
         debug_buffers = {} if self.args.collect_mask_diagnostics else None
 
-        val_state_kwargs = self._build_state_kwargs(allow_reject=True)
+        val_state_kwargs = self._build_state_kwargs(
+            allow_reject=True,
+            benchmark_timing=self.args.benchmark_batch_timing,
+        )
         with torch.no_grad():
             for batch in tqdm(val_loader, desc='Validating'):
                 batch = self._to_device(batch)
+                model_start = time.perf_counter() if self.args.benchmark_mode else None
                 if self.args.collect_mask_diagnostics:
                     objective_cost, _, pi, debug = self.model(
                         batch,
@@ -460,15 +741,33 @@ class POMOTrainerOptimized:
                         state_kwargs=val_state_kwargs,
                         return_debug=True,
                     )
+                    benchmark_payload = debug.pop('benchmark_timing', None)
+                    self._add_benchmark_payload(timing, benchmark_payload)
                     for key, value in debug.items():
                         debug_buffers.setdefault(key, []).append(value)
                 else:
-                    objective_cost, _, pi = self.model(
-                        batch,
-                        return_pi=True,
-                        state_kwargs=val_state_kwargs
-                    )
+                    if self.args.benchmark_batch_timing:
+                        objective_cost, _, pi, benchmark_payload = self.model(
+                            batch,
+                            return_pi=True,
+                            state_kwargs=val_state_kwargs,
+                            return_benchmark=True,
+                        )
+                        self._add_benchmark_payload(timing, benchmark_payload)
+                    else:
+                        objective_cost, _, pi = self.model(
+                            batch,
+                            return_pi=True,
+                            state_kwargs=val_state_kwargs
+                        )
+                if self.args.benchmark_mode:
+                    self._sync_if_needed()
+                    timing.add('validate_model_forward', time.perf_counter() - model_start)
+                costs_start = time.perf_counter() if self.args.benchmark_mode else None
                 _, details = self.problem.get_costs(batch, pi, return_details=True)
+                if self.args.benchmark_mode:
+                    self._sync_if_needed()
+                    timing.add('validate_get_costs', time.perf_counter() - costs_start)
 
                 all_objectives.append(objective_cost)
                 raw_total_costs.append(details['total_cost_raw'])
@@ -515,7 +814,9 @@ class POMOTrainerOptimized:
         if debug_buffers is not None:
             for key, value in debug_buffers.items():
                 results[key] = value.mean().item()
-        return results
+        if self.args.benchmark_mode:
+            timing.add('epoch_validate', time.perf_counter() - validate_start)
+        return results, timing
 
     def train(self):
         print('\n' + '=' * 70)
@@ -555,15 +856,21 @@ class POMOTrainerOptimized:
         best_service_key = self.best_service_key
         best_service_rate = self.best_service_rate
         for epoch in range(self.start_epoch, self.args.n_epochs + 1):
+            epoch_bench = BenchmarkAccumulator() if self.args.benchmark_mode else None
+            epoch_total_start = time.perf_counter() if self.args.benchmark_mode else None
             curriculum_kwargs = self._build_curriculum_dataset_kwargs(epoch)
             train_seed = self._training_dataset_seed(epoch)
             print(f"Epoch {epoch} training dataset seed: {train_seed}")
+            dataset_build_start = time.perf_counter() if self.args.benchmark_mode else None
             train_dataset = MCVRPPDTWDataset(
                 num_samples=self.args.epoch_size,
                 graph_size=self.args.graph_size,
                 seed=train_seed,
                 **curriculum_kwargs,
             )
+            if self.args.benchmark_mode:
+                epoch_bench.add('epoch_dataset_build_train', time.perf_counter() - dataset_build_start)
+            dataloader_build_start = time.perf_counter() if self.args.benchmark_mode else None
             train_loader = DataLoader(
                 train_dataset,
                 batch_size=self.args.batch_size,
@@ -571,9 +878,55 @@ class POMOTrainerOptimized:
                 collate_fn=collate_fn,
                 **self.loader_kwargs,
             )
+            if self.args.benchmark_mode:
+                epoch_bench.add('epoch_dataloader_build_train', time.perf_counter() - dataloader_build_start)
 
-            train_loss, train_objective = self.train_epoch(epoch, train_loader)
-            val_results = self.validate(val_loader)
+            train_loss, train_objective, train_timing = self.train_epoch(epoch, train_loader)
+            if self.args.benchmark_mode:
+                epoch_bench.merge(train_timing)
+            if self.args.benchmark_skip_validation:
+                val_results = {
+                    'avg_objective': float('nan'),
+                    'std_objective': float('nan'),
+                    'avg_cost': float('nan'),
+                    'std_cost': float('nan'),
+                    'min_cost': float('nan'),
+                    'max_cost': float('nan'),
+                    'avg_energy_cost': float('nan'),
+                    'avg_passenger_delivery_delay_cost': float('nan'),
+                    'avg_cargo_delay_cost': float('nan'),
+                    'avg_trip_overtime_penalty': float('nan'),
+                    'avg_reject_penalty': float('nan'),
+                    'avg_unfulfilled_penalty': float('nan'),
+                    'avg_rejected_orders': float('nan'),
+                    'avg_unfulfilled_orders': float('nan'),
+                    'avg_completed_orders': float('nan'),
+                    'avg_untouched_orders': float('nan'),
+                    'avg_untouched_unrejected_orders': float('nan'),
+                    'avg_pickup_only_orders': float('nan'),
+                    'avg_started_not_completed_orders': float('nan'),
+                    'avg_vehicle_cost': float('nan'),
+                    'avg_distance': float('nan'),
+                    'avg_passenger_pickup_hard_violations': float('nan'),
+                    'avg_passenger_total_ride_time_violations': float('nan'),
+                    'avg_passenger_excess_ride_time_violations': float('nan'),
+                    'avg_passenger_ride_time_violations': float('nan'),
+                    'avg_passenger_delay_cost': float('nan'),
+                    'service_rate': float('nan'),
+                    'rejected_rate': float('nan'),
+                    'unfulfilled_rate': float('nan'),
+                    'served_plus_rejected_rate': float('nan'),
+                    'untouched_unrejected_rate': float('nan'),
+                    'pickup_only_rate': float('nan'),
+                    'started_not_completed_rate': float('nan'),
+                    'non_service_rate': float('nan'),
+                    'business_clean': False,
+                }
+                val_timing = BenchmarkAccumulator() if self.args.benchmark_mode else None
+            else:
+                val_results, val_timing = self.validate(val_loader)
+                if self.args.benchmark_mode:
+                    epoch_bench.merge(val_timing)
 
             self.train_log.append({'epoch': epoch, 'loss': train_loss, 'objective': train_objective})
             self.val_log.append({'epoch': epoch, **val_results})
@@ -582,82 +935,202 @@ class POMOTrainerOptimized:
             print(f"  Train Loss: {train_loss:.4f}")
             print(f"  Train Objective: {train_objective:.2f}")
             print(f"  Data Profile: {self._describe_curriculum(epoch)}")
-            print(f"  Val Objective: {val_results['avg_objective']:.2f} +/- {val_results['std_objective']:.2f}")
-            print(f"  Val Cost (CNY): {val_results['avg_cost']:.2f} +/- {val_results['std_cost']:.2f}")
-            print(f"  Energy: {val_results['avg_energy_cost']:.2f} RMB")
-            print(f"  Passenger Delivery Delay: {val_results['avg_passenger_delivery_delay_cost']:.2f} RMB")
-            print(f"  Cargo Delay: {val_results['avg_cargo_delay_cost']:.2f} RMB")
-            print(f"  Passenger Pickup Hard Violations: {val_results['avg_passenger_pickup_hard_violations']:.2f}")
-            print(f"  Passenger Total Ride-Time Violations: {val_results['avg_passenger_total_ride_time_violations']:.2f}")
-            print(f"  Passenger Excess Ride-Time Violations: {val_results['avg_passenger_excess_ride_time_violations']:.2f}")
-            print(f"  Trip Overtime: {val_results['avg_trip_overtime_penalty']:.2f} RMB")
-            print(f"  Reject Penalty: {val_results['avg_reject_penalty']:.2f} RMB")
-            print(f"  Unfulfilled Penalty: {val_results['avg_unfulfilled_penalty']:.2f} RMB")
-            print(f"  Avg Completed Orders: {val_results['avg_completed_orders']:.2f}")
-            print(f"  Avg Rejected Orders: {val_results['avg_rejected_orders']:.2f}")
-            print(f"  Avg Unfulfilled Orders: {val_results['avg_unfulfilled_orders']:.2f}")
-            print(f"  Avg Untouched Orders: {val_results['avg_untouched_orders']:.2f}")
-            print(f"  Avg Untouched-Unrejected Orders: {val_results['avg_untouched_unrejected_orders']:.2f}")
-            print(f"  Service Rate: {val_results['service_rate']:.3f}")
-            print(f"  Rejected Rate: {val_results['rejected_rate']:.3f}")
-            print(f"  Unfulfilled Rate: {val_results['unfulfilled_rate']:.3f}")
-            print(f"  Served+Rejected Rate: {val_results['served_plus_rejected_rate']:.3f}")
-            print(f"  Untouched-Unrejected Rate: {val_results['untouched_unrejected_rate']:.3f}")
-            print(f"  Avg Pickup-only Orders: {val_results['avg_pickup_only_orders']:.2f}")
-            print(f"  Avg Started-not-completed Orders: {val_results['avg_started_not_completed_orders']:.2f}")
-            print(f"  Vehicle Cost: {val_results['avg_vehicle_cost']:.2f} RMB")
-            print(f"  Distance: {val_results['avg_distance']:.2f} km")
-            if self.args.collect_mask_diagnostics:
-                print("  [Mask Diagnostics]")
-                print(f"    Feasible pickups/step     : {val_results.get('diag_feasible_pickups', 0.0):.2f}")
-                print(f"    Feasible deliveries/step  : {val_results.get('diag_feasible_deliveries', 0.0):.2f}")
-                print(f"    Any service feasible rate : {val_results.get('diag_any_service_feasible', 0.0):.2f}")
-                print(f"    Depot-only rate           : {val_results.get('diag_depot_only', 0.0):.2f}")
-                print(f"    Reject available rate     : {val_results.get('diag_reject_available_rate', 0.0):.2f}")
-                print(f"    Feasible->depot rate      : {val_results.get('diag_service_feasible_but_selected_depot', 0.0):.2f}")
-                print(f"    Feasible->reject rate     : {val_results.get('diag_service_feasible_but_selected_reject', 0.0):.2f}")
-                print(f"    Mask by pickup TW         : {val_results.get('diag_mask_pickup_tw', 0.0):.2f}")
-                print(f"    Mask by ride time         : {val_results.get('diag_mask_ride_time', 0.0):.2f}")
-                print(f"    Mask by trip time         : {val_results.get('diag_mask_trip_time', 0.0):.2f}")
-                print(f"    Mask by ops end           : {val_results.get('diag_mask_ops_end', 0.0):.2f}")
-                print(f"    Mask by pickup commitment : {val_results.get('diag_mask_pickup_commitment', 0.0):.2f}")
-                print(f"    Open started count        : {val_results.get('diag_open_started_count', 0.0):.2f}")
-                print(f"    Second pickup feasible    : {val_results.get('diag_second_pickup_feasible', 0.0):.2f}")
-                print(f"    Delivery viability masked : {val_results.get('diag_delivery_viability_masked', 0.0):.2f}")
-                print(f"    Delivery fallback rate    : {val_results.get('diag_delivery_viability_fallback', 0.0):.2f}")
-                print(f"    Mask by vehicle limit     : {val_results.get('diag_mask_vehicle_limit', 0.0):.2f}")
-                print(f"    Reject predeparture rate  : {val_results.get('diag_reject_predeparture_available', 0.0):.2f}")
-                print(f"    Reject in-route rate      : {val_results.get('diag_reject_inroute_available', 0.0):.2f}")
+            if self.args.benchmark_skip_validation:
+                print("  Validation: skipped (benchmark mode)")
+            else:
+                print(f"  Val Objective: {val_results['avg_objective']:.2f} +/- {val_results['std_objective']:.2f}")
+                print(f"  Val Cost (CNY): {val_results['avg_cost']:.2f} +/- {val_results['std_cost']:.2f}")
+                print(f"  Energy: {val_results['avg_energy_cost']:.2f} RMB")
+                print(f"  Passenger Delivery Delay: {val_results['avg_passenger_delivery_delay_cost']:.2f} RMB")
+                print(f"  Cargo Delay: {val_results['avg_cargo_delay_cost']:.2f} RMB")
+                print(f"  Passenger Pickup Hard Violations: {val_results['avg_passenger_pickup_hard_violations']:.2f}")
+                print(f"  Passenger Total Ride-Time Violations: {val_results['avg_passenger_total_ride_time_violations']:.2f}")
+                print(f"  Passenger Excess Ride-Time Violations: {val_results['avg_passenger_excess_ride_time_violations']:.2f}")
+                print(f"  Trip Overtime: {val_results['avg_trip_overtime_penalty']:.2f} RMB")
+                print(f"  Reject Penalty: {val_results['avg_reject_penalty']:.2f} RMB")
+                print(f"  Unfulfilled Penalty: {val_results['avg_unfulfilled_penalty']:.2f} RMB")
+                print(f"  Avg Completed Orders: {val_results['avg_completed_orders']:.2f}")
+                print(f"  Avg Rejected Orders: {val_results['avg_rejected_orders']:.2f}")
+                print(f"  Avg Unfulfilled Orders: {val_results['avg_unfulfilled_orders']:.2f}")
+                print(f"  Avg Untouched Orders: {val_results['avg_untouched_orders']:.2f}")
+                print(f"  Avg Untouched-Unrejected Orders: {val_results['avg_untouched_unrejected_orders']:.2f}")
+                print(f"  Service Rate: {val_results['service_rate']:.3f}")
+                print(f"  Rejected Rate: {val_results['rejected_rate']:.3f}")
+                print(f"  Unfulfilled Rate: {val_results['unfulfilled_rate']:.3f}")
+                print(f"  Served+Rejected Rate: {val_results['served_plus_rejected_rate']:.3f}")
+                print(f"  Untouched-Unrejected Rate: {val_results['untouched_unrejected_rate']:.3f}")
+                print(f"  Avg Pickup-only Orders: {val_results['avg_pickup_only_orders']:.2f}")
+                print(f"  Avg Started-not-completed Orders: {val_results['avg_started_not_completed_orders']:.2f}")
+                print(f"  Vehicle Cost: {val_results['avg_vehicle_cost']:.2f} RMB")
+                print(f"  Distance: {val_results['avg_distance']:.2f} km")
+                if self.args.collect_mask_diagnostics:
+                    print("  [Mask Diagnostics]")
+                    print(f"    Feasible pickups/step     : {val_results.get('diag_feasible_pickups', 0.0):.2f}")
+                    print(f"    Feasible deliveries/step  : {val_results.get('diag_feasible_deliveries', 0.0):.2f}")
+                    print(f"    Any service feasible rate : {val_results.get('diag_any_service_feasible', 0.0):.2f}")
+                    print(f"    Depot-only rate           : {val_results.get('diag_depot_only', 0.0):.2f}")
+                    print(f"    Reject available rate     : {val_results.get('diag_reject_available_rate', 0.0):.2f}")
+                    print(f"    Feasible->depot rate      : {val_results.get('diag_service_feasible_but_selected_depot', 0.0):.2f}")
+                    print(f"    Feasible->reject rate     : {val_results.get('diag_service_feasible_but_selected_reject', 0.0):.2f}")
+                    print(f"    Mask by pickup TW         : {val_results.get('diag_mask_pickup_tw', 0.0):.2f}")
+                    print(f"    Mask by ride time         : {val_results.get('diag_mask_ride_time', 0.0):.2f}")
+                    print(f"    Mask by trip time         : {val_results.get('diag_mask_trip_time', 0.0):.2f}")
+                    print(f"    Mask by ops end           : {val_results.get('diag_mask_ops_end', 0.0):.2f}")
+                    print(f"    Mask by pickup commitment : {val_results.get('diag_mask_pickup_commitment', 0.0):.2f}")
+                    print(f"    Open started count        : {val_results.get('diag_open_started_count', 0.0):.2f}")
+                    print(f"    Second pickup feasible    : {val_results.get('diag_second_pickup_feasible', 0.0):.2f}")
+                    print(f"    Delivery viability masked : {val_results.get('diag_delivery_viability_masked', 0.0):.2f}")
+                    print(f"    Delivery fallback rate    : {val_results.get('diag_delivery_viability_fallback', 0.0):.2f}")
+                    print(f"    Mask by vehicle limit     : {val_results.get('diag_mask_vehicle_limit', 0.0):.2f}")
+                    print(f"    Reject predeparture rate  : {val_results.get('diag_reject_predeparture_available', 0.0):.2f}")
+                    print(f"    Reject in-route rate      : {val_results.get('diag_reject_inroute_available', 0.0):.2f}")
 
-            business_key = self._business_priority_key(val_results)
-            if best_business_key is None or business_key > best_business_key:
-                best_business_key = business_key
-                best_business_rate = float(val_results['service_rate'])
-                self.best_business_key = best_business_key
-                self.best_business_rate = best_business_rate
-                self._save_model(epoch, val_results, 'best', selection_rule='business_first')
-                print('  [Saved best model by business priority]')
+            if not self.args.benchmark_skip_validation:
+                business_key = self._business_priority_key(val_results)
+                if best_business_key is None or business_key > best_business_key:
+                    best_business_key = business_key
+                    best_business_rate = float(val_results['service_rate'])
+                    self.best_business_key = best_business_key
+                    self.best_business_rate = best_business_rate
+                    if not self.args.benchmark_disable_checkpoint:
+                        checkpoint_start = time.perf_counter() if self.args.benchmark_mode else None
+                        self._save_model(epoch, val_results, 'best', selection_rule='business_first')
+                        if self.args.benchmark_mode:
+                            epoch_bench.add('epoch_checkpoint', time.perf_counter() - checkpoint_start)
+                        print('  [Saved best model by business priority]')
 
-            service_key = self._service_priority_key(val_results)
-            if best_service_key is None or service_key > best_service_key:
-                best_service_key = service_key
-                best_service_rate = float(val_results['service_rate'])
-                self.best_service_key = best_service_key
-                self.best_service_rate = best_service_rate
-                self._save_model(epoch, val_results, 'best_service', selection_rule='service_priority')
-                print('  [Saved best model by service priority]')
+                service_key = self._service_priority_key(val_results)
+                if best_service_key is None or service_key > best_service_key:
+                    best_service_key = service_key
+                    best_service_rate = float(val_results['service_rate'])
+                    self.best_service_key = best_service_key
+                    self.best_service_rate = best_service_rate
+                    if not self.args.benchmark_disable_checkpoint:
+                        checkpoint_start = time.perf_counter() if self.args.benchmark_mode else None
+                        self._save_model(epoch, val_results, 'best_service', selection_rule='service_priority')
+                        if self.args.benchmark_mode:
+                            epoch_bench.add('epoch_checkpoint', time.perf_counter() - checkpoint_start)
+                        print('  [Saved best model by service priority]')
 
-            if val_results['avg_objective'] < best_val_objective:
-                best_val_objective = val_results['avg_objective']
-                self.best_val_objective = best_val_objective
-                self._save_model(epoch, val_results, 'best_objective', selection_rule='objective_min')
-                print('  [Saved best model by objective]')
+                if val_results['avg_objective'] < best_val_objective:
+                    best_val_objective = val_results['avg_objective']
+                    self.best_val_objective = best_val_objective
+                    if not self.args.benchmark_disable_checkpoint:
+                        checkpoint_start = time.perf_counter() if self.args.benchmark_mode else None
+                        self._save_model(epoch, val_results, 'best_objective', selection_rule='objective_min')
+                        if self.args.benchmark_mode:
+                            epoch_bench.add('epoch_checkpoint', time.perf_counter() - checkpoint_start)
+                        print('  [Saved best model by objective]')
 
-            if self.args.save_interval > 0 and epoch % self.args.save_interval == 0 and epoch != self.args.n_epochs:
-                self._save_model(epoch, val_results, f'epoch_{epoch}', selection_rule='periodic')
+                if self.args.save_interval > 0 and epoch % self.args.save_interval == 0 and epoch != self.args.n_epochs and not self.args.benchmark_disable_checkpoint:
+                    checkpoint_start = time.perf_counter() if self.args.benchmark_mode else None
+                    self._save_model(epoch, val_results, f'epoch_{epoch}', selection_rule='periodic')
+                    if self.args.benchmark_mode:
+                        epoch_bench.add('epoch_checkpoint', time.perf_counter() - checkpoint_start)
 
-        self._save_model(self.args.n_epochs, val_results, 'final', selection_rule='final_epoch')
-        self._save_logs()
+            if self.args.benchmark_mode:
+                epoch_bench.add('epoch_total', time.perf_counter() - epoch_total_start)
+                batch_count = max(train_timing.count('batch_total'), 1)
+                samples_seen = batch_count * self.args.batch_size
+                epoch_payload = {
+                    'epoch': epoch,
+                    'epoch_total_s': epoch_bench.total('epoch_total'),
+                    'train_s': epoch_bench.total('epoch_train'),
+                    'validate_s': epoch_bench.total('epoch_validate'),
+                    'checkpoint_s': epoch_bench.total('epoch_checkpoint'),
+                    'dataset_build_s': epoch_bench.total('epoch_dataset_build_train'),
+                    'dataloader_build_s': epoch_bench.total('epoch_dataloader_build_train'),
+                    'mean_batch_total_ms': train_timing.mean_ms('batch_total'),
+                    'mean_batch_forward_ms': train_timing.mean_ms('batch_forward'),
+                    'mean_batch_backward_ms': train_timing.mean_ms('batch_backward'),
+                    'mean_batch_optimizer_ms': train_timing.mean_ms('batch_optimizer_step'),
+                    'mean_model_init_embed_ms': self._per_batch_ms(train_timing, 'model_init_embed', batch_count),
+                    'mean_model_encoder_ms': self._per_batch_ms(train_timing, 'model_encoder', batch_count),
+                    'mean_model_decode_inner_ms': self._per_batch_ms(train_timing, 'model_decode_inner', batch_count),
+                    'mean_decode_make_state_ms': self._per_batch_ms(train_timing, 'decode_make_state', batch_count),
+                    'mean_decode_precompute_fixed_ms': self._per_batch_ms(train_timing, 'decode_precompute_fixed', batch_count),
+                    'mean_decode_get_log_p_total_ms': self._per_batch_ms(train_timing, 'decode_get_log_p_total', batch_count),
+                    'mean_decode_step_context_ms': self._per_batch_ms(train_timing, 'decode_step_context', batch_count),
+                    'mean_decode_attention_node_data_ms': self._per_batch_ms(train_timing, 'decode_attention_node_data', batch_count),
+                    'mean_decode_get_mask_ms': self._per_batch_ms(train_timing, 'decode_get_mask', batch_count),
+                    'mean_mask_active_views_ms': self._per_batch_ms(train_timing, 'mask_active_views', batch_count),
+                    'mean_mask_init_visited_ms': self._per_batch_ms(train_timing, 'mask_init_visited', batch_count),
+                    'mean_mask_precedence_ms': self._per_batch_ms(train_timing, 'mask_precedence', batch_count),
+                    'mean_mask_capacity_ms': self._per_batch_ms(train_timing, 'mask_capacity', batch_count),
+                    'mean_mask_pickup_tw_ms': self._per_batch_ms(train_timing, 'mask_pickup_tw', batch_count),
+                    'mean_mask_open_started_ms': self._per_batch_ms(train_timing, 'mask_open_started', batch_count),
+                    'mean_mask_ride_time_ms': self._per_batch_ms(train_timing, 'mask_ride_time', batch_count),
+                    'mean_mask_trip_time_ms': self._per_batch_ms(train_timing, 'mask_trip_time', batch_count),
+                    'mean_mask_ops_end_ms': self._per_batch_ms(train_timing, 'mask_ops_end', batch_count),
+                    'mean_mask_pickup_commitment_ms': self._per_batch_ms(train_timing, 'mask_pickup_commitment', batch_count),
+                    'mean_pc_has_feasible_open_completion_ms': self._per_batch_ms(train_timing, 'pc_has_feasible_open_completion', batch_count),
+                    'mean_pc_delivery_step_feasible_ms': self._per_batch_ms(train_timing, 'pc_delivery_step_feasible', batch_count),
+                    'mean_pc_evaluate_post_pickup_open_delivery_ms': self._per_batch_ms(train_timing, 'pc_evaluate_post_pickup_open_delivery', batch_count),
+                    'mean_pc_get_legal_delivery_orders_ms': self._per_batch_ms(train_timing, 'pc_get_legal_delivery_orders', batch_count),
+                    'mean_pc_has_legal_delivery_path_ms': self._per_batch_ms(train_timing, 'pc_has_legal_delivery_path', batch_count),
+                    'mean_pc_has_any_physical_delivery_step_ms': self._per_batch_ms(train_timing, 'pc_has_any_physical_delivery_step', batch_count),
+                    'mean_pc_has_feasible_open_completion_calls': self._per_batch_count(train_timing, 'pc_has_feasible_open_completion_calls', batch_count),
+                    'mean_pc_completion_memo_lookups': self._per_batch_count(train_timing, 'pc_completion_memo_lookups', batch_count),
+                    'mean_pc_completion_memo_hits': self._per_batch_count(train_timing, 'pc_completion_memo_hits', batch_count),
+                    'mean_pc_completion_memo_misses': self._per_batch_count(train_timing, 'pc_completion_memo_misses', batch_count),
+                    'mean_pc_completion_memo_stores': self._per_batch_count(train_timing, 'pc_completion_memo_stores', batch_count),
+                    'mean_pc_completion_memo_hit_rate': self._safe_ratio(
+                        train_timing.count('pc_completion_memo_hits'),
+                        train_timing.count('pc_completion_memo_lookups'),
+                    ),
+                    'mean_pc_completion_branch_attempts': self._per_batch_count(train_timing, 'pc_completion_branch_attempts', batch_count),
+                    'mean_pc_completion_open_bits': self._safe_ratio(
+                        train_timing.count('pc_completion_open_bits_sum'),
+                        train_timing.count('pc_has_feasible_open_completion_calls'),
+                    ),
+                    'mean_pc_completion_avg_recursion_depth': self._safe_ratio(
+                        train_timing.count('pc_completion_recursion_depth_sum'),
+                        train_timing.count('pc_has_feasible_open_completion_calls'),
+                    ),
+                    'mean_pc_completion_max_recursion_depth': self._per_batch_count(train_timing, 'pc_completion_max_recursion_depth', batch_count),
+                    'mean_pc_delivery_step_feasible_calls': self._per_batch_count(train_timing, 'pc_delivery_step_feasible_calls', batch_count),
+                    'mean_pc_step_memo_lookups': self._per_batch_count(train_timing, 'pc_step_memo_lookups', batch_count),
+                    'mean_pc_step_memo_hits': self._per_batch_count(train_timing, 'pc_step_memo_hits', batch_count),
+                    'mean_pc_step_memo_misses': self._per_batch_count(train_timing, 'pc_step_memo_misses', batch_count),
+                    'mean_pc_step_memo_stores': self._per_batch_count(train_timing, 'pc_step_memo_stores', batch_count),
+                    'mean_pc_step_memo_hit_rate': self._safe_ratio(
+                        train_timing.count('pc_step_memo_hits'),
+                        train_timing.count('pc_step_memo_lookups'),
+                    ),
+                    'mean_pc_step_reason_ok': self._per_batch_count(train_timing, 'pc_step_reason_ok', batch_count),
+                    'mean_pc_step_reason_trip_time': self._per_batch_count(train_timing, 'pc_step_reason_trip_time', batch_count),
+                    'mean_pc_step_reason_ride_time': self._per_batch_count(train_timing, 'pc_step_reason_ride_time', batch_count),
+                    'mean_pc_step_reason_ops_end': self._per_batch_count(train_timing, 'pc_step_reason_ops_end', batch_count),
+                    'mean_pc_step_reason_missing_pickup_time': self._per_batch_count(train_timing, 'pc_step_reason_missing_pickup_time', batch_count),
+                    'mean_mask_delivery_viability_ms': self._per_batch_ms(train_timing, 'mask_delivery_viability', batch_count),
+                    'mean_mask_finalize_ms': self._per_batch_ms(train_timing, 'mask_finalize', batch_count),
+                    'mean_decode_logits_ms': self._per_batch_ms(train_timing, 'decode_logits', batch_count),
+                    'mean_decode_log_softmax_ms': self._per_batch_ms(train_timing, 'decode_log_softmax', batch_count),
+                    'mean_decode_select_node_ms': self._per_batch_ms(train_timing, 'decode_select_node', batch_count),
+                    'mean_decode_state_update_ms': self._per_batch_ms(train_timing, 'decode_state_update', batch_count),
+                    'mean_model_get_costs_ms': self._per_batch_ms(train_timing, 'model_get_costs', batch_count),
+                    'mean_model_log_likelihood_ms': self._per_batch_ms(train_timing, 'model_log_likelihood', batch_count),
+                    'mean_validate_model_forward_ms': val_timing.mean_ms('validate_model_forward') if val_timing is not None else 0.0,
+                    'mean_validate_get_costs_ms': val_timing.mean_ms('validate_get_costs') if val_timing is not None else 0.0,
+                    'batches_per_s': batch_count / max(epoch_bench.total('epoch_train'), 1e-9),
+                    'samples_per_s': samples_seen / max(epoch_bench.total('epoch_train'), 1e-9),
+                }
+                self.benchmark_epoch_summaries.append(epoch_payload)
+                self.benchmark.merge(epoch_bench)
+                self._emit_benchmark_summary(epoch_payload)
+
+        if not self.args.benchmark_disable_checkpoint:
+            final_checkpoint_start = time.perf_counter() if self.args.benchmark_mode else None
+            self._save_model(self.args.n_epochs, val_results, 'final', selection_rule='final_epoch')
+            if self.args.benchmark_mode:
+                self.benchmark.add('final_checkpoint', time.perf_counter() - final_checkpoint_start)
+        if not self.args.benchmark_disable_log_save:
+            final_log_start = time.perf_counter() if self.args.benchmark_mode else None
+            self._save_logs()
+            if self.args.benchmark_mode:
+                self.benchmark.add('final_log_save', time.perf_counter() - final_log_start)
+
+        self._emit_benchmark_final_summary()
 
         self.best_business_key = best_business_key
         self.best_business_rate = best_business_rate
@@ -667,9 +1140,14 @@ class POMOTrainerOptimized:
 
         print('\n' + '=' * 70)
         print('Training Complete!')
-        print(f"Best validation business-clean service rate: {best_business_rate:.3f}")
-        print(f"Best validation service-priority rate: {best_service_rate:.3f}")
-        print(f"Best validation objective: {best_val_objective:.2f}")
+        if self.args.benchmark_skip_validation:
+            print('Best validation business-clean service rate: skipped')
+            print('Best validation service-priority rate: skipped')
+            print('Best validation objective: skipped')
+        else:
+            print(f"Best validation business-clean service rate: {best_business_rate:.3f}")
+            print(f"Best validation service-priority rate: {best_service_rate:.3f}")
+            print(f"Best validation objective: {best_val_objective:.2f}")
         print('=' * 70)
         return {
             'best_business_rate': best_business_rate,
@@ -804,6 +1282,13 @@ def parse_args():
     parser.add_argument('--baseline-mode', choices=['auto', 'batch_mean', 'instance_mean'], default='auto',
                         help='训练 advantage 的 baseline 模式；auto 保持当前默认行为，batch_mean / instance_mean 用于解耦 POMO 对比')
     parser.add_argument('--collect-mask-diagnostics', action='store_true', help='在验证/评估中收集 mask 与动作可行性诊断指标')
+    parser.add_argument('--benchmark-mode', action='store_true', help='启用训练 wall-clock benchmark 分解输出')
+    parser.add_argument('--benchmark-skip-validation', action='store_true', help='benchmark 模式下跳过 validation')
+    parser.add_argument('--benchmark-disable-checkpoint', action='store_true', help='benchmark 模式下禁用 checkpoint 保存')
+    parser.add_argument('--benchmark-disable-log-save', action='store_true', help='benchmark 模式下禁用 training_log.json 写入')
+    parser.add_argument('--benchmark-warmup-epochs', type=int, default=1, help='benchmark 汇总时忽略前若干 warmup epoch')
+    parser.add_argument('--benchmark-batch-timing', action='store_true', help='benchmark 模式下输出 batch 子阶段计时')
+    parser.add_argument('--benchmark-json', action='store_true', help='benchmark 模式下额外输出 JSON 摘要')
     parser.add_argument('--deadlock-limit', type=int, default=2, help='连续回 depot 且无可服务节点时的终止阈值')
     parser.add_argument('--max-concurrent-open-orders', type=int, default=6, help='共享主线：允许的最大并发 open 单数量')
     parser.add_argument('--enable-delivery-viability', action='store_true', default=True, help='共享主线：启用 delivery viability')
@@ -999,6 +1484,13 @@ def build_phase_args(cli_args, graph_size):
         normalization_dir=cli_args.normalization_dir,
         num_vehicles=cli_args.num_vehicles,
         collect_mask_diagnostics=cli_args.collect_mask_diagnostics,
+        benchmark_mode=cli_args.benchmark_mode,
+        benchmark_skip_validation=cli_args.benchmark_skip_validation,
+        benchmark_disable_checkpoint=cli_args.benchmark_disable_checkpoint,
+        benchmark_disable_log_save=cli_args.benchmark_disable_log_save,
+        benchmark_warmup_epochs=cli_args.benchmark_warmup_epochs,
+        benchmark_batch_timing=cli_args.benchmark_batch_timing,
+        benchmark_json=cli_args.benchmark_json,
         deadlock_limit=cli_args.deadlock_limit,
         resume_path=cli_args.resume_path,
         resume_weights_only=cli_args.resume_weights_only,
@@ -1045,7 +1537,10 @@ def main():
     print('All requested training phases complete!')
     for graph_size in cli_args.graph_sizes:
         metrics = summary[graph_size]
-        print(f"N={graph_size}: best service rate = {metrics['best_service_rate']:.3f}, best objective = {metrics['best_objective']:.2f}")
+        if cli_args.benchmark_skip_validation:
+            print(f"N={graph_size}: benchmark-only run (validation skipped)")
+        else:
+            print(f"N={graph_size}: best service rate = {metrics['best_service_rate']:.3f}, best objective = {metrics['best_objective']:.2f}")
     print('=' * 70)
 
 

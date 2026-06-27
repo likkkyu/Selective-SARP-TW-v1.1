@@ -259,17 +259,21 @@ def pickup_commitment_next_delivery_equivalence_regression():
     direct_ride_time = (
         (pickup_coords - delivery_coords).norm(p=2, dim=-1) * state.AREA_SIZE / state.VEHICLE_SPEED
     )
+    open_before = state.get_open_started_mask()[0]
+    open_before_bits = state._open_mask_to_bits(open_before)
     candidate_indices = torch.nonzero((~mask[0, 0, 1:n_orders + 1]), as_tuple=False).squeeze(-1).tolist()
     assert candidate_indices, '测试状态下应存在可选 pickup 候选'
 
     for candidate_slot in candidate_indices:
         candidate_idx = int(candidate_slot)
-        open_after = state.get_open_started_mask()[0].clone()
+        open_after = open_before.clone()
         open_after[candidate_idx] = True
+        open_after_bits = open_before_bits | (1 << candidate_idx)
         passenger_pickup_times_after = passenger_pickup_times_before[0].clone()
         if bool(passenger_orders[0, candidate_idx].item()):
             passenger_pickup_times_after[candidate_idx] = pickup_finish[0, candidate_idx]
 
+        start_node_key = ('pickup', candidate_idx)
         helper_has_delivery = state._has_post_pickup_next_delivery(
             pickup_coords[0, candidate_idx],
             pickup_finish[0, candidate_idx],
@@ -281,7 +285,40 @@ def pickup_commitment_next_delivery_equivalence_regression():
             passenger_orders[0],
             passenger_pickup_times_after,
             direct_ride_time[0],
+            open_bits=open_after_bits,
+            start_node=start_node_key,
         )
+
+        helper_completion = state._has_feasible_open_completion(
+            pickup_coords[0, candidate_idx],
+            pickup_finish[0, candidate_idx],
+            trip_start_after_pickup[0],
+            open_after,
+            delivery_coords[0],
+            delivery_earliest[0],
+            delivery_to_depot_time[0],
+            passenger_orders[0],
+            passenger_pickup_times_after,
+            direct_ride_time[0],
+            open_bits=open_after_bits,
+            start_node=start_node_key,
+        )
+        helper_completion_reason = state._has_feasible_open_completion(
+            pickup_coords[0, candidate_idx],
+            pickup_finish[0, candidate_idx],
+            trip_start_after_pickup[0],
+            open_after,
+            delivery_coords[0],
+            delivery_earliest[0],
+            delivery_to_depot_time[0],
+            passenger_orders[0],
+            passenger_pickup_times_after,
+            direct_ride_time[0],
+            return_reason=True,
+            open_bits=open_after_bits,
+            start_node=start_node_key,
+        )
+        assert helper_completion == helper_completion_reason[0], 'return_reason 不应改变 completion 布尔结果'
 
         candidate_node = candidate_idx + 1
         next_state = state.update(torch.tensor([candidate_node]), current_mask=mask)
@@ -290,7 +327,8 @@ def pickup_commitment_next_delivery_equivalence_regression():
         full_mask_has_delivery = next_feasible_deliveries > 0
         print(
             f'candidate pickup={candidate_node} helper_has_delivery={helper_has_delivery} '
-            f'full_mask_has_delivery={full_mask_has_delivery}'
+            f'full_mask_has_delivery={full_mask_has_delivery} completion={helper_completion} '
+            f'reason={helper_completion_reason[1]}'
         )
         assert helper_has_delivery == full_mask_has_delivery, (
             f'pickup {candidate_node} 的 next-delivery helper 与 full next_mask 不一致'

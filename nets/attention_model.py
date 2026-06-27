@@ -2,6 +2,7 @@ import torch
 from torch import nn
 from torch.utils.checkpoint import checkpoint
 import math
+import time
 from typing import NamedTuple
 from utils.tensor_functions import compute_in_batches
 
@@ -14,6 +15,22 @@ from problem_mcvrptw_v2 import Config
 
 
 REJECT_ACTION_EMBED_SCALE = 0.1
+
+
+def _merge_benchmark_stats(base, extra):
+    if base is None:
+        return extra
+    if extra is None:
+        return base
+    merged = {
+        'seconds': dict(base.get('seconds', {})),
+        'calls': dict(base.get('calls', {})),
+    }
+    for name, value in extra.get('seconds', {}).items():
+        merged['seconds'][name] = merged['seconds'].get(name, 0.0) + float(value)
+    for name, value in extra.get('calls', {}).items():
+        merged['calls'][name] = merged['calls'].get(name, 0) + int(value)
+    return merged
 
 
 def set_decode_type(model, decode_type):
@@ -162,16 +179,33 @@ class AttentionModel(nn.Module):
         pd_pair_mask[:, delivery_nodes, pickup_nodes] = passenger_delivery | cargo_delivery
         return pd_pair_mask
 
-    def forward(self, input, return_pi=False, state_kwargs=None, return_debug=False):
+    def forward(self, input, return_pi=False, state_kwargs=None, return_debug=False, return_benchmark=False):
         """
         :param input: (batch_size, graph_size, node_dim) input node features or dictionary with multiple tensors
         :param return_pi: whether to return the output sequences, this is optional as it is not compatible with
         using DataParallel as the results may be of different lengths on different GPUs
         :return:
         """
+        benchmark = {'seconds': {}, 'calls': {}} if state_kwargs and state_kwargs.get('benchmark_timing') else None
+        state_init_kwargs = dict(state_kwargs or {})
+        benchmark_enabled = bool(state_init_kwargs.pop('benchmark_timing', False))
+
+        def _record(name, seconds):
+            nonlocal benchmark
+            if not benchmark_enabled:
+                return
+            if benchmark is None:
+                benchmark = {'seconds': {}, 'calls': {}}
+            benchmark['seconds'][name] = benchmark['seconds'].get(name, 0.0) + float(seconds)
+            benchmark['calls'][name] = benchmark['calls'].get(name, 0) + 1
+
+        init_embed_start = time.perf_counter() if benchmark_enabled else None
         init_embed = self._init_embed(input)
         pd_pair_mask = self._build_pd_pair_mask(input)
+        if benchmark_enabled:
+            _record('model_init_embed', time.perf_counter() - init_embed_start)
 
+        encoder_start = time.perf_counter() if benchmark_enabled else None
         if self.checkpoint_encoder and self.training:
             embeddings, _ = checkpoint(
                 lambda embed_input, pair_mask: self.embedder(embed_input, pd_pair_mask=pair_mask),
@@ -181,19 +215,50 @@ class AttentionModel(nn.Module):
             )
         else:
             embeddings, _ = self.embedder(init_embed, pd_pair_mask=pd_pair_mask)
+        if benchmark_enabled:
+            _record('model_encoder', time.perf_counter() - encoder_start)
 
-        _log_p, pi, debug = self._inner(input, embeddings, state_kwargs=state_kwargs, return_debug=return_debug)
+        inner_start = time.perf_counter() if benchmark_enabled else None
+        _log_p, pi, debug = self._inner(
+            input,
+            embeddings,
+            state_kwargs=state_init_kwargs,
+            return_debug=return_debug,
+            benchmark_timing=benchmark_enabled,
+        )
+        if benchmark_enabled:
+            _record('model_decode_inner', time.perf_counter() - inner_start)
+            if isinstance(debug, dict):
+                benchmark = _merge_benchmark_stats(benchmark, debug.pop('benchmark_timing', None))
 
+        costs_start = time.perf_counter() if benchmark_enabled else None
         cost, mask = self.problem.get_costs(input, pi)
-        ll = self._calc_log_likelihood(_log_p, pi, mask)
-        if return_pi and return_debug:
-            return cost, ll, pi, debug
-        if return_pi:
-            return cost, ll, pi
-        if return_debug:
-            return cost, ll, debug
+        if benchmark_enabled:
+            _record('model_get_costs', time.perf_counter() - costs_start)
 
-        return cost, ll
+        ll_start = time.perf_counter() if benchmark_enabled else None
+        ll = self._calc_log_likelihood(_log_p, pi, mask)
+        if benchmark_enabled:
+            _record('model_log_likelihood', time.perf_counter() - ll_start)
+
+        benchmark_payload = benchmark or {'seconds': {}, 'calls': {}}
+        if return_debug:
+            if debug is None:
+                debug = {}
+            if benchmark_enabled:
+                debug['benchmark_timing'] = benchmark_payload
+        if return_pi and return_debug:
+            result = (cost, ll, pi, debug)
+        elif return_pi:
+            result = (cost, ll, pi)
+        elif return_debug:
+            result = (cost, ll, debug)
+        else:
+            result = (cost, ll)
+
+        if return_benchmark:
+            return (*result, benchmark_payload)
+        return result
 
     def beam_search(self, *args, **kwargs):
         return self.problem.beam_search(*args, **kwargs, model=self)
@@ -283,12 +348,31 @@ class AttentionModel(nn.Module):
             )
         return self.init_embed(input)
 
-    def _inner(self, input, embeddings, state_kwargs=None, return_debug=False):
+    def _inner(self, input, embeddings, state_kwargs=None, return_debug=False, benchmark_timing=False):
         outputs = []
         sequences = []
 
+        benchmark = {'seconds': {}, 'calls': {}} if benchmark_timing else None
+        benchmark_enabled = bool(benchmark_timing)
+
+        def _record(name, seconds):
+            nonlocal benchmark
+            if not benchmark_enabled:
+                return
+            if benchmark is None:
+                benchmark = {'seconds': {}, 'calls': {}}
+            benchmark['seconds'][name] = benchmark['seconds'].get(name, 0.0) + float(seconds)
+            benchmark['calls'][name] = benchmark['calls'].get(name, 0) + 1
+
+        state_start = time.perf_counter() if benchmark_enabled else None
         state = self.problem.make_state(input, **(state_kwargs or {}))
+        if benchmark_enabled:
+            _record('decode_make_state', time.perf_counter() - state_start)
+
+        precompute_start = time.perf_counter() if benchmark_enabled else None
         fixed = self._precompute(embeddings)
+        if benchmark_enabled:
+            _record('decode_precompute_fixed', time.perf_counter() - precompute_start)
 
         batch_size = state.ids.size(0)
         node_count = embeddings.size(1)
@@ -376,13 +460,20 @@ class AttentionModel(nn.Module):
                     consecutive_depot = consecutive_depot[unfinished]
 
             active_ids = state.ids[:, 0]
+            get_log_p_start = time.perf_counter() if benchmark_enabled else None
             log_p, mask, step_debug = self._get_log_p(
                 fixed,
                 state,
                 consecutive_depot=consecutive_depot,
                 return_debug=return_debug,
+                benchmark_stats=benchmark if benchmark_enabled else None,
             )
+            if benchmark_enabled:
+                _record('decode_get_log_p_total', time.perf_counter() - get_log_p_start)
+            select_start = time.perf_counter() if benchmark_enabled else None
             selected = self._select_node(log_p.exp()[:, 0, :], mask[:, 0, :])
+            if benchmark_enabled:
+                _record('decode_select_node', time.perf_counter() - select_start)
             if return_debug:
                 active_debug_updates = {
                     'diag_selected_depot': (selected == 0).float(),
@@ -404,7 +495,10 @@ class AttentionModel(nn.Module):
                     debug_totals[key] += _restore_to_full_batch(value, active_ids, fill_value=0)
             consecutive_depot = torch.where(selected == 0, consecutive_depot + 1, torch.zeros_like(consecutive_depot))
 
+            update_start = time.perf_counter() if benchmark_enabled else None
             state = state.update(selected, current_mask=mask)
+            if benchmark_enabled:
+                _record('decode_state_update', time.perf_counter() - update_start)
 
             outputs.append(_restore_to_full_batch(log_p, active_ids, fill_value=0)[:, 0, :])
             sequences.append(_restore_to_full_batch(selected, active_ids, fill_value=0))
@@ -482,9 +576,11 @@ class AttentionModel(nn.Module):
                     normalized_debug[key] = value / denom
                 else:
                     normalized_debug[key] = value
+            if benchmark_enabled:
+                normalized_debug['benchmark_timing'] = benchmark or {'seconds': {}, 'calls': {}}
             return torch.stack(outputs, 1), torch.stack(sequences, 1), normalized_debug
 
-        return torch.stack(outputs, 1), torch.stack(sequences, 1), None
+        return torch.stack(outputs, 1), torch.stack(sequences, 1), {'benchmark_timing': benchmark or {'seconds': {}, 'calls': {}}} if benchmark_enabled else None
 
     def sample_many(self, input, batch_rep=1, iter_rep=1):
         return sample_many(
@@ -536,17 +632,29 @@ class AttentionModel(nn.Module):
             torch.arange(log_p.size(-1), device=log_p.device, dtype=torch.int64).repeat(log_p.size(0), 1)[:, None, :]
         )
 
-    def _get_log_p(self, fixed, state, normalize=True, consecutive_depot=None, return_debug=False):
+    def _get_log_p(self, fixed, state, normalize=True, consecutive_depot=None, return_debug=False, benchmark_stats=None):
+        step_context_start = time.perf_counter() if benchmark_stats is not None else None
         step_context = self._get_parallel_step_context(fixed.node_embeddings, state)
         query = fixed.context_node_projected + self.project_step_context(step_context)
+        if benchmark_stats is not None:
+            benchmark_stats['seconds']['decode_step_context'] = benchmark_stats['seconds'].get('decode_step_context', 0.0) + (time.perf_counter() - step_context_start)
+            benchmark_stats['calls']['decode_step_context'] = benchmark_stats['calls'].get('decode_step_context', 0) + 1
 
+        attention_data_start = time.perf_counter() if benchmark_stats is not None else None
         glimpse_K, glimpse_V, logit_K = self._get_attention_node_data(fixed, state)
+        if benchmark_stats is not None:
+            benchmark_stats['seconds']['decode_attention_node_data'] = benchmark_stats['seconds'].get('decode_attention_node_data', 0.0) + (time.perf_counter() - attention_data_start)
+            benchmark_stats['calls']['decode_attention_node_data'] = benchmark_stats['calls'].get('decode_attention_node_data', 0) + 1
 
         step_debug = None
+        mask_start = time.perf_counter() if benchmark_stats is not None else None
         if return_debug:
-            mask, step_debug = state.get_mask(return_debug=True)
+            mask, step_debug = state.get_mask(return_debug=True, benchmark_stats=benchmark_stats)
         else:
-            mask = state.get_mask()
+            mask = state.get_mask(benchmark_stats=benchmark_stats)
+        if benchmark_stats is not None:
+            benchmark_stats['seconds']['decode_get_mask'] = benchmark_stats['seconds'].get('decode_get_mask', 0.0) + (time.perf_counter() - mask_start)
+            benchmark_stats['calls']['decode_get_mask'] = benchmark_stats['calls'].get('decode_get_mask', 0) + 1
         if consecutive_depot is not None and self.max_consecutive_depot is not None:
             depot_limit_reached = (consecutive_depot >= self.max_consecutive_depot)
             if depot_limit_reached.any():
@@ -573,10 +681,18 @@ class AttentionModel(nn.Module):
             step_debug['diag_depot_only'] = ((~mask[:, 0, 0]) & service_mask.all(-1) & mask[:, 0, -1]).float()
             step_debug['diag_reject_available_rate'] = (~mask[:, 0, -1]).float()
 
+        logits_start = time.perf_counter() if benchmark_stats is not None else None
         log_p, glimpse = self._one_to_many_logits(query, step_context, glimpse_K, glimpse_V, logit_K, mask)
+        if benchmark_stats is not None:
+            benchmark_stats['seconds']['decode_logits'] = benchmark_stats['seconds'].get('decode_logits', 0.0) + (time.perf_counter() - logits_start)
+            benchmark_stats['calls']['decode_logits'] = benchmark_stats['calls'].get('decode_logits', 0) + 1
 
+        normalize_start = time.perf_counter() if benchmark_stats is not None and normalize else None
         if normalize:
             log_p = torch.log_softmax(log_p / self.temp, dim=-1)
+        if benchmark_stats is not None and normalize:
+            benchmark_stats['seconds']['decode_log_softmax'] = benchmark_stats['seconds'].get('decode_log_softmax', 0.0) + (time.perf_counter() - normalize_start)
+            benchmark_stats['calls']['decode_log_softmax'] = benchmark_stats['calls'].get('decode_log_softmax', 0) + 1
 
         assert not torch.isnan(log_p).any()
 
