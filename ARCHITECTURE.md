@@ -85,6 +85,7 @@ run_training_optimized.py
 
 5. `StateMCVRPPDTW.update()`
    - 普通节点：更新时间、容量、pickup/delivery 状态
+   - `passenger_pickup_time` 只在“被选中的 passenger pickup 订单槽位”写入，不再广播覆盖其他订单
    - reject 动作：选择 tw_late 最紧迫的可达未服务 pickup，永久屏蔽对应订单
 
 6. `MCVRPPDTW.get_costs()`
@@ -196,7 +197,27 @@ class Config:
 - **可工作版 POMO-style 多 rollout**
 - 但**并非强制不同首步**的完全经典 POMO
 
-### 6.2 validate 与 checkpoint 选择口径
+### 6.2 state 热点与当前回归护栏
+
+`state_mcvrptw_v2.py` 当前最重的运行时热点仍是 `StateMCVRPPDTW.get_mask()`，尤其是：
+
+- `pickup_commitment` 的 open-delivery completion proof
+- `delivery_viability` 的 legal next-delivery 搜索
+
+当前代码已经同步了以下关键实现真相：
+
+- `_evaluate_post_pickup_open_delivery()` 已改为 existence-only fast path：只回答“是否存在至少一个合法后续 delivery 路径”，不再为布尔问题构造完整订单列表
+- `get_mask()` 在 `relax_pickup_commitment_trip_time=False` 的默认语义下，`pickup_commitment` 直接以 completion proof 为主判定，不再重复进入 post-pickup next-delivery viability 搜索
+- `delivery_viability` 阶段继续单独做当前 open deliveries 的合法出口检查，因此业务语义不变，但 Python 侧重复递归与重复对象构造更少
+- `dry_run_test.py` 已新增并保留直接回归：
+  - `pickup_time_update_regression()`
+  - `pickup_commitment_next_delivery_equivalence_regression()`
+  - `shared_mask_regression()`
+  - `viability_fallback_regression()`
+
+这些回归现在是后续热点优化的硬护栏。
+
+### 6.3 validate 与 checkpoint 选择口径
 
 `validate()` 当前聚合：
 - energy / passenger delay / cargo delay

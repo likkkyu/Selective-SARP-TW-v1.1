@@ -176,14 +176,24 @@ Continue making the 25-order data distribution slightly easier by reducing late-
 
 This has the strongest direct evidence from the new order-profile run.
 
-### 2. Model/state-side action with the highest information value
+### 2. Model/state-side follow-up
 
-Run a stronger controlled experiment that relaxes only the **next-state first-delivery `trip_time` gate** after a hypothetical pickup.
+代码侧已经先完成了一轮**不放松任何硬约束语义**的热点优化：
 
-Why this is the best next experiment:
+- `_evaluate_post_pickup_open_delivery()` 保持 existence-only fast path
+- 默认配置 `relax_pickup_commitment_trip_time=False` 下，`pickup_commitment` 不再重复进入 post-pickup next-delivery viability 搜索
+- `delivery_viability` 阶段复用同批次已准备的 `scalar_cache`
+
+这轮优化的目标只是减少重复搜索与 Python 对象开销，**不改变**这里的结构性诊断结论。
+
+在此基础上，后续最有信息价值的实验仍然是：
+
+- 单独放松 **next-state first-delivery `trip_time` gate** 的受控实验
+
+Why this is still the best next experiment:
 - the completion-proof `trip_time` ablation already showed no service improvement,
 - the deeper bottleneck is now localized to `next_state_trip_time`,
-- this cleanly tests whether the current service ceiling is still driven by trip-time legality at the first post-pickup delivery step.
+- 当前代码优化已经先把“算得更快”和“约束是否该放松”这两个问题分开，后续实验可以更干净地检验 trip-time legality 是否仍是服务率上限的直接来源。
 
 ## Guardrails
 

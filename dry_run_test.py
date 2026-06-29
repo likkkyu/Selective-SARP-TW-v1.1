@@ -225,6 +225,39 @@ def viability_fallback_regression():
     assert feasible_deliveries >= 1, 'delivery viability 不应把所有出口都锁死'
 
 
+def pickup_time_update_regression():
+    print('\n' + '=' * 60)
+    print('passenger_pickup_time update 回归测试')
+    print('=' * 60)
+
+    input_data = _build_shared_ride_case()
+    base_state = StateMCVRPPDTW.initialize(
+        input_data,
+        max_concurrent_open_orders=6,
+        enable_delivery_viability=True,
+        enable_viability_fallback=True,
+    )
+
+    first_state = base_state.update(torch.tensor([1]))
+    first_times = first_state.passenger_pickup_time.squeeze(1)[0]
+    expected_first = torch.full_like(first_times, -1.0)
+    expected_first[0] = first_state.current_time.item()
+    print(f'after pickup1 times={first_times.tolist()}')
+    assert torch.allclose(first_times, expected_first), '第一次 passenger pickup 应只写入第一个订单时间'
+
+    second_state = first_state.update(torch.tensor([2]))
+    second_times = second_state.passenger_pickup_time.squeeze(1)[0]
+    expected_second = expected_first.clone()
+    expected_second[1] = second_state.current_time.item()
+    print(f'after pickup2 times={second_times.tolist()}')
+    assert torch.allclose(second_times, expected_second), '第二次 passenger pickup 不应覆盖第一个订单时间'
+
+    delivery_state = second_state.update(torch.tensor([4]))
+    delivery_times = delivery_state.passenger_pickup_time.squeeze(1)[0]
+    assert torch.allclose(delivery_times, expected_second), 'delivery 动作不应重写 passenger pickup time'
+
+
+
 def pickup_commitment_next_delivery_equivalence_regression():
     print('\n' + '=' * 60)
     print('pickup_commitment next-delivery 等价测试')
@@ -322,6 +355,10 @@ def pickup_commitment_next_delivery_equivalence_regression():
 
         candidate_node = candidate_idx + 1
         next_state = state.update(torch.tensor([candidate_node]), current_mask=mask)
+        next_state_times = next_state.passenger_pickup_time.squeeze(1)[0]
+        assert torch.allclose(next_state_times, passenger_pickup_times_after), (
+            f'pickup {candidate_node} 后 next_state.passenger_pickup_time 与手工构造不一致'
+        )
         next_mask = next_state.get_mask(skip_pickup_commitment=True)
         next_feasible_deliveries = int((~next_mask[0, 0, n_orders + 1:2 * n_orders + 1]).sum().item())
         full_mask_has_delivery = next_feasible_deliveries > 0
@@ -478,6 +515,7 @@ def dry_run():
     basic_dry_run()
     shared_mask_regression()
     viability_fallback_regression()
+    pickup_time_update_regression()
     pickup_commitment_next_delivery_equivalence_regression()
     attention_shrink_pomo_regression()
     pomo_baseline_mode_regression()

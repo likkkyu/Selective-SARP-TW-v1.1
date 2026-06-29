@@ -5,6 +5,62 @@
 
 ---
 
+## 2026-06-29：state 热点优化与语义同步
+
+### 1. `passenger_pickup_time` 写入 bug 修复
+
+`state_mcvrptw_v2.py` 中 `StateMCVRPPDTW.update()` 已修复 passenger pickup 时间写入路径：
+
+- 旧行为会在某些共享 open-order 场景下用 broadcast mask 污染多个订单槽位
+- 当前行为改为只在“当前被选中的 passenger pickup 对应订单槽位”写入 pickup time
+- delivery / cargo pickup / depot / reject 动作都不会重写已记录的 passenger pickup time
+
+### 2. 新增直接语义回归
+
+`dry_run_test.py` 已补充并固定以下护栏：
+
+- `pickup_time_update_regression()`
+- `pickup_commitment_next_delivery_equivalence_regression()`
+- `shared_mask_regression()`
+- `viability_fallback_regression()`
+
+其中：
+- 前者直接保护 pickup timestamp 的状态写入语义
+- 第二项保护 helper 级 feasibility 与真实 next-state mask 行为一致
+
+### 3. 保留并确认 existence-only fast path
+
+`state_mcvrptw_v2.py::_evaluate_post_pickup_open_delivery()` 继续使用 existence-only fast path：
+
+- 当前只回答“是否存在至少一个合法后续 delivery 路径”
+- 不再为纯布尔问题构造完整 `legal_orders / physical_orders` 列表
+
+### 4. 新一轮 `get_mask()` 热点优化
+
+本轮继续在不改变硬约束语义的前提下，减少 `pickup_commitment` 与 `delivery_viability` 路径中的 Python 重复推理：
+
+- 默认配置 `relax_pickup_commitment_trip_time=False` 下，`pickup_commitment` 直接以 completion proof 为主判定
+- 仅在显式放松 completion-proof `trip_time` 的诊断模式下，才继续进入 post-pickup next-delivery viability 检查
+- `delivery_viability` 阶段复用同一批次已经准备好的 `scalar_cache`
+- 这样减少了重复递归入口、重复 key 构造、重复 tensor→Python 标量展开
+
+### 5. 当前验证结论
+
+- `dry_run_test.py` 全部通过
+- 小型 service-rate smoke 仍保持 clean：
+  - `service_rate ≈ 0.904`
+  - `unfulfilled = 0`
+  - `pickup_only = 0`
+  - `started_not_completed = 0`
+  - `untouched_unrejected = 0`
+- CPU benchmark 继续改善：
+  - `mean_decode_get_mask_ms: 682.49 -> 592.11`
+  - `mean_mask_pickup_commitment_ms: 585.65 -> 511.92`
+  - `mean_mask_delivery_viability_ms: 65.86 -> 48.87`
+  - `samples_per_s: 4.35 -> 5.41`
+
+> 结论：本轮优化以“减少重复搜索/对象开销”为主，不引入新的业务语义变化；当前没有看到服务率损失迹象。
+
 ## 2026-06-25：checkpoint 业务验收口径更新
 
 ### 新增：formal eval JSON 摘要输出

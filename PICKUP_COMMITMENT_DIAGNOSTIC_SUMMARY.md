@@ -90,12 +90,21 @@ rather than enforcing a strict per-trip return proof before every new pickup.
 
 ## Recommended next action
 
-Run a controlled ablation that relaxes only the `pickup_commitment` trip-time completion gate while keeping the rest of the rollout and reward setup fixed.
+> Historical note: this recommendation has been partially superseded by the follow-up findings in `NEXT_STATE_AND_ORDER_PROFILE_SUMMARY.md`.
 
-Why this is the best next step:
-- the K ceiling hypothesis has already been empirically saturated (`K >= 4` plateau),
-- the new structural diagnostic shows `trip_time` is the largest explicit commitment blocker,
-- this isolates whether the current service ceiling is caused by an overly conservative forward legality proof versus genuinely hard instance structure.
+当时建议先做：
+
+- 只放松 `pickup_commitment` completion-proof `trip_time` gate 的受控 ablation
+
+后续 follow-up 已确认：
+
+- 只放松 upstream completion-proof `trip_time` 并不会提升 rollout service
+- blocking mass 会转移到 `next_state_trip_time`
+
+因此当前更合适的顺序是：
+
+1. 先在**不改变约束语义**的前提下优化 `get_mask()` / `pickup_commitment` / `delivery_viability` 的重复搜索开销
+2. 若仍要做语义实验，再单独测试 **next-state first-delivery `trip_time` gate** 是否是当前服务率上限的直接驱动因素
 
 ## Guardrails
 
