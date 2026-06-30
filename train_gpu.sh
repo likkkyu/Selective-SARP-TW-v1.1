@@ -49,16 +49,24 @@ if [ -n "$ALPHA_VEHICLE" ]; then EXTRA_ARGS="$EXTRA_ARGS --alpha-vehicle $ALPHA_
 if [ -n "$ALPHA_REJECT" ]; then EXTRA_ARGS="$EXTRA_ARGS --alpha-reject $ALPHA_REJECT"; fi
 if [ -n "$ALPHA_UNFULFILLED" ]; then EXTRA_ARGS="$EXTRA_ARGS --alpha-unfulfilled $ALPHA_UNFULFILLED"; fi
 if [ -n "$ALPHA_TRIP_OVERTIME" ]; then EXTRA_ARGS="$EXTRA_ARGS --alpha-trip-overtime $ALPHA_TRIP_OVERTIME"; fi
+if [ "$AMP" = "1" ]; then EXTRA_ARGS="$EXTRA_ARGS --amp"; fi
+if [ -n "$AMP_DTYPE" ]; then EXTRA_ARGS="$EXTRA_ARGS --amp-dtype $AMP_DTYPE"; fi
+if [ -n "$GRAD_ACCUM_STEPS" ]; then EXTRA_ARGS="$EXTRA_ARGS --grad-accum-steps $GRAD_ACCUM_STEPS"; fi
+if [ "$DIST_EVAL" = "1" ]; then EXTRA_ARGS="$EXTRA_ARGS --dist-eval"; fi
+if [ "$DDP_FIND_UNUSED" = "1" ]; then EXTRA_ARGS="$EXTRA_ARGS --ddp-find-unused-parameters"; fi
+
+LAUNCHER="python"
+if [ -n "$NPROC_PER_NODE" ] && [ "$NPROC_PER_NODE" != "1" ]; then
+  LAUNCHER="torchrun --standalone --nproc_per_node=$NPROC_PER_NODE"
+fi
 
 echo "Mainline shared env: --enable-delivery-viability --max-concurrent-open-orders ${MAX_OPEN:-6} --enable-viability-fallback=${ENABLE_FALLBACK:-0}"
 echo "Service-first best defaults: passenger_tw=1.0h passenger_tw_mix=(0.56,0.29,0.15) cargo_tw_mix=(0.58,0.28,0.14) alpha_delay=${ALPHA_DELAY:-2.5} alpha_reject=${ALPHA_REJECT:-575} alpha_unfulfilled=${ALPHA_UNFULFILLED:-750} reject_warmup=${REJECT_WARMUP_EPOCHS:-3} reject_init_bias=${REJECT_INIT_BIAS:--2.0}"
+echo "Training architecture: AMP=${AMP:-0} AMP_DTYPE=${AMP_DTYPE:-bf16} NPROC_PER_NODE=${NPROC_PER_NODE:-1} GRAD_ACCUM_STEPS=${GRAD_ACCUM_STEPS:-1} DIST_EVAL=${DIST_EVAL:-0}"
 
 echo "Extra args: $EXTRA_ARGS"
 
-python run_training_optimized.py \
-    --graph_sizes $SIZES \
-    --calibrate-before-train \
-    $EXTRA_ARGS
+eval "$LAUNCHER run_training_optimized.py --graph_sizes $SIZES --calibrate-before-train $EXTRA_ARGS"
 
 echo ""
 echo "训练完成。Checkpoint 在 outputs/pomo_n{N}_optimized/ 下。"

@@ -97,6 +97,10 @@ def _repeat_for_pomo(batch, pomo_size):
     }
 
 
+def _reshape_pomo_tensor(value, base_batch_size, pomo_size):
+    return value.reshape(base_batch_size, pomo_size, *value.shape[1:])
+
+
 def _build_test_attention_model(shrink_size):
     model = AttentionModel(
         embedding_dim=64,
@@ -395,23 +399,51 @@ def attention_shrink_pomo_regression():
 
     with torch.no_grad():
         cost_no_shrink, ll_no_shrink, pi_no_shrink, debug_no_shrink = model_no_shrink(
-            repeated_batch,
+            batch,
             return_pi=True,
             state_kwargs=state_kwargs,
             return_debug=True,
+            logical_pomo_size=pomo_size,
         )
         cost_shrink, ll_shrink, pi_shrink, debug_shrink = model_shrink(
+            batch,
+            return_pi=True,
+            state_kwargs=state_kwargs,
+            return_debug=True,
+            logical_pomo_size=pomo_size,
+        )
+        cost_ref, ll_ref, pi_ref, debug_ref = model_no_shrink(
             repeated_batch,
             return_pi=True,
             state_kwargs=state_kwargs,
             return_debug=True,
         )
 
+    cost_no_shrink_flat = cost_no_shrink
+    ll_no_shrink_flat = ll_no_shrink
+    pi_no_shrink_flat = pi_no_shrink
+    cost_shrink_flat = cost_shrink
+    ll_shrink_flat = ll_shrink
+    pi_shrink_flat = pi_shrink
+
+    cost_no_shrink = _reshape_pomo_tensor(cost_no_shrink_flat, base_batch_size, pomo_size)
+    ll_no_shrink = _reshape_pomo_tensor(ll_no_shrink_flat, base_batch_size, pomo_size)
+    pi_no_shrink = _reshape_pomo_tensor(pi_no_shrink_flat, base_batch_size, pomo_size)
+    cost_shrink = _reshape_pomo_tensor(cost_shrink_flat, base_batch_size, pomo_size)
+    ll_shrink = _reshape_pomo_tensor(ll_shrink_flat, base_batch_size, pomo_size)
+    pi_shrink = _reshape_pomo_tensor(pi_shrink_flat, base_batch_size, pomo_size)
+    cost_ref = _reshape_pomo_tensor(cost_ref, base_batch_size, pomo_size)
+    ll_ref = _reshape_pomo_tensor(ll_ref, base_batch_size, pomo_size)
+    pi_ref = _reshape_pomo_tensor(pi_ref, base_batch_size, pomo_size)
+
     print(f'no_shrink pi shape={tuple(pi_no_shrink.shape)}, shrink pi shape={tuple(pi_shrink.shape)}')
     assert pi_no_shrink.shape == pi_shrink.shape, 'shrink/no-shrink 的 pi shape 不一致'
     assert torch.equal(pi_no_shrink, pi_shrink), 'shrink/no-shrink greedy decode 序列不一致'
     assert torch.allclose(cost_no_shrink, cost_shrink), 'shrink/no-shrink cost 不一致'
     assert torch.allclose(ll_no_shrink, ll_shrink), 'shrink/no-shrink log likelihood 不一致'
+    assert torch.equal(pi_no_shrink, pi_ref), 'logical POMO 与物理 repeat POMO greedy decode 序列不一致'
+    assert torch.allclose(cost_no_shrink, cost_ref), 'logical POMO 与物理 repeat POMO cost 不一致'
+    assert torch.allclose(ll_no_shrink, ll_ref), 'logical POMO 与物理 repeat POMO log likelihood 不一致'
 
     debug_keys = [
         'diag_steps',
@@ -424,8 +456,9 @@ def attention_shrink_pomo_regression():
         'diag_delivery_viability_masked',
     ]
     for key in debug_keys:
-        assert key in debug_no_shrink and key in debug_shrink, f'缺少 shrink debug key: {key}'
-        assert debug_no_shrink[key].shape == debug_shrink[key].shape, f'shrink/no-shrink debug[{key}] shape 不一致'
+        assert key in debug_no_shrink and key in debug_shrink and key in debug_ref, f'缺少 shrink/logical POMO debug key: {key}'
+        assert debug_no_shrink[key].shape == debug_shrink[key].shape == debug_ref[key].shape, f'debug[{key}] shape 不一致'
+        assert torch.allclose(debug_no_shrink[key], debug_ref[key]), f'logical POMO debug[{key}] 与物理 repeat POMO 不一致'
         assert torch.isfinite(debug_no_shrink[key]).all(), f'no-shrink debug[{key}] 出现非有限值'
         assert torch.isfinite(debug_shrink[key]).all(), f'shrink debug[{key}] 出现非有限值'
 

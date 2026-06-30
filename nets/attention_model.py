@@ -8,6 +8,7 @@ from utils.tensor_functions import compute_in_batches
 
 from nets.graph_encoder import GraphAttentionEncoder
 from torch.nn import DataParallel
+from torch.nn.parallel import DistributedDataParallel
 from utils.beam_search import CachedLookup
 from utils.functions import sample_many
 
@@ -34,7 +35,7 @@ def _merge_benchmark_stats(base, extra):
 
 
 def set_decode_type(model, decode_type):
-    if isinstance(model, DataParallel):
+    if isinstance(model, (DataParallel, DistributedDataParallel)):
         model = model.module
     model.set_decode_type(decode_type)
 
@@ -179,16 +180,31 @@ class AttentionModel(nn.Module):
         pd_pair_mask[:, delivery_nodes, pickup_nodes] = passenger_delivery | cargo_delivery
         return pd_pair_mask
 
-    def forward(self, input, return_pi=False, state_kwargs=None, return_debug=False, return_benchmark=False):
+    @staticmethod
+    def _repeat_batch_for_pomo(input_data, pomo_size):
+        if pomo_size <= 1:
+            return input_data
+        return {
+            key: value.repeat_interleave(pomo_size, dim=0) if torch.is_tensor(value) else value
+            for key, value in input_data.items()
+        }
+
+    @staticmethod
+    def _build_logical_pomo_index(batch_size, pomo_size, device):
+        return torch.arange(batch_size, device=device, dtype=torch.long).repeat_interleave(pomo_size)
+
+    def forward(self, input, return_pi=False, state_kwargs=None, return_debug=False, return_benchmark=False, logical_pomo_size=1):
         """
         :param input: (batch_size, graph_size, node_dim) input node features or dictionary with multiple tensors
         :param return_pi: whether to return the output sequences, this is optional as it is not compatible with
         using DataParallel as the results may be of different lengths on different GPUs
+        :param logical_pomo_size: decode each base instance with multiple logical rollouts while encoding the input once
         :return:
         """
         benchmark = {'seconds': {}, 'calls': {}} if state_kwargs and state_kwargs.get('benchmark_timing') else None
         state_init_kwargs = dict(state_kwargs or {})
         benchmark_enabled = bool(state_init_kwargs.pop('benchmark_timing', False))
+        logical_pomo_size = max(int(logical_pomo_size or 1), 1)
 
         def _record(name, seconds):
             nonlocal benchmark
@@ -198,6 +214,15 @@ class AttentionModel(nn.Module):
                 benchmark = {'seconds': {}, 'calls': {}}
             benchmark['seconds'][name] = benchmark['seconds'].get(name, 0.0) + float(seconds)
             benchmark['calls'][name] = benchmark['calls'].get(name, 0) + 1
+
+        model_input = input
+        pomo_ids = None
+        if logical_pomo_size > 1:
+            batch_size = input['loc'].size(0)
+            if batch_size <= 0:
+                raise ValueError('logical_pomo_size requires a non-empty batch')
+            pomo_ids = self._build_logical_pomo_index(batch_size, logical_pomo_size, input['loc'].device)
+            model_input = self._repeat_batch_for_pomo(input, logical_pomo_size)
 
         init_embed_start = time.perf_counter() if benchmark_enabled else None
         init_embed = self._init_embed(input)
@@ -215,12 +240,14 @@ class AttentionModel(nn.Module):
             )
         else:
             embeddings, _ = self.embedder(init_embed, pd_pair_mask=pd_pair_mask)
+        if logical_pomo_size > 1:
+            embeddings = embeddings.index_select(0, pomo_ids)
         if benchmark_enabled:
             _record('model_encoder', time.perf_counter() - encoder_start)
 
         inner_start = time.perf_counter() if benchmark_enabled else None
         _log_p, pi, debug = self._inner(
-            input,
+            model_input,
             embeddings,
             state_kwargs=state_init_kwargs,
             return_debug=return_debug,
@@ -232,7 +259,8 @@ class AttentionModel(nn.Module):
                 benchmark = _merge_benchmark_stats(benchmark, debug.pop('benchmark_timing', None))
 
         costs_start = time.perf_counter() if benchmark_enabled else None
-        cost, mask = self.problem.get_costs(input, pi)
+        cost_input = input if logical_pomo_size <= 1 else self._repeat_batch_for_pomo(input, logical_pomo_size)
+        cost, mask = self.problem.get_costs(cost_input, pi)
         if benchmark_enabled:
             _record('model_get_costs', time.perf_counter() - costs_start)
 

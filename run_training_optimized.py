@@ -14,11 +14,15 @@ import math
 import os
 import random
 import time
+from contextlib import nullcontext
 
 import numpy as np
 import torch
+import torch.distributed as dist
 import torch.optim as optim
+from torch.nn.parallel import DistributedDataParallel
 from torch.utils.data import DataLoader
+from torch.utils.data.distributed import DistributedSampler
 
 try:
     from tqdm import tqdm
@@ -124,19 +128,81 @@ class BenchmarkAccumulator:
         }
 
 
+def _normalize_state_dict_keys(state_dict):
+    if not isinstance(state_dict, dict):
+        return state_dict
+    normalized = {}
+    for key, value in state_dict.items():
+        if isinstance(key, str) and key.startswith('module.'):
+            normalized[key[len('module.'):]] = value
+        else:
+            normalized[key] = value
+    return normalized
+
+
+def _str_to_bool(value):
+    if isinstance(value, bool):
+        return value
+    value = str(value).strip().lower()
+    if value in {'1', 'true', 'yes', 'y', 'on'}:
+        return True
+    if value in {'0', 'false', 'no', 'n', 'off'}:
+        return False
+    raise ValueError(f'Cannot parse boolean value: {value}')
+
+
+def _infer_distributed_from_env():
+    world_size = int(os.environ.get('WORLD_SIZE', '1'))
+    return world_size > 1
+
+
+def _resolve_amp_dtype(name):
+    amp_name = str(name).strip().lower()
+    if amp_name == 'fp16':
+        return torch.float16
+    if amp_name == 'bf16':
+        return torch.bfloat16
+    raise ValueError(f'Unsupported amp dtype: {name}')
+
+
+def _build_grad_scaler(enabled):
+    if hasattr(torch, 'amp') and hasattr(torch.amp, 'GradScaler'):
+        try:
+            return torch.amp.GradScaler('cuda', enabled=enabled)
+        except TypeError:
+            return torch.amp.GradScaler(enabled=enabled)
+    return torch.cuda.amp.GradScaler(enabled=enabled)
+
+
 class POMOTrainerOptimized:
     """POMO Trainer with graph-size-aware normalization calibration."""
 
     def __init__(self, args):
         self.args = args
-        set_global_seed(self.args.seed)
-        self.device = torch.device('cuda' if torch.cuda.is_available() and not args.no_cuda else 'cpu')
+        self.distributed = bool(getattr(self.args, 'distributed', False))
+        self.rank = int(getattr(self.args, 'rank', 0))
+        self.world_size = int(getattr(self.args, 'world_size', 1))
+        self.local_rank = int(getattr(self.args, 'local_rank', 0))
+        self.is_main_process = (not self.distributed) or self.rank == 0
+        set_global_seed(self.args.seed + self.rank)
+        self.device = torch.device('cuda', self.local_rank) if self.args.use_cuda else torch.device('cpu')
+        if self.device.type == 'cuda':
+            torch.cuda.set_device(self.device)
         self.problem = MCVRPPDTW
         self.normalization_profile = self._prepare_normalization_profile()
-        self.model = self._create_model().to(self.device)
+        base_model = self._create_model().to(self.device)
+        self.model = base_model
+        if self.distributed:
+            self.model = DistributedDataParallel(
+                base_model,
+                device_ids=[self.local_rank] if self.device.type == 'cuda' else None,
+                output_device=self.local_rank if self.device.type == 'cuda' else None,
+                find_unused_parameters=self.args.ddp_find_unused_parameters,
+            )
+        self.raw_model = self.model.module if isinstance(self.model, DistributedDataParallel) else self.model
 
         self.optimizer = optim.AdamW(
-            self.model.parameters(),
+            self.raw_model.parameters(),
             lr=args.lr,
             weight_decay=args.weight_decay,
         )
@@ -156,6 +222,10 @@ class POMOTrainerOptimized:
         self.best_service_rate = float('-inf')
         self.benchmark = BenchmarkAccumulator() if self.args.benchmark_mode else None
         self.benchmark_epoch_summaries = []
+        self.amp_enabled = bool(getattr(self.args, 'amp', False)) and self.device.type == 'cuda'
+        self.amp_dtype = _resolve_amp_dtype(self.args.amp_dtype) if self.amp_enabled else None
+        self.grad_accum_steps = max(1, int(getattr(self.args, 'grad_accum_steps', 1)))
+        self.scaler = _build_grad_scaler(enabled=self.amp_enabled and self.amp_dtype == torch.float16)
 
         if args.resume_path:
             self._load_checkpoint(args.resume_path)
@@ -170,41 +240,51 @@ class POMOTrainerOptimized:
             self.loader_kwargs['persistent_workers'] = not self.args.disable_persistent_workers
             self.loader_kwargs['prefetch_factor'] = max(1, self.args.prefetch_factor)
 
-        print(f"Device: {self.device}")
-        print(f"Graph size: {self.args.graph_size} orders")
-        print(f"Normalization profile: {json.dumps(self.normalization_profile, ensure_ascii=False)}")
-        print(f"Shared env defaults: max_open={self.args.max_concurrent_open_orders}, "
-              f"delivery_viability={self.args.enable_delivery_viability}, "
-              f"viability_fallback={self.args.enable_viability_fallback}")
-        print(f"Reward profile: energy={self.args.alpha_energy}, delay={self.args.alpha_delay}, "
-              f"vehicle={self.args.alpha_vehicle}, reject={self.args.alpha_reject}, "
-              f"unfulfilled={self.args.alpha_unfulfilled}, overtime={self.args.alpha_trip_overtime}")
-        print(f"Passenger pickup TW width: {Config.PASSENGER_TW_WIDTH:.1f} h")
-        print(f"Global seed: {self.args.seed}")
-        print(f"Model params: {sum(p.numel() for p in self.model.parameters()):,}")
-        if self.args.benchmark_mode:
-            print(f"Benchmark mode: warmup_epochs={self.args.benchmark_warmup_epochs}, "
-                  f"skip_validation={self.args.benchmark_skip_validation}, "
-                  f"disable_checkpoint={self.args.benchmark_disable_checkpoint}, "
-                  f"disable_log_save={self.args.benchmark_disable_log_save}, "
-                  f"batch_timing={self.args.benchmark_batch_timing}")
+        if self.is_main_process:
+            print(f"Device: {self.device}")
+            print(f"Graph size: {self.args.graph_size} orders")
+            print(f"Normalization profile: {json.dumps(self.normalization_profile, ensure_ascii=False)}")
+            print(f"Shared env defaults: max_open={self.args.max_concurrent_open_orders}, "
+                  f"delivery_viability={self.args.enable_delivery_viability}, "
+                  f"viability_fallback={self.args.enable_viability_fallback}")
+            print(f"Reward profile: energy={self.args.alpha_energy}, delay={self.args.alpha_delay}, "
+                  f"vehicle={self.args.alpha_vehicle}, reject={self.args.alpha_reject}, "
+                  f"unfulfilled={self.args.alpha_unfulfilled}, overtime={self.args.alpha_trip_overtime}")
+            print(f"Passenger pickup TW width: {Config.PASSENGER_TW_WIDTH:.1f} h")
+            print(f"Global seed: {self.args.seed}")
+            print(f"Model params: {sum(p.numel() for p in self.raw_model.parameters()):,}")
+            print(f"Distributed: {self.distributed} (rank={self.rank}, world_size={self.world_size})")
+            print(f"AMP: {self.amp_enabled} ({self.args.amp_dtype if self.amp_enabled else 'fp32'})")
+            print(f"Grad accumulation steps: {self.grad_accum_steps}")
+            if self.args.benchmark_mode:
+                print(f"Benchmark mode: warmup_epochs={self.args.benchmark_warmup_epochs}, "
+                      f"skip_validation={self.args.benchmark_skip_validation}, "
+                      f"disable_checkpoint={self.args.benchmark_disable_checkpoint}, "
+                      f"disable_log_save={self.args.benchmark_disable_log_save}, "
+                      f"batch_timing={self.args.benchmark_batch_timing}")
 
     def _prepare_normalization_profile(self):
         if self.args.calibrate_before_train:
-            print(
-                f"[Normalization] 开始校准 graph_size={self.args.graph_size}, "
-                f"samples={self.args.normalization_samples}, seed={self.args.normalization_seed}"
-            )
-            return calibrate_normalization(
-                graph_size=self.args.graph_size,
-                num_samples=self.args.normalization_samples,
-                seed=self.args.normalization_seed,
-                num_vehicles=self.args.num_vehicles,
-                output_path=Config.get_normalization_output_path(
-                    self.args.graph_size,
-                    base_dir=self.args.normalization_dir,
-                ),
-            )
+            if self.is_main_process:
+                print(
+                    f"[Normalization] 开始校准 graph_size={self.args.graph_size}, "
+                    f"samples={self.args.normalization_samples}, seed={self.args.normalization_seed}"
+                )
+                profile = calibrate_normalization(
+                    graph_size=self.args.graph_size,
+                    num_samples=self.args.normalization_samples,
+                    seed=self.args.normalization_seed,
+                    num_vehicles=self.args.num_vehicles,
+                    output_path=Config.get_normalization_output_path(
+                        self.args.graph_size,
+                        base_dir=self.args.normalization_dir,
+                    ),
+                )
+                if self.distributed:
+                    dist.barrier()
+                return profile
+            if self.distributed:
+                dist.barrier()
 
         profile = Config.load_normalization_profile(
             self.args.graph_size,
@@ -265,6 +345,31 @@ class POMOTrainerOptimized:
     def _sync_if_needed(self):
         if self.args.benchmark_mode and self.device.type == 'cuda':
             torch.cuda.synchronize(self.device)
+
+    def _amp_context(self):
+        if not self.amp_enabled:
+            return nullcontext()
+        return torch.autocast(device_type='cuda', dtype=self.amp_dtype)
+
+    def _distributed_average(self, value):
+        if not self.distributed:
+            return value
+        if isinstance(value, torch.Tensor):
+            tensor = value.detach().clone().to(self.device)
+        else:
+            tensor = torch.tensor(float(value), device=self.device)
+        dist.all_reduce(tensor, op=dist.ReduceOp.SUM)
+        tensor /= float(self.world_size)
+        if isinstance(value, torch.Tensor):
+            return tensor
+        return float(tensor.item())
+
+    def _should_run_validation(self):
+        if self.args.benchmark_skip_validation:
+            return False
+        if not self.distributed:
+            return True
+        return bool(self.args.dist_eval) or self.is_main_process
 
     def _emit_benchmark_summary(self, payload):
         if not self.args.benchmark_mode:
@@ -533,16 +638,20 @@ class POMOTrainerOptimized:
             return cost.unsqueeze(1), log_likelihood.unsqueeze(1)
 
         batch_size = batch['loc'].size(0)
-        repeated_batch = self._repeat_for_pomo(batch, self.args.pomo_size)
         if return_benchmark:
             cost, log_likelihood, benchmark_payload = self.model(
-                repeated_batch,
+                batch,
                 state_kwargs=state_kwargs,
                 return_benchmark=True,
+                logical_pomo_size=self.args.pomo_size,
             )
             self._add_benchmark_payload(timing, benchmark_payload)
         else:
-            cost, log_likelihood = self.model(repeated_batch, state_kwargs=state_kwargs)
+            cost, log_likelihood = self.model(
+                batch,
+                state_kwargs=state_kwargs,
+                logical_pomo_size=self.args.pomo_size,
+            )
         return cost.reshape(batch_size, self.args.pomo_size), log_likelihood.reshape(batch_size, self.args.pomo_size)
 
     @staticmethod
@@ -631,8 +740,9 @@ class POMOTrainerOptimized:
         timing = BenchmarkAccumulator() if self.args.benchmark_mode else None
 
         current_lr = self.optimizer.param_groups[0]['lr']
-        progress = tqdm(train_loader, desc=f"Epoch {epoch} (lr={current_lr:.2e})")
+        progress = tqdm(train_loader, desc=f"Epoch {epoch} (lr={current_lr:.2e})", disable=not self.is_main_process)
         epoch_train_start = time.perf_counter() if self.args.benchmark_mode else None
+        self.optimizer.zero_grad(set_to_none=True)
         for batch_idx, batch in enumerate(progress, start=1):
             batch_start = time.perf_counter() if self.args.benchmark_mode else None
 
@@ -642,45 +752,54 @@ class POMOTrainerOptimized:
                 timing.add('batch_to_device', time.perf_counter() - to_device_start)
 
             forward_start = time.perf_counter() if self.args.benchmark_batch_timing else None
-            costs, log_probs = self._pomo_forward(
-                batch,
-                state_kwargs=state_kwargs,
-                timing=timing if self.args.benchmark_batch_timing else None,
-            )
+            with self._amp_context():
+                costs, log_probs = self._pomo_forward(
+                    batch,
+                    state_kwargs=state_kwargs,
+                    timing=timing if self.args.benchmark_batch_timing else None,
+                )
+                loss, mean_objective = self._pomo_loss(
+                    costs,
+                    log_probs,
+                    baseline_mode=self.args.baseline_mode,
+                )
+                scaled_loss = loss / self.grad_accum_steps
             if self.args.benchmark_batch_timing:
                 self._sync_if_needed()
                 timing.add('batch_forward', time.perf_counter() - forward_start)
 
             loss_start = time.perf_counter() if self.args.benchmark_batch_timing else None
-            loss, mean_objective = self._pomo_loss(
-                costs,
-                log_probs,
-                baseline_mode=self.args.baseline_mode,
-            )
             if self.args.benchmark_batch_timing:
                 timing.add('batch_loss', time.perf_counter() - loss_start)
 
-            zero_grad_start = time.perf_counter() if self.args.benchmark_batch_timing else None
-            self.optimizer.zero_grad()
-            if self.args.benchmark_batch_timing:
-                timing.add('batch_zero_grad', time.perf_counter() - zero_grad_start)
-
             backward_start = time.perf_counter() if self.args.benchmark_batch_timing else None
-            loss.backward()
+            if self.scaler.is_enabled():
+                self.scaler.scale(scaled_loss).backward()
+            else:
+                scaled_loss.backward()
             if self.args.benchmark_batch_timing:
                 self._sync_if_needed()
                 timing.add('batch_backward', time.perf_counter() - backward_start)
 
-            clip_start = time.perf_counter() if self.args.benchmark_batch_timing else None
-            torch.nn.utils.clip_grad_norm_(self.model.parameters(), self.args.max_grad_norm)
-            if self.args.benchmark_batch_timing:
-                timing.add('batch_grad_clip', time.perf_counter() - clip_start)
+            should_step = (batch_idx % self.grad_accum_steps == 0) or (batch_idx == len(train_loader))
+            if should_step:
+                clip_start = time.perf_counter() if self.args.benchmark_batch_timing else None
+                if self.scaler.is_enabled():
+                    self.scaler.unscale_(self.optimizer)
+                torch.nn.utils.clip_grad_norm_(self.raw_model.parameters(), self.args.max_grad_norm)
+                if self.args.benchmark_batch_timing:
+                    timing.add('batch_grad_clip', time.perf_counter() - clip_start)
 
-            step_start = time.perf_counter() if self.args.benchmark_batch_timing else None
-            self.optimizer.step()
-            if self.args.benchmark_batch_timing:
-                self._sync_if_needed()
-                timing.add('batch_optimizer_step', time.perf_counter() - step_start)
+                step_start = time.perf_counter() if self.args.benchmark_batch_timing else None
+                if self.scaler.is_enabled():
+                    self.scaler.step(self.optimizer)
+                    self.scaler.update()
+                else:
+                    self.optimizer.step()
+                self.optimizer.zero_grad(set_to_none=True)
+                if self.args.benchmark_batch_timing:
+                    self._sync_if_needed()
+                    timing.add('batch_optimizer_step', time.perf_counter() - step_start)
             if self.args.benchmark_mode:
                 timing.add('batch_total', time.perf_counter() - batch_start)
 
@@ -688,13 +807,17 @@ class POMOTrainerOptimized:
             epoch_objective += mean_objective.item()
             n_batches += 1
 
-            if (batch_idx % self.log_interval == 0) or (batch_idx == len(train_loader)):
+            if self.is_main_process and ((batch_idx % self.log_interval == 0) or (batch_idx == len(train_loader))):
                 progress.set_postfix({'loss': f'{loss.item():.4f}', 'objective': f'{mean_objective.item():.2f}'})
 
         self.lr_scheduler.step()
+        avg_loss = epoch_loss / max(n_batches, 1)
+        avg_objective = epoch_objective / max(n_batches, 1)
+        avg_loss = self._distributed_average(avg_loss)
+        avg_objective = self._distributed_average(avg_objective)
         if self.args.benchmark_mode:
             timing.add('epoch_train', time.perf_counter() - epoch_train_start)
-        return epoch_loss / max(n_batches, 1), epoch_objective / max(n_batches, 1), timing
+        return avg_loss, avg_objective, timing
 
     def validate(self, val_loader):
         self.model.eval()
@@ -731,35 +854,36 @@ class POMOTrainerOptimized:
             benchmark_timing=self.args.benchmark_batch_timing,
         )
         with torch.no_grad():
-            for batch in tqdm(val_loader, desc='Validating'):
+            for batch in tqdm(val_loader, desc='Validating', disable=not self.is_main_process):
                 batch = self._to_device(batch)
                 model_start = time.perf_counter() if self.args.benchmark_mode else None
-                if self.args.collect_mask_diagnostics:
-                    objective_cost, _, pi, debug = self.model(
-                        batch,
-                        return_pi=True,
-                        state_kwargs=val_state_kwargs,
-                        return_debug=True,
-                    )
-                    benchmark_payload = debug.pop('benchmark_timing', None)
-                    self._add_benchmark_payload(timing, benchmark_payload)
-                    for key, value in debug.items():
-                        debug_buffers.setdefault(key, []).append(value)
-                else:
-                    if self.args.benchmark_batch_timing:
-                        objective_cost, _, pi, benchmark_payload = self.model(
+                with self._amp_context():
+                    if self.args.collect_mask_diagnostics:
+                        objective_cost, _, pi, debug = self.model(
                             batch,
                             return_pi=True,
                             state_kwargs=val_state_kwargs,
-                            return_benchmark=True,
+                            return_debug=True,
                         )
+                        benchmark_payload = debug.pop('benchmark_timing', None)
                         self._add_benchmark_payload(timing, benchmark_payload)
+                        for key, value in debug.items():
+                            debug_buffers.setdefault(key, []).append(value)
                     else:
-                        objective_cost, _, pi = self.model(
-                            batch,
-                            return_pi=True,
-                            state_kwargs=val_state_kwargs
-                        )
+                        if self.args.benchmark_batch_timing:
+                            objective_cost, _, pi, benchmark_payload = self.model(
+                                batch,
+                                return_pi=True,
+                                state_kwargs=val_state_kwargs,
+                                return_benchmark=True,
+                            )
+                            self._add_benchmark_payload(timing, benchmark_payload)
+                        else:
+                            objective_cost, _, pi = self.model(
+                                batch,
+                                return_pi=True,
+                                state_kwargs=val_state_kwargs
+                            )
                 if self.args.benchmark_mode:
                     self._sync_if_needed()
                     timing.add('validate_model_forward', time.perf_counter() - model_start)
@@ -814,39 +938,51 @@ class POMOTrainerOptimized:
         if debug_buffers is not None:
             for key, value in debug_buffers.items():
                 results[key] = value.mean().item()
+        if self.distributed and self.args.dist_eval:
+            reduce_keys = [key for key, value in results.items() if isinstance(value, (int, float, bool))]
+            for key in reduce_keys:
+                results[key] = self._distributed_average(float(results[key]))
+            results = self._augment_service_metrics(results)
         if self.args.benchmark_mode:
             timing.add('epoch_validate', time.perf_counter() - validate_start)
         return results, timing
 
     def train(self):
-        print('\n' + '=' * 70)
-        print('Starting Optimized POMO Training')
-        print('=' * 70)
-        print(f"Graph size: {self.args.graph_size} orders ({self.args.graph_size * 2} nodes)")
-        print(f"Batch size: {self.args.batch_size}")
-        print(f"POMO size: {self.args.pomo_size}")
-        print(f"Epochs: {self.args.n_epochs}")
-        print(f"Seed: {self.args.seed}")
-        print(f"Reject warmup epochs: {self.args.reject_warmup_epochs}")
-        print(f"Reject init bias: {self.args.reject_init_bias}")
-        print(f"Baseline mode: {self.args.baseline_mode}")
-        print(f"Shared env: {self._build_state_kwargs(allow_reject=True)}")
-        print(f"Curriculum enabled: {self.args.enable_rideshare_curriculum}")
-        print('=' * 70)
+        if self.is_main_process:
+            print('\n' + '=' * 70)
+            print('Starting Optimized POMO Training')
+            print('=' * 70)
+            print(f"Graph size: {self.args.graph_size} orders ({self.args.graph_size * 2} nodes)")
+            print(f"Batch size: {self.args.batch_size}")
+            print(f"POMO size: {self.args.pomo_size}")
+            print(f"Epochs: {self.args.n_epochs}")
+            print(f"Seed: {self.args.seed}")
+            print(f"Reject warmup epochs: {self.args.reject_warmup_epochs}")
+            print(f"Reject init bias: {self.args.reject_init_bias}")
+            print(f"Baseline mode: {self.args.baseline_mode}")
+            print(f"Shared env: {self._build_state_kwargs(allow_reject=True)}")
+            print(f"Curriculum enabled: {self.args.enable_rideshare_curriculum}")
+            print('=' * 70)
 
         os.makedirs(self.args.save_dir, exist_ok=True)
         val_seed = self._validation_dataset_seed()
-        print(f"Validation dataset seed: {val_seed}")
+        if self.is_main_process:
+            print(f"Validation dataset seed: {val_seed}")
         val_dataset = MCVRPPDTWDataset(
             num_samples=self.args.val_size,
             graph_size=self.args.graph_size,
             seed=val_seed,
             **self._build_default_dataset_kwargs(),
         )
+        val_sampler = None
+        if self.distributed and self.args.dist_eval:
+            val_sampler = DistributedSampler(val_dataset, num_replicas=self.world_size, rank=self.rank, shuffle=False)
         val_loader = DataLoader(
             val_dataset,
             batch_size=self.args.batch_size,
             collate_fn=collate_fn,
+            sampler=val_sampler,
+            shuffle=False,
             **self.loader_kwargs,
         )
 
@@ -860,7 +996,8 @@ class POMOTrainerOptimized:
             epoch_total_start = time.perf_counter() if self.args.benchmark_mode else None
             curriculum_kwargs = self._build_curriculum_dataset_kwargs(epoch)
             train_seed = self._training_dataset_seed(epoch)
-            print(f"Epoch {epoch} training dataset seed: {train_seed}")
+            if self.is_main_process:
+                print(f"Epoch {epoch} training dataset seed: {train_seed}")
             dataset_build_start = time.perf_counter() if self.args.benchmark_mode else None
             train_dataset = MCVRPPDTWDataset(
                 num_samples=self.args.epoch_size,
@@ -871,10 +1008,15 @@ class POMOTrainerOptimized:
             if self.args.benchmark_mode:
                 epoch_bench.add('epoch_dataset_build_train', time.perf_counter() - dataset_build_start)
             dataloader_build_start = time.perf_counter() if self.args.benchmark_mode else None
+            train_sampler = None
+            if self.distributed:
+                train_sampler = DistributedSampler(train_dataset, num_replicas=self.world_size, rank=self.rank, shuffle=True)
+                train_sampler.set_epoch(epoch)
             train_loader = DataLoader(
                 train_dataset,
                 batch_size=self.args.batch_size,
-                shuffle=True,
+                shuffle=train_sampler is None,
+                sampler=train_sampler,
                 collate_fn=collate_fn,
                 **self.loader_kwargs,
             )
@@ -884,7 +1026,7 @@ class POMOTrainerOptimized:
             train_loss, train_objective, train_timing = self.train_epoch(epoch, train_loader)
             if self.args.benchmark_mode:
                 epoch_bench.merge(train_timing)
-            if self.args.benchmark_skip_validation:
+            if self.args.benchmark_skip_validation or (not self._should_run_validation()):
                 val_results = {
                     'avg_objective': float('nan'),
                     'std_objective': float('nan'),
@@ -928,64 +1070,65 @@ class POMOTrainerOptimized:
                 if self.args.benchmark_mode:
                     epoch_bench.merge(val_timing)
 
-            self.train_log.append({'epoch': epoch, 'loss': train_loss, 'objective': train_objective})
-            self.val_log.append({'epoch': epoch, **val_results})
+            if self.is_main_process:
+                self.train_log.append({'epoch': epoch, 'loss': train_loss, 'objective': train_objective})
+                self.val_log.append({'epoch': epoch, **val_results})
 
-            print(f"\nEpoch {epoch}/{self.args.n_epochs}:")
-            print(f"  Train Loss: {train_loss:.4f}")
-            print(f"  Train Objective: {train_objective:.2f}")
-            print(f"  Data Profile: {self._describe_curriculum(epoch)}")
-            if self.args.benchmark_skip_validation:
-                print("  Validation: skipped (benchmark mode)")
-            else:
-                print(f"  Val Objective: {val_results['avg_objective']:.2f} +/- {val_results['std_objective']:.2f}")
-                print(f"  Val Cost (CNY): {val_results['avg_cost']:.2f} +/- {val_results['std_cost']:.2f}")
-                print(f"  Energy: {val_results['avg_energy_cost']:.2f} RMB")
-                print(f"  Passenger Delivery Delay: {val_results['avg_passenger_delivery_delay_cost']:.2f} RMB")
-                print(f"  Cargo Delay: {val_results['avg_cargo_delay_cost']:.2f} RMB")
-                print(f"  Passenger Pickup Hard Violations: {val_results['avg_passenger_pickup_hard_violations']:.2f}")
-                print(f"  Passenger Total Ride-Time Violations: {val_results['avg_passenger_total_ride_time_violations']:.2f}")
-                print(f"  Passenger Excess Ride-Time Violations: {val_results['avg_passenger_excess_ride_time_violations']:.2f}")
-                print(f"  Trip Overtime: {val_results['avg_trip_overtime_penalty']:.2f} RMB")
-                print(f"  Reject Penalty: {val_results['avg_reject_penalty']:.2f} RMB")
-                print(f"  Unfulfilled Penalty: {val_results['avg_unfulfilled_penalty']:.2f} RMB")
-                print(f"  Avg Completed Orders: {val_results['avg_completed_orders']:.2f}")
-                print(f"  Avg Rejected Orders: {val_results['avg_rejected_orders']:.2f}")
-                print(f"  Avg Unfulfilled Orders: {val_results['avg_unfulfilled_orders']:.2f}")
-                print(f"  Avg Untouched Orders: {val_results['avg_untouched_orders']:.2f}")
-                print(f"  Avg Untouched-Unrejected Orders: {val_results['avg_untouched_unrejected_orders']:.2f}")
-                print(f"  Service Rate: {val_results['service_rate']:.3f}")
-                print(f"  Rejected Rate: {val_results['rejected_rate']:.3f}")
-                print(f"  Unfulfilled Rate: {val_results['unfulfilled_rate']:.3f}")
-                print(f"  Served+Rejected Rate: {val_results['served_plus_rejected_rate']:.3f}")
-                print(f"  Untouched-Unrejected Rate: {val_results['untouched_unrejected_rate']:.3f}")
-                print(f"  Avg Pickup-only Orders: {val_results['avg_pickup_only_orders']:.2f}")
-                print(f"  Avg Started-not-completed Orders: {val_results['avg_started_not_completed_orders']:.2f}")
-                print(f"  Vehicle Cost: {val_results['avg_vehicle_cost']:.2f} RMB")
-                print(f"  Distance: {val_results['avg_distance']:.2f} km")
-                if self.args.collect_mask_diagnostics:
-                    print("  [Mask Diagnostics]")
-                    print(f"    Feasible pickups/step     : {val_results.get('diag_feasible_pickups', 0.0):.2f}")
-                    print(f"    Feasible deliveries/step  : {val_results.get('diag_feasible_deliveries', 0.0):.2f}")
-                    print(f"    Any service feasible rate : {val_results.get('diag_any_service_feasible', 0.0):.2f}")
-                    print(f"    Depot-only rate           : {val_results.get('diag_depot_only', 0.0):.2f}")
-                    print(f"    Reject available rate     : {val_results.get('diag_reject_available_rate', 0.0):.2f}")
-                    print(f"    Feasible->depot rate      : {val_results.get('diag_service_feasible_but_selected_depot', 0.0):.2f}")
-                    print(f"    Feasible->reject rate     : {val_results.get('diag_service_feasible_but_selected_reject', 0.0):.2f}")
-                    print(f"    Mask by pickup TW         : {val_results.get('diag_mask_pickup_tw', 0.0):.2f}")
-                    print(f"    Mask by ride time         : {val_results.get('diag_mask_ride_time', 0.0):.2f}")
-                    print(f"    Mask by trip time         : {val_results.get('diag_mask_trip_time', 0.0):.2f}")
-                    print(f"    Mask by ops end           : {val_results.get('diag_mask_ops_end', 0.0):.2f}")
-                    print(f"    Mask by pickup commitment : {val_results.get('diag_mask_pickup_commitment', 0.0):.2f}")
-                    print(f"    Open started count        : {val_results.get('diag_open_started_count', 0.0):.2f}")
-                    print(f"    Second pickup feasible    : {val_results.get('diag_second_pickup_feasible', 0.0):.2f}")
-                    print(f"    Delivery viability masked : {val_results.get('diag_delivery_viability_masked', 0.0):.2f}")
-                    print(f"    Delivery fallback rate    : {val_results.get('diag_delivery_viability_fallback', 0.0):.2f}")
-                    print(f"    Mask by vehicle limit     : {val_results.get('diag_mask_vehicle_limit', 0.0):.2f}")
-                    print(f"    Reject predeparture rate  : {val_results.get('diag_reject_predeparture_available', 0.0):.2f}")
-                    print(f"    Reject in-route rate      : {val_results.get('diag_reject_inroute_available', 0.0):.2f}")
+                print(f"\nEpoch {epoch}/{self.args.n_epochs}:")
+                print(f"  Train Loss: {train_loss:.4f}")
+                print(f"  Train Objective: {train_objective:.2f}")
+                print(f"  Data Profile: {self._describe_curriculum(epoch)}")
+                if self.args.benchmark_skip_validation:
+                    print("  Validation: skipped (benchmark mode)")
+                else:
+                    print(f"  Val Objective: {val_results['avg_objective']:.2f} +/- {val_results['std_objective']:.2f}")
+                    print(f"  Val Cost (CNY): {val_results['avg_cost']:.2f} +/- {val_results['std_cost']:.2f}")
+                    print(f"  Energy: {val_results['avg_energy_cost']:.2f} RMB")
+                    print(f"  Passenger Delivery Delay: {val_results['avg_passenger_delivery_delay_cost']:.2f} RMB")
+                    print(f"  Cargo Delay: {val_results['avg_cargo_delay_cost']:.2f} RMB")
+                    print(f"  Passenger Pickup Hard Violations: {val_results['avg_passenger_pickup_hard_violations']:.2f}")
+                    print(f"  Passenger Total Ride-Time Violations: {val_results['avg_passenger_total_ride_time_violations']:.2f}")
+                    print(f"  Passenger Excess Ride-Time Violations: {val_results['avg_passenger_excess_ride_time_violations']:.2f}")
+                    print(f"  Trip Overtime: {val_results['avg_trip_overtime_penalty']:.2f} RMB")
+                    print(f"  Reject Penalty: {val_results['avg_reject_penalty']:.2f} RMB")
+                    print(f"  Unfulfilled Penalty: {val_results['avg_unfulfilled_penalty']:.2f} RMB")
+                    print(f"  Avg Completed Orders: {val_results['avg_completed_orders']:.2f}")
+                    print(f"  Avg Rejected Orders: {val_results['avg_rejected_orders']:.2f}")
+                    print(f"  Avg Unfulfilled Orders: {val_results['avg_unfulfilled_orders']:.2f}")
+                    print(f"  Avg Untouched Orders: {val_results['avg_untouched_orders']:.2f}")
+                    print(f"  Avg Untouched-Unrejected Orders: {val_results['avg_untouched_unrejected_orders']:.2f}")
+                    print(f"  Service Rate: {val_results['service_rate']:.3f}")
+                    print(f"  Rejected Rate: {val_results['rejected_rate']:.3f}")
+                    print(f"  Unfulfilled Rate: {val_results['unfulfilled_rate']:.3f}")
+                    print(f"  Served+Rejected Rate: {val_results['served_plus_rejected_rate']:.3f}")
+                    print(f"  Untouched-Unrejected Rate: {val_results['untouched_unrejected_rate']:.3f}")
+                    print(f"  Avg Pickup-only Orders: {val_results['avg_pickup_only_orders']:.2f}")
+                    print(f"  Avg Started-not-completed Orders: {val_results['avg_started_not_completed_orders']:.2f}")
+                    print(f"  Vehicle Cost: {val_results['avg_vehicle_cost']:.2f} RMB")
+                    print(f"  Distance: {val_results['avg_distance']:.2f} km")
+                    if self.args.collect_mask_diagnostics:
+                        print("  [Mask Diagnostics]")
+                        print(f"    Feasible pickups/step     : {val_results.get('diag_feasible_pickups', 0.0):.2f}")
+                        print(f"    Feasible deliveries/step  : {val_results.get('diag_feasible_deliveries', 0.0):.2f}")
+                        print(f"    Any service feasible rate : {val_results.get('diag_any_service_feasible', 0.0):.2f}")
+                        print(f"    Depot-only rate           : {val_results.get('diag_depot_only', 0.0):.2f}")
+                        print(f"    Reject available rate     : {val_results.get('diag_reject_available_rate', 0.0):.2f}")
+                        print(f"    Feasible->depot rate      : {val_results.get('diag_service_feasible_but_selected_depot', 0.0):.2f}")
+                        print(f"    Feasible->reject rate     : {val_results.get('diag_service_feasible_but_selected_reject', 0.0):.2f}")
+                        print(f"    Mask by pickup TW         : {val_results.get('diag_mask_pickup_tw', 0.0):.2f}")
+                        print(f"    Mask by ride time         : {val_results.get('diag_mask_ride_time', 0.0):.2f}")
+                        print(f"    Mask by trip time         : {val_results.get('diag_mask_trip_time', 0.0):.2f}")
+                        print(f"    Mask by ops end           : {val_results.get('diag_mask_ops_end', 0.0):.2f}")
+                        print(f"    Mask by pickup commitment : {val_results.get('diag_mask_pickup_commitment', 0.0):.2f}")
+                        print(f"    Open started count        : {val_results.get('diag_open_started_count', 0.0):.2f}")
+                        print(f"    Second pickup feasible    : {val_results.get('diag_second_pickup_feasible', 0.0):.2f}")
+                        print(f"    Delivery viability masked : {val_results.get('diag_delivery_viability_masked', 0.0):.2f}")
+                        print(f"    Delivery fallback rate    : {val_results.get('diag_delivery_viability_fallback', 0.0):.2f}")
+                        print(f"    Mask by vehicle limit     : {val_results.get('diag_mask_vehicle_limit', 0.0):.2f}")
+                        print(f"    Reject predeparture rate  : {val_results.get('diag_reject_predeparture_available', 0.0):.2f}")
+                        print(f"    Reject in-route rate      : {val_results.get('diag_reject_inroute_available', 0.0):.2f}")
 
-            if not self.args.benchmark_skip_validation:
+            if self.is_main_process and (not self.args.benchmark_skip_validation):
                 business_key = self._business_priority_key(val_results)
                 if best_business_key is None or business_key > best_business_key:
                     best_business_key = business_key
@@ -1031,7 +1174,7 @@ class POMOTrainerOptimized:
             if self.args.benchmark_mode:
                 epoch_bench.add('epoch_total', time.perf_counter() - epoch_total_start)
                 batch_count = max(train_timing.count('batch_total'), 1)
-                samples_seen = batch_count * self.args.batch_size
+                samples_seen = batch_count * self.args.batch_size * self.world_size
                 epoch_payload = {
                     'epoch': epoch,
                     'epoch_total_s': epoch_bench.total('epoch_total'),
@@ -1115,22 +1258,24 @@ class POMOTrainerOptimized:
                     'batches_per_s': batch_count / max(epoch_bench.total('epoch_train'), 1e-9),
                     'samples_per_s': samples_seen / max(epoch_bench.total('epoch_train'), 1e-9),
                 }
-                self.benchmark_epoch_summaries.append(epoch_payload)
-                self.benchmark.merge(epoch_bench)
-                self._emit_benchmark_summary(epoch_payload)
+                if self.is_main_process:
+                    self.benchmark_epoch_summaries.append(epoch_payload)
+                    self.benchmark.merge(epoch_bench)
+                    self._emit_benchmark_summary(epoch_payload)
 
-        if not self.args.benchmark_disable_checkpoint:
+        if self.is_main_process and not self.args.benchmark_disable_checkpoint:
             final_checkpoint_start = time.perf_counter() if self.args.benchmark_mode else None
             self._save_model(self.args.n_epochs, val_results, 'final', selection_rule='final_epoch')
             if self.args.benchmark_mode:
                 self.benchmark.add('final_checkpoint', time.perf_counter() - final_checkpoint_start)
-        if not self.args.benchmark_disable_log_save:
+        if self.is_main_process and not self.args.benchmark_disable_log_save:
             final_log_start = time.perf_counter() if self.args.benchmark_mode else None
             self._save_logs()
             if self.args.benchmark_mode:
                 self.benchmark.add('final_log_save', time.perf_counter() - final_log_start)
 
-        self._emit_benchmark_final_summary()
+        if self.is_main_process:
+            self._emit_benchmark_final_summary()
 
         self.best_business_key = best_business_key
         self.best_business_rate = best_business_rate
@@ -1138,17 +1283,18 @@ class POMOTrainerOptimized:
         self.best_service_rate = best_service_rate
         self.best_val_objective = best_val_objective
 
-        print('\n' + '=' * 70)
-        print('Training Complete!')
-        if self.args.benchmark_skip_validation:
-            print('Best validation business-clean service rate: skipped')
-            print('Best validation service-priority rate: skipped')
-            print('Best validation objective: skipped')
-        else:
-            print(f"Best validation business-clean service rate: {best_business_rate:.3f}")
-            print(f"Best validation service-priority rate: {best_service_rate:.3f}")
-            print(f"Best validation objective: {best_val_objective:.2f}")
-        print('=' * 70)
+        if self.is_main_process:
+            print('\n' + '=' * 70)
+            print('Training Complete!')
+            if self.args.benchmark_skip_validation:
+                print('Best validation business-clean service rate: skipped')
+                print('Best validation service-priority rate: skipped')
+                print('Best validation objective: skipped')
+            else:
+                print(f"Best validation business-clean service rate: {best_business_rate:.3f}")
+                print(f"Best validation service-priority rate: {best_service_rate:.3f}")
+                print(f"Best validation objective: {best_val_objective:.2f}")
+            print('=' * 70)
         return {
             'best_business_rate': best_business_rate,
             'best_service_rate': best_service_rate,
@@ -1157,18 +1303,32 @@ class POMOTrainerOptimized:
 
     def _save_model(self, epoch, results, name, selection_rule=None):
         path = os.path.join(self.args.save_dir, f'model_{name}.pt')
+        checkpoint_args = dict(vars(self.args))
+        checkpoint_args.pop('dist_backend', None)
+        checkpoint_args.pop('local_rank', None)
+        checkpoint_args.pop('rank', None)
+        checkpoint_args.pop('world_size', None)
+        checkpoint_args.pop('distributed', None)
+        checkpoint_args['amp'] = bool(self.amp_enabled)
+        checkpoint_args['amp_dtype'] = self.args.amp_dtype
+        checkpoint_args['grad_accum_steps'] = self.grad_accum_steps
+        checkpoint_args['dist_eval'] = bool(self.args.dist_eval)
         torch.save({
             'epoch': epoch,
-            'model_state_dict': self.model.state_dict(),
+            'model_state_dict': self.raw_model.state_dict(),
             'optimizer_state_dict': self.optimizer.state_dict(),
             'results': results,
-            'args': vars(self.args),
+            'args': checkpoint_args,
             'normalization_profile': self.normalization_profile,
             'checkpoint_role': name,
             'selection_rule': selection_rule,
             'business_clean': bool(results.get('business_clean', False)),
             'business_priority_key': list(self._business_priority_key(results)),
             'service_priority_key': list(self._service_priority_key(results)),
+            'training_architecture_version': 2,
+            'distributed_training': bool(self.distributed),
+            'amp_enabled': bool(self.amp_enabled),
+            'amp_dtype': self.args.amp_dtype if self.amp_enabled else 'fp32',
         }, path)
 
     def _save_logs(self):
@@ -1177,6 +1337,13 @@ class POMOTrainerOptimized:
             json.dump({
                 'train': self.train_log,
                 'val': self.val_log,
+                'training_architecture': {
+                    'distributed': bool(self.distributed),
+                    'world_size': self.world_size,
+                    'amp_enabled': bool(self.amp_enabled),
+                    'amp_dtype': self.args.amp_dtype if self.amp_enabled else 'fp32',
+                    'grad_accum_steps': self.grad_accum_steps,
+                },
                 'config': {
                     'AREA_SIZE': Config.AREA_SIZE,
                     'PASSENGER_CAPACITY': Config.PASSENGER_CAPACITY,
@@ -1213,11 +1380,13 @@ class POMOTrainerOptimized:
 
     def _load_checkpoint(self, checkpoint_path):
         checkpoint = torch.load(checkpoint_path, map_location=self.device, weights_only=False)
-        self.model.load_state_dict(checkpoint['model_state_dict'])
+        model_state = _normalize_state_dict_keys(checkpoint['model_state_dict'])
+        self.raw_model.load_state_dict(model_state)
 
         if self.args.resume_weights_only:
-            print(f"[Resume] Loaded weights only: {checkpoint_path}")
-            print(f"[Resume] Start epoch: {self.start_epoch}")
+            if self.is_main_process:
+                print(f"[Resume] Loaded weights only: {checkpoint_path}")
+                print(f"[Resume] Start epoch: {self.start_epoch}")
             return
 
         if 'optimizer_state_dict' in checkpoint:
@@ -1234,13 +1403,14 @@ class POMOTrainerOptimized:
             self.best_business_rate = float(saved_results.get('service_rate', float('-inf')))
             self.best_service_key = tuple(checkpoint.get('service_priority_key', self._service_priority_key(saved_results)))
             self.best_service_rate = float(saved_results.get('service_rate', float('-inf')))
-        print(f"[Resume] Loaded checkpoint: {checkpoint_path}")
-        print(f"[Resume] Start epoch: {self.start_epoch}")
-        print(f"[Resume] Best objective so far: {self.best_val_objective:.2f}")
-        if self.best_business_key is not None:
-            print(f"[Resume] Best business-clean service rate so far: {self.best_business_rate:.3f}")
-        if self.best_service_key is not None:
-            print(f"[Resume] Best service-priority rate so far: {self.best_service_rate:.3f}")
+        if self.is_main_process:
+            print(f"[Resume] Loaded checkpoint: {checkpoint_path}")
+            print(f"[Resume] Start epoch: {self.start_epoch}")
+            print(f"[Resume] Best objective so far: {self.best_val_objective:.2f}")
+            if self.best_business_key is not None:
+                print(f"[Resume] Best business-clean service rate so far: {self.best_business_rate:.3f}")
+            if self.best_service_key is not None:
+                print(f"[Resume] Best service-priority rate so far: {self.best_service_rate:.3f}")
 
 
 def parse_args():
@@ -1334,6 +1504,14 @@ def parse_args():
     parser.add_argument('--curriculum-phase2-cargo-tw-evening', type=float, default=0.17, help='curriculum phase2 cargo evening TW weight')
     parser.add_argument('--resume-path', type=str, default=None, help='从已有 checkpoint 继续训练/微调')
     parser.add_argument('--resume-weights-only', action='store_true', help='仅加载模型权重，不恢复优化器状态')
+    parser.add_argument('--distributed', action='store_true', default=None, help='启用单机分布式训练骨架（建议配合 torchrun）')
+    parser.add_argument('--dist-backend', type=str, default='nccl', help='distributed backend (default: nccl)')
+    parser.add_argument('--local-rank', type=int, default=int(os.environ.get('LOCAL_RANK', 0)), help='当前进程的 local rank')
+    parser.add_argument('--amp', action='store_true', help='启用 AMP 自动混合精度训练')
+    parser.add_argument('--amp-dtype', choices=['fp16', 'bf16'], default='bf16', help='AMP 精度类型')
+    parser.add_argument('--grad-accum-steps', type=int, default=1, help='梯度累积步数')
+    parser.add_argument('--dist-eval', action='store_true', help='在 distributed 模式下分布式执行 validation 并做均值归并')
+    parser.add_argument('--ddp-find-unused-parameters', action='store_true', help='DistributedDataParallel: find_unused_parameters=True')
     parser.add_argument('--no-cuda', action='store_true')
     return parser.parse_args()
 
@@ -1375,6 +1553,11 @@ def build_phase_args(cli_args, graph_size):
         raise ValueError(f'Unsupported graph size: {graph_size}')
 
     phase = PHASE_CONFIGS[graph_size].copy()
+    distributed = _infer_distributed_from_env() if cli_args.distributed is None else bool(cli_args.distributed)
+    world_size = int(os.environ.get('WORLD_SIZE', '1')) if distributed else 1
+    rank = int(os.environ.get('RANK', '0')) if distributed else 0
+    local_rank = int(os.environ.get('LOCAL_RANK', cli_args.local_rank)) if distributed else int(cli_args.local_rank)
+    use_cuda = torch.cuda.is_available() and not cli_args.no_cuda
     phase1_distance_mix = _normalize_ratio_triplet((
         cli_args.curriculum_phase1_short_ratio,
         cli_args.curriculum_phase1_mid_ratio,
@@ -1471,6 +1654,17 @@ def build_phase_args(cli_args, graph_size):
         max_grad_norm=cli_args.max_grad_norm,
         seed=cli_args.seed,
         no_cuda=cli_args.no_cuda,
+        use_cuda=use_cuda,
+        distributed=distributed,
+        dist_backend=cli_args.dist_backend,
+        world_size=world_size,
+        rank=rank,
+        local_rank=local_rank,
+        amp=cli_args.amp,
+        amp_dtype=cli_args.amp_dtype,
+        grad_accum_steps=cli_args.grad_accum_steps,
+        dist_eval=cli_args.dist_eval,
+        ddp_find_unused_parameters=cli_args.ddp_find_unused_parameters,
         save_dir=os.path.join(cli_args.output_root, f'pomo_n{graph_size}_optimized'),
         save_interval=cli_args.save_interval,
         log_interval=cli_args.log_interval,
@@ -1520,28 +1714,46 @@ def main():
         run_calibration_only(cli_args)
         return
 
-    print('=' * 70)
-    print('MCVRP-PDTW with POMO Training (OPTIMIZED VERSION)')
-    print('=' * 70)
+    distributed_requested = _infer_distributed_from_env() if cli_args.distributed is None else bool(cli_args.distributed)
+    rank = int(os.environ.get('RANK', '0')) if distributed_requested else 0
+    world_size = int(os.environ.get('WORLD_SIZE', '1')) if distributed_requested else 1
+    local_rank = int(os.environ.get('LOCAL_RANK', cli_args.local_rank)) if distributed_requested else int(cli_args.local_rank)
+    if distributed_requested:
+        backend = cli_args.dist_backend
+        if backend == 'nccl' and (cli_args.no_cuda or not torch.cuda.is_available()):
+            backend = 'gloo'
+        dist.init_process_group(backend=backend, init_method='env://')
+    is_main_process = (not distributed_requested) or rank == 0
 
-    summary = {}
-    for graph_size in cli_args.graph_sizes:
-        phase_args = build_phase_args(cli_args, graph_size)
-        apply_runtime_training_config(phase_args)
-        print(f"\n[Phase] Training on {graph_size} orders ({graph_size * 2} nodes)...")
-        trainer = POMOTrainerOptimized(phase_args)
-        best_metrics = trainer.train()
-        summary[graph_size] = best_metrics
+    try:
+        if is_main_process:
+            print('=' * 70)
+            print('MCVRP-PDTW with POMO Training (OPTIMIZED VERSION)')
+            print('=' * 70)
 
-    print('\n' + '=' * 70)
-    print('All requested training phases complete!')
-    for graph_size in cli_args.graph_sizes:
-        metrics = summary[graph_size]
-        if cli_args.benchmark_skip_validation:
-            print(f"N={graph_size}: benchmark-only run (validation skipped)")
-        else:
-            print(f"N={graph_size}: best service rate = {metrics['best_service_rate']:.3f}, best objective = {metrics['best_objective']:.2f}")
-    print('=' * 70)
+        summary = {}
+        for graph_size in cli_args.graph_sizes:
+            phase_args = build_phase_args(cli_args, graph_size)
+            apply_runtime_training_config(phase_args)
+            if is_main_process:
+                print(f"\n[Phase] Training on {graph_size} orders ({graph_size * 2} nodes)...")
+            trainer = POMOTrainerOptimized(phase_args)
+            best_metrics = trainer.train()
+            summary[graph_size] = best_metrics
+
+        if is_main_process:
+            print('\n' + '=' * 70)
+            print('All requested training phases complete!')
+            for graph_size in cli_args.graph_sizes:
+                metrics = summary[graph_size]
+                if cli_args.benchmark_skip_validation:
+                    print(f"N={graph_size}: benchmark-only run (validation skipped)")
+                else:
+                    print(f"N={graph_size}: best service rate = {metrics['best_service_rate']:.3f}, best objective = {metrics['best_objective']:.2f}")
+            print('=' * 70)
+    finally:
+        if distributed_requested and dist.is_initialized():
+            dist.destroy_process_group()
 
 
 if __name__ == '__main__':
