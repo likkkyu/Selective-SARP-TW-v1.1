@@ -12,6 +12,7 @@ State for Multi-Compartment VRP with Pickup-Delivery and Time Windows
 
 import time
 
+import numpy as np
 import torch
 from typing import NamedTuple
 
@@ -255,11 +256,16 @@ class StateMCVRPPDTW(NamedTuple):
                                         passenger_pickup_times, direct_ride_time,
                                         delivery_earliest, delivery_to_depot_time):
         batch_size = pickup_coords.size(0)
-        passenger_flags_batch = [[bool(v) for v in row] for row in passenger_orders.tolist()]
-        pickup_times_batch = passenger_pickup_times.tolist()
-        direct_ride_limits_batch = direct_ride_time.tolist()
-        delivery_earliest_batch = delivery_earliest.tolist()
-        delivery_to_depot_batch = delivery_to_depot_time.tolist()
+
+        passenger_flags_batch = passenger_orders.detach().cpu().numpy().astype(np.bool_, copy=False)
+        pickup_times_batch = passenger_pickup_times.detach().cpu().numpy()
+        direct_ride_limits_batch = direct_ride_time.detach().cpu().numpy()
+        delivery_earliest_batch = delivery_earliest.detach().cpu().numpy()
+        delivery_to_depot_batch = delivery_to_depot_time.detach().cpu().numpy()
+
+        travel_time_scale = self.AREA_SIZE / self.VEHICLE_SPEED
+        pickup_to_delivery_batch = (torch.cdist(pickup_coords, delivery_coords, p=2) * travel_time_scale).detach().cpu().numpy()
+        delivery_to_delivery_batch = (torch.cdist(delivery_coords, delivery_coords, p=2) * travel_time_scale).detach().cpu().numpy()
 
         latest_delivery_arrival_batch = [[None] * self.n_orders for _ in range(batch_size)]
         if Config.HARD_PASSENGER_MAX_RIDE_TIME:
@@ -273,18 +279,14 @@ class StateMCVRPPDTW(NamedTuple):
                 for order_idx in range(self.n_orders):
                     if not passenger_flags[order_idx]:
                         continue
-                    pickup_time = pickup_times[order_idx]
+                    pickup_time = float(pickup_times[order_idx])
                     if pickup_time < 0:
                         latest_delivery_arrival[order_idx] = -1.0
                         continue
                     latest_delivery_arrival[order_idx] = min(
                         pickup_time + total_limit,
-                        pickup_time + direct_ride_limits[order_idx] + excess_limit,
+                        pickup_time + float(direct_ride_limits[order_idx]) + excess_limit,
                     )
-
-        travel_time_scale = self.AREA_SIZE / self.VEHICLE_SPEED
-        pickup_to_delivery_batch = (torch.cdist(pickup_coords, delivery_coords, p=2) * travel_time_scale).tolist()
-        delivery_to_delivery_batch = (torch.cdist(delivery_coords, delivery_coords, p=2) * travel_time_scale).tolist()
 
         caches = []
         for batch_idx in range(batch_size):
@@ -297,7 +299,7 @@ class StateMCVRPPDTW(NamedTuple):
                 travel_time_to_delivery_by_start_node[self._delivery_node_key(order_idx)] = delivery_to_delivery_time[order_idx]
             caches.append({
                 'passenger_orders': passenger_flags_batch[batch_idx],
-                'pickup_times': pickup_times_batch[batch_idx],
+                'pickup_times': pickup_times_batch[batch_idx].copy(),
                 'direct_ride_time': direct_ride_limits_batch[batch_idx],
                 'delivery_earliest': delivery_earliest_batch[batch_idx],
                 'delivery_to_depot_time': delivery_to_depot_batch[batch_idx],
@@ -1564,7 +1566,7 @@ class StateMCVRPPDTW(NamedTuple):
             return 'mixed'
         return 'other'
 
-    def get_mask(self, return_debug=False, skip_pickup_commitment=False, benchmark_stats=None):
+    def get_mask(self, return_debug=False, skip_pickup_commitment=False, benchmark_stats=None, return_urgency_slack=False, aux_outputs=None):
         batch_size = self.ids.size(0)
         n_orders = self.n_orders
         device = self.coords.device
@@ -1672,6 +1674,7 @@ class StateMCVRPPDTW(NamedTuple):
 
         tw_end = time_windows_active[:, :, 1]
         node_positions = torch.arange(coords_active.size(1), device=device)[None, :]
+        pickup_tw_slack_hours = None
         is_passenger_node = node_type_active == 1
         is_cargo_node = node_type_active == 0
         is_pickup_node = (node_positions >= 1) & (node_positions <= n_orders)
@@ -1681,6 +1684,10 @@ class StateMCVRPPDTW(NamedTuple):
             | (Config.HARD_CARGO_PICKUP_TIMEWINDOW & is_cargo_node)
         )
         pickup_hard_mask_full = pickup_hard_gate & is_pickup_node & (arrival_time > tw_end + 1e-5)
+        if return_urgency_slack and n_orders > 0:
+            pickup_tw_slack_hours = tw_end[:, 1:n_orders + 1] - arrival_time[:, 1:n_orders + 1]
+        if return_urgency_slack and pickup_tw_slack_hours is None:
+            pickup_tw_slack_hours = torch.zeros(batch_size, n_orders, device=device, dtype=arrival_time.dtype)
         before_mask = service_mask.clone()
         service_mask |= pickup_hard_mask_full[:, 1:2 * n_orders + 1]
         if return_debug:
@@ -1826,12 +1833,13 @@ class StateMCVRPPDTW(NamedTuple):
                     batch_passenger_orders = passenger_orders[batch_idx]
                     batch_passenger_pickup_times_before = passenger_pickup_times_before[batch_idx]
                     batch_direct_ride_time = direct_ride_time[batch_idx]
-                    batch_prev_node = self._current_start_node_key(prev_a_flat[batch_idx].item())
                     batch_scalar_cache = batch_scalar_caches[batch_idx]
                     batch_completion_memo = shared_search_memo
                     batch_state = None
                     batch_mask = None
                     batch_over_k = batch_open_count + 1 > self.max_concurrent_open_orders
+                    passenger_total_limit = Config.PASSENGER_MAX_RIDE_TIME_MINUTES / 60.0 if Config.HARD_PASSENGER_MAX_RIDE_TIME else None
+                    passenger_excess_limit = Config.PASSENGER_MAX_EXCESS_RIDE_TIME_MINUTES / 60.0 if Config.HARD_PASSENGER_MAX_RIDE_TIME else None
 
                     if return_debug:
                         batch_state = self[batch_idx:batch_idx + 1]
@@ -1847,41 +1855,29 @@ class StateMCVRPPDTW(NamedTuple):
 
                         open_after_bits = batch_open_bits | (1 << candidate_idx)
                         candidate_is_passenger = batch_scalar_cache['passenger_orders'][candidate_idx]
+                        passenger_pickup_times_after = batch_passenger_pickup_times_before
                         candidate_scalar_cache = batch_scalar_cache
-                        if candidate_is_passenger:
-                            passenger_pickup_times_after = batch_passenger_pickup_times_before.clone()
-                            passenger_pickup_times_after[candidate_idx] = batch_pickup_finish[candidate_idx]
-                            candidate_scalar_cache = dict(batch_scalar_cache)
-                            candidate_scalar_cache['pickup_times'] = list(batch_scalar_cache['pickup_times'])
-                            candidate_scalar_cache['pickup_times'][candidate_idx] = float(batch_pickup_finish[candidate_idx].item())
-                            candidate_scalar_cache['latest_delivery_arrival'] = list(batch_scalar_cache['latest_delivery_arrival'])
-                            candidate_scalar_cache['latest_delivery_arrival'][candidate_idx] = min(
-                                candidate_scalar_cache['pickup_times'][candidate_idx] + Config.PASSENGER_MAX_RIDE_TIME_MINUTES / 60.0,
-                                candidate_scalar_cache['pickup_times'][candidate_idx] + candidate_scalar_cache['direct_ride_time'][candidate_idx] + Config.PASSENGER_MAX_EXCESS_RIDE_TIME_MINUTES / 60.0,
-                            ) if Config.HARD_PASSENGER_MAX_RIDE_TIME else None
-                        else:
-                            passenger_pickup_times_after = batch_passenger_pickup_times_before
                         start_node_key = self._pickup_node_key(candidate_idx)
-                        completion_feasible, completion_block_reason = self._has_feasible_open_completion(
-                            batch_pickup_coords[candidate_idx],
-                            batch_pickup_finish[candidate_idx],
-                            batch_trip_start_after_pickup,
-                            None,
-                            batch_delivery_coords,
-                            batch_delivery_earliest,
-                            batch_delivery_to_depot_time,
-                            batch_passenger_orders,
-                            passenger_pickup_times_after,
-                            batch_direct_ride_time,
-                            return_reason=return_debug,
-                            ignore_trip_time=self.relax_pickup_commitment_trip_time,
-                            memo=batch_completion_memo,
-                            open_bits=open_after_bits,
-                            start_node=start_node_key,
-                            benchmark_stats=benchmark_stats,
-                            scalar_cache=candidate_scalar_cache,
-                        ) if return_debug else (
-                            self._has_feasible_open_completion(
+
+                        restore_pickup_time = None
+                        restore_latest_arrival = None
+                        if candidate_is_passenger:
+                            candidate_pickup_finish = float(batch_pickup_finish[candidate_idx].item())
+                            pickup_times_cache = batch_scalar_cache['pickup_times']
+                            latest_arrival_cache = batch_scalar_cache['latest_delivery_arrival']
+                            restore_pickup_time = pickup_times_cache[candidate_idx]
+                            restore_latest_arrival = latest_arrival_cache[candidate_idx]
+                            pickup_times_cache[candidate_idx] = candidate_pickup_finish
+                            if Config.HARD_PASSENGER_MAX_RIDE_TIME:
+                                latest_arrival_cache[candidate_idx] = min(
+                                    candidate_pickup_finish + passenger_total_limit,
+                                    candidate_pickup_finish + batch_scalar_cache['direct_ride_time'][candidate_idx] + passenger_excess_limit,
+                                )
+                            else:
+                                latest_arrival_cache[candidate_idx] = None
+
+                        try:
+                            completion_feasible, completion_block_reason = self._has_feasible_open_completion(
                                 batch_pickup_coords[candidate_idx],
                                 batch_pickup_finish[candidate_idx],
                                 batch_trip_start_after_pickup,
@@ -1892,83 +1888,106 @@ class StateMCVRPPDTW(NamedTuple):
                                 batch_passenger_orders,
                                 passenger_pickup_times_after,
                                 batch_direct_ride_time,
+                                return_reason=return_debug,
                                 ignore_trip_time=self.relax_pickup_commitment_trip_time,
                                 memo=batch_completion_memo,
                                 open_bits=open_after_bits,
                                 start_node=start_node_key,
                                 benchmark_stats=benchmark_stats,
                                 scalar_cache=candidate_scalar_cache,
-                                ),
-                            None,
-                        )
-
-                        next_state_feasible = True
-                        fallback_safe = True
-                        if completion_feasible and requires_post_pickup_delivery_check:
-                            next_state_feasible, fallback_safe = self._evaluate_post_pickup_open_delivery(
-                                batch_pickup_coords[candidate_idx],
-                                batch_pickup_finish[candidate_idx],
-                                batch_trip_start_after_pickup,
+                            ) if return_debug else (
+                                self._has_feasible_open_completion(
+                                    batch_pickup_coords[candidate_idx],
+                                    batch_pickup_finish[candidate_idx],
+                                    batch_trip_start_after_pickup,
+                                    None,
+                                    batch_delivery_coords,
+                                    batch_delivery_earliest,
+                                    batch_delivery_to_depot_time,
+                                    batch_passenger_orders,
+                                    passenger_pickup_times_after,
+                                    batch_direct_ride_time,
+                                    ignore_trip_time=self.relax_pickup_commitment_trip_time,
+                                    memo=batch_completion_memo,
+                                    open_bits=open_after_bits,
+                                    start_node=start_node_key,
+                                    benchmark_stats=benchmark_stats,
+                                    scalar_cache=candidate_scalar_cache,
+                                    ),
                                 None,
-                                batch_delivery_coords,
-                                batch_delivery_earliest,
-                                batch_delivery_to_depot_time,
-                                batch_passenger_orders,
-                                passenger_pickup_times_after,
-                                batch_direct_ride_time,
-                                memo=shared_search_memo,
-                                open_bits=open_after_bits,
-                                start_node=start_node_key,
-                                benchmark_stats=benchmark_stats,
-                                scalar_cache=candidate_scalar_cache,
-                                )
+                            )
 
-                        candidate_feasible = completion_feasible and next_state_feasible and fallback_safe
-                        pickup_commitment_mask[batch_idx, candidate_idx] = not candidate_feasible
-                        if candidate_feasible:
-                            second_pickup_feasible += 1
-                        else:
-                            second_pickup_blocked += 1
-                            if return_debug:
-                                if not completion_feasible:
-                                    debug['diag_pickup_commitment_block_by_completion'][batch_idx] += 1.0
-                                    if completion_block_reason == 'ride_time':
-                                        debug['diag_pickup_commitment_block_by_completion_ride_time'][batch_idx] += 1.0
-                                    elif completion_block_reason == 'trip_time':
-                                        debug['diag_pickup_commitment_block_by_completion_trip_time'][batch_idx] += 1.0
-                                    elif completion_block_reason == 'ops_end':
-                                        debug['diag_pickup_commitment_block_by_completion_ops_end'][batch_idx] += 1.0
-                                    elif completion_block_reason == 'open_over_6':
-                                        debug['diag_pickup_commitment_block_by_completion_open_over_6'][batch_idx] += 1.0
-                                    else:
-                                        debug['diag_pickup_commitment_block_by_completion_other'][batch_idx] += 1.0
-                                elif not next_state_feasible:
-                                    debug['diag_pickup_commitment_block_by_next_state'][batch_idx] += 1.0
-                                    if batch_state is not None and batch_mask is not None:
-                                        candidate_node = candidate_idx + 1
-                                        selected = torch.tensor([candidate_node], dtype=torch.long, device=device)
-                                        next_state = batch_state.update(selected, current_mask=batch_mask)
-                                        next_state_reason = self._classify_next_state_delivery_block(next_state)
-                                    else:
-                                        next_state_reason = 'other'
-                                    if next_state_reason == 'precedence':
-                                        debug['diag_pickup_commitment_block_by_next_state_precedence'][batch_idx] += 1.0
-                                    elif next_state_reason == 'ride_time':
-                                        debug['diag_pickup_commitment_block_by_next_state_ride_time'][batch_idx] += 1.0
-                                    elif next_state_reason == 'trip_time':
-                                        debug['diag_pickup_commitment_block_by_next_state_trip_time'][batch_idx] += 1.0
-                                    elif next_state_reason == 'ops_end':
-                                        debug['diag_pickup_commitment_block_by_next_state_ops_end'][batch_idx] += 1.0
-                                    elif next_state_reason == 'delivery_viability':
-                                        debug['diag_pickup_commitment_block_by_next_state_delivery_viability'][batch_idx] += 1.0
-                                    elif next_state_reason == 'vehicle_limit':
-                                        debug['diag_pickup_commitment_block_by_next_state_vehicle_limit'][batch_idx] += 1.0
-                                    elif next_state_reason == 'mixed':
-                                        debug['diag_pickup_commitment_block_by_next_state_mixed'][batch_idx] += 1.0
-                                    else:
-                                        debug['diag_pickup_commitment_block_by_next_state_other'][batch_idx] += 1.0
-                                elif not fallback_safe:
-                                    debug['diag_pickup_commitment_block_by_fallback'][batch_idx] += 1.0
+                            next_state_feasible = True
+                            fallback_safe = True
+                            if completion_feasible and requires_post_pickup_delivery_check:
+                                next_state_feasible, fallback_safe = self._evaluate_post_pickup_open_delivery(
+                                    batch_pickup_coords[candidate_idx],
+                                    batch_pickup_finish[candidate_idx],
+                                    batch_trip_start_after_pickup,
+                                    None,
+                                    batch_delivery_coords,
+                                    batch_delivery_earliest,
+                                    batch_delivery_to_depot_time,
+                                    batch_passenger_orders,
+                                    passenger_pickup_times_after,
+                                    batch_direct_ride_time,
+                                    memo=shared_search_memo,
+                                    open_bits=open_after_bits,
+                                    start_node=start_node_key,
+                                    benchmark_stats=benchmark_stats,
+                                    scalar_cache=candidate_scalar_cache,
+                                    )
+
+                            candidate_feasible = completion_feasible and next_state_feasible and fallback_safe
+                            pickup_commitment_mask[batch_idx, candidate_idx] = not candidate_feasible
+                            if candidate_feasible:
+                                second_pickup_feasible += 1
+                            else:
+                                second_pickup_blocked += 1
+                                if return_debug:
+                                    if not completion_feasible:
+                                        debug['diag_pickup_commitment_block_by_completion'][batch_idx] += 1.0
+                                        if completion_block_reason == 'ride_time':
+                                            debug['diag_pickup_commitment_block_by_completion_ride_time'][batch_idx] += 1.0
+                                        elif completion_block_reason == 'trip_time':
+                                            debug['diag_pickup_commitment_block_by_completion_trip_time'][batch_idx] += 1.0
+                                        elif completion_block_reason == 'ops_end':
+                                            debug['diag_pickup_commitment_block_by_completion_ops_end'][batch_idx] += 1.0
+                                        elif completion_block_reason == 'open_over_6':
+                                            debug['diag_pickup_commitment_block_by_completion_open_over_6'][batch_idx] += 1.0
+                                        else:
+                                            debug['diag_pickup_commitment_block_by_completion_other'][batch_idx] += 1.0
+                                    elif not next_state_feasible:
+                                        debug['diag_pickup_commitment_block_by_next_state'][batch_idx] += 1.0
+                                        if batch_state is not None and batch_mask is not None:
+                                            candidate_node = candidate_idx + 1
+                                            selected = torch.tensor([candidate_node], dtype=torch.long, device=device)
+                                            next_state = batch_state.update(selected, current_mask=batch_mask)
+                                            next_state_reason = self._classify_next_state_delivery_block(next_state)
+                                        else:
+                                            next_state_reason = 'other'
+                                        if next_state_reason == 'precedence':
+                                            debug['diag_pickup_commitment_block_by_next_state_precedence'][batch_idx] += 1.0
+                                        elif next_state_reason == 'ride_time':
+                                            debug['diag_pickup_commitment_block_by_next_state_ride_time'][batch_idx] += 1.0
+                                        elif next_state_reason == 'trip_time':
+                                            debug['diag_pickup_commitment_block_by_next_state_trip_time'][batch_idx] += 1.0
+                                        elif next_state_reason == 'ops_end':
+                                            debug['diag_pickup_commitment_block_by_next_state_ops_end'][batch_idx] += 1.0
+                                        elif next_state_reason == 'delivery_viability':
+                                            debug['diag_pickup_commitment_block_by_next_state_delivery_viability'][batch_idx] += 1.0
+                                        elif next_state_reason == 'vehicle_limit':
+                                            debug['diag_pickup_commitment_block_by_next_state_vehicle_limit'][batch_idx] += 1.0
+                                        elif next_state_reason == 'mixed':
+                                            debug['diag_pickup_commitment_block_by_next_state_mixed'][batch_idx] += 1.0
+                                        else:
+                                            debug['diag_pickup_commitment_block_by_next_state_other'][batch_idx] += 1.0
+                                    elif not fallback_safe:
+                                        debug['diag_pickup_commitment_block_by_fallback'][batch_idx] += 1.0
+                        finally:
+                            if restore_pickup_time is not None:
+                                batch_scalar_cache['pickup_times'][candidate_idx] = restore_pickup_time
+                                batch_scalar_cache['latest_delivery_arrival'][candidate_idx] = restore_latest_arrival
                 if return_debug and batch_open_count >= 1:
                     debug['diag_second_pickup_feasible'][batch_idx] = float(second_pickup_feasible)
                     debug['diag_second_pickup_blocked_by_commitment'][batch_idx] = float(second_pickup_blocked)
@@ -2001,6 +2020,7 @@ class StateMCVRPPDTW(NamedTuple):
                     direct_ride_time[batch_idx],
                     allow_fallback=self.enable_viability_fallback,
                     memo=shared_search_memo,
+                    start_node=self._current_start_node_key(prev_a_flat[batch_idx].item()),
                     scalar_cache=scalar_cache,
                 )
                 if len(physical_orders) == 0:
@@ -2125,7 +2145,11 @@ class StateMCVRPPDTW(NamedTuple):
             debug['diag_reject_dead_end_inroute_available'] = (reject_available & inroute_dead_end_reject_gate).float()
         _record('mask_finalize', phase_start)
 
+        if return_urgency_slack and aux_outputs is not None:
+            aux_outputs['pickup_tw_slack_hours'] = pickup_tw_slack_hours
         if return_debug:
+            if return_urgency_slack:
+                debug['pickup_tw_slack_hours'] = pickup_tw_slack_hours
             return mask.bool(), debug
         return mask.bool()
 
