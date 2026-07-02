@@ -126,6 +126,8 @@ def parse_args():
     parser.add_argument('--no-cuda', action='store_true')
     parser.add_argument('--max-concurrent-open-orders', type=int, default=1,
                         help='If left at 1, rollout state kwargs will inherit the checkpoint value when available.')
+    parser.add_argument('--min-orders-per-dispatch', type=int, default=4,
+                        help='硬约束：车辆一旦发车，至少完成该数量订单后才可回 depot')
     parser.add_argument('--enable-delivery-viability', dest='enable_delivery_viability', action='store_true')
     parser.add_argument('--disable-delivery-viability', dest='enable_delivery_viability', action='store_false')
     parser.set_defaults(enable_delivery_viability=None)
@@ -372,6 +374,7 @@ def _run_heuristic_episode(sample, policy, state_kwargs, deadlock_limit, trace_f
         batch,
         deadlock_limit=deadlock_limit,
         max_concurrent_open_orders=state_kwargs['max_concurrent_open_orders'],
+        min_orders_per_dispatch=state_kwargs.get('min_orders_per_dispatch', 4),
         enable_delivery_viability=state_kwargs['enable_delivery_viability'],
         enable_viability_fallback=state_kwargs['enable_viability_fallback'],
     )
@@ -550,6 +553,7 @@ def _resolve_shared_state_kwargs(args, checkpoint):
     enable_viability_fallback = bool(args.enable_viability_fallback) if args.enable_viability_fallback is not None else False
     return {
         'max_concurrent_open_orders': max_open,
+        'min_orders_per_dispatch': int(max(getattr(args, 'min_orders_per_dispatch', 4), 1)),
         'enable_delivery_viability': enable_delivery_viability,
         'enable_viability_fallback': enable_viability_fallback,
         'relax_pickup_commitment_trip_time': bool(getattr(args, 'relax_pickup_commitment_trip_time', False)),

@@ -14,6 +14,7 @@ def parse_args():
     parser.add_argument('--seed', type=int, default=12345)
     parser.add_argument('--policy', type=str, default='bad', choices=['bad', 'random', 'oracle'])
     parser.add_argument('--max-concurrent-open-orders', type=int, default=6)
+    parser.add_argument('--min-orders-per-dispatch', type=int, default=4)
     parser.add_argument('--enable-delivery-viability', action='store_true', default=True)
     parser.add_argument('--disable-delivery-viability', action='store_false', dest='enable_delivery_viability')
     parser.add_argument('--enable-viability-fallback', action='store_true')
@@ -138,6 +139,7 @@ def run_episode(sample, policy, args, rng):
     state = StateMCVRPPDTW.initialize(
         batch,
         max_concurrent_open_orders=args.max_concurrent_open_orders,
+        min_orders_per_dispatch=args.min_orders_per_dispatch,
         enable_delivery_viability=args.enable_delivery_viability,
         enable_viability_fallback=args.enable_viability_fallback,
     )
@@ -232,6 +234,7 @@ def main():
     print(f'policy    : {args.policy}')
     print(f'samples   : {args.num_samples}')
     print(f'max_open  : {args.max_concurrent_open_orders}')
+    print(f'min_orders_per_dispatch : {args.min_orders_per_dispatch}')
     print(f'delivery_viability : {args.enable_delivery_viability}')
     print(f'fallback  : {args.enable_viability_fallback}')
     print('-' * 64)

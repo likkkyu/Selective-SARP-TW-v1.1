@@ -693,9 +693,22 @@ class AttentionModel(nn.Module):
 
         all_masked = mask[:, 0, :].all(-1)
         if all_masked.any():
-            state = state._replace(terminal_=state.terminal_ | all_masked[:, None])
             mask = mask.clone()
-            mask[all_masked, :, 0] = False
+            reject_index = state.reject_index
+            min_orders_required = int(getattr(state, 'min_orders_per_dispatch', 1))
+            in_dispatch = state.prev_a.squeeze(1) != 0
+            below_min_dispatch = state.served_orders_since_dispatch.squeeze(1) < min_orders_required
+            reject_targets = state._deterministic_reject_order(mask)
+            reject_candidate_available = reject_targets >= 0
+            prefer_reject_fallback = all_masked & in_dispatch & below_min_dispatch & reject_candidate_available
+            if prefer_reject_fallback.any():
+                mask[prefer_reject_fallback, :, reject_index] = False
+
+            still_all_masked = mask[:, 0, :].all(-1)
+            if still_all_masked.any():
+                state = state._replace(terminal_=state.terminal_ | still_all_masked[:, None])
+                mask[still_all_masked, :, :] = True
+                mask[still_all_masked, :, 0] = False
 
         if return_debug:
             service_mask = mask[:, 0, 1:1 + 2 * state.n_orders]

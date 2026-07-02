@@ -8,9 +8,9 @@ Multi-Compartment Vehicle Routing Problem with Pickup-Delivery and Time Windows
 3. 货物语义：每单 1-3 单位（能耗按每单位 1 kg 计），舱容 20 单位
 4. 乘客语义：每单 1-4 人（80% 为 {1,2}，20% 为 {3,4}），舱容 15 人
 5. 类型分布：乘客 60% / 货物 40%
-6. passenger pickup：硬时间窗
+6. pickup（passenger + cargo）：硬时间窗（cargo 可由开关控制用于消融）
 7. passenger maximum ride time：总时长 70 min / 超额 30 min 硬约束
-8. passenger delivery：软迟到成本；cargo 继续仅在 delivery 端统计软迟到
+8. passenger delivery：软迟到成本；cargo delivery 使用分段软迟到成本
 9. 16:00 运营硬约束：DRL mask 禁止任何会超出 16:00 的非-depot 节点
 10. 单趟硬上限：3h（DRL mask + 软兜底 ALPHA_TRIP_OVERTIME=200）
 11. 训练目标 = objective_total（归一化+α 加权+主动 reject + 未履约兜底）
@@ -22,7 +22,7 @@ Multi-Compartment Vehicle Routing Problem with Pickup-Delivery and Time Windows
 其中：
     - c_elec = 1.0 元/kWh
     - ω_p = 0.6 元/min（仅乘客 delivery）
-    - ω_c = 0.06 元/min（仅货物 delivery）
+    - ω_c = 分段元/min（仅货物 delivery，0-30 / 30-60 / 60+）
     - ω_v = 20 元/车
     - reject = 575 元/主动 reject 订单
     - unfulfilled = 750 元/未显式 reject 但最终未完成订单
@@ -69,7 +69,11 @@ class Config:
     # ---------- 成本参数（元） ----------
     ELECTRICITY_PRICE = 1.0      # 元/kWh
     PASSENGER_DELAY_COST = 0.6   # ω_p, 元/min（仅 delivery）
-    CARGO_DELAY_COST = 0.06      # ω_c, 元/min（仅 delivery）
+    CARGO_DELAY_COST = 0.06      # cargo 迟到分段惩罚的 0-30min 基础费率（元/min）
+    CARGO_DELAY_TIER1_MIN = 30.0
+    CARGO_DELAY_TIER2_MIN = 60.0
+    CARGO_DELAY_COST_30_60 = 0.18
+    CARGO_DELAY_COST_60_PLUS = 0.36
     VEHICLE_COST = 20.0          # ω_v, 元/车·班次（更贴近静态多车日计划中的固定派车成本）
 
     # ---------- α 加权（仅训练目标使用，论文公式不出现） ----------
@@ -82,6 +86,7 @@ class Config:
 
     # ---------- 约束开关（服务质量强化版） ----------
     HARD_PASSENGER_PICKUP_TIMEWINDOW = True   # passenger pickup 硬时间窗
+    HARD_CARGO_PICKUP_TIMEWINDOW = True       # cargo pickup 硬时间窗
     HARD_PASSENGER_MAX_RIDE_TIME = True       # passenger maximum ride time 双层硬约束
     PASSENGER_MAX_RIDE_TIME_MINUTES = 70.0    # passenger total ride time: 70 min
     PASSENGER_MAX_EXCESS_RIDE_TIME_MINUTES = 30.0  # passenger excess ride time: 30 min
@@ -601,7 +606,17 @@ class MCVRPPDTW:
         vp_dict = MCVRPPDTW._compute_vehicle_and_penalty(pi_for_cost, graph_size, time_dict)
 
         passenger_delivery_delay_cost_raw = time_dict['passenger_delivery_delay_minutes'] * Config.PASSENGER_DELAY_COST
-        cargo_delay_cost_raw = time_dict['cargo_delay_minutes'] * Config.CARGO_DELAY_COST
+
+        cargo_delay_minutes = time_dict['cargo_delay_minutes']
+        tier1_bound = max(float(Config.CARGO_DELAY_TIER1_MIN), 0.0)
+        tier2_bound = max(float(Config.CARGO_DELAY_TIER2_MIN), tier1_bound)
+        cargo_delay_minutes_0_30 = torch.clamp(cargo_delay_minutes, min=0.0, max=tier1_bound)
+        cargo_delay_minutes_30_60 = torch.clamp(cargo_delay_minutes - tier1_bound, min=0.0, max=tier2_bound - tier1_bound)
+        cargo_delay_minutes_60_plus = torch.clamp(cargo_delay_minutes - tier2_bound, min=0.0)
+        cargo_delay_cost_0_30_raw = cargo_delay_minutes_0_30 * float(Config.CARGO_DELAY_COST)
+        cargo_delay_cost_30_60_raw = cargo_delay_minutes_30_60 * float(Config.CARGO_DELAY_COST_30_60)
+        cargo_delay_cost_60_plus_raw = cargo_delay_minutes_60_plus * float(Config.CARGO_DELAY_COST_60_PLUS)
+        cargo_delay_cost_raw = cargo_delay_cost_0_30_raw + cargo_delay_cost_30_60_raw + cargo_delay_cost_60_plus_raw
 
         # 归一化 + 加权（方案 B）
         normalized_energy_cost = energy_cost_raw / normalization_profile['energy_cost_raw']
@@ -642,6 +657,12 @@ class MCVRPPDTW:
                 'energy_cost_raw': energy_cost_raw,
                 'passenger_delivery_delay_cost_raw': passenger_delivery_delay_cost_raw,
                 'cargo_delay_cost_raw': cargo_delay_cost_raw,
+                'cargo_delay_minutes_0_30': cargo_delay_minutes_0_30,
+                'cargo_delay_minutes_30_60': cargo_delay_minutes_30_60,
+                'cargo_delay_minutes_60_plus': cargo_delay_minutes_60_plus,
+                'cargo_delay_cost_0_30_raw': cargo_delay_cost_0_30_raw,
+                'cargo_delay_cost_30_60_raw': cargo_delay_cost_30_60_raw,
+                'cargo_delay_cost_60_plus_raw': cargo_delay_cost_60_plus_raw,
                 'vehicle_cost_raw': vp_dict['vehicle_cost_raw'],
                 'reject_penalty': vp_dict['reject_penalty'],
                 'unfulfilled_penalty': vp_dict['unfulfilled_penalty'],

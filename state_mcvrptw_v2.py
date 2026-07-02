@@ -41,6 +41,7 @@ class StateMCVRPPDTW(NamedTuple):
     reject_count: torch.Tensor
     allow_reject: bool
     max_concurrent_open_orders: int
+    min_orders_per_dispatch: int
     enable_delivery_viability: bool
     enable_viability_fallback: bool
     relax_pickup_commitment_trip_time: bool
@@ -48,6 +49,7 @@ class StateMCVRPPDTW(NamedTuple):
     cur_coord: torch.Tensor
     deadlock_count: torch.Tensor
     deadlock_limit: torch.Tensor
+    served_orders_since_dispatch: torch.Tensor
     terminal_: torch.Tensor
     i: torch.Tensor
 
@@ -1312,6 +1314,7 @@ class StateMCVRPPDTW(NamedTuple):
         allow_reject=True,
         deadlock_limit=2,
         max_concurrent_open_orders=1,
+        min_orders_per_dispatch=4,
         enable_delivery_viability=False,
         enable_viability_fallback=False,
         relax_pickup_commitment_trip_time=False,
@@ -1364,6 +1367,7 @@ class StateMCVRPPDTW(NamedTuple):
             reject_count=torch.zeros(batch_size, 1, device=device),
             allow_reject=bool(allow_reject),
             max_concurrent_open_orders=max(int(max_concurrent_open_orders), 1),
+            min_orders_per_dispatch=max(int(min_orders_per_dispatch), 1),
             enable_delivery_viability=bool(enable_delivery_viability),
             enable_viability_fallback=bool(enable_viability_fallback),
             relax_pickup_commitment_trip_time=bool(relax_pickup_commitment_trip_time),
@@ -1371,6 +1375,7 @@ class StateMCVRPPDTW(NamedTuple):
             cur_coord=depot[:, None, :],
             deadlock_count=torch.zeros(batch_size, 1, dtype=torch.long, device=device),
             deadlock_limit=torch.full((batch_size, 1), max(int(deadlock_limit), 1), dtype=torch.int64, device=device),
+            served_orders_since_dispatch=torch.zeros(batch_size, 1, dtype=torch.int64, device=device),
             terminal_=torch.zeros(batch_size, 1, dtype=torch.bool, device=device),
             i=torch.zeros(batch_size, 1, dtype=torch.int64, device=device),
         )
@@ -1611,11 +1616,13 @@ class StateMCVRPPDTW(NamedTuple):
                 'diag_mask_vehicle_limit',
                 'diag_depot_carry_block',
                 'diag_depot_no_work_block',
+                'diag_depot_min_orders_block',
                 'diag_depot_fallback_used',
                 'diag_reject_candidate_available',
                 'diag_reject_allowed',
                 'diag_reject_predeparture_available',
                 'diag_reject_inroute_available',
+                'diag_reject_dead_end_inroute_available',
             ]
             debug = {key: torch.zeros(batch_size, device=device) for key in debug_keys}
 
@@ -1666,16 +1673,16 @@ class StateMCVRPPDTW(NamedTuple):
         tw_end = time_windows_active[:, :, 1]
         node_positions = torch.arange(coords_active.size(1), device=device)[None, :]
         is_passenger_node = node_type_active == 1
+        is_cargo_node = node_type_active == 0
         is_pickup_node = (node_positions >= 1) & (node_positions <= n_orders)
 
-        passenger_pickup_mask_full = (
-            Config.HARD_PASSENGER_PICKUP_TIMEWINDOW
-            & is_passenger_node
-            & is_pickup_node
-            & (arrival_time > tw_end + 1e-5)
+        pickup_hard_gate = (
+            (Config.HARD_PASSENGER_PICKUP_TIMEWINDOW & is_passenger_node)
+            | (Config.HARD_CARGO_PICKUP_TIMEWINDOW & is_cargo_node)
         )
+        pickup_hard_mask_full = pickup_hard_gate & is_pickup_node & (arrival_time > tw_end + 1e-5)
         before_mask = service_mask.clone()
-        service_mask |= passenger_pickup_mask_full[:, 1:2 * n_orders + 1]
+        service_mask |= pickup_hard_mask_full[:, 1:2 * n_orders + 1]
         if return_debug:
             debug['diag_mask_pickup_tw'] = (service_mask & ~before_mask).sum(1).float()
         _record('mask_pickup_tw', phase_start)
@@ -2030,6 +2037,27 @@ class StateMCVRPPDTW(NamedTuple):
         mask[:, :, 0] = mask[:, :, 0] | at_depot_no_work[:, None].to(torch.uint8)
 
         all_done = ((self.visited_[:, :, 1:2 * n_orders + 1].sum(-1) == 2 * n_orders) | (self.rejected_.sum(-1) == n_orders)).to(torch.uint8)
+        min_orders = max(int(self.min_orders_per_dispatch), 1)
+        in_dispatch = (self.prev_a != 0)
+        below_min_orders = (
+            in_dispatch
+            & (self.served_orders_since_dispatch < min_orders)
+            & (~all_done.bool())
+        ).squeeze(1)
+
+        no_open_started_orders = (~self.has_open_started_orders()).squeeze(1)
+        pickup_visited = self.visited_[:, :, 1:n_orders + 1].bool().squeeze(1)
+        delivery_visited = self.visited_[:, :, n_orders + 1:2 * n_orders + 1].bool().squeeze(1)
+        untouched_unrejected = (~pickup_visited) & (~delivery_visited) & (~self.rejected_.squeeze(1).bool())
+        remaining_unrejected_orders = untouched_unrejected.sum(-1)
+        at_depot_clean = (self.prev_a == 0).squeeze(1) & no_open_started_orders
+        forbid_small_dispatch = at_depot_clean & (remaining_unrejected_orders > 0) & (remaining_unrejected_orders < min_orders)
+        if forbid_small_dispatch.any():
+            mask[forbid_small_dispatch, :, 1:2 * n_orders + 1] = True
+
+        if return_debug:
+            debug['diag_depot_min_orders_block'] = (below_min_orders | forbid_small_dispatch).float()
+        mask[:, :, 0] = mask[:, :, 0] | below_min_orders[:, None].to(torch.uint8)
         if Config.HARD_VEHICLE_LIMIT:
             import math as _math
             k_max = max(1, _math.ceil(n_orders * Config.DEFAULT_NUM_VEHICLE_RATIO))
@@ -2065,7 +2093,13 @@ class StateMCVRPPDTW(NamedTuple):
         ).squeeze(1)
         at_depot = (self.prev_a == 0).squeeze(1)
         depot_dead_end_reject_gate = at_depot & no_open_started_orders & all_order_nodes_masked.squeeze(-1).bool()
-        dead_end_reject_gate = depot_dead_end_reject_gate
+        inroute_dead_end_reject_gate = (
+            (~at_depot)
+            & below_min_orders
+            & no_open_started_orders
+            & all_order_nodes_masked.squeeze(-1).bool()
+        )
+        dead_end_reject_gate = depot_dead_end_reject_gate | inroute_dead_end_reject_gate
         reject_allowed = (
             reject_candidate_available
             & (~all_done.squeeze(-1).bool())
@@ -2088,6 +2122,7 @@ class StateMCVRPPDTW(NamedTuple):
             debug['diag_reject_allowed'] = reject_allowed.float()
             debug['diag_reject_predeparture_available'] = (reject_available & pre_departure_gate).float()
             debug['diag_reject_inroute_available'] = (reject_available & (~pre_departure_gate)).float()
+            debug['diag_reject_dead_end_inroute_available'] = (reject_available & inroute_dead_end_reject_gate).float()
         _record('mask_finalize', phase_start)
 
         if return_debug:
@@ -2159,6 +2194,16 @@ class StateMCVRPPDTW(NamedTuple):
             torch.where(leaving_depot, dispatch_time, torch.where(is_depot > 0, new_time, self.trip_start_time))
         )
 
+        is_delivery = (actual_selected >= n_orders + 1) & (actual_selected <= 2 * n_orders) & (~is_reject)
+        served_increment = is_delivery.to(self.served_orders_since_dispatch.dtype)
+        new_served_orders_since_dispatch = self.served_orders_since_dispatch + served_increment
+        depot_return = (actual_selected == DEPOT) & (~is_reject)
+        new_served_orders_since_dispatch = torch.where(
+            leaving_depot | depot_return,
+            torch.zeros_like(new_served_orders_since_dispatch),
+            new_served_orders_since_dispatch,
+        )
+
         all_order_nodes_masked = current_mask[:, :, 1:2 * n_orders + 1].all(-1).to(torch.long)
         new_deadlock_count = torch.where(
             (is_depot > 0) & (~is_reject),
@@ -2225,6 +2270,7 @@ class StateMCVRPPDTW(NamedTuple):
             cur_coord=selected_coord,
             deadlock_count=new_deadlock_count,
             deadlock_limit=self.deadlock_limit,
+            served_orders_since_dispatch=new_served_orders_since_dispatch,
             terminal_=new_terminal,
             i=self.i + 1,
         )
@@ -2274,6 +2320,7 @@ class StateMCVRPPDTW(NamedTuple):
                 reject_count=self.reject_count[key],
                 allow_reject=self.allow_reject,
                 max_concurrent_open_orders=self.max_concurrent_open_orders,
+                min_orders_per_dispatch=self.min_orders_per_dispatch,
                 enable_delivery_viability=self.enable_delivery_viability,
                 enable_viability_fallback=self.enable_viability_fallback,
                 relax_pickup_commitment_trip_time=self.relax_pickup_commitment_trip_time,
@@ -2281,6 +2328,7 @@ class StateMCVRPPDTW(NamedTuple):
                 cur_coord=self.cur_coord[key],
                 deadlock_count=self.deadlock_count[key],
                 deadlock_limit=self.deadlock_limit[key],
+                served_orders_since_dispatch=self.served_orders_since_dispatch[key],
                 terminal_=self.terminal_[key],
                 i=self.i[key],
             )

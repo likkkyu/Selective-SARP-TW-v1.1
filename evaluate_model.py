@@ -52,6 +52,23 @@ def parse_args():
                         help='共享实验：若 delivery viability 全挡死则启用安全回退')
     parser.add_argument('--relax-pickup-commitment-trip-time', action='store_true',
                         help='仅对 pickup_commitment 的 completion proof 放松 trip_time gate')
+    parser.add_argument('--min-orders-per-dispatch', type=int, default=None,
+                        help='硬约束：车辆一旦发车，至少完成该数量订单后才可回 depot；默认沿用 checkpoint')
+    parser.add_argument('--hard-cargo-pickup-timewindow', dest='hard_cargo_pickup_timewindow', action='store_true',
+                        help='启用 cargo pickup 硬时间窗（覆盖 checkpoint）')
+    parser.add_argument('--soft-cargo-pickup-timewindow', dest='hard_cargo_pickup_timewindow', action='store_false',
+                        help='关闭 cargo pickup 硬时间窗（覆盖 checkpoint）')
+    parser.set_defaults(hard_cargo_pickup_timewindow=None)
+    parser.add_argument('--cargo-delay-tier1-min', type=float, default=None,
+                        help='cargo delivery 分段迟到阈值1（分钟）；默认沿用 checkpoint')
+    parser.add_argument('--cargo-delay-tier2-min', type=float, default=None,
+                        help='cargo delivery 分段迟到阈值2（分钟）；默认沿用 checkpoint')
+    parser.add_argument('--cargo-delay-cost-0-30', type=float, default=None,
+                        help='cargo delivery 0~tier1 每分钟成本；默认沿用 checkpoint')
+    parser.add_argument('--cargo-delay-cost-30-60', type=float, default=None,
+                        help='cargo delivery tier1~tier2 每分钟成本；默认沿用 checkpoint')
+    parser.add_argument('--cargo-delay-cost-60-plus', type=float, default=None,
+                        help='cargo delivery >tier2 每分钟成本；默认沿用 checkpoint')
     parser.add_argument('--passenger-tw-period-weights', nargs=3, type=float, default=None,
                         metavar=('MORNING', 'MIDDAY', 'EVENING'),
                         help='覆盖默认 passenger 三时段 TW 权重')
@@ -160,16 +177,46 @@ def _resolve_state_kwargs(args, checkpoint):
     if max_open == 1 and 'max_concurrent_open_orders' in ckpt_args:
         max_open = ckpt_args['max_concurrent_open_orders']
 
-    enable_delivery_viability = args.enable_delivery_viability
-    if (not enable_delivery_viability) and ('enable_delivery_viability' in ckpt_args):
+    min_orders_per_dispatch = getattr(args, 'min_orders_per_dispatch', None)
+    if min_orders_per_dispatch is None:
+        min_orders_per_dispatch = int(ckpt_args.get('min_orders_per_dispatch', 4))
+
+    enable_delivery_viability = getattr(args, 'enable_delivery_viability', False)
+    if enable_delivery_viability is None:
+        enable_delivery_viability = bool(ckpt_args.get('enable_delivery_viability', True))
+    elif (not enable_delivery_viability) and ('enable_delivery_viability' in ckpt_args):
         enable_delivery_viability = bool(ckpt_args['enable_delivery_viability'])
 
-    enable_viability_fallback = args.enable_viability_fallback
-    if (not enable_viability_fallback) and ('enable_viability_fallback' in ckpt_args):
+    enable_viability_fallback = getattr(args, 'enable_viability_fallback', False)
+    if enable_viability_fallback is None:
+        enable_viability_fallback = bool(ckpt_args.get('enable_viability_fallback', False))
+    elif (not enable_viability_fallback) and ('enable_viability_fallback' in ckpt_args):
         enable_viability_fallback = bool(ckpt_args['enable_viability_fallback'])
+
+    if getattr(args, 'hard_cargo_pickup_timewindow', None) is None:
+        Config.HARD_CARGO_PICKUP_TIMEWINDOW = bool(ckpt_args.get('hard_cargo_pickup_timewindow', Config.HARD_CARGO_PICKUP_TIMEWINDOW))
+    else:
+        Config.HARD_CARGO_PICKUP_TIMEWINDOW = bool(args.hard_cargo_pickup_timewindow)
+
+    arg_tier1 = getattr(args, 'cargo_delay_tier1_min', None)
+    arg_tier2 = getattr(args, 'cargo_delay_tier2_min', None)
+    tier1 = arg_tier1 if arg_tier1 is not None else ckpt_args.get('cargo_delay_tier1_min', Config.CARGO_DELAY_TIER1_MIN)
+    tier2 = arg_tier2 if arg_tier2 is not None else ckpt_args.get('cargo_delay_tier2_min', Config.CARGO_DELAY_TIER2_MIN)
+    Config.CARGO_DELAY_TIER1_MIN = max(float(tier1), 0.0)
+    Config.CARGO_DELAY_TIER2_MIN = max(float(tier2), Config.CARGO_DELAY_TIER1_MIN)
+    arg_cost0 = getattr(args, 'cargo_delay_cost_0_30', None)
+    arg_cost1 = getattr(args, 'cargo_delay_cost_30_60', None)
+    arg_cost2 = getattr(args, 'cargo_delay_cost_60_plus', None)
+    cost0 = arg_cost0 if arg_cost0 is not None else ckpt_args.get('cargo_delay_cost_0_30', Config.CARGO_DELAY_COST)
+    cost1 = arg_cost1 if arg_cost1 is not None else ckpt_args.get('cargo_delay_cost_30_60', Config.CARGO_DELAY_COST_30_60)
+    cost2 = arg_cost2 if arg_cost2 is not None else ckpt_args.get('cargo_delay_cost_60_plus', Config.CARGO_DELAY_COST_60_PLUS)
+    Config.CARGO_DELAY_COST = max(float(cost0), 0.0)
+    Config.CARGO_DELAY_COST_30_60 = max(float(cost1), 0.0)
+    Config.CARGO_DELAY_COST_60_PLUS = max(float(cost2), 0.0)
 
     return {
         'max_concurrent_open_orders': max_open,
+        'min_orders_per_dispatch': int(max(min_orders_per_dispatch, 1)),
         'enable_delivery_viability': enable_delivery_viability,
         'enable_viability_fallback': enable_viability_fallback,
         'relax_pickup_commitment_trip_time': bool(getattr(args, 'relax_pickup_commitment_trip_time', False)),
@@ -654,6 +701,7 @@ def evaluate():
     print(f'  loaded epoch : {checkpoint.get("epoch", "?")}')
     state_kwargs = _resolve_state_kwargs(args, checkpoint)
     print(f"  shared env   : max_open={state_kwargs['max_concurrent_open_orders']}, "
+          f"min_orders_per_dispatch={state_kwargs['min_orders_per_dispatch']}, "
           f"delivery_viability={state_kwargs['enable_delivery_viability']}, "
           f"viability_fallback={state_kwargs['enable_viability_fallback']}, "
           f"relax_commitment_trip_time={state_kwargs['relax_pickup_commitment_trip_time']}")
@@ -1041,7 +1089,10 @@ def evaluate():
     print(f'  Passenger Excess Ride: {Config.PASSENGER_MAX_EXCESS_RIDE_TIME_MINUTES:.0f} min')
     print(f'  Electricity Price    : {Config.ELECTRICITY_PRICE} RMB/kWh')
     print(f'  Passenger Delivery Delay Cost : {Config.PASSENGER_DELAY_COST} RMB/min')
-    print(f'  Cargo Delay Cost     : {Config.CARGO_DELAY_COST} RMB/min')
+    print(f'  Cargo Pickup TW Hard : {Config.HARD_CARGO_PICKUP_TIMEWINDOW}')
+    print(f'  Cargo Delay Piecewise: [0,{Config.CARGO_DELAY_TIER1_MIN:.0f}]={Config.CARGO_DELAY_COST} RMB/min, '
+          f'({Config.CARGO_DELAY_TIER1_MIN:.0f},{Config.CARGO_DELAY_TIER2_MIN:.0f}]={Config.CARGO_DELAY_COST_30_60} RMB/min, '
+          f'>{Config.CARGO_DELAY_TIER2_MIN:.0f}={Config.CARGO_DELAY_COST_60_PLUS} RMB/min')
     print(f'  Vehicle Fixed Cost   : {Config.VEHICLE_COST} RMB/车')
     print(f'  Reject Penalty (α)   : {Config.ALPHA_REJECT} RMB/主动 reject 单')
     print(f'  Unfulfilled (α)      : {Config.ALPHA_UNFULFILLED} RMB/未履约单')

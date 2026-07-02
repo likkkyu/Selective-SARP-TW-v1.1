@@ -544,6 +544,181 @@ def business_priority_regression():
     )
 
 
+def cargo_pickup_hard_timewindow_regression():
+    print('\n' + '=' * 60)
+    print('cargo pickup 硬时间窗回归测试')
+    print('=' * 60)
+
+    old_hard = Config.HARD_CARGO_PICKUP_TIMEWINDOW
+    Config.HARD_CARGO_PICKUP_TIMEWINDOW = True
+    try:
+        depot = torch.tensor([[0.2, 0.2]], dtype=torch.float)
+        pickup = torch.tensor([[0.8, 0.8]], dtype=torch.float)
+        delivery = torch.tensor([[0.81, 0.81]], dtype=torch.float)
+        loc = torch.cat([pickup, delivery], dim=0).unsqueeze(0)
+        node_type = torch.zeros(1, 2, dtype=torch.float)
+        demand_passenger = torch.zeros(1, 2, dtype=torch.float)
+        demand_cargo = torch.tensor([[0.2, -0.2]], dtype=torch.float)
+        time_windows = torch.tensor([[[10.0, 10.05], [10.0, 16.0]]], dtype=torch.float)
+        batch = {
+            'depot': depot,
+            'loc': loc,
+            'node_type': node_type,
+            'demand_passenger': demand_passenger,
+            'demand_cargo': demand_cargo,
+            'time_windows': time_windows,
+        }
+        state = StateMCVRPPDTW.initialize(batch, min_orders_per_dispatch=1)
+        mask = state.get_mask()
+        pickup_masked = bool(mask[0, 0, 1].item())
+        print(f'cargo pickup masked={pickup_masked}')
+        assert pickup_masked is True, 'cargo pickup 超窗时必须被硬屏蔽'
+    finally:
+        Config.HARD_CARGO_PICKUP_TIMEWINDOW = old_hard
+
+
+def cargo_piecewise_delay_cost_regression():
+    print('\n' + '=' * 60)
+    print('cargo delivery 分段迟到成本回归测试')
+    print('=' * 60)
+
+    old_cfg = (
+        Config.CARGO_DELAY_COST,
+        Config.CARGO_DELAY_TIER1_MIN,
+        Config.CARGO_DELAY_TIER2_MIN,
+        Config.CARGO_DELAY_COST_30_60,
+        Config.CARGO_DELAY_COST_60_PLUS,
+    )
+    Config.CARGO_DELAY_COST = 0.06
+    Config.CARGO_DELAY_TIER1_MIN = 30.0
+    Config.CARGO_DELAY_TIER2_MIN = 60.0
+    Config.CARGO_DELAY_COST_30_60 = 0.18
+    Config.CARGO_DELAY_COST_60_PLUS = 0.36
+    try:
+        depot = torch.tensor([[0.2, 0.2]], dtype=torch.float)
+        pickup = torch.tensor([[0.2, 0.2]], dtype=torch.float)
+        delivery = torch.tensor([[0.8, 0.8]], dtype=torch.float)
+        loc = torch.cat([pickup, delivery], dim=0).unsqueeze(0)
+        node_type = torch.zeros(1, 2, dtype=torch.float)
+        demand_passenger = torch.zeros(1, 2, dtype=torch.float)
+        demand_cargo = torch.tensor([[0.2, -0.2]], dtype=torch.float)
+        time_windows = torch.tensor([[[10.0, 16.0], [10.0, 11.0]]], dtype=torch.float)
+        batch = {
+            'depot': depot,
+            'loc': loc,
+            'node_type': node_type,
+            'demand_passenger': demand_passenger,
+            'demand_cargo': demand_cargo,
+            'time_windows': time_windows,
+        }
+        pi = torch.tensor([[0, 1, 2, 0]], dtype=torch.long)
+        _, details = MCVRPPDTW.get_costs(batch, pi, return_details=True)
+        late_min = float(details['cargo_delay_minutes'].item())
+        tier1 = min(late_min, Config.CARGO_DELAY_TIER1_MIN)
+        tier2 = min(max(late_min - Config.CARGO_DELAY_TIER1_MIN, 0.0), Config.CARGO_DELAY_TIER2_MIN - Config.CARGO_DELAY_TIER1_MIN)
+        tier3 = max(late_min - Config.CARGO_DELAY_TIER2_MIN, 0.0)
+        expected = (
+            tier1 * Config.CARGO_DELAY_COST
+            + tier2 * Config.CARGO_DELAY_COST_30_60
+            + tier3 * Config.CARGO_DELAY_COST_60_PLUS
+        )
+        got = float(details['cargo_delay_cost_raw'].item())
+        print(f'late_min={late_min:.2f}, expected={expected:.6f}, got={got:.6f}')
+        assert abs(got - expected) < 1e-5, 'cargo 分段迟到成本与手算不一致'
+    finally:
+        (
+            Config.CARGO_DELAY_COST,
+            Config.CARGO_DELAY_TIER1_MIN,
+            Config.CARGO_DELAY_TIER2_MIN,
+            Config.CARGO_DELAY_COST_30_60,
+            Config.CARGO_DELAY_COST_60_PLUS,
+        ) = old_cfg
+
+
+def min_orders_per_dispatch_regression():
+    print('\n' + '=' * 60)
+    print('发车最少完成订单数硬约束回归测试')
+    print('=' * 60)
+
+    n_orders = 4
+    depot = torch.tensor([[0.2, 0.2]], dtype=torch.float)
+    pickup = torch.tensor([[0.24, 0.24], [0.26, 0.24], [0.28, 0.24], [0.30, 0.24]], dtype=torch.float)
+    delivery = torch.tensor([[0.24, 0.32], [0.26, 0.32], [0.28, 0.32], [0.30, 0.32]], dtype=torch.float)
+    loc = torch.cat([pickup, delivery], dim=0).unsqueeze(0)
+    node_type = torch.ones(1, 2 * n_orders, dtype=torch.float)
+    demand_passenger = torch.zeros(1, 2 * n_orders, dtype=torch.float)
+    per = 1.0 / Config.PASSENGER_CAPACITY
+    demand_passenger[0, :n_orders] = per
+    demand_passenger[0, n_orders:] = -per
+    demand_cargo = torch.zeros(1, 2 * n_orders, dtype=torch.float)
+    time_windows = torch.tensor([[[10.0, 16.0]] * (2 * n_orders)], dtype=torch.float)
+    batch = {
+        'depot': depot,
+        'loc': loc,
+        'node_type': node_type,
+        'demand_passenger': demand_passenger,
+        'demand_cargo': demand_cargo,
+        'time_windows': time_windows,
+    }
+
+    state = StateMCVRPPDTW.initialize(batch, min_orders_per_dispatch=4)
+    for pickup_idx in [1, 2, 3]:
+        state = state.update(torch.tensor([pickup_idx]))
+        state = state.update(torch.tensor([pickup_idx + n_orders]))
+
+    mask = state.get_mask()
+    depot_masked_before = bool(mask[0, 0, 0].item())
+    print(f'完成3单后 depot masked={depot_masked_before}')
+    assert depot_masked_before is True, '未满4单时 depot 必须被硬屏蔽'
+
+    state = state.update(torch.tensor([4]))
+    state = state.update(torch.tensor([8]))
+    mask = state.get_mask()
+    depot_masked_after = bool(mask[0, 0, 0].item())
+    print(f'完成4单后 depot masked={depot_masked_after}')
+    assert depot_masked_after is False, '达到4单后 depot 应可恢复可行'
+
+
+def dead_end_reject_under_min_dispatch_regression():
+    print('\n' + '=' * 60)
+    print('min-orders dead-end reject 可用性回归测试')
+    print('=' * 60)
+
+    old_hard = Config.HARD_CARGO_PICKUP_TIMEWINDOW
+    Config.HARD_CARGO_PICKUP_TIMEWINDOW = True
+    try:
+        n_orders = 2
+        depot = torch.tensor([[0.2, 0.2]], dtype=torch.float)
+        pickup = torch.tensor([[0.24, 0.24], [0.80, 0.80]], dtype=torch.float)
+        delivery = torch.tensor([[0.24, 0.34], [0.82, 0.82]], dtype=torch.float)
+        loc = torch.cat([pickup, delivery], dim=0).unsqueeze(0)
+        node_type = torch.zeros(1, 2 * n_orders, dtype=torch.float)
+        demand_passenger = torch.zeros(1, 2 * n_orders, dtype=torch.float)
+        demand_cargo = torch.zeros(1, 2 * n_orders, dtype=torch.float)
+        demand_cargo[0, :n_orders] = 0.2
+        demand_cargo[0, n_orders:] = -0.2
+        time_windows = torch.tensor([[[10.0, 16.0], [10.0, 10.02], [10.0, 16.0], [10.0, 16.0]]], dtype=torch.float)
+        batch = {
+            'depot': depot,
+            'loc': loc,
+            'node_type': node_type,
+            'demand_passenger': demand_passenger,
+            'demand_cargo': demand_cargo,
+            'time_windows': time_windows,
+        }
+        state = StateMCVRPPDTW.initialize(batch, min_orders_per_dispatch=4, allow_reject=True)
+        state = state.update(torch.tensor([1]))
+        state = state.update(torch.tensor([3]))
+        mask, debug = state.get_mask(return_debug=True)
+        reject_available = bool((~mask[0, 0, state.reject_index]).item())
+        depot_masked = bool(mask[0, 0, 0].item())
+        print(f'reject_available={reject_available}, depot_masked={depot_masked}, inroute_dead_end={debug["diag_reject_dead_end_inroute_available"].item():.1f}')
+        assert depot_masked is True, '未满4单且仍在路上时 depot 应被屏蔽'
+        assert reject_available is True, 'dead-end 场景必须放开 reject'
+    finally:
+        Config.HARD_CARGO_PICKUP_TIMEWINDOW = old_hard
+
+
 def dry_run():
     basic_dry_run()
     shared_mask_regression()
@@ -553,6 +728,10 @@ def dry_run():
     attention_shrink_pomo_regression()
     pomo_baseline_mode_regression()
     business_priority_regression()
+    cargo_pickup_hard_timewindow_regression()
+    cargo_piecewise_delay_cost_regression()
+    min_orders_per_dispatch_regression()
+    dead_end_reject_under_min_dispatch_regression()
     print('\nDry-run 验证完成！')
 
 

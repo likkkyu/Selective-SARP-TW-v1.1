@@ -245,11 +245,16 @@ class POMOTrainerOptimized:
             print(f"Graph size: {self.args.graph_size} orders")
             print(f"Normalization profile: {json.dumps(self.normalization_profile, ensure_ascii=False)}")
             print(f"Shared env defaults: max_open={self.args.max_concurrent_open_orders}, "
+                  f"min_orders_per_dispatch={self.args.min_orders_per_dispatch}, "
                   f"delivery_viability={self.args.enable_delivery_viability}, "
                   f"viability_fallback={self.args.enable_viability_fallback}")
             print(f"Reward profile: energy={self.args.alpha_energy}, delay={self.args.alpha_delay}, "
                   f"vehicle={self.args.alpha_vehicle}, reject={self.args.alpha_reject}, "
                   f"unfulfilled={self.args.alpha_unfulfilled}, overtime={self.args.alpha_trip_overtime}")
+            print(f"Cargo pickup hard TW: {Config.HARD_CARGO_PICKUP_TIMEWINDOW}")
+            print(f"Cargo delay piecewise: [0,{Config.CARGO_DELAY_TIER1_MIN:.0f}]={Config.CARGO_DELAY_COST:.3f}, "
+                  f"({Config.CARGO_DELAY_TIER1_MIN:.0f},{Config.CARGO_DELAY_TIER2_MIN:.0f}]={Config.CARGO_DELAY_COST_30_60:.3f}, "
+                  f">{Config.CARGO_DELAY_TIER2_MIN:.0f}={Config.CARGO_DELAY_COST_60_PLUS:.3f}")
             print(f"Passenger pickup TW width: {Config.PASSENGER_TW_WIDTH:.1f} h")
             print(f"Global seed: {self.args.seed}")
             print(f"Model params: {sum(p.numel() for p in self.raw_model.parameters()):,}")
@@ -318,6 +323,7 @@ class POMOTrainerOptimized:
             'allow_reject': allow_reject,
             'deadlock_limit': self.args.deadlock_limit,
             'max_concurrent_open_orders': self.args.max_concurrent_open_orders,
+            'min_orders_per_dispatch': self.args.min_orders_per_dispatch,
             'enable_delivery_viability': self.args.enable_delivery_viability,
             'enable_viability_fallback': self.args.enable_viability_fallback,
             'relax_pickup_commitment_trip_time': self.args.relax_pickup_commitment_trip_time,
@@ -1353,6 +1359,11 @@ class POMOTrainerOptimized:
                     'ELECTRICITY_PRICE': Config.ELECTRICITY_PRICE,
                     'PASSENGER_DELAY_COST': Config.PASSENGER_DELAY_COST,
                     'CARGO_DELAY_COST': Config.CARGO_DELAY_COST,
+                    'CARGO_DELAY_TIER1_MIN': Config.CARGO_DELAY_TIER1_MIN,
+                    'CARGO_DELAY_TIER2_MIN': Config.CARGO_DELAY_TIER2_MIN,
+                    'CARGO_DELAY_COST_30_60': Config.CARGO_DELAY_COST_30_60,
+                    'CARGO_DELAY_COST_60_PLUS': Config.CARGO_DELAY_COST_60_PLUS,
+                    'HARD_CARGO_PICKUP_TIMEWINDOW': Config.HARD_CARGO_PICKUP_TIMEWINDOW,
                     'ALPHA_ENERGY': self.args.alpha_energy,
                     'ALPHA_DELAY': self.args.alpha_delay,
                     'ALPHA_VEHICLE': self.args.alpha_vehicle,
@@ -1371,6 +1382,7 @@ class POMOTrainerOptimized:
                     'service_checkpoint_metric': 'service_priority(service_rate -> unfulfilled_rate -> rejected_rate -> avg_objective)',
                     'OPERATION_END': Config.OPERATION_END,
                     'max_concurrent_open_orders': self.args.max_concurrent_open_orders,
+                    'min_orders_per_dispatch': self.args.min_orders_per_dispatch,
                     'enable_delivery_viability': self.args.enable_delivery_viability,
                     'enable_viability_fallback': self.args.enable_viability_fallback,
                     'enable_rideshare_curriculum': self.args.enable_rideshare_curriculum,
@@ -1465,6 +1477,14 @@ def parse_args():
     parser.add_argument('--disable-delivery-viability', action='store_false', dest='enable_delivery_viability', help='关闭 delivery viability（仅对照实验）')
     parser.add_argument('--enable-viability-fallback', action='store_true', default=False, help='启用 delivery viability fallback（仅对照实验）')
     parser.add_argument('--relax-pickup-commitment-trip-time', action='store_true', default=False, help='仅对 pickup_commitment 的 completion proof 放松 trip_time gate（实验开关）')
+    parser.add_argument('--min-orders-per-dispatch', type=int, default=4, help='硬约束：车辆一旦发车，至少完成该数量订单后才可回 depot')
+    parser.add_argument('--hard-cargo-pickup-timewindow', dest='hard_cargo_pickup_timewindow', action='store_true', default=True, help='启用 cargo pickup 硬时间窗')
+    parser.add_argument('--soft-cargo-pickup-timewindow', dest='hard_cargo_pickup_timewindow', action='store_false', help='关闭 cargo pickup 硬时间窗（用于消融）')
+    parser.add_argument('--cargo-delay-tier1-min', type=float, default=Config.CARGO_DELAY_TIER1_MIN, help='cargo delivery 分段迟到阈值1（分钟）')
+    parser.add_argument('--cargo-delay-tier2-min', type=float, default=Config.CARGO_DELAY_TIER2_MIN, help='cargo delivery 分段迟到阈值2（分钟）')
+    parser.add_argument('--cargo-delay-cost-0-30', type=float, default=Config.CARGO_DELAY_COST, help='cargo delivery 0~tier1 每分钟成本')
+    parser.add_argument('--cargo-delay-cost-30-60', type=float, default=Config.CARGO_DELAY_COST_30_60, help='cargo delivery tier1~tier2 每分钟成本')
+    parser.add_argument('--cargo-delay-cost-60-plus', type=float, default=Config.CARGO_DELAY_COST_60_PLUS, help='cargo delivery >tier2 每分钟成本')
     parser.add_argument('--alpha-energy', type=float, default=Config.ALPHA_ENERGY, help='训练 objective 中 energy 项的权重')
     parser.add_argument('--alpha-delay', type=float, default=Config.ALPHA_DELAY, help='训练 objective 中 delay 项的权重')
     parser.add_argument('--alpha-vehicle', type=float, default=Config.ALPHA_VEHICLE, help='训练 objective 中 vehicle 项的权重')
@@ -1547,6 +1567,15 @@ def apply_runtime_training_config(args):
     Config.ALPHA_UNFULFILLED = float(args.alpha_unfulfilled)
     Config.ALPHA_TRIP_OVERTIME = float(args.alpha_trip_overtime)
 
+    Config.HARD_CARGO_PICKUP_TIMEWINDOW = bool(getattr(args, 'hard_cargo_pickup_timewindow', True))
+    tier1 = max(float(getattr(args, 'cargo_delay_tier1_min', Config.CARGO_DELAY_TIER1_MIN)), 0.0)
+    tier2 = max(float(getattr(args, 'cargo_delay_tier2_min', Config.CARGO_DELAY_TIER2_MIN)), tier1)
+    Config.CARGO_DELAY_TIER1_MIN = tier1
+    Config.CARGO_DELAY_TIER2_MIN = tier2
+    Config.CARGO_DELAY_COST = max(float(getattr(args, 'cargo_delay_cost_0_30', Config.CARGO_DELAY_COST)), 0.0)
+    Config.CARGO_DELAY_COST_30_60 = max(float(getattr(args, 'cargo_delay_cost_30_60', Config.CARGO_DELAY_COST_30_60)), 0.0)
+    Config.CARGO_DELAY_COST_60_PLUS = max(float(getattr(args, 'cargo_delay_cost_60_plus', Config.CARGO_DELAY_COST_60_PLUS)), 0.0)
+
 
 def build_phase_args(cli_args, graph_size):
     if graph_size not in PHASE_CONFIGS:
@@ -1605,15 +1634,23 @@ def build_phase_args(cli_args, graph_size):
         reject_init_bias=cli_args.reject_init_bias,
         baseline_mode=cli_args.baseline_mode,
         max_concurrent_open_orders=cli_args.max_concurrent_open_orders,
+        min_orders_per_dispatch=cli_args.min_orders_per_dispatch,
         enable_delivery_viability=cli_args.enable_delivery_viability,
         enable_viability_fallback=cli_args.enable_viability_fallback,
         relax_pickup_commitment_trip_time=cli_args.relax_pickup_commitment_trip_time,
+        hard_cargo_pickup_timewindow=cli_args.hard_cargo_pickup_timewindow,
+        cargo_delay_tier1_min=cli_args.cargo_delay_tier1_min,
+        cargo_delay_tier2_min=cli_args.cargo_delay_tier2_min,
+        cargo_delay_cost_0_30=cli_args.cargo_delay_cost_0_30,
+        cargo_delay_cost_30_60=cli_args.cargo_delay_cost_30_60,
+        cargo_delay_cost_60_plus=cli_args.cargo_delay_cost_60_plus,
         alpha_energy=cli_args.alpha_energy,
         alpha_delay=cli_args.alpha_delay,
         alpha_vehicle=cli_args.alpha_vehicle,
         alpha_reject=cli_args.alpha_reject,
         alpha_unfulfilled=cli_args.alpha_unfulfilled,
         alpha_trip_overtime=cli_args.alpha_trip_overtime,
+        cargo_delay_cost=cli_args.cargo_delay_cost_0_30,
         passenger_tw_period_weights_override=default_passenger_tw,
         cargo_tw_period_weights_override=default_cargo_tw,
         passenger_tw_period_bounds_override=default_passenger_tw_bounds,
