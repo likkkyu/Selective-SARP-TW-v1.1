@@ -1,5 +1,6 @@
 import os
 import sys
+import types
 
 import torch
 
@@ -101,7 +102,7 @@ def _reshape_pomo_tensor(value, base_batch_size, pomo_size):
     return value.reshape(base_batch_size, pomo_size, *value.shape[1:])
 
 
-def _build_test_attention_model(shrink_size):
+def _build_test_attention_model(shrink_size, decode_pickup_urgency_bias=0.0, decode_pickup_urgency_horizon_hours=1.0):
     model = AttentionModel(
         embedding_dim=64,
         hidden_dim=64,
@@ -112,6 +113,8 @@ def _build_test_attention_model(shrink_size):
         normalization='batch',
         shrink_size=shrink_size,
         reject_init_bias=-2.5,
+        decode_pickup_urgency_bias=decode_pickup_urgency_bias,
+        decode_pickup_urgency_horizon_hours=decode_pickup_urgency_horizon_hours,
     )
     model.eval()
     set_decode_type(model, 'greedy')
@@ -463,6 +466,159 @@ def attention_shrink_pomo_regression():
         assert torch.isfinite(debug_shrink[key]).all(), f'shrink debug[{key}] 出现非有限值'
 
 
+def _build_pickup_urgency_case(second_pickup_missed=False):
+    n_orders = 2
+    depot = torch.tensor([[0.10, 0.10]], dtype=torch.float)
+    pickup_locs = torch.tensor([[0.12, 0.10], [0.11, 0.10]], dtype=torch.float)
+    delivery_locs = torch.tensor([[0.12, 0.14], [0.11, 0.14]], dtype=torch.float)
+    loc = torch.cat([pickup_locs, delivery_locs], dim=0).unsqueeze(0)
+
+    node_type = torch.ones(1, 2 * n_orders, dtype=torch.float)
+    demand_passenger = torch.zeros(1, 2 * n_orders, dtype=torch.float)
+    demand_cargo = torch.zeros(1, 2 * n_orders, dtype=torch.float)
+    per_order = 1.0 / Config.PASSENGER_CAPACITY
+    demand_passenger[0, :n_orders] = per_order
+    demand_passenger[0, n_orders:] = -per_order
+
+    pickup2_end = 10.002 if second_pickup_missed else 10.06
+    time_windows = torch.tensor([[
+        [10.0, 12.0],
+        [10.0, pickup2_end],
+        [10.0, 16.0],
+        [10.0, 16.0],
+    ]], dtype=torch.float)
+
+    return {
+        'depot': depot,
+        'loc': loc,
+        'node_type': node_type,
+        'demand_passenger': demand_passenger,
+        'demand_cargo': demand_cargo,
+        'time_windows': time_windows,
+    }
+
+
+def _prepare_fixed_and_state(model, batch):
+    with torch.no_grad():
+        init_embed = model._init_embed(batch)
+        pd_pair_mask = model._build_pd_pair_mask(batch)
+        embeddings, _ = model.embedder(init_embed, pd_pair_mask=pd_pair_mask)
+        fixed = model._precompute(embeddings)
+    state = StateMCVRPPDTW.initialize(
+        batch,
+        min_orders_per_dispatch=1,
+        max_concurrent_open_orders=6,
+        enable_delivery_viability=True,
+        enable_viability_fallback=False,
+    )
+    return fixed, state
+
+
+def _attach_flat_logits(model):
+    def _flat_logits(self, query, step_context, glimpse_K, glimpse_V, logit_K, mask):
+        logits = torch.zeros(mask.size(), device=mask.device, dtype=query.dtype)
+        logits = logits.masked_fill(mask, -float('inf'))
+        glimpse = torch.zeros(query.size(0), query.size(1), query.size(-1), device=query.device, dtype=query.dtype)
+        return logits, glimpse
+
+    model._one_to_many_logits = types.MethodType(_flat_logits, model)
+
+
+def urgency_bias_changes_greedy_choice_regression():
+    print('\n' + '=' * 60)
+    print('pickup urgency bias 改变 greedy 选择回归测试')
+    print('=' * 60)
+
+    batch = _build_pickup_urgency_case(second_pickup_missed=False)
+
+    model_base = _build_test_attention_model(shrink_size=None, decode_pickup_urgency_bias=0.0, decode_pickup_urgency_horizon_hours=1.0)
+    model_urgency = _build_test_attention_model(shrink_size=None, decode_pickup_urgency_bias=3.0, decode_pickup_urgency_horizon_hours=1.0)
+    model_urgency.load_state_dict(model_base.state_dict())
+    _attach_flat_logits(model_base)
+    _attach_flat_logits(model_urgency)
+
+    fixed_base, state = _prepare_fixed_and_state(model_base, batch)
+    fixed_urgency, _ = _prepare_fixed_and_state(model_urgency, batch)
+
+    with torch.no_grad():
+        log_p_base, mask_base, _ = model_base._get_log_p(fixed_base, state, normalize=True, return_debug=False)
+        log_p_urgency, mask_urgency, _ = model_urgency._get_log_p(fixed_urgency, state, normalize=True, return_debug=False)
+        selected_base = model_base._select_node(log_p_base.exp()[:, 0, :], mask_base[:, 0, :])
+        selected_urgency = model_urgency._select_node(log_p_urgency.exp()[:, 0, :], mask_urgency[:, 0, :])
+
+    print(f'base selected={int(selected_base.item())}, urgency selected={int(selected_urgency.item())}')
+    assert bool(mask_base[0, 0, 1].item()) is False and bool(mask_base[0, 0, 2].item()) is False, '测试前提失败：两个 pickup 应都可行'
+    assert int(selected_base.item()) == 1, '无 urgency 时应按平分 tie-break 选第一个 pickup'
+    assert int(selected_urgency.item()) == 2, '开启 urgency 后应优先更紧迫的 pickup'
+
+
+def urgency_bias_preserves_mask_semantics_regression():
+    print('\n' + '=' * 60)
+    print('pickup urgency bias 保持 mask 语义回归测试')
+    print('=' * 60)
+
+    batch = _build_pickup_urgency_case(second_pickup_missed=True)
+    model_urgency = _build_test_attention_model(shrink_size=None, decode_pickup_urgency_bias=50.0, decode_pickup_urgency_horizon_hours=1.0)
+    _attach_flat_logits(model_urgency)
+    fixed, state = _prepare_fixed_and_state(model_urgency, batch)
+
+    with torch.no_grad():
+        log_p, mask, _ = model_urgency._get_log_p(fixed, state, normalize=False, return_debug=False)
+        probs = torch.softmax(log_p[:, 0, :], dim=-1)
+        selected = model_urgency._select_node(probs, mask[:, 0, :])
+
+    print(f'masked pickup2={bool(mask[0,0,2].item())}, selected={int(selected.item())}')
+    assert bool(mask[0, 0, 2].item()) is True, '测试前提失败：pickup2 应被 pickup TW 硬屏蔽'
+    assert torch.isneginf(log_p[0, 0, 2]), '被 mask 的 pickup2 logit 必须保持 -inf'
+    assert int(selected.item()) != 2, '被 mask 的 pickup2 不可被选中'
+
+
+def urgency_bias_training_path_slack_available_regression():
+    print('\n' + '=' * 60)
+    print('pickup urgency bias 训练路径 slack 可用性回归测试')
+    print('=' * 60)
+
+    batch = _build_pickup_urgency_case(second_pickup_missed=False)
+
+    model_base = _build_test_attention_model(shrink_size=None, decode_pickup_urgency_bias=0.0, decode_pickup_urgency_horizon_hours=1.0)
+    model_urgency = _build_test_attention_model(shrink_size=None, decode_pickup_urgency_bias=3.0, decode_pickup_urgency_horizon_hours=1.0)
+    model_urgency.load_state_dict(model_base.state_dict())
+    _attach_flat_logits(model_base)
+    _attach_flat_logits(model_urgency)
+
+    fixed_base, state_base = _prepare_fixed_and_state(model_base, batch)
+    fixed_urgency, state_urgency = _prepare_fixed_and_state(model_urgency, batch)
+
+    observed = {'training_calls': 0, 'slack_populated': 0}
+    original_get_mask = StateMCVRPPDTW.get_mask
+
+    def _wrapped_get_mask(self, *args, **kwargs):
+        aux_outputs = kwargs.get('aux_outputs')
+        return_debug = bool(kwargs.get('return_debug', False))
+        return_urgency_slack = bool(kwargs.get('return_urgency_slack', False))
+        result = original_get_mask(self, *args, **kwargs)
+        if (not return_debug) and return_urgency_slack:
+            observed['training_calls'] += 1
+            if isinstance(aux_outputs, dict) and ('pickup_tw_slack_hours' in aux_outputs):
+                observed['slack_populated'] += 1
+        return result
+
+    StateMCVRPPDTW.get_mask = _wrapped_get_mask
+    try:
+        with torch.no_grad():
+            log_p_base, mask_base, _ = model_base._get_log_p(fixed_base, state_base, normalize=True, return_debug=False)
+            log_p_urgency, mask_urgency, _ = model_urgency._get_log_p(fixed_urgency, state_urgency, normalize=True, return_debug=False)
+            selected_base = model_base._select_node(log_p_base.exp()[:, 0, :], mask_base[:, 0, :])
+            selected_urgency = model_urgency._select_node(log_p_urgency.exp()[:, 0, :], mask_urgency[:, 0, :])
+    finally:
+        StateMCVRPPDTW.get_mask = original_get_mask
+
+    print(f"training_path_calls={observed['training_calls']}, slack_populated={observed['slack_populated']}, base={int(selected_base.item())}, urgency={int(selected_urgency.item())}")
+    assert observed['training_calls'] > 0, 'return_debug=False 训练路径应请求 urgency slack'
+    assert observed['slack_populated'] > 0, '训练路径 aux_outputs 中应写入 pickup_tw_slack_hours'
+    assert int(selected_base.item()) == 1 and int(selected_urgency.item()) == 2, '训练路径下 urgency 应实际影响选择'
+
+
 def pomo_baseline_mode_regression():
     print('\n' + '=' * 60)
     print('POMO baseline mode 回归测试')
@@ -726,6 +882,9 @@ def dry_run():
     pickup_time_update_regression()
     pickup_commitment_next_delivery_equivalence_regression()
     attention_shrink_pomo_regression()
+    urgency_bias_changes_greedy_choice_regression()
+    urgency_bias_preserves_mask_semantics_regression()
+    urgency_bias_training_path_slack_available_regression()
     pomo_baseline_mode_regression()
     business_priority_regression()
     cargo_pickup_hard_timewindow_regression()

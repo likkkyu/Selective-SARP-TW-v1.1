@@ -313,6 +313,8 @@ class POMOTrainerOptimized:
             max_decode_steps=self.args.max_decode_steps,
             max_consecutive_depot=self.args.max_consecutive_depot,
             reject_init_bias=self.args.reject_init_bias,
+            decode_pickup_urgency_bias=self.args.decode_pickup_urgency_bias,
+            decode_pickup_urgency_horizon_hours=self.args.decode_pickup_urgency_horizon_hours,
         )
 
     def _to_device(self, batch):
@@ -965,6 +967,8 @@ class POMOTrainerOptimized:
             print(f"Seed: {self.args.seed}")
             print(f"Reject warmup epochs: {self.args.reject_warmup_epochs}")
             print(f"Reject init bias: {self.args.reject_init_bias}")
+            print(f"Decode pickup urgency bias: {self.args.decode_pickup_urgency_bias}")
+            print(f"Decode pickup urgency horizon (h): {self.args.decode_pickup_urgency_horizon_hours}")
             print(f"Baseline mode: {self.args.baseline_mode}")
             print(f"Shared env: {self._build_state_kwargs(allow_reject=True)}")
             print(f"Curriculum enabled: {self.args.enable_rideshare_curriculum}")
@@ -1377,6 +1381,8 @@ class POMOTrainerOptimized:
                     'OPERATION_START': Config.OPERATION_START,
                     'reject_warmup_epochs': self.args.reject_warmup_epochs,
                     'reject_init_bias': self.args.reject_init_bias,
+                    'decode_pickup_urgency_bias': self.args.decode_pickup_urgency_bias,
+                    'decode_pickup_urgency_horizon_hours': self.args.decode_pickup_urgency_horizon_hours,
                     'baseline_mode': self.args.baseline_mode,
                     'best_checkpoint_metric': 'business_first(clean -> service_rate -> avg_objective)',
                     'service_checkpoint_metric': 'service_priority(service_rate -> unfulfilled_rate -> rejected_rate -> avg_objective)',
@@ -1461,6 +1467,10 @@ def parse_args():
     parser.add_argument('--max-consecutive-depot', type=int, default=8, help='连续 depot 选择上限，超过后强制终止当前 rollout')
     parser.add_argument('--reject-warmup-epochs', type=int, default=3, help='训练前若干 epoch 屏蔽 reject 动作，先学习服务')
     parser.add_argument('--reject-init-bias', type=float, default=-2.5, help='reject head 的初始 bias，负值用于抑制早期 reject')
+    parser.add_argument('--decode-pickup-urgency-bias', type=float, default=0.0,
+                        help='解码打分：pickup 紧迫度加分系数 beta（0 表示关闭）')
+    parser.add_argument('--decode-pickup-urgency-horizon-hours', type=float, default=1.0,
+                        help='解码打分：pickup 紧迫度窗口 horizon（小时）')
     parser.add_argument('--baseline-mode', choices=['auto', 'batch_mean', 'instance_mean'], default='auto',
                         help='训练 advantage 的 baseline 模式；auto 保持当前默认行为，batch_mean / instance_mean 用于解耦 POMO 对比')
     parser.add_argument('--collect-mask-diagnostics', action='store_true', help='在验证/评估中收集 mask 与动作可行性诊断指标')
@@ -1632,6 +1642,8 @@ def build_phase_args(cli_args, graph_size):
         max_consecutive_depot=cli_args.max_consecutive_depot,
         reject_warmup_epochs=cli_args.reject_warmup_epochs,
         reject_init_bias=cli_args.reject_init_bias,
+        decode_pickup_urgency_bias=cli_args.decode_pickup_urgency_bias,
+        decode_pickup_urgency_horizon_hours=cli_args.decode_pickup_urgency_horizon_hours,
         baseline_mode=cli_args.baseline_mode,
         max_concurrent_open_orders=cli_args.max_concurrent_open_orders,
         min_orders_per_dispatch=cli_args.min_orders_per_dispatch,

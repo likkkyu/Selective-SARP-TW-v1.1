@@ -87,6 +87,10 @@ def parse_args():
                         help='轨迹 JSON 输出路径 (default: <checkpoint_dir>/residual_trace.json)')
     parser.add_argument('--shrink-size', type=int, default=None,
                         help='覆盖模型 shrink_size；0 表示禁用，默认沿用 checkpoint / AttentionModel 默认值')
+    parser.add_argument('--decode-pickup-urgency-bias', type=float, default=None,
+                        help='解码打分：pickup 紧迫度加分系数 beta（默认沿用 checkpoint）')
+    parser.add_argument('--decode-pickup-urgency-horizon-hours', type=float, default=None,
+                        help='解码打分：pickup 紧迫度窗口 horizon（小时，默认沿用 checkpoint）')
     parser.add_argument('--json-output', type=str, default=None,
                         help='将评估摘要写入 JSON 文件，便于多 checkpoint 正式对比')
     return parser.parse_args()
@@ -123,7 +127,8 @@ def _parse_period_bounds(values):
     return tuple(bounds)
 
 
-def build_model_from_checkpoint(checkpoint, device, shrink_size_override=None):
+def build_model_from_checkpoint(checkpoint, device, shrink_size_override=None, decode_pickup_urgency_bias_override=None,
+                                decode_pickup_urgency_horizon_hours_override=None):
     """从 checkpoint['args'] 恢复模型超参数；缺省时回退到当前默认值 (256/256/6/8)。"""
     args_dict = checkpoint.get('args', {}) or {}
     if not isinstance(args_dict, dict):
@@ -138,6 +143,7 @@ def build_model_from_checkpoint(checkpoint, device, shrink_size_override=None):
     n_heads = args_dict.get('n_heads', 8)
     tanh_clipping = args_dict.get('tanh_clipping', 10.0)
     normalization = args_dict.get('normalization', 'batch')
+
     checkpoint_shrink_size = args_dict.get('shrink_size', None)
     if shrink_size_override is None:
         shrink_size = checkpoint_shrink_size
@@ -145,6 +151,19 @@ def build_model_from_checkpoint(checkpoint, device, shrink_size_override=None):
         shrink_size = None
     else:
         shrink_size = shrink_size_override
+
+    checkpoint_pickup_urgency_bias = args_dict.get('decode_pickup_urgency_bias', 0.0)
+    checkpoint_pickup_urgency_horizon_hours = args_dict.get('decode_pickup_urgency_horizon_hours', 1.0)
+    decode_pickup_urgency_bias = (
+        checkpoint_pickup_urgency_bias
+        if decode_pickup_urgency_bias_override is None
+        else decode_pickup_urgency_bias_override
+    )
+    decode_pickup_urgency_horizon_hours = (
+        checkpoint_pickup_urgency_horizon_hours
+        if decode_pickup_urgency_horizon_hours_override is None
+        else decode_pickup_urgency_horizon_hours_override
+    )
 
     model = AttentionModel(
         embedding_dim=embedding_dim,
@@ -155,12 +174,16 @@ def build_model_from_checkpoint(checkpoint, device, shrink_size_override=None):
         tanh_clipping=tanh_clipping,
         normalization=normalization,
         shrink_size=shrink_size,
+        decode_pickup_urgency_bias=decode_pickup_urgency_bias,
+        decode_pickup_urgency_horizon_hours=decode_pickup_urgency_horizon_hours,
     ).to(device)
 
     print(f'  embedding_dim={embedding_dim}, hidden_dim={hidden_dim}, '
           f'n_encode_layers={n_encode_layers}, n_heads={n_heads}, '
           f'tanh_clipping={tanh_clipping}, normalization={normalization}, '
           f'shrink_size={shrink_size}')
+    print(f'  decode_pickup_urgency_bias={float(decode_pickup_urgency_bias):.6f}, '
+          f'decode_pickup_urgency_horizon_hours={float(decode_pickup_urgency_horizon_hours):.6f}')
 
     return model
 
@@ -643,6 +666,8 @@ def _build_eval_summary(args, checkpoint, device, state_kwargs,
             'decode': args.decode,
             'device': str(device),
             'state_kwargs': state_kwargs,
+            'decode_pickup_urgency_bias': getattr(args, 'resolved_decode_pickup_urgency_bias', None),
+            'decode_pickup_urgency_horizon_hours': getattr(args, 'resolved_decode_pickup_urgency_horizon_hours', None),
             'checkpoint_role': checkpoint.get('checkpoint_role'),
             'selection_rule': checkpoint.get('selection_rule'),
             'business_clean': checkpoint.get('business_clean'),
@@ -711,10 +736,14 @@ def evaluate():
         checkpoint,
         device,
         shrink_size_override=shrink_size_override,
+        decode_pickup_urgency_bias_override=args.decode_pickup_urgency_bias,
+        decode_pickup_urgency_horizon_hours_override=args.decode_pickup_urgency_horizon_hours,
     )
     model.load_state_dict(checkpoint['model_state_dict'])
     model.eval()
     set_decode_type(model, args.decode)
+    args.resolved_decode_pickup_urgency_bias = float(getattr(model, 'decode_pickup_urgency_bias', 0.0))
+    args.resolved_decode_pickup_urgency_horizon_hours = float(getattr(model, 'decode_pickup_urgency_horizon_hours', 1.0))
 
     dataset_kwargs = {}
     if args.passenger_tw_period_weights is not None:

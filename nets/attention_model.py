@@ -78,7 +78,9 @@ class AttentionModel(nn.Module):
                  shrink_size=None,
                  max_decode_steps=None,
                  max_consecutive_depot=8,
-                 reject_init_bias=-2.5):
+                 reject_init_bias=-2.5,
+                 decode_pickup_urgency_bias=0.0,
+                 decode_pickup_urgency_horizon_hours=1.0):
         super(AttentionModel, self).__init__()
 
         self.embedding_dim = embedding_dim
@@ -103,6 +105,8 @@ class AttentionModel(nn.Module):
         self.shrink_size = shrink_size
         self.max_decode_steps = max_decode_steps
         self.max_consecutive_depot = max_consecutive_depot
+        self.decode_pickup_urgency_bias = float(decode_pickup_urgency_bias)
+        self.decode_pickup_urgency_horizon_hours = max(float(decode_pickup_urgency_horizon_hours), 1e-6)
 
         if self.is_vrp or self.is_orienteering or self.is_pctsp or self.is_mvrptw:
             if self.is_mvrptw:
@@ -675,11 +679,29 @@ class AttentionModel(nn.Module):
             benchmark_stats['calls']['decode_attention_node_data'] = benchmark_stats['calls'].get('decode_attention_node_data', 0) + 1
 
         step_debug = None
+        urgency_payload = None
+        need_urgency_slack = abs(self.decode_pickup_urgency_bias) > 1e-12
         mask_start = time.perf_counter() if benchmark_stats is not None else None
+        aux_outputs = {} if need_urgency_slack else None
         if return_debug:
-            mask, step_debug = state.get_mask(return_debug=True, benchmark_stats=benchmark_stats)
+            mask, step_debug = state.get_mask(
+                return_debug=True,
+                return_urgency_slack=need_urgency_slack,
+                aux_outputs=aux_outputs,
+                benchmark_stats=benchmark_stats,
+            )
+            if need_urgency_slack and isinstance(step_debug, dict):
+                urgency_payload = step_debug.get('pickup_tw_slack_hours')
+            if urgency_payload is None and need_urgency_slack and isinstance(aux_outputs, dict):
+                urgency_payload = aux_outputs.get('pickup_tw_slack_hours')
         else:
-            mask = state.get_mask(benchmark_stats=benchmark_stats)
+            mask = state.get_mask(
+                return_urgency_slack=need_urgency_slack,
+                aux_outputs=aux_outputs,
+                benchmark_stats=benchmark_stats,
+            )
+            if need_urgency_slack and isinstance(aux_outputs, dict):
+                urgency_payload = aux_outputs.get('pickup_tw_slack_hours')
         if benchmark_stats is not None:
             benchmark_stats['seconds']['decode_get_mask'] = benchmark_stats['seconds'].get('decode_get_mask', 0.0) + (time.perf_counter() - mask_start)
             benchmark_stats['calls']['decode_get_mask'] = benchmark_stats['calls'].get('decode_get_mask', 0) + 1
@@ -724,6 +746,16 @@ class AttentionModel(nn.Module):
 
         logits_start = time.perf_counter() if benchmark_stats is not None else None
         log_p, glimpse = self._one_to_many_logits(query, step_context, glimpse_K, glimpse_V, logit_K, mask)
+        urgency_bias = self._build_pickup_urgency_bias(
+            state,
+            mask,
+            urgency_payload,
+            dtype=log_p.dtype,
+        )
+        if urgency_bias is not None:
+            log_p = log_p + urgency_bias
+            if self.mask_logits:
+                log_p = log_p.masked_fill(mask, -math.inf)
         if benchmark_stats is not None:
             benchmark_stats['seconds']['decode_logits'] = benchmark_stats['seconds'].get('decode_logits', 0.0) + (time.perf_counter() - logits_start)
             benchmark_stats['calls']['decode_logits'] = benchmark_stats['calls'].get('decode_logits', 0) + 1
@@ -827,6 +859,33 @@ class AttentionModel(nn.Module):
                     embeddings_per_step
                 ), 2)
             ), 1)
+
+    def _build_pickup_urgency_bias(self, state, mask, pickup_tw_slack_hours, dtype):
+        if abs(self.decode_pickup_urgency_bias) <= 1e-12:
+            return None
+        n_orders = int(state.n_orders)
+        if n_orders <= 0 or pickup_tw_slack_hours is None:
+            return None
+
+        if pickup_tw_slack_hours.dim() == 2:
+            slack = pickup_tw_slack_hours[:, None, :]
+        else:
+            slack = pickup_tw_slack_hours
+
+        if slack.size(-1) != n_orders:
+            return None
+
+        horizon = max(float(self.decode_pickup_urgency_horizon_hours), 1e-6)
+        urgency = torch.clamp(horizon - slack, min=0.0, max=horizon) / horizon
+
+        pickup_start = 1
+        pickup_end = 1 + n_orders
+        pickup_mask = mask[:, :, pickup_start:pickup_end]
+        urgency = torch.where(pickup_mask, torch.zeros_like(urgency), urgency)
+
+        bias = torch.zeros(mask.size(), device=mask.device, dtype=dtype)
+        bias[:, :, pickup_start:pickup_end] = float(self.decode_pickup_urgency_bias) * urgency.to(dtype)
+        return bias
 
     def _one_to_many_logits(self, query, step_context, glimpse_K, glimpse_V, logit_K, mask):
         batch_size, num_steps, embed_dim = query.size()
