@@ -67,6 +67,15 @@ PHASE_CONFIGS = {
         'lr': 3e-5,
         'epoch_size': 10000,
     },
+    200: {
+        'n_epochs': 100,
+        'batch_size': 2,
+        'pomo_size': 1,
+        'n_encode_layers': 6,
+        'hidden_dim': 256,
+        'lr': 2e-5,
+        'epoch_size': 12000,
+    },
 }
 
 

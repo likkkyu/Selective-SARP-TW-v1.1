@@ -26,6 +26,7 @@
 ### B. 关键配置/文档（长期保留）
 - `outputs/normalization_profiles/*.json`
 - 本台账 `FILE_CONTROL.md`
+- 基线版本记录 `BASELINES.md`
 
 ### C. 训练与评测产物（按阶段保留）
 - `outputs/*`：仅保留当前主线必要目录；历史目录迁移归档。
@@ -56,6 +57,8 @@
 
 | 日期 | 路径 | 变更类型 | 说明 | 操作人 |
 |---|---|---|---|---|
+| 2026-07-06 | `run_training_optimized.py` | 修改 | 新增 N=200 训练配置（PHASE_CONFIGS）用于扩展实验起步 | Claude |
+| 2026-07-06 | `BASELINES.md` | 新增 | 新增可复现封版版本记录（commit/tag/回退命令/归档映射） | Claude |
 | 2026-07-06 | `state_mcvrptw_v2.py` | 修改 | 热路径优化：静态几何缓存复用、小规模 open completion 快路径、减少 mask 临时张量分配 | Claude + bytedance |
 | 2026-07-06 | `FILE_CONTROL.md` | 新增 | 新增项目文件控制台账，统一记录新增文件/目录用途与变更 | Claude |
 | 2026-07-06 | 仓库外归档目录 | 迁移/清理 | 将 `_cleanup_hold_*`、`_keep_n100_*`、`cloud_pull_opt51`、`artifacts` 迁出仓库根目录并清理临时目录 | bytedance |
