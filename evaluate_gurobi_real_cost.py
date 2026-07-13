@@ -16,7 +16,7 @@ from problem_mcvrptw_v2 import MCVRPPDTWDataset
 
 
 
-def reevaluate_gurobi_results(graph_size, gurobi_json_path, num_samples=None):
+def reevaluate_gurobi_results(graph_size, gurobi_json_path, num_samples=None, seed=42):
     if not os.path.exists(gurobi_json_path):
         raise FileNotFoundError(f'文件不存在: {gurobi_json_path}')
 
@@ -43,7 +43,7 @@ def reevaluate_gurobi_results(graph_size, gurobi_json_path, num_samples=None):
     if num_samples is None:
         num_samples = max_id + 1
 
-    dataset = MCVRPPDTWDataset(num_samples=num_samples, graph_size=graph_size, seed=42)
+    dataset = MCVRPPDTWDataset(num_samples=num_samples, graph_size=graph_size, seed=seed)
     reevaluated_results = []
     for index, result in enumerate(feasible_entries):
         instance_id = result.get('instance_id', index)
@@ -86,12 +86,13 @@ def reevaluate_gurobi_results(graph_size, gurobi_json_path, num_samples=None):
 
 def main():
     parser = argparse.ArgumentParser(description='Re-evaluate Gurobi outputs with DRL costs')
-    parser.add_argument('--graph_size', type=int, choices=[25, 50, 100], required=True)
+    parser.add_argument('--graph_size', type=int, choices=[25, 50, 100, 200], required=True)
     parser.add_argument('--input', required=True, help='Gurobi 结果 JSON 路径')
     parser.add_argument('--output', default=None, help='重评估结果输出路径')
+    parser.add_argument('--seed', type=int, default=99999, help='重评估数据集 seed（应与 DRL 正式评估保持一致）')
     args = parser.parse_args()
 
-    summary = reevaluate_gurobi_results(args.graph_size, args.input)
+    summary = reevaluate_gurobi_results(args.graph_size, args.input, seed=args.seed)
     if summary is None:
         print('没有可重评估的结果。')
         return

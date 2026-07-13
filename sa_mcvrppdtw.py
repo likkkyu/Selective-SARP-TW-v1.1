@@ -12,6 +12,8 @@ import random
 import time
 
 from baseline_utils import (
+    ALIGNED_PROTOCOL,
+    LEGACY_PROTOCOL,
     build_solution_info,
     clone_routes,
     default_num_vehicles,
@@ -24,24 +26,51 @@ from problem_mcvrptw_v2 import MCVRPPDTWDataset
 
 
 class SimulatedAnnealingSolver:
-    def __init__(self, iterations, initial_temperature, cooling_rate, num_vehicles=None, seed=1234):
+    def __init__(
+        self,
+        iterations,
+        initial_temperature,
+        cooling_rate,
+        num_vehicles=None,
+        seed=1234,
+        eval_protocol=LEGACY_PROTOCOL,
+        fill_missing_orders=True,
+        hard_violation_penalty_weight=0.0,
+    ):
         self.iterations = iterations
         self.initial_temperature = initial_temperature
         self.cooling_rate = cooling_rate
         self.num_vehicles = num_vehicles
         self.rng = random.Random(seed)
+        self.eval_protocol = eval_protocol
+        self.fill_missing_orders = fill_missing_orders
+        self.hard_violation_penalty_weight = float(hard_violation_penalty_weight)
 
     def repair_pd_order(self, order_routes, n_orders):
         from baseline_utils import repair_order_routes
-        return repair_order_routes(order_routes, n_orders, num_vehicles=self.num_vehicles)
+        return repair_order_routes(
+            order_routes,
+            n_orders,
+            num_vehicles=self.num_vehicles,
+            fill_missing_orders=self.fill_missing_orders,
+        )
 
     def evaluate_cost(self, sample, order_routes):
-        objective_cost, details, _, repaired_routes, node_routes = evaluate_order_routes(
+        objective_cost, details, _, repaired_routes, node_routes, eval_meta = evaluate_order_routes(
             sample,
             order_routes,
             num_vehicles=self.num_vehicles,
+            fill_missing_orders=self.fill_missing_orders,
+            eval_protocol=self.eval_protocol,
+            hard_violation_penalty_weight=self.hard_violation_penalty_weight,
         )
-        info = build_solution_info(objective_cost, details, node_routes, algorithm='SA')
+        info = build_solution_info(
+            objective_cost,
+            details,
+            node_routes,
+            algorithm='SA',
+            eval_meta=eval_meta,
+        )
         return objective_cost, info, repaired_routes
 
     def swap(self, order_routes):
@@ -203,6 +232,9 @@ def run_sa_benchmark(args):
         cooling_rate=args.cooling_rate,
         num_vehicles=args.num_vehicles,
         seed=args.seed,
+        eval_protocol=args.eval_protocol,
+        fill_missing_orders=args.fill_missing_orders,
+        hard_violation_penalty_weight=args.hard_violation_penalty_weight,
     )
 
     results = []
@@ -218,7 +250,7 @@ def run_sa_benchmark(args):
             f"raw={info['raw_total_cost']:.2f} CNY vehicles={info['used_vehicles']}"
         )
 
-    summary = summarize_results(results)
+    summary = summarize_results(results, graph_size=args.graph_size)
     if summary is None:
         return None
     summary.update({
@@ -228,6 +260,12 @@ def run_sa_benchmark(args):
         'initial_temperature': args.initial_temperature,
         'cooling_rate': args.cooling_rate,
         'num_vehicles': solver.num_vehicles,
+        'protocol_version': args.eval_protocol,
+        'fill_missing_orders': bool(args.fill_missing_orders),
+        'hard_violation_penalty_weight': float(args.hard_violation_penalty_weight),
+        'comparability_notes': [] if args.eval_protocol == ALIGNED_PROTOCOL else [
+            'Legacy baseline protocol: results are not strictly comparable to DRL hard-mask decode semantics.'
+        ],
     })
 
     with open(args.output_file, 'w', encoding='utf-8') as output_file:
@@ -240,13 +278,17 @@ def run_sa_benchmark(args):
 
 def parse_args():
     parser = argparse.ArgumentParser(description='Simulated Annealing baseline for MCVRP-PDTW')
-    parser.add_argument('--graph_size', type=int, choices=[25, 50, 100], required=True)
+    parser.add_argument('--graph_size', type=int, choices=[25, 50, 100, 200], required=True)
     parser.add_argument('--num_samples', type=int, default=1)
     parser.add_argument('--iterations', type=int, default=1500)
     parser.add_argument('--initial_temperature', type=float, default=50.0)
     parser.add_argument('--cooling_rate', type=float, default=0.995)
     parser.add_argument('--num_vehicles', type=int, default=None)
     parser.add_argument('--seed', type=int, default=1234)
+    parser.add_argument('--eval_protocol', choices=[LEGACY_PROTOCOL, ALIGNED_PROTOCOL], default=LEGACY_PROTOCOL)
+    parser.add_argument('--hard_violation_penalty_weight', type=float, default=float(575.0))
+    parser.add_argument('--fill-missing-orders', dest='fill_missing_orders', action='store_true', default=True)
+    parser.add_argument('--no-fill-missing-orders', dest='fill_missing_orders', action='store_false')
     parser.add_argument('--output_file', default='sa_results.json')
     return parser.parse_args()
 

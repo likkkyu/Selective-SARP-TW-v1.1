@@ -12,6 +12,8 @@ import random
 import time
 
 from baseline_utils import (
+    ALIGNED_PROTOCOL,
+    LEGACY_PROTOCOL,
     build_solution_info,
     default_num_vehicles,
     evaluate_order_routes,
@@ -21,13 +23,27 @@ from problem_mcvrptw_v2 import MCVRPPDTWDataset, Config
 
 
 class GeneticAlgorithmSolver:
-    def __init__(self, population_size, generations, mutation_rate, elite_size=4, num_vehicles=None, seed=1234):
+    def __init__(
+        self,
+        population_size,
+        generations,
+        mutation_rate,
+        elite_size=4,
+        num_vehicles=None,
+        seed=1234,
+        eval_protocol=LEGACY_PROTOCOL,
+        fill_missing_orders=True,
+        hard_violation_penalty_weight=0.0,
+    ):
         self.population_size = population_size
         self.generations = generations
         self.mutation_rate = mutation_rate
         self.elite_size = elite_size
         self.num_vehicles = num_vehicles
         self.rng = random.Random(seed)
+        self.eval_protocol = eval_protocol
+        self.fill_missing_orders = fill_missing_orders
+        self.hard_violation_penalty_weight = float(hard_violation_penalty_weight)
 
     def repair_pd_order(self, chromosome, n_orders):
         """去重+补全，保证 0..n_orders-1 恰好各出现一次。"""
@@ -158,12 +174,21 @@ class GeneticAlgorithmSolver:
         n_orders = int(sample['n_orders'])
         repaired = self.repair_pd_order(chromosome, n_orders)
         order_routes = self.chromosome_to_routes(repaired, n_orders, sample)
-        objective_cost, details, _, repaired_routes, node_routes = evaluate_order_routes(
+        objective_cost, details, _, repaired_routes, node_routes, eval_meta = evaluate_order_routes(
             sample,
             order_routes,
             num_vehicles=self.num_vehicles,
+            fill_missing_orders=self.fill_missing_orders,
+            eval_protocol=self.eval_protocol,
+            hard_violation_penalty_weight=self.hard_violation_penalty_weight,
         )
-        info = build_solution_info(objective_cost, details, node_routes, algorithm='GA')
+        info = build_solution_info(
+            objective_cost,
+            details,
+            node_routes,
+            algorithm='GA',
+            eval_meta=eval_meta,
+        )
         info['chromosome'] = repaired
         info['order_routes'] = repaired_routes
         return objective_cost, info
@@ -241,6 +266,9 @@ def run_ga_benchmark(args):
         elite_size=args.elite_size,
         num_vehicles=args.num_vehicles,
         seed=args.seed,
+        eval_protocol=args.eval_protocol,
+        fill_missing_orders=args.fill_missing_orders,
+        hard_violation_penalty_weight=args.hard_violation_penalty_weight,
     )
 
     results = []
@@ -257,7 +285,7 @@ def run_ga_benchmark(args):
             f"raw={info['raw_total_cost']:.2f} CNY vehicles={info['used_vehicles']}"
         )
 
-    summary = summarize_results(results)
+    summary = summarize_results(results, graph_size=args.graph_size)
     if summary is None:
         return None
     summary.update({
@@ -267,6 +295,12 @@ def run_ga_benchmark(args):
         'generations': args.generations,
         'mutation_rate': args.mutation_rate,
         'num_vehicles': solver.num_vehicles,
+        'protocol_version': args.eval_protocol,
+        'fill_missing_orders': bool(args.fill_missing_orders),
+        'hard_violation_penalty_weight': float(args.hard_violation_penalty_weight),
+        'comparability_notes': [] if args.eval_protocol == ALIGNED_PROTOCOL else [
+            'Legacy baseline protocol: results are not strictly comparable to DRL hard-mask decode semantics.'
+        ],
     })
 
     with open(args.output_file, 'w', encoding='utf-8') as output_file:
@@ -278,7 +312,7 @@ def run_ga_benchmark(args):
 
 def parse_args():
     parser = argparse.ArgumentParser(description='Genetic Algorithm baseline for MCVRP-PDTW')
-    parser.add_argument('--graph_size', type=int, choices=[25, 50, 100], required=True)
+    parser.add_argument('--graph_size', type=int, choices=[25, 50, 100, 200], required=True)
     parser.add_argument('--num_samples', type=int, default=1)
     parser.add_argument('--population_size', type=int, default=48)
     parser.add_argument('--generations', type=int, default=120)
@@ -286,6 +320,10 @@ def parse_args():
     parser.add_argument('--elite_size', type=int, default=4)
     parser.add_argument('--num_vehicles', type=int, default=None)
     parser.add_argument('--seed', type=int, default=1234)
+    parser.add_argument('--eval_protocol', choices=[LEGACY_PROTOCOL, ALIGNED_PROTOCOL], default=LEGACY_PROTOCOL)
+    parser.add_argument('--hard_violation_penalty_weight', type=float, default=float(Config.ALPHA_REJECT))
+    parser.add_argument('--fill-missing-orders', dest='fill_missing_orders', action='store_true', default=True)
+    parser.add_argument('--no-fill-missing-orders', dest='fill_missing_orders', action='store_false')
     parser.add_argument('--output_file', default='ga_results.json')
     return parser.parse_args()
 

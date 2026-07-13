@@ -518,8 +518,7 @@ def _attach_flat_logits(model):
     def _flat_logits(self, query, step_context, glimpse_K, glimpse_V, logit_K, mask):
         logits = torch.zeros(mask.size(), device=mask.device, dtype=query.dtype)
         logits = logits.masked_fill(mask, -float('inf'))
-        glimpse = torch.zeros(query.size(0), query.size(1), query.size(-1), device=query.device, dtype=query.dtype)
-        return logits, glimpse
+        return logits
 
     model._one_to_many_logits = types.MethodType(_flat_logits, model)
 
@@ -543,8 +542,8 @@ def urgency_bias_changes_greedy_choice_regression():
     with torch.no_grad():
         log_p_base, mask_base, _ = model_base._get_log_p(fixed_base, state, normalize=True, return_debug=False)
         log_p_urgency, mask_urgency, _ = model_urgency._get_log_p(fixed_urgency, state, normalize=True, return_debug=False)
-        selected_base = model_base._select_node(log_p_base.exp()[:, 0, :], mask_base[:, 0, :])
-        selected_urgency = model_urgency._select_node(log_p_urgency.exp()[:, 0, :], mask_urgency[:, 0, :])
+        selected_base = model_base._select_node(log_p_base[:, 0, :], mask_base[:, 0, :])
+        selected_urgency = model_urgency._select_node(log_p_urgency[:, 0, :], mask_urgency[:, 0, :])
 
     print(f'base selected={int(selected_base.item())}, urgency selected={int(selected_urgency.item())}')
     assert bool(mask_base[0, 0, 1].item()) is False and bool(mask_base[0, 0, 2].item()) is False, '测试前提失败：两个 pickup 应都可行'
@@ -564,8 +563,7 @@ def urgency_bias_preserves_mask_semantics_regression():
 
     with torch.no_grad():
         log_p, mask, _ = model_urgency._get_log_p(fixed, state, normalize=False, return_debug=False)
-        probs = torch.softmax(log_p[:, 0, :], dim=-1)
-        selected = model_urgency._select_node(probs, mask[:, 0, :])
+        selected = model_urgency._select_node(log_p[:, 0, :], mask[:, 0, :])
 
     print(f'masked pickup2={bool(mask[0,0,2].item())}, selected={int(selected.item())}')
     assert bool(mask[0, 0, 2].item()) is True, '测试前提失败：pickup2 应被 pickup TW 硬屏蔽'
@@ -608,8 +606,8 @@ def urgency_bias_training_path_slack_available_regression():
         with torch.no_grad():
             log_p_base, mask_base, _ = model_base._get_log_p(fixed_base, state_base, normalize=True, return_debug=False)
             log_p_urgency, mask_urgency, _ = model_urgency._get_log_p(fixed_urgency, state_urgency, normalize=True, return_debug=False)
-            selected_base = model_base._select_node(log_p_base.exp()[:, 0, :], mask_base[:, 0, :])
-            selected_urgency = model_urgency._select_node(log_p_urgency.exp()[:, 0, :], mask_urgency[:, 0, :])
+            selected_base = model_base._select_node(log_p_base[:, 0, :], mask_base[:, 0, :])
+            selected_urgency = model_urgency._select_node(log_p_urgency[:, 0, :], mask_urgency[:, 0, :])
     finally:
         StateMCVRPPDTW.get_mask = original_get_mask
 

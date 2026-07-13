@@ -15,5 +15,10 @@ __pycache__/
 *.pt
 *.pth
 *.log
+*.tgz
+*.tar.gz
+logs/*.pid
 .DS_Store
 .Rhistory
+outputs_cmp/sa_results_*.json
+outputs_cmp/ga_results_*.json

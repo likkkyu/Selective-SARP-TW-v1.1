@@ -327,7 +327,10 @@ class POMOTrainerOptimized:
         )
 
     def _to_device(self, batch):
-        return {key: value.to(self.device) if torch.is_tensor(value) else value for key, value in batch.items()}
+        return {
+            key: value.to(self.device, non_blocking=True) if torch.is_tensor(value) else value
+            for key, value in batch.items()
+        }
 
     def _build_state_kwargs(self, allow_reject, benchmark_timing=False):
         return {
@@ -981,6 +984,9 @@ class POMOTrainerOptimized:
             print(f"Baseline mode: {self.args.baseline_mode}")
             print(f"Shared env: {self._build_state_kwargs(allow_reject=True)}")
             print(f"Curriculum enabled: {self.args.enable_rideshare_curriculum}")
+            if self.args.n_epochs <= self.args.reject_warmup_epochs:
+                print("[Warning] n_epochs <= reject_warmup_epochs: 训练期间 reject 始终被屏蔽，")
+                print("          train/val 行为可能出现偏差（短训 smoke 建议显式设置 --reject-warmup-epochs 0）。")
             print('=' * 70)
 
         os.makedirs(self.args.save_dir, exist_ok=True)

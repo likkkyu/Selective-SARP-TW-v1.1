@@ -263,7 +263,8 @@ class AttentionModel(nn.Module):
                 benchmark = _merge_benchmark_stats(benchmark, debug.pop('benchmark_timing', None))
 
         costs_start = time.perf_counter() if benchmark_enabled else None
-        cost_input = input if logical_pomo_size <= 1 else self._repeat_batch_for_pomo(input, logical_pomo_size)
+        # logical_pomo_size > 1 时，model_input 已经 repeat 过，避免重复构造大张量
+        cost_input = model_input
         cost, mask = self.problem.get_costs(cost_input, pi)
         if benchmark_enabled:
             _record('model_get_costs', time.perf_counter() - costs_start)
@@ -503,7 +504,7 @@ class AttentionModel(nn.Module):
             if benchmark_enabled:
                 _record('decode_get_log_p_total', time.perf_counter() - get_log_p_start)
             select_start = time.perf_counter() if benchmark_enabled else None
-            selected = self._select_node(log_p.exp()[:, 0, :], mask[:, 0, :])
+            selected = self._select_node(log_p[:, 0, :], mask[:, 0, :])
             if benchmark_enabled:
                 _record('decode_select_node', time.perf_counter() - select_start)
             if return_debug:
@@ -622,18 +623,18 @@ class AttentionModel(nn.Module):
             batch_rep, iter_rep
         )
 
-    def _select_node(self, probs, mask):
-        assert (probs == probs).all(), "Probs should not contain any nans"
+    def _select_node(self, log_p, mask):
+        assert (log_p == log_p).all(), "Log probs should not contain any nans"
 
         if self.decode_type == "greedy":
-            _, selected = probs.max(1)
+            _, selected = log_p.max(1)
             assert not mask.gather(1, selected.unsqueeze(-1)).data.any(), "Decode greedy: infeasible action has maximum probability"
 
         elif self.decode_type == "sampling":
-            selected = probs.multinomial(1).squeeze(1)
+            selected = torch.distributions.Categorical(logits=log_p).sample()
             while mask.gather(1, selected.unsqueeze(-1)).data.any():
                 print('Sampled bad values, resampling!')
-                selected = probs.multinomial(1).squeeze(1)
+                selected = torch.distributions.Categorical(logits=log_p).sample()
 
         else:
             assert False, "Unknown decode type"
@@ -654,7 +655,7 @@ class AttentionModel(nn.Module):
         return AttentionModelFixed(embeddings, fixed_context, *fixed_attention_node_data)
 
     def _get_log_p_topk(self, fixed, state, k=None, normalize=True):
-        log_p, _ = self._get_log_p(fixed, state, normalize=normalize)
+        log_p, _, _ = self._get_log_p(fixed, state, normalize=normalize)
 
         if k is not None and k < log_p.size(-1):
             return log_p.topk(k, -1)
@@ -745,7 +746,7 @@ class AttentionModel(nn.Module):
             step_debug['diag_reject_available_rate'] = (~mask[:, 0, -1]).float()
 
         logits_start = time.perf_counter() if benchmark_stats is not None else None
-        log_p, glimpse = self._one_to_many_logits(query, step_context, glimpse_K, glimpse_V, logit_K, mask)
+        log_p = self._one_to_many_logits(query, step_context, glimpse_K, glimpse_V, logit_K, mask)
         urgency_bias = self._build_pickup_urgency_bias(
             state,
             mask,
@@ -753,7 +754,9 @@ class AttentionModel(nn.Module):
             dtype=log_p.dtype,
         )
         if urgency_bias is not None:
-            log_p = log_p + urgency_bias
+            pickup_start = 1
+            pickup_end = 1 + state.n_orders
+            log_p[:, :, pickup_start:pickup_end] = log_p[:, :, pickup_start:pickup_end] + urgency_bias
             if self.mask_logits:
                 log_p = log_p.masked_fill(mask, -math.inf)
         if benchmark_stats is not None:
@@ -767,7 +770,14 @@ class AttentionModel(nn.Module):
             benchmark_stats['seconds']['decode_log_softmax'] = benchmark_stats['seconds'].get('decode_log_softmax', 0.0) + (time.perf_counter() - normalize_start)
             benchmark_stats['calls']['decode_log_softmax'] = benchmark_stats['calls'].get('decode_log_softmax', 0) + 1
 
-        assert not torch.isnan(log_p).any()
+        invalid_value_rows = (~(torch.isfinite(log_p) | torch.isneginf(log_p))).any(dim=-1).squeeze(1)
+        if invalid_value_rows.any():
+            mask = mask.clone()
+            mask[invalid_value_rows, :, :] = True
+            mask[invalid_value_rows, :, 0] = False
+            log_p = log_p.clone()
+            log_p[invalid_value_rows, :, :] = -math.inf
+            log_p[invalid_value_rows, :, 0] = 0.0
 
         return log_p, mask, step_debug
 
@@ -882,10 +892,7 @@ class AttentionModel(nn.Module):
         pickup_end = 1 + n_orders
         pickup_mask = mask[:, :, pickup_start:pickup_end]
         urgency = torch.where(pickup_mask, torch.zeros_like(urgency), urgency)
-
-        bias = torch.zeros(mask.size(), device=mask.device, dtype=dtype)
-        bias[:, :, pickup_start:pickup_end] = float(self.decode_pickup_urgency_bias) * urgency.to(dtype)
-        return bias
+        return float(self.decode_pickup_urgency_bias) * urgency.to(dtype)
 
     def _one_to_many_logits(self, query, step_context, glimpse_K, glimpse_V, logit_K, mask):
         batch_size, num_steps, embed_dim = query.size()
@@ -902,11 +909,10 @@ class AttentionModel(nn.Module):
             compatibility[node_mask[:, :, None, :][None, :, :, :, :].expand_as(compatibility)] = -math.inf
 
         heads = torch.matmul(torch.softmax(compatibility, dim=-1), glimpse_V)
-        glimpse = self.project_out(
+        final_Q = self.project_out(
             heads.permute(1, 2, 3, 0, 4).contiguous().view(-1, num_steps, 1, self.n_heads * val_size)
         )
 
-        final_Q = glimpse
         node_logits = torch.matmul(final_Q, logit_K.transpose(-2, -1)).squeeze(-2) / math.sqrt(final_Q.size(-1))
         reject_logit = self.reject_proj(step_context)
         logits = torch.cat((node_logits, reject_logit), dim=-1)
@@ -916,7 +922,7 @@ class AttentionModel(nn.Module):
         if self.mask_logits:
             logits[mask] = -math.inf
 
-        return logits, glimpse.squeeze(-2)
+        return logits
 
     def _get_attention_node_data(self, fixed, state):
         if self.is_vrp and self.allow_partial:
