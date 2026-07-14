@@ -20,13 +20,22 @@ Gantt Chart Visualization for Multi-Compartment VRP with Pickup-Delivery and Tim
 - gantt_100.png (100个订单)
 """
 
+import argparse
+import csv
+import json
 import torch
 import numpy as np
-import matplotlib.pyplot as plt
-import matplotlib.patches as mpatches
-from matplotlib.patches import Rectangle
 from datetime import datetime, timedelta
 import os
+
+try:
+    import matplotlib.pyplot as plt
+    import matplotlib.patches as mpatches
+    from matplotlib.patches import Rectangle
+except Exception:  # pragma: no cover
+    plt = None
+    mpatches = None
+    Rectangle = None
 
 # 核心模块
 from problem_mcvrptw_v2 import MCVRPPDTW, MCVRPPDTWDataset, Config
@@ -51,11 +60,12 @@ COLORS = {
 }
 
 # 字体配置 (论文级)
-plt.rcParams['font.family'] = 'Arial'
-plt.rcParams['font.size'] = 10
-plt.rcParams['axes.labelsize'] = 12
-plt.rcParams['axes.titlesize'] = 14
-plt.rcParams['legend.fontsize'] = 9
+if plt is not None:
+    plt.rcParams['font.family'] = 'Arial'
+    plt.rcParams['font.size'] = 10
+    plt.rcParams['axes.labelsize'] = 12
+    plt.rcParams['axes.titlesize'] = 14
+    plt.rcParams['legend.fontsize'] = 9
 
 
 # ============================================================
@@ -123,17 +133,22 @@ def generate_execution_logs(model, batch, device):
     dem_p = batch['demand_passenger'][0].cpu().numpy()
     dem_c = batch['demand_cargo'][0].cpu().numpy()
     tw = batch['time_windows'][0].cpu().numpy()
-    n_orders = batch['n_orders']
+    n_orders = int(batch['n_orders'])
 
     # 拆分路径为子路径 (以 0 为分隔符)
+    # 注意：若模型启用了 reject 动作，pi 中可能出现 > 2*n_orders 的动作索引，这里直接忽略
     sub_routes = []
     current_sub = []
+    max_valid_node = 2 * n_orders
     for node_idx in route:
+        node_idx = int(node_idx)
         if node_idx == 0:
             if len(current_sub) > 0:
                 sub_routes.append(current_sub)
                 current_sub = []
-        else:
+            continue
+
+        if 1 <= node_idx <= max_valid_node:
             current_sub.append(node_idx)
     if len(current_sub) > 0:
         sub_routes.append(current_sub)
@@ -274,6 +289,9 @@ def plot_gantt(logs, num_orders, save_path, num_vehicles=None):
     - save_path: 图片保存路径
     - num_vehicles: 车辆数量 (可选，自动检测)
     """
+    if plt is None or Rectangle is None or mpatches is None:
+        raise RuntimeError("matplotlib 未安装，无法绘制甘特图；可先安装 matplotlib，或仅使用 --export_logs 导出日志。")
+
     if len(logs) == 0:
         print(f"警告: 没有日志数据，跳过 {save_path}")
         return
@@ -451,29 +469,35 @@ def plot_gantt(logs, num_orders, save_path, num_vehicles=None):
 # 主程序
 # ============================================================
 
-def load_model_for_size(graph_size, device):
-    """加载指定规模的训练模型"""
-
-    # 尝试优化版模型路径
-    model_paths = [
-        f'outputs/pomo_n{graph_size}_optimized/model_best.pt',
-        f'outputs/pomo_n{graph_size}/model_best.pt',
-        f'outputs/pomo_n{graph_size}_optimized/model_final.pt',
-        f'outputs/pomo_n{graph_size}/model_final.pt'
-    ]
-
-    model_path = None
-    for path in model_paths:
-        if os.path.exists(path):
-            model_path = path
-            break
+def load_model_for_size(graph_size, device, model_path=None):
+    """加载指定规模的训练模型（可显式传入 checkpoint 路径）"""
 
     if model_path is None:
-        print(f"✗ 未找到 {graph_size} 订单的模型文件")
-        return None
+        # 尝试优化版模型路径
+        model_paths = [
+            f'outputs/pomo_n{graph_size}_optimized/model_best.pt',
+            f'outputs/pomo_n{graph_size}/model_best.pt',
+            f'outputs/pomo_n{graph_size}_optimized/model_final.pt',
+            f'outputs/pomo_n{graph_size}/model_final.pt'
+        ]
 
-    print(f"  加载模型: {model_path}")
-    checkpoint = torch.load(model_path, map_location=device)
+        resolved_model_path = None
+        for path in model_paths:
+            if os.path.exists(path):
+                resolved_model_path = path
+                break
+
+        if resolved_model_path is None:
+            print(f"✗ 未找到 {graph_size} 订单的模型文件")
+            return None
+    else:
+        resolved_model_path = model_path
+        if not os.path.exists(resolved_model_path):
+            print(f"✗ 指定模型文件不存在: {resolved_model_path}")
+            return None
+
+    print(f"  加载模型: {resolved_model_path}")
+    checkpoint = torch.load(resolved_model_path, map_location=device)
 
     # 提取模型参数
     if 'args' in checkpoint and checkpoint['args'] is not None:
@@ -514,6 +538,11 @@ def run_visualization():
     print("MCVRP-PDTW 车辆排班甘特图生成器")
     print("Vehicle Scheduling Gantt Chart Generator")
     print("=" * 70)
+
+    if plt is None:
+        print("✗ matplotlib 未安装，run_visualization 模式无法绘制图片。")
+        print("  可改用单规模模式并加 --export_logs 先导出执行日志。")
+        return
 
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     print(f"Device: {device}")
@@ -598,9 +627,82 @@ def generate_single_gantt(graph_size, seed=2024, save_path=None):
     return logs, num_vehicles
 
 
+def export_logs(logs, export_path):
+    """将执行日志导出为 CSV 或 JSON。"""
+    if not export_path:
+        return
+
+    export_dir = os.path.dirname(export_path)
+    if export_dir:
+        os.makedirs(export_dir, exist_ok=True)
+
+    ext = os.path.splitext(export_path)[1].lower()
+    if ext == '.json':
+        with open(export_path, 'w', encoding='utf-8') as fp:
+            json.dump(logs, fp, ensure_ascii=False, indent=2)
+        print(f"✓ 执行日志已导出(JSON): {export_path}")
+        return
+
+    if ext != '.csv':
+        export_path = f"{export_path}.csv"
+
+    fieldnames = [
+        'vehicle_id', 'action', 'node_id', 'node_type',
+        'start_time', 'end_time',
+        'tw_start', 'tw_end',
+        'load_change',
+    ]
+    with open(export_path, 'w', encoding='utf-8', newline='') as fp:
+        writer = csv.DictWriter(fp, fieldnames=fieldnames)
+        writer.writeheader()
+        for log in logs:
+            writer.writerow({
+                'vehicle_id': log.get('vehicle_id'),
+                'action': log.get('action'),
+                'node_id': log.get('node_id'),
+                'node_type': log.get('node_type'),
+                'start_time': log.get('start_time'),
+                'end_time': log.get('end_time'),
+                'tw_start': (log.get('tw') or (None, None))[0],
+                'tw_end': (log.get('tw') or (None, None))[1],
+                'load_change': log.get('load_change'),
+            })
+    print(f"✓ 执行日志已导出(CSV): {export_path}")
+
+
+def parse_args():
+    parser = argparse.ArgumentParser(description='Generate vehicle gantt chart and optional execution logs')
+    parser.add_argument('--graph_size', type=int, choices=[25, 50, 100, 200], default=None,
+                        help='Generate only one graph size; omit to run default batch mode')
+    parser.add_argument('--seed', type=int, default=2024)
+    parser.add_argument('--save_path', type=str, default=None,
+                        help='Output image path for single-size mode')
+    parser.add_argument('--model_path', type=str, default=None,
+                        help='Optional checkpoint path override (supports n100/n200 custom path)')
+    parser.add_argument('--export_logs', type=str, default=None,
+                        help='Export execution logs to .csv/.json in single-size mode')
+    return parser.parse_args()
+
+
 # ============================================================
 # 入口
 # ============================================================
 
 if __name__ == '__main__':
-    run_visualization()
+    args = parse_args()
+    if args.graph_size is None:
+        run_visualization()
+    else:
+        device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+        model = load_model_for_size(args.graph_size, device, model_path=args.model_path)
+        if model is None:
+            raise SystemExit(1)
+        dataset = MCVRPPDTWDataset(num_samples=1, graph_size=args.graph_size, seed=args.seed)
+        batch = collate_fn([dataset[0]])
+        logs, num_vehicles = generate_execution_logs(model, batch, device)
+        export_logs(logs, args.export_logs)
+        save_path = args.save_path or f'gantt_{args.graph_size}.png'
+        if plt is None:
+            print('! matplotlib 未安装，已导出执行日志，跳过甘特图绘制。')
+        else:
+            plot_gantt(logs, args.graph_size, save_path, num_vehicles)

@@ -13,7 +13,9 @@ import time
 
 from baseline_utils import (
     ALIGNED_PROTOCOL,
+    HARD_CONSTRAINT_MODES,
     LEGACY_PROTOCOL,
+    PENALTY_HARD_CONSTRAINT_MODE,
     build_solution_info,
     default_num_vehicles,
     evaluate_order_routes,
@@ -34,6 +36,8 @@ class GeneticAlgorithmSolver:
         eval_protocol=LEGACY_PROTOCOL,
         fill_missing_orders=True,
         hard_violation_penalty_weight=0.0,
+        hard_constraint_mode=PENALTY_HARD_CONSTRAINT_MODE,
+        strict_infeasible_cost=1e12,
     ):
         self.population_size = population_size
         self.generations = generations
@@ -44,6 +48,8 @@ class GeneticAlgorithmSolver:
         self.eval_protocol = eval_protocol
         self.fill_missing_orders = fill_missing_orders
         self.hard_violation_penalty_weight = float(hard_violation_penalty_weight)
+        self.hard_constraint_mode = hard_constraint_mode if hard_constraint_mode in HARD_CONSTRAINT_MODES else PENALTY_HARD_CONSTRAINT_MODE
+        self.strict_infeasible_cost = float(strict_infeasible_cost)
 
     def repair_pd_order(self, chromosome, n_orders):
         """去重+补全，保证 0..n_orders-1 恰好各出现一次。"""
@@ -181,6 +187,8 @@ class GeneticAlgorithmSolver:
             fill_missing_orders=self.fill_missing_orders,
             eval_protocol=self.eval_protocol,
             hard_violation_penalty_weight=self.hard_violation_penalty_weight,
+            hard_constraint_mode=self.hard_constraint_mode,
+            strict_infeasible_cost=self.strict_infeasible_cost,
         )
         info = build_solution_info(
             objective_cost,
@@ -269,6 +277,8 @@ def run_ga_benchmark(args):
         eval_protocol=args.eval_protocol,
         fill_missing_orders=args.fill_missing_orders,
         hard_violation_penalty_weight=args.hard_violation_penalty_weight,
+        hard_constraint_mode=args.hard_constraint_mode,
+        strict_infeasible_cost=args.strict_infeasible_cost,
     )
 
     results = []
@@ -298,6 +308,8 @@ def run_ga_benchmark(args):
         'protocol_version': args.eval_protocol,
         'fill_missing_orders': bool(args.fill_missing_orders),
         'hard_violation_penalty_weight': float(args.hard_violation_penalty_weight),
+        'hard_constraint_mode': args.hard_constraint_mode,
+        'strict_infeasible_cost': float(args.strict_infeasible_cost),
         'comparability_notes': [] if args.eval_protocol == ALIGNED_PROTOCOL else [
             'Legacy baseline protocol: results are not strictly comparable to DRL hard-mask decode semantics.'
         ],
@@ -321,6 +333,8 @@ def parse_args():
     parser.add_argument('--num_vehicles', type=int, default=None)
     parser.add_argument('--seed', type=int, default=1234)
     parser.add_argument('--eval_protocol', choices=[LEGACY_PROTOCOL, ALIGNED_PROTOCOL], default=LEGACY_PROTOCOL)
+    parser.add_argument('--hard_constraint_mode', choices=list(HARD_CONSTRAINT_MODES), default=PENALTY_HARD_CONSTRAINT_MODE)
+    parser.add_argument('--strict_infeasible_cost', type=float, default=1e12)
     parser.add_argument('--hard_violation_penalty_weight', type=float, default=float(Config.ALPHA_REJECT))
     parser.add_argument('--fill-missing-orders', dest='fill_missing_orders', action='store_true', default=True)
     parser.add_argument('--no-fill-missing-orders', dest='fill_missing_orders', action='store_false')

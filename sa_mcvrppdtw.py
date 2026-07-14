@@ -13,7 +13,10 @@ import time
 
 from baseline_utils import (
     ALIGNED_PROTOCOL,
+    HARD_CONSTRAINT_MODES,
     LEGACY_PROTOCOL,
+    PENALTY_HARD_CONSTRAINT_MODE,
+    STRICT_HARD_CONSTRAINT_MODE,
     build_solution_info,
     clone_routes,
     default_num_vehicles,
@@ -36,6 +39,8 @@ class SimulatedAnnealingSolver:
         eval_protocol=LEGACY_PROTOCOL,
         fill_missing_orders=True,
         hard_violation_penalty_weight=0.0,
+        hard_constraint_mode=PENALTY_HARD_CONSTRAINT_MODE,
+        strict_infeasible_cost=1e12,
     ):
         self.iterations = iterations
         self.initial_temperature = initial_temperature
@@ -45,6 +50,8 @@ class SimulatedAnnealingSolver:
         self.eval_protocol = eval_protocol
         self.fill_missing_orders = fill_missing_orders
         self.hard_violation_penalty_weight = float(hard_violation_penalty_weight)
+        self.hard_constraint_mode = hard_constraint_mode if hard_constraint_mode in HARD_CONSTRAINT_MODES else PENALTY_HARD_CONSTRAINT_MODE
+        self.strict_infeasible_cost = float(strict_infeasible_cost)
 
     def repair_pd_order(self, order_routes, n_orders):
         from baseline_utils import repair_order_routes
@@ -63,6 +70,8 @@ class SimulatedAnnealingSolver:
             fill_missing_orders=self.fill_missing_orders,
             eval_protocol=self.eval_protocol,
             hard_violation_penalty_weight=self.hard_violation_penalty_weight,
+            hard_constraint_mode=self.hard_constraint_mode,
+            strict_infeasible_cost=self.strict_infeasible_cost,
         )
         info = build_solution_info(
             objective_cost,
@@ -204,9 +213,30 @@ class SimulatedAnnealingSolver:
         best_routes = current_routes
 
         temperature = self.initial_temperature
+        strict_mode = self.hard_constraint_mode == STRICT_HARD_CONSTRAINT_MODE
+        if strict_mode and current_info.get('strict_rejected_by_hard', False):
+            max_init_retry = 64
+            for _ in range(max_init_retry):
+                trial_routes = self.repair_pd_order(
+                    random_initial_order_routes(n_orders, self.num_vehicles, self.rng),
+                    n_orders,
+                )
+                trial_cost, trial_info, trial_routes = self.evaluate_cost(sample, trial_routes)
+                if not trial_info.get('strict_rejected_by_hard', False):
+                    current_cost = trial_cost
+                    current_info = trial_info
+                    current_routes = trial_routes
+                    best_cost = trial_cost
+                    best_info = trial_info
+                    best_routes = trial_routes
+                    break
+
         for _ in range(self.iterations):
             candidate_routes = self.repair_pd_order(self.generate_neighbor(current_routes), n_orders)
             candidate_cost, candidate_info, candidate_routes = self.evaluate_cost(sample, candidate_routes)
+            if strict_mode and candidate_info.get('strict_rejected_by_hard', False):
+                temperature *= self.cooling_rate
+                continue
             delta = candidate_cost - current_cost
             accept = delta < 0 or self.rng.random() < math.exp(-delta / max(temperature, 1e-6))
             if accept:
@@ -235,6 +265,8 @@ def run_sa_benchmark(args):
         eval_protocol=args.eval_protocol,
         fill_missing_orders=args.fill_missing_orders,
         hard_violation_penalty_weight=args.hard_violation_penalty_weight,
+        hard_constraint_mode=args.hard_constraint_mode,
+        strict_infeasible_cost=args.strict_infeasible_cost,
     )
 
     results = []
@@ -263,6 +295,8 @@ def run_sa_benchmark(args):
         'protocol_version': args.eval_protocol,
         'fill_missing_orders': bool(args.fill_missing_orders),
         'hard_violation_penalty_weight': float(args.hard_violation_penalty_weight),
+        'hard_constraint_mode': args.hard_constraint_mode,
+        'strict_infeasible_cost': float(args.strict_infeasible_cost),
         'comparability_notes': [] if args.eval_protocol == ALIGNED_PROTOCOL else [
             'Legacy baseline protocol: results are not strictly comparable to DRL hard-mask decode semantics.'
         ],
@@ -286,6 +320,8 @@ def parse_args():
     parser.add_argument('--num_vehicles', type=int, default=None)
     parser.add_argument('--seed', type=int, default=1234)
     parser.add_argument('--eval_protocol', choices=[LEGACY_PROTOCOL, ALIGNED_PROTOCOL], default=LEGACY_PROTOCOL)
+    parser.add_argument('--hard_constraint_mode', choices=list(HARD_CONSTRAINT_MODES), default=PENALTY_HARD_CONSTRAINT_MODE)
+    parser.add_argument('--strict_infeasible_cost', type=float, default=1e12)
     parser.add_argument('--hard_violation_penalty_weight', type=float, default=float(575.0))
     parser.add_argument('--fill-missing-orders', dest='fill_missing_orders', action='store_true', default=True)
     parser.add_argument('--no-fill-missing-orders', dest='fill_missing_orders', action='store_false')

@@ -9,6 +9,10 @@ from problem_mcvrptw_v2 import Config, MCVRPPDTW, node_routes_to_pi
 LEGACY_PROTOCOL = 'legacy_unaligned_v0'
 ALIGNED_PROTOCOL = 'drl_aligned_v1'
 
+PENALTY_HARD_CONSTRAINT_MODE = 'penalty'
+STRICT_HARD_CONSTRAINT_MODE = 'strict'
+HARD_CONSTRAINT_MODES = (PENALTY_HARD_CONSTRAINT_MODE, STRICT_HARD_CONSTRAINT_MODE)
+
 
 def default_num_vehicles(n_orders):
     return Config.get_default_num_vehicles(n_orders)
@@ -69,6 +73,139 @@ def repair_order_routes(order_routes, n_orders, num_vehicles=None, fill_missing_
     return sanitized_routes[:num_vehicles]
 
 
+
+
+def prune_order_routes_for_strict(sample, order_routes, n_orders, num_vehicles=None):
+    """Greedily rebuild routes under strict hard constraints.
+
+    仅用于 baseline strict 搜索辅助：
+    - passenger pickup latest TW
+    - operation end
+    - max trip time
+    - simple capacity bound (normalized demand)
+    """
+    num_vehicles = num_vehicles or default_num_vehicles(n_orders)
+    sanitized_routes = repair_order_routes(
+        order_routes,
+        n_orders,
+        num_vehicles=num_vehicles,
+        fill_missing_orders=False,
+    )
+
+    demand_p_per_order = sample['demand_passenger'][:n_orders]
+    demand_c_per_order = sample['demand_cargo'][:n_orders]
+
+    area_size = Config.AREA_SIZE
+    vehicle_speed = Config.VEHICLE_SPEED
+    service_time = Config.SERVICE_TIME
+    max_trip_time = Config.MAX_TRIP_TIME
+    op_start = Config.OPERATION_START
+    op_end = Config.OPERATION_END
+
+    loc = sample['loc']
+    depot = sample['depot'].squeeze()
+    time_windows = sample['time_windows']
+
+    def get_loc(node_idx):
+        if int(node_idx) == 0:
+            return depot
+        return loc[int(node_idx) - 1]
+
+    def try_append(state, order_id):
+        order_id = int(order_id)
+        dp = float(demand_p_per_order[order_id].item())
+        dc = float(demand_c_per_order[order_id].item())
+
+        if (state['load_p'] + max(dp, 0.0)) > 1.0 + 1e-6:
+            return None
+        if (state['load_c'] + max(dc, 0.0)) > 1.0 + 1e-6:
+            return None
+
+        pickup_node = order_id + 1
+        delivery_node = order_id + n_orders + 1
+
+        pickup_travel = (get_loc(state['last_node']) - get_loc(pickup_node)).norm(p=2).item() * area_size
+        pickup_arrival = state['cur_time'] + pickup_travel / vehicle_speed
+        pickup_tw_start = float(time_windows[order_id, 0].item())
+        pickup_tw_end = float(time_windows[order_id, 1].item())
+        pickup_start = max(pickup_arrival, pickup_tw_start)
+        pickup_finish = pickup_start + service_time
+
+        delivery_travel = (get_loc(pickup_node) - get_loc(delivery_node)).norm(p=2).item() * area_size
+        delivery_arrival = pickup_finish + delivery_travel / vehicle_speed
+        delivery_tw_start = float(time_windows[order_id + n_orders, 0].item())
+        delivery_start = max(delivery_arrival, delivery_tw_start)
+        delivery_finish = delivery_start + service_time
+
+        depot_travel = (get_loc(delivery_node) - get_loc(0)).norm(p=2).item() * area_size
+        depot_arrival = delivery_finish + depot_travel / vehicle_speed
+        trip_time = depot_arrival - op_start
+
+        violate_hard = (
+            pickup_start > pickup_tw_end + 1e-9
+            or pickup_start > op_end + 1e-9
+            or delivery_start > op_end + 1e-9
+            or trip_time > max_trip_time + 1e-9
+        )
+        if violate_hard:
+            return None
+
+        return {
+            'route': state['route'] + [order_id],
+            'load_p': state['load_p'] + max(dp, 0.0),
+            'load_c': state['load_c'] + max(dc, 0.0),
+            'cur_time': delivery_finish,
+            'last_node': delivery_node,
+        }
+
+    flat_orders = [int(order_id) for route in sanitized_routes[:num_vehicles] for order_id in route]
+
+    states = []
+    dropped_orders = []
+
+    for order_id in flat_orders:
+        best_index = None
+        best_state = None
+        best_finish_time = float('inf')
+
+        for idx in range(len(states)):
+            next_state = try_append(states[idx], order_id)
+            if next_state is None:
+                continue
+            if next_state['cur_time'] < best_finish_time:
+                best_finish_time = next_state['cur_time']
+                best_state = next_state
+                best_index = idx
+
+        if len(states) < num_vehicles:
+            fresh_state = {
+                'route': [],
+                'load_p': 0.0,
+                'load_c': 0.0,
+                'cur_time': op_start,
+                'last_node': 0,
+            }
+            next_state = try_append(fresh_state, order_id)
+            if next_state is not None and next_state['cur_time'] < best_finish_time:
+                best_finish_time = next_state['cur_time']
+                best_state = next_state
+                best_index = None
+
+        if best_state is None:
+            dropped_orders.append(order_id)
+            continue
+
+        if best_index is None:
+            states.append(best_state)
+        else:
+            states[best_index] = best_state
+
+    pruned_routes = [state['route'] for state in states if state['route']]
+    return pruned_routes[:num_vehicles], dropped_orders
+
+
+
+
 def _detail_scalar(details, key, default=0.0):
     value = details.get(key, default)
     if torch.is_tensor(value):
@@ -76,7 +213,14 @@ def _detail_scalar(details, key, default=0.0):
     return float(value)
 
 
-def _build_eval_meta(details, objective_cost, eval_protocol, hard_violation_penalty_weight):
+def _build_eval_meta(
+    details,
+    objective_cost,
+    eval_protocol,
+    hard_violation_penalty_weight,
+    hard_constraint_mode=PENALTY_HARD_CONSTRAINT_MODE,
+    strict_infeasible_cost=1e12,
+):
     objective_legacy = float(objective_cost)
     raw_legacy = _detail_scalar(details, 'total_cost_raw', objective_legacy)
 
@@ -86,8 +230,12 @@ def _build_eval_meta(details, objective_cost, eval_protocol, hard_violation_pena
     hard_violation_count = pickup_hard_violations + total_ride_hard_violations + excess_ride_hard_violations
 
     comparable = eval_protocol == ALIGNED_PROTOCOL
+    hard_constraint_mode = hard_constraint_mode if hard_constraint_mode in HARD_CONSTRAINT_MODES else PENALTY_HARD_CONSTRAINT_MODE
     applied_penalty_weight = float(hard_violation_penalty_weight) if comparable else 0.0
     hard_violation_penalty = hard_violation_count * applied_penalty_weight
+
+    is_hard_feasible = hard_violation_count <= 1e-9
+    strict_rejected_by_hard = hard_constraint_mode == STRICT_HARD_CONSTRAINT_MODE and (not is_hard_feasible)
 
     return {
         'protocol_version': eval_protocol,
@@ -105,7 +253,10 @@ def _build_eval_meta(details, objective_cost, eval_protocol, hard_violation_pena
         'passenger_pickup_hard_violations': pickup_hard_violations,
         'passenger_total_ride_time_violations': total_ride_hard_violations,
         'passenger_excess_ride_time_violations': excess_ride_hard_violations,
-        'is_hard_feasible': hard_violation_count <= 1e-9,
+        'is_hard_feasible': is_hard_feasible,
+        'hard_constraint_mode': hard_constraint_mode,
+        'strict_rejected_by_hard': strict_rejected_by_hard,
+        'strict_infeasible_cost': float(strict_infeasible_cost),
     }
 
 
@@ -114,6 +265,8 @@ def evaluate_node_routes(
     node_routes,
     eval_protocol=LEGACY_PROTOCOL,
     hard_violation_penalty_weight=0.0,
+    hard_constraint_mode=PENALTY_HARD_CONSTRAINT_MODE,
+    strict_infeasible_cost=1e12,
     return_eval_meta=False,
 ):
     n_orders = int(sample['n_orders'])
@@ -127,9 +280,13 @@ def evaluate_node_routes(
         objective_cost.item(),
         eval_protocol=eval_protocol,
         hard_violation_penalty_weight=hard_violation_penalty_weight,
+        hard_constraint_mode=hard_constraint_mode,
+        strict_infeasible_cost=strict_infeasible_cost,
     )
 
     score_cost = eval_meta['objective_cost_aligned'] if eval_meta['comparable_to_drl'] else eval_meta['objective_cost_legacy']
+    if eval_meta['strict_rejected_by_hard']:
+        score_cost = float(strict_infeasible_cost)
     if return_eval_meta:
         return score_cost, details, pi, eval_meta
     return score_cost, details, pi
@@ -143,24 +300,41 @@ def evaluate_order_routes(
     fill_missing_orders=True,
     eval_protocol=LEGACY_PROTOCOL,
     hard_violation_penalty_weight=0.0,
+    hard_constraint_mode=PENALTY_HARD_CONSTRAINT_MODE,
+    strict_infeasible_cost=1e12,
 ):
     n_orders = int(sample['n_orders'])
-    repaired_routes = repair_order_routes(
-        order_routes,
-        n_orders,
-        num_vehicles=num_vehicles,
-        fill_missing_orders=fill_missing_orders,
-    )
+    if hard_constraint_mode == STRICT_HARD_CONSTRAINT_MODE:
+        repaired_routes, dropped_orders = prune_order_routes_for_strict(
+            sample,
+            order_routes,
+            n_orders,
+            num_vehicles=num_vehicles,
+        )
+    else:
+        repaired_routes = repair_order_routes(
+            order_routes,
+            n_orders,
+            num_vehicles=num_vehicles,
+            fill_missing_orders=fill_missing_orders,
+        )
+        dropped_orders = []
+
     node_routes = order_routes_to_node_routes(repaired_routes, n_orders)
     objective_cost, details, pi, eval_meta = evaluate_node_routes(
         sample,
         node_routes,
         eval_protocol=eval_protocol,
         hard_violation_penalty_weight=hard_violation_penalty_weight,
+        hard_constraint_mode=hard_constraint_mode,
+        strict_infeasible_cost=strict_infeasible_cost,
         return_eval_meta=True,
     )
 
-    if eval_protocol == ALIGNED_PROTOCOL and fill_missing_orders:
+    eval_meta['strict_pruned_orders'] = float(len(dropped_orders))
+    eval_meta['strict_pruned_order_ids'] = [int(order_id) for order_id in dropped_orders]
+
+    if eval_protocol == ALIGNED_PROTOCOL and fill_missing_orders and hard_constraint_mode != STRICT_HARD_CONSTRAINT_MODE:
         eval_meta['comparable_to_drl'] = False
         eval_meta['comparability_notes'].append(
             'fill_missing_orders=True may bias service upward; use --no-fill-missing-orders for strict DRL comparability.'
@@ -174,6 +348,8 @@ def build_solution_info(objective_cost, details, node_routes, algorithm, extra=N
 
     objective_effective = float(eval_meta['objective_cost_aligned'] if eval_meta['comparable_to_drl'] else eval_meta['objective_cost_legacy'])
     raw_effective = float(eval_meta['raw_total_cost_aligned'] if eval_meta['comparable_to_drl'] else eval_meta['raw_total_cost_legacy'])
+    if eval_meta.get('strict_rejected_by_hard', False):
+        objective_effective = float(eval_meta.get('strict_infeasible_cost', objective_effective))
 
     unfulfilled_orders = _detail_scalar(details, 'unfulfilled_orders', 0.0)
     pickup_only_orders = _detail_scalar(details, 'pickup_only_orders', 0.0)
@@ -211,6 +387,10 @@ def build_solution_info(objective_cost, details, node_routes, algorithm, extra=N
         'hard_violation_penalty_weight': float(eval_meta['hard_violation_penalty_weight']),
         'hard_violation_penalty': float(eval_meta['hard_violation_penalty']),
         'is_hard_feasible': bool(eval_meta['is_hard_feasible']),
+        'hard_constraint_mode': eval_meta.get('hard_constraint_mode', PENALTY_HARD_CONSTRAINT_MODE),
+        'strict_rejected_by_hard': bool(eval_meta.get('strict_rejected_by_hard', False)),
+        'strict_infeasible_cost': float(eval_meta.get('strict_infeasible_cost', 0.0)),
+        'strict_pruned_orders': float(eval_meta.get('strict_pruned_orders', 0.0)),
         'protocol_version': eval_meta['protocol_version'],
         'comparable_to_drl': bool(eval_meta['comparable_to_drl']),
         'comparability_notes': list(eval_meta.get('comparability_notes', [])),
