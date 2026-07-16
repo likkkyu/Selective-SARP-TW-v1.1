@@ -59,6 +59,7 @@
 
 | 日期 | 路径 | 变更类型 | 说明 | 操作人 |
 |---|---|---|---|---|
+| 2026-07-16 | `outputs_cmp/n200_sr_opt_a1_ub003_eval500.json`、`outputs_cmp/n200_sr_opt_a2_ub006_eval500.json`、`COMPARATIVE_EXPERIMENT_PLAN_AND_TRACKER_20260710.md`、`N200_LONGTERM_PLAN_AND_PROGRESS_20260708.md` | 新增+修改 | 完成 N200 服务率优化 A1/A2（decode urgency bias）候选评估并回填台账：A1/A2 均 FAIL（未达到服务率/业务门槛），保留 frozen baseline 不变 | Claude + bytedance |
 | 2026-07-16 | `COMPARATIVE_EXPERIMENT_PLAN_AND_TRACKER_20260710.md`、`N200_LONGTERM_PLAN_AND_PROGRESS_20260708.md`、`CURRENT_BEST_CHECKPOINT_SUMMARY.md`、`BASELINES.md`、`FILE_CONTROL.md` | 修改 | 完成 DRL 主实验“服务率优化前冻结”台账：回填 N100/N200 冻结指标与门槛，新增单变量优化队列和基线回退锚点（pre-sr-opt） | Claude + bytedance |
 | 2026-07-12 | `baseline_utils.py`、`ga_mcvrppdtw.py`、`sa_mcvrppdtw.py` | 修改 | 完成 GA/SA 与 DRL 的协议对齐升级：新增 `protocol_version/comparable_to_drl`、硬违约统计(`hard_violation_*`)与 aligned cost 机制；支持 `--eval_protocol drl_aligned_v1` 与 `--no-fill-missing-orders`，用于公平主表对比 | Claude + bytedance |
 | 2026-07-12 | `outputs_cmp/*_aligned_smoke*.json`、`outputs_cmp/*_legacy_smoke*.json` | 新增（验证产物） | 新增 GA/SA 对齐协议 smoke 验证结果（N25），用于验证“硬违约可见化 + comparable 标记”生效，不直接进入论文主表 | Claude |

@@ -63,12 +63,15 @@
 | 2026-07-10 | `n200_phaseB_rw1_warmup1` | 在 Phase B 基线上仅改 `reject-warmup-epochs=1` | best service=0.672, best objective=39819.82 | （未提取） | **PASS（显著优于 rw0_base）** |
 | 2026-07-11 | `n200_phaseC_rw1_e10_eval500` | 正式评估（500样本，seed=99999） | audited service=0.863540, rejected=0.106610, unfulfilled=0.029850, raw_cost=17880.395 | 评估完成 | **PASS（按当前可接受阈值>=0.85）** |
 | 2026-07-11 | `n200_phaseB_rw1_warmup1_eval500` | 对照评估（500样本，seed=99999） | audited service=0.705630, rejected=0.225720, unfulfilled=0.068650, raw_cost=37041.609 | 评估完成 | 对照基线 |
+| 2026-07-16 | `n200_sr_opt_a1_ub003_eval500` | 单变量：`decode_pickup_urgency_bias=0.03`（其余冻结） | service=0.848070, rejected=0.122420, unfulfilled=0.029510, raw_cost=19633.149, clean=false | 评估完成 | **FAIL（服务率下降）** |
+| 2026-07-16 | `n200_sr_opt_a2_ub006_eval500` | 单变量：`decode_pickup_urgency_bias=0.06`（其余冻结） | service=0.862700, rejected=0.101990, unfulfilled=0.035310, raw_cost=18176.966, clean=false | 评估完成 | **FAIL（unfulfilled升高）** |
 
 当前状态：
 - Phase C 正式评估完成：`n200_phaseC_rw1_e10` 在 service/cost/reject/unfulfilled 上全面优于 `phaseB_rw1_warmup1`。
 - 当前 champion（Phase C 冻结基线）更新为：`n200_phaseC_rw1_e10`。
 - 冻结基线关键值：`service=0.86354`、`rejected=0.10661`、`unfulfilled=0.02985`、`business_acceptance.clean=false`。
-- 下一步：在固定协议下执行服务率优化单变量队列，并优先将 `clean` 推进到 true。
+- A1/A2（仅调 decode urgency bias）均已 FAIL，不满足晋级门槛。
+- 下一步：转入 A3（`alpha_unfulfilled=850`）与 A4（`alpha_reject=620`）训练候选；当前会话的“新训练任务”权限受限，待用户确认后执行。
 ---
 
 ## 5. 下一阶段执行顺序（单变量队列）

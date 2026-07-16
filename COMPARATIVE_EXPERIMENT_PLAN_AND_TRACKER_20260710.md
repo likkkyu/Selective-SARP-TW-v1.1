@@ -257,6 +257,8 @@ python3 compare_drl_vs_gurobi.py --graph-sizes 50 100 200 --num-samples 500 --se
 | 日期 | 规模 | 变量 | 对照A | 对照B | A结果 | B结果 | PASS/FAIL | 备注 |
 |---|---|---|---|---|---|---|---|---|
 | 2026-07-11 | N50 | pomo-size | 1 | 2 | service=0.840, cost=7086.755 | service=0.778, cost=6690.745 | FAIL | 服务率明显下降，回退到 pomo=1 |
+| 2026-07-16 | N200 | decode-pickup-urgency-bias | 0.00 | 0.03 | service=0.86354, unfulfilled=0.02985, raw=17880.395 | service=0.84807, unfulfilled=0.02951, raw=19633.149 | FAIL | 服务率下降约 1.55pp，成本显著上升 |
+| 2026-07-16 | N200 | decode-pickup-urgency-bias | 0.00 | 0.06 | service=0.86354, unfulfilled=0.02985, raw=17880.395 | service=0.86270, unfulfilled=0.03531, raw=18176.966 | FAIL | 服务率未提升且 unfulfilled 升高 |
 | YYYY-MM-DD | N100 | reject-warmup-epochs | 0 | 1 |  |  |  |  |
 
 ---
