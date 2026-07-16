@@ -1,5 +1,45 @@
 # Current best checkpoint summary
 
+> Update (2026-07-16): 主线对比实验已完成一次“pre-service-optimization baseline”冻结。本文保留历史 N25 记录，同时新增 N100/N200 冻结基线摘要，作为后续服务率优化的唯一对照起点。
+
+## Mainline frozen baseline (for service-rate optimization)
+
+### N100 frozen baseline
+
+- checkpoint:
+  - `outputs_cmp/n100_ours_rw1_fixed/pomo_n100_optimized/model_best_service.pt`
+- evaluation evidence:
+  - `outputs_cmp/n100_ours_rw1_fixed_eval500.json`
+- key metrics (`num_samples=500`, `seed=99999`, greedy decode):
+  - `service_rate_mean = 0.84592`
+  - `rejected_rate_mean = 0.15408`
+  - `unfulfilled_rate_mean = 0.0`
+  - `total_cost_raw_mean = 9604.0489`
+  - `passenger_delivery_delay_cost_mean = 0.0`
+  - `business_acceptance.clean = true`
+
+### N200 frozen baseline
+
+- checkpoint:
+  - `outputs_n200_phaseC_rw1_e10/pomo_n200_optimized/model_best_service.pt`
+- evaluation evidence:
+  - `outputs_cmp/n200_phaseC_rw1_e10_eval500.json`
+- key metrics (`num_samples=500`, `seed=99999`, greedy decode):
+  - `service_rate_mean = 0.86354`
+  - `rejected_rate_mean = 0.10661`
+  - `unfulfilled_rate_mean = 0.02985`
+  - `total_cost_raw_mean = 17880.3951`
+  - `passenger_delivery_delay_cost_mean = 0.0`
+  - `business_acceptance.clean = false`
+
+### Freeze policy
+
+- 后续服务率优化阶段，所有候选都必须相对上述 N100/N200 冻结值做增量比较。
+- 对比优先门槛：`service_rate_mean` 提升、`unfulfilled_rate_mean` 不升、`business_acceptance.clean` 不退化。
+- 所有候选先 `num_samples=500`，晋级后必须补 `num_samples=2000` 复核。
+
+---
+
 This note consolidates the current best 25-order DRL checkpoint after the depot dead-end reject-cleanup fix and the follow-up retraining run.
 
 ## Current best checkpoint

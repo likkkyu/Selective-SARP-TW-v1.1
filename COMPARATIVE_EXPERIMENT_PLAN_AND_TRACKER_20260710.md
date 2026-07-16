@@ -1,8 +1,27 @@
 # 对比试验总控看板（N25 / N50 / N100 / N200）
 
-- 更新时间：2026-07-12
+- 更新时间：2026-07-16
 - 负责人：bytedance + Claude
 - 目标：在**硬约束语义不变**前提下，补齐论文级对比证据链（主对比 + 消融 + 效率）。
+
+---
+
+## 0. 当前冻结里程碑（pre-service-optimization baseline）
+
+基线证据文件（冻结，不改口径）：
+- `outputs_cmp/n100_ours_rw1_fixed_eval500.json`
+- `outputs_cmp/n200_phaseC_rw1_e10_eval500.json`
+
+冻结指标（用于后续服务率优化对照）：
+
+| 规模 | checkpoint | service_rate_mean | rejected_rate_mean | unfulfilled_rate_mean | total_cost_raw_mean | business_acceptance.clean |
+|---|---|---:|---:|---:|---:|---:|
+| N100 | `outputs_cmp/n100_ours_rw1_fixed/pomo_n100_optimized/model_best_service.pt` | 0.84592 | 0.15408 | 0.00000 | 9604.0489 | true |
+| N200 | `outputs_n200_phaseC_rw1_e10/pomo_n200_optimized/model_best_service.pt` | 0.86354 | 0.10661 | 0.02985 | 17880.3951 | false |
+
+说明：
+- N100 文件中的 `run.business_clean=false` 与 `business_acceptance.clean=true` 存在口径差异；本看板后续统一以 `business_acceptance.clean` 作为业务门禁字段。
+- 本冻结里程碑完成后，后续所有服务率优化实验均以该表为对照，不允许回写覆盖。
 
 ---
 
@@ -299,18 +318,40 @@ python3 sa_mcvrppdtw.py --graph_size 100 --num_samples 500 --seed 99999 --iterat
 
 ---
 
-## 9. 当前待办
+## 9. 下一阶段服务率优化队列（基于冻结基线）
 
-1. ✅ 回填 N200 rw1（PhaseC/PhaseB）500样本正式评估结果并确定当前 champion。
-2. 跑 N200 rw0 对照（同口径单变量）以完善消融证据链。
-3. ✅ N50 rw1 已补 eval500；`pomo-size=2` 消融已完成并判定 FAIL（回退到 `pomo-size=1`）。
-4. ✅ 用户云端续训日志回传：`n50_ours_rw1_resume20` 已完成，eval500=`service=0.845, raw=4734.072`，当前领先于旧 e10 结果。
-5. 补齐 N50 剩余矩阵：rw0 / GA / SA / Gurobi(distance+cost+reeval)。
-6. ✅ N100 固定口径 Ours-rw1 已完成（train+eval500）；基线进度：SA(500)已完成，待 GA(500) 与 Gurobi(distance+cost+reeval)。
-7. ✅ N25 固定口径 Ours-rw1/rw0 已完成并给出对照结论（rw1 champion）；待同步 `n25_ours_rw1_fixed_eval500.json` / `n25_ours_rw0_fixed_eval500.json` 到本地证据目录。
-8. N25 主线剩余：GA / SA / Gurobi(distance+cost+reeval) 的全量500；本地小样本 GA+SA 试跑已完成（SA-20/SA-10/GA-10），当前先验结论为 SA 在成本侧显著优于 GA。
-9. ✅ 已完成 GA/SA vs DRL 协议对齐改造（新增 `protocol_version/comparable_to_drl/hard_violation_*` 与 aligned cost）；下一步仅回填 `comparable_to_drl=true` 的新基线结果。
-10. 汇总主表 + 消融表 + 效率表。
+### 9.1 固定评估口径（不可漂移）
+- `evaluate_model.py --decode greedy --seed 99999 --num-samples 500`（候选筛选）
+- 晋级候选必须补 `--num-samples 2000` 复核
+- state 参数固定：
+  - `--max-concurrent-open-orders 6`
+  - `--min-orders-per-dispatch 4`
+  - `--enable-delivery-viability`
+  - `--disable-viability-fallback`（若显式传参）
+
+### 9.2 N200 单变量队列（优先执行）
+1. `decode_pickup_urgency_bias: 0.00 -> 0.03`
+2. `decode_pickup_urgency_bias: 0.03 -> 0.06`
+3. `alpha_unfulfilled: 750 -> 850`
+4. `alpha_reject: 575 -> 620`（仅在前3项不达标时启用）
+
+执行纪律：
+- 一次只改 1 个变量；
+- 每个候选都输出独立 JSON（文件名包含变量和值）；
+- FAIL 即回退，不并行开枝。
+
+### 9.3 晋级门槛（相对冻结基线）
+- N200 `service_rate_mean` 至少提升 +1pp；
+- `unfulfilled_rate_mean` 不升高（目标下降）；
+- `business_acceptance.clean` 不退化（优先从 false 变 true）；
+- `audit.partition_consistent_samples == total_samples` 且 `audit.core_aggregate_match_samples == total_samples`。
+
+### 9.4 当前待办
+1. ✅ 完成主实验冻结里程碑回填（N100/N200 基线写入本看板）。
+2. 跑 N200 单变量 A1：`decode_pickup_urgency_bias=0.03`。
+3. 若 A1 FAIL，顺序执行 A2/A3/A4（按 9.2 队列）。
+4. 对晋级候选补 `num_samples=2000` 正式复核。
+5. 同步更新主表 + 消融表 + 效率表（只记录通过门槛的候选）。
 
 ---
 

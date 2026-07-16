@@ -1,9 +1,9 @@
 # N200 长期计划与进度看板（Harness化管理）
 
-- 更新时间：2026-07-11
+- 更新时间：2026-07-16
 - 负责人：bytedance + Claude
-- 当前阶段：**Phase C 已完成 500样本正式评估（继续补齐对比矩阵）**
-- 当前 Champion（Phase C 口径）：`n200_phaseC_rw1_e10`
+- 当前阶段：**Phase C 基线已冻结（进入服务率优化队列）**
+- 当前 Champion（Phase C 冻结基线）：`n200_phaseC_rw1_e10`
 - 当前 Champion（快筛口径）：`rw0_base`
 - 对比试验总控看板：`COMPARATIVE_EXPERIMENT_PLAN_AND_TRACKER_20260710.md`
 
@@ -66,21 +66,23 @@
 
 当前状态：
 - Phase C 正式评估完成：`n200_phaseC_rw1_e10` 在 service/cost/reject/unfulfilled 上全面优于 `phaseB_rw1_warmup1`。
-- 当前 champion（Phase C 口径）更新为：`n200_phaseC_rw1_e10`。
-- 在用户当前接受标准（service>=0.85）下，N200 主线结果可暂定 PASS。
-- 下一步：补齐 N50/N100 的对比矩阵并同步本地台账。
+- 当前 champion（Phase C 冻结基线）更新为：`n200_phaseC_rw1_e10`。
+- 冻结基线关键值：`service=0.86354`、`rejected=0.10661`、`unfulfilled=0.02985`、`business_acceptance.clean=false`。
+- 下一步：在固定协议下执行服务率优化单变量队列，并优先将 `clean` 推进到 true。
 ---
 
 ## 5. 下一阶段执行顺序（单变量队列）
 
 按照信息增益/成本优先级（动态更新）：
-1. 进入 Phase C 中程验证：以 `n200_phaseB_rw1_warmup1` 跑 8~10 epoch（其余参数固定）
-2. 中程通过后执行正式评估：`evaluate_model.py` 500 -> 2000 样本
-3. 若中程仍明显低于目标（service < 0.80），进入“非微调路线”方案设计（保持硬约束语义不变）
+1. A1：仅改 `decode_pickup_urgency_bias=0.03`（其余参数冻结）；
+2. A2：仅改 `decode_pickup_urgency_bias=0.06`；
+3. A3：仅改 `alpha_unfulfilled=850`；
+4. A4：仅改 `alpha_reject=620`（仅在 A1~A3 未达门槛时）。
 
 每一步都必须经过：
-- 单变量控制
-- 达标后再进入下一阶段
+- 单变量控制；
+- 固定评估口径（`seed=99999`, `decode=greedy`, `num_samples=500`）；
+- 满足晋级门槛后再补 `num_samples=2000` 复核。
 
 ---
 

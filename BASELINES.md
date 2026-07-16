@@ -2,6 +2,25 @@
 
 > 目的：记录可复现封版版本（代码 commit / tag / 对应实验资产），用于后续 N=200 扩展时快速回退与对比。
 
+## 0) DRL 主实验冻结基线（服务率优化前）
+
+- 名称：`drl-mainline-freeze-20260716-pre-sr-opt`
+- 分支：`reject-split-doc-sync`
+- 证据文件：
+  - `outputs_cmp/n100_ours_rw1_fixed_eval500.json`
+  - `outputs_cmp/n200_phaseC_rw1_e10_eval500.json`
+- 冻结指标：
+  - N100：`service=0.84592`, `rejected=0.15408`, `unfulfilled=0.00000`, `raw=9604.0489`, `business_clean=true`
+  - N200：`service=0.86354`, `rejected=0.10661`, `unfulfilled=0.02985`, `raw=17880.3951`, `business_clean=false`
+- 用途：作为后续服务率优化的唯一对照基线；不回写覆盖。
+- 回退命令（冻结后补齐 commit/tag 后生效）：
+
+```bash
+git fetch --tags
+git switch reject-split-doc-sync
+git reset --hard drl-mainline-freeze-20260716-pre-sr-opt
+```
+
 ## 1) N100 稳定基线（封版）
 
 - 名称：`baseline-n100-stable-20260706`
