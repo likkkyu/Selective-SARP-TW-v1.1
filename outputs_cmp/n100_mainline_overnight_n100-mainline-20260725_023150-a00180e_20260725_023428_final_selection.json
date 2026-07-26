@@ -1,0 +1,34 @@
+{
+  "candidates": [
+    {
+      "name": "tail2",
+      "eval500": "outputs_cmp/n100_mainline_overnight_n100-mainline-20260725_023150-a00180e_20260725_023428_tail2_s1234_eval500.json",
+      "checkpoint": "outputs_cloud/n100_mainline_overnight_n100-mainline-20260725_023150-a00180e_20260725_023428_tail2_s1234/pomo_n100_optimized/model_best_service.pt",
+      "service": 0.82834,
+      "rejected": 0.1715,
+      "unfulfilled": 0.00016,
+      "raw": 10425.02865185547,
+      "clean_metric": false
+    },
+    {
+      "name": "e6_best",
+      "eval500": "outputs_cmp/n100_mainline_overnight_n100-mainline-20260725_023150-a00180e_20260725_023428_e6_s1234_eval500.json",
+      "checkpoint": "outputs_cloud/n100_mainline_overnight_n100-mainline-20260725_023150-a00180e_20260725_023428_e6_s1234/pomo_n100_optimized/model_best_service.pt",
+      "service": 0.8253,
+      "rejected": 0.17452,
+      "unfulfilled": 0.00017999999999999998,
+      "raw": 10560.349601074218,
+      "clean_metric": false
+    }
+  ],
+  "selected": {
+    "name": "tail2",
+    "eval500": "outputs_cmp/n100_mainline_overnight_n100-mainline-20260725_023150-a00180e_20260725_023428_tail2_s1234_eval500.json",
+    "checkpoint": "outputs_cloud/n100_mainline_overnight_n100-mainline-20260725_023150-a00180e_20260725_023428_tail2_s1234/pomo_n100_optimized/model_best_service.pt",
+    "service": 0.82834,
+    "rejected": 0.1715,
+    "unfulfilled": 0.00016,
+    "raw": 10425.02865185547,
+    "clean_metric": false
+  }
+}

@@ -1,0 +1,86 @@
+{
+  "eval500": {
+    "n": 5,
+    "service_mean": 0.891232,
+    "service_std": 0.003941410914888223,
+    "service_ci95_half": 0.0034547989913162836,
+    "service_min": 0.8872,
+    "service_max": 0.89688,
+    "unfulfilled_mean": 0.0,
+    "unfulfilled_max": 0.0,
+    "all_clean": true,
+    "rows": [
+      {
+        "file": "eval500_seed10007.json",
+        "service": 0.88776,
+        "unfulfilled": 0.0,
+        "clean": true
+      },
+      {
+        "file": "eval500_seed10037.json",
+        "service": 0.8872,
+        "unfulfilled": 0.0,
+        "clean": true
+      },
+      {
+        "file": "eval500_seed10067.json",
+        "service": 0.89184,
+        "unfulfilled": 0.0,
+        "clean": true
+      },
+      {
+        "file": "eval500_seed10099.json",
+        "service": 0.8924799999999999,
+        "unfulfilled": 0.0,
+        "clean": true
+      },
+      {
+        "file": "eval500_seed99999.json",
+        "service": 0.89688,
+        "unfulfilled": 0.0,
+        "clean": true
+      }
+    ]
+  },
+  "eval2000": {
+    "n": 3,
+    "service_mean": 0.8881,
+    "service_std": 0.0007472616676907955,
+    "service_ci95_half": 0.0008456061809928841,
+    "service_min": 0.88742,
+    "service_max": 0.8889,
+    "unfulfilled_mean": 0.0,
+    "unfulfilled_max": 0.0,
+    "all_clean": true,
+    "rows": [
+      {
+        "file": "eval2000_seed10007.json",
+        "service": 0.88798,
+        "unfulfilled": 0.0,
+        "clean": true
+      },
+      {
+        "file": "eval2000_seed10037.json",
+        "service": 0.88742,
+        "unfulfilled": 0.0,
+        "clean": true
+      },
+      {
+        "file": "eval2000_seed99999.json",
+        "service": 0.8889,
+        "unfulfilled": 0.0,
+        "clean": true
+      }
+    ]
+  },
+  "skipped_files": {
+    "eval500": [],
+    "eval2000": []
+  },
+  "verdict": {
+    "stable_eval500": true,
+    "stable_eval2000": true,
+    "cross_consistent_500_vs_2000": true,
+    "overall_stability_pass": true
+  }
+}

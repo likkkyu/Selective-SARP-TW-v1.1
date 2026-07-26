@@ -13,6 +13,7 @@ import json
 import math
 import os
 import random
+import socket
 import time
 from contextlib import nullcontext
 
@@ -43,20 +44,74 @@ PHASE_CONFIGS = {
     25: {
         'n_epochs': 50,
         'batch_size': 8,
-        'pomo_size': 2,
+        'pomo_size': 1,
         'n_encode_layers': 6,
         'hidden_dim': 256,
         'lr': 5e-5,
         'epoch_size': 8000,
+        'amp': False,
+        'checkpoint_encoder': False,
+        'curriculum': {
+            'enabled': True,
+            'warmup_epochs': 3,
+            'mix_epochs': 6,
+            'phase1_passenger_ratio': 0.66,
+            'phase1_short_ratio': 0.64,
+            'phase1_mid_ratio': 0.30,
+            'phase1_long_ratio': 0.06,
+            'phase1_passenger_tw_morning': 0.60,
+            'phase1_passenger_tw_midday': 0.26,
+            'phase1_passenger_tw_evening': 0.14,
+            'phase1_cargo_tw_morning': 0.58,
+            'phase1_cargo_tw_midday': 0.28,
+            'phase1_cargo_tw_evening': 0.14,
+            'phase2_passenger_ratio': 0.63,
+            'phase2_short_ratio': 0.62,
+            'phase2_mid_ratio': 0.31,
+            'phase2_long_ratio': 0.07,
+            'phase2_passenger_tw_morning': 0.57,
+            'phase2_passenger_tw_midday': 0.28,
+            'phase2_passenger_tw_evening': 0.15,
+            'phase2_cargo_tw_morning': 0.58,
+            'phase2_cargo_tw_midday': 0.28,
+            'phase2_cargo_tw_evening': 0.14,
+        },
     },
     50: {
         'n_epochs': 60,
         'batch_size': 8,
-        'pomo_size': 2,
+        'pomo_size': 1,
         'n_encode_layers': 6,
         'hidden_dim': 256,
         'lr': 5e-5,
         'epoch_size': 8000,
+        'amp': False,
+        'checkpoint_encoder': False,
+        'curriculum': {
+            'enabled': True,
+            'warmup_epochs': 4,
+            'mix_epochs': 8,
+            'phase1_passenger_ratio': 0.70,
+            'phase1_short_ratio': 0.67,
+            'phase1_mid_ratio': 0.27,
+            'phase1_long_ratio': 0.06,
+            'phase1_passenger_tw_morning': 0.63,
+            'phase1_passenger_tw_midday': 0.24,
+            'phase1_passenger_tw_evening': 0.13,
+            'phase1_cargo_tw_morning': 0.60,
+            'phase1_cargo_tw_midday': 0.26,
+            'phase1_cargo_tw_evening': 0.14,
+            'phase2_passenger_ratio': 0.66,
+            'phase2_short_ratio': 0.63,
+            'phase2_mid_ratio': 0.29,
+            'phase2_long_ratio': 0.08,
+            'phase2_passenger_tw_morning': 0.58,
+            'phase2_passenger_tw_midday': 0.27,
+            'phase2_passenger_tw_evening': 0.15,
+            'phase2_cargo_tw_morning': 0.57,
+            'phase2_cargo_tw_midday': 0.28,
+            'phase2_cargo_tw_evening': 0.15,
+        },
     },
     100: {
         'n_epochs': 80,
@@ -66,6 +121,33 @@ PHASE_CONFIGS = {
         'hidden_dim': 256,
         'lr': 3e-5,
         'epoch_size': 10000,
+        'amp': True,
+        'checkpoint_encoder': True,
+        'curriculum': {
+            'enabled': True,
+            'warmup_epochs': 5,
+            'mix_epochs': 10,
+            'phase1_passenger_ratio': 0.74,
+            'phase1_short_ratio': 0.70,
+            'phase1_mid_ratio': 0.24,
+            'phase1_long_ratio': 0.06,
+            'phase1_passenger_tw_morning': 0.66,
+            'phase1_passenger_tw_midday': 0.23,
+            'phase1_passenger_tw_evening': 0.11,
+            'phase1_cargo_tw_morning': 0.61,
+            'phase1_cargo_tw_midday': 0.25,
+            'phase1_cargo_tw_evening': 0.14,
+            'phase2_passenger_ratio': 0.69,
+            'phase2_short_ratio': 0.64,
+            'phase2_mid_ratio': 0.28,
+            'phase2_long_ratio': 0.08,
+            'phase2_passenger_tw_morning': 0.59,
+            'phase2_passenger_tw_midday': 0.26,
+            'phase2_passenger_tw_evening': 0.15,
+            'phase2_cargo_tw_morning': 0.57,
+            'phase2_cargo_tw_midday': 0.28,
+            'phase2_cargo_tw_evening': 0.15,
+        },
     },
     200: {
         'n_epochs': 100,
@@ -75,7 +157,60 @@ PHASE_CONFIGS = {
         'hidden_dim': 256,
         'lr': 2e-5,
         'epoch_size': 12000,
+        'amp': True,
+        'checkpoint_encoder': True,
+        'curriculum': {
+            'enabled': True,
+            'warmup_epochs': 6,
+            'mix_epochs': 12,
+            'phase1_passenger_ratio': 0.76,
+            'phase1_short_ratio': 0.72,
+            'phase1_mid_ratio': 0.23,
+            'phase1_long_ratio': 0.05,
+            'phase1_passenger_tw_morning': 0.67,
+            'phase1_passenger_tw_midday': 0.22,
+            'phase1_passenger_tw_evening': 0.11,
+            'phase1_cargo_tw_morning': 0.62,
+            'phase1_cargo_tw_midday': 0.24,
+            'phase1_cargo_tw_evening': 0.14,
+            'phase2_passenger_ratio': 0.70,
+            'phase2_short_ratio': 0.65,
+            'phase2_mid_ratio': 0.27,
+            'phase2_long_ratio': 0.08,
+            'phase2_passenger_tw_morning': 0.60,
+            'phase2_passenger_tw_midday': 0.26,
+            'phase2_passenger_tw_evening': 0.14,
+            'phase2_cargo_tw_morning': 0.58,
+            'phase2_cargo_tw_midday': 0.28,
+            'phase2_cargo_tw_evening': 0.14,
+        },
     },
+}
+
+
+CURRICULUM_DEFAULTS = {
+    'warmup_epochs': 5,
+    'mix_epochs': 10,
+    'phase1_passenger_ratio': 0.8,
+    'phase1_short_ratio': 0.75,
+    'phase1_mid_ratio': 0.2,
+    'phase1_long_ratio': 0.05,
+    'phase1_passenger_tw_morning': 0.7,
+    'phase1_passenger_tw_midday': 0.2,
+    'phase1_passenger_tw_evening': 0.1,
+    'phase1_cargo_tw_morning': 0.6,
+    'phase1_cargo_tw_midday': 0.25,
+    'phase1_cargo_tw_evening': 0.15,
+    'phase2_passenger_ratio': 0.7,
+    'phase2_short_ratio': 0.6,
+    'phase2_mid_ratio': 0.3,
+    'phase2_long_ratio': 0.1,
+    'phase2_passenger_tw_morning': 0.58,
+    'phase2_passenger_tw_midday': 0.27,
+    'phase2_passenger_tw_evening': 0.15,
+    'phase2_cargo_tw_morning': 0.55,
+    'phase2_cargo_tw_midday': 0.28,
+    'phase2_cargo_tw_evening': 0.17,
 }
 
 
@@ -248,6 +383,7 @@ class POMOTrainerOptimized:
         if self.loader_kwargs['num_workers'] > 0:
             self.loader_kwargs['persistent_workers'] = not self.args.disable_persistent_workers
             self.loader_kwargs['prefetch_factor'] = max(1, self.args.prefetch_factor)
+        self.benchmark_run_context = self._build_benchmark_run_context()
 
         if self.is_main_process:
             print(f"Device: {self.device}")
@@ -391,6 +527,54 @@ class POMOTrainerOptimized:
             return True
         return bool(self.args.dist_eval) or self.is_main_process
 
+    def _build_benchmark_run_context(self):
+        if not self.args.benchmark_mode:
+            return None
+        return {
+            'experiment_label': getattr(self.args, 'experiment_label', None),
+            'baseline_ref': getattr(self.args, 'baseline_ref', None),
+            'candidate_ref': getattr(self.args, 'candidate_ref', None),
+            'single_variable_under_test': getattr(self.args, 'single_variable_under_test', None),
+            'graph_size': int(self.args.graph_size),
+            'seed': int(self.args.seed),
+            'host': socket.gethostname(),
+            'world_size': int(self.world_size),
+            'distributed': bool(self.distributed),
+            'device': str(self.device),
+            'output_dir': self.args.save_dir,
+            'resume_path': getattr(self.args, 'resume_path', None),
+            'resume_weights_only': bool(getattr(self.args, 'resume_weights_only', False)),
+            'benchmark_config': {
+                'warmup_epochs': int(self.args.benchmark_warmup_epochs),
+                'skip_validation': bool(self.args.benchmark_skip_validation),
+                'disable_checkpoint': bool(self.args.benchmark_disable_checkpoint),
+                'disable_log_save': bool(self.args.benchmark_disable_log_save),
+                'batch_timing': bool(self.args.benchmark_batch_timing),
+                'json': bool(self.args.benchmark_json),
+            },
+            'training_config': {
+                'batch_size': int(self.args.batch_size),
+                'epoch_size': int(self.args.epoch_size),
+                'n_epochs': int(self.args.n_epochs),
+                'pomo_size': int(self.args.pomo_size),
+                'lr': float(self.args.lr),
+                'amp': bool(self.amp_enabled),
+                'amp_dtype': self.args.amp_dtype if self.amp_enabled else 'fp32',
+                'checkpoint_encoder': bool(self.args.checkpoint_encoder),
+                'num_workers': int(self.args.num_workers),
+                'prefetch_factor': int(self.args.prefetch_factor),
+                'persistent_workers': bool(not self.args.disable_persistent_workers),
+                'pin_memory': bool(self.loader_kwargs.get('pin_memory', False)),
+            },
+            'state_kwargs': {
+                'max_concurrent_open_orders': int(self.args.max_concurrent_open_orders),
+                'min_orders_per_dispatch': int(self.args.min_orders_per_dispatch),
+                'enable_delivery_viability': bool(self.args.enable_delivery_viability),
+                'enable_viability_fallback': bool(self.args.enable_viability_fallback),
+                'relax_pickup_commitment_trip_time': bool(self.args.relax_pickup_commitment_trip_time),
+            },
+        }
+
     def _emit_benchmark_summary(self, payload):
         if not self.args.benchmark_mode:
             return
@@ -429,6 +613,9 @@ class POMOTrainerOptimized:
         print(f"    mean_pc_comp_open_bits : {payload['mean_pc_completion_open_bits']:.2f}")
         print(f"    mean_pc_comp_avg_depth : {payload['mean_pc_completion_avg_recursion_depth']:.2f}")
         print(f"    mean_pc_comp_max_depth : {payload['mean_pc_completion_max_recursion_depth']:.2f}")
+        print(f"    mean_pc_prune_ride     : {payload['mean_pc_pruned_by_ride_time']:.2f}")
+        print(f"    mean_pc_prune_trip     : {payload['mean_pc_pruned_by_trip_time']:.2f}")
+        print(f"    mean_pc_prune_ops      : {payload['mean_pc_pruned_by_ops_end']:.2f}")
         print(f"    mean_pc_step_calls     : {payload['mean_pc_delivery_step_feasible_calls']:.2f}")
         print(f"    mean_pc_step_hit_rate  : {payload['mean_pc_step_memo_hit_rate']:.3f}")
         print(f"    mean_pc_step_ok_calls  : {payload['mean_pc_step_reason_ok']:.2f}")
@@ -447,7 +634,11 @@ class POMOTrainerOptimized:
         print(f"    batches_per_s          : {payload['batches_per_s']:.3f}")
         print(f"    samples_per_s          : {payload['samples_per_s']:.3f}")
         if self.args.benchmark_json:
-            print(json.dumps({'type': 'benchmark_epoch', **payload}, ensure_ascii=False))
+            print(json.dumps({
+                'type': 'benchmark_epoch',
+                'run_context': self.benchmark_run_context,
+                **payload,
+            }, ensure_ascii=False))
 
     def _emit_benchmark_final_summary(self):
         if not self.args.benchmark_mode:
@@ -465,6 +656,7 @@ class POMOTrainerOptimized:
         summary = {
             'measured_epochs': len(measured),
             'warmup_epochs': warmup_epochs,
+            'run_context': self.benchmark_run_context,
             'avg_epoch_total_s': _avg('epoch_total_s'),
             'avg_train_s': _avg('train_s'),
             'avg_validate_s': _avg('validate_s'),
@@ -499,6 +691,9 @@ class POMOTrainerOptimized:
             'avg_mean_pc_completion_open_bits': _avg('mean_pc_completion_open_bits'),
             'avg_mean_pc_completion_avg_recursion_depth': _avg('mean_pc_completion_avg_recursion_depth'),
             'avg_mean_pc_completion_max_recursion_depth': _avg('mean_pc_completion_max_recursion_depth'),
+            'avg_mean_pc_pruned_by_ride_time': _avg('mean_pc_pruned_by_ride_time'),
+            'avg_mean_pc_pruned_by_trip_time': _avg('mean_pc_pruned_by_trip_time'),
+            'avg_mean_pc_pruned_by_ops_end': _avg('mean_pc_pruned_by_ops_end'),
             'avg_mean_pc_delivery_step_feasible_calls': _avg('mean_pc_delivery_step_feasible_calls'),
             'avg_mean_pc_step_memo_hit_rate': _avg('mean_pc_step_memo_hit_rate'),
             'avg_mean_pc_step_reason_ok': _avg('mean_pc_step_reason_ok'),
@@ -515,6 +710,16 @@ class POMOTrainerOptimized:
             'avg_batches_per_s': _avg('batches_per_s'),
             'avg_samples_per_s': _avg('samples_per_s'),
         }
+        key_metrics = {
+            'epoch_total_s': summary['avg_epoch_total_s'],
+            'train_s': summary['avg_train_s'],
+            'samples_per_s': summary['avg_samples_per_s'],
+            'decode_get_mask_ms': summary['avg_mean_decode_get_mask_ms'],
+            'mask_pickup_commitment_ms': summary['avg_mean_mask_pickup_commitment_ms'],
+            'mask_delivery_viability_ms': summary['avg_mean_mask_delivery_viability_ms'],
+            'pc_has_feasible_open_completion_ms': summary['avg_mean_pc_has_feasible_open_completion_ms'],
+        }
+        summary['key_metrics'] = key_metrics
         print('\n' + '=' * 70)
         print('Benchmark Summary')
         print('=' * 70)
@@ -525,6 +730,10 @@ class POMOTrainerOptimized:
                 print(f"{key}: {value}")
         if self.args.benchmark_json:
             print(json.dumps({'type': 'benchmark_final', **summary}, ensure_ascii=False))
+        if self.args.benchmark_json_output:
+            with open(self.args.benchmark_json_output, 'w', encoding='utf-8') as benchmark_file:
+                json.dump({'type': 'benchmark_final', **summary}, benchmark_file, ensure_ascii=False, indent=2)
+            print(f"benchmark final summary saved to: {self.args.benchmark_json_output}")
 
     def _build_curriculum_dataset_kwargs(self, epoch):
         kwargs = self._build_default_dataset_kwargs()
@@ -584,8 +793,14 @@ class POMOTrainerOptimized:
 
         if not self.args.enable_rideshare_curriculum:
             parts = []
+            passenger_ratio = kwargs.get('passenger_ratio_override')
+            distance_mix = kwargs.get('passenger_distance_mix_override')
             tw_mix = kwargs.get('passenger_tw_period_weights_override')
             cargo_tw_mix = kwargs.get('cargo_tw_period_weights_override')
+            if passenger_ratio is not None:
+                parts.append(f"passenger_ratio={passenger_ratio:.2f}")
+            if distance_mix is not None:
+                parts.append(f"distance_mix={tuple(round(v, 2) for v in distance_mix)}")
             if tw_mix is not None:
                 parts.append(f"passenger_tw={tuple(round(v, 2) for v in tw_mix)}")
             if cargo_tw_mix is not None:
@@ -1256,6 +1471,9 @@ class POMOTrainerOptimized:
                         train_timing.count('pc_has_feasible_open_completion_calls'),
                     ),
                     'mean_pc_completion_max_recursion_depth': self._per_batch_count(train_timing, 'pc_completion_max_recursion_depth', batch_count),
+                    'mean_pc_pruned_by_ride_time': self._per_batch_count(train_timing, 'pc_pruned_by_ride_time', batch_count),
+                    'mean_pc_pruned_by_trip_time': self._per_batch_count(train_timing, 'pc_pruned_by_trip_time', batch_count),
+                    'mean_pc_pruned_by_ops_end': self._per_batch_count(train_timing, 'pc_pruned_by_ops_end', batch_count),
                     'mean_pc_delivery_step_feasible_calls': self._per_batch_count(train_timing, 'pc_delivery_step_feasible_calls', batch_count),
                     'mean_pc_step_memo_lookups': self._per_batch_count(train_timing, 'pc_step_memo_lookups', batch_count),
                     'mean_pc_step_memo_hits': self._per_batch_count(train_timing, 'pc_step_memo_hits', batch_count),
@@ -1396,6 +1614,7 @@ class POMOTrainerOptimized:
                     'OPERATION_START': Config.OPERATION_START,
                     'reject_warmup_epochs': self.args.reject_warmup_epochs,
                     'reject_init_bias': self.args.reject_init_bias,
+                    'lr': self.args.lr,
                     'decode_pickup_urgency_bias': self.args.decode_pickup_urgency_bias,
                     'decode_pickup_urgency_horizon_hours': self.args.decode_pickup_urgency_horizon_hours,
                     'baseline_mode': self.args.baseline_mode,
@@ -1467,6 +1686,7 @@ def parse_args():
     parser.add_argument('--n-heads', type=int, default=8)
     parser.add_argument('--tanh-clipping', type=float, default=10.0)
     parser.add_argument('--normalization', default='batch')
+    parser.add_argument('--lr', type=float, default=None, help='覆盖 graph-size 默认 learning rate；用于保守微调 frozen checkpoint')
     parser.add_argument('--weight-decay', type=float, default=1e-5)
     parser.add_argument('--max-grad-norm', type=float, default=1.0)
     parser.add_argument('--save-interval', type=int, default=20)
@@ -1480,7 +1700,7 @@ def parse_args():
     parser.add_argument('--shrink-size', type=int, default=16, help='decoder shrink_size，0 表示禁用')
     parser.add_argument('--max-decode-steps', type=int, default=None, help='decoder 最大步数上限，默认按节点数自动推断')
     parser.add_argument('--max-consecutive-depot', type=int, default=8, help='连续 depot 选择上限，超过后强制终止当前 rollout')
-    parser.add_argument('--reject-warmup-epochs', type=int, default=3, help='训练前若干 epoch 屏蔽 reject 动作，先学习服务')
+    parser.add_argument('--reject-warmup-epochs', type=int, default=1, help='训练前若干 epoch 屏蔽 reject 动作，先学习服务')
     parser.add_argument('--reject-init-bias', type=float, default=-2.5, help='reject head 的初始 bias，负值用于抑制早期 reject')
     parser.add_argument('--decode-pickup-urgency-bias', type=float, default=0.0,
                         help='解码打分：pickup 紧迫度加分系数 beta（0 表示关闭）')
@@ -1496,6 +1716,11 @@ def parse_args():
     parser.add_argument('--benchmark-warmup-epochs', type=int, default=1, help='benchmark 汇总时忽略前若干 warmup epoch')
     parser.add_argument('--benchmark-batch-timing', action='store_true', help='benchmark 模式下输出 batch 子阶段计时')
     parser.add_argument('--benchmark-json', action='store_true', help='benchmark 模式下额外输出 JSON 摘要')
+    parser.add_argument('--benchmark-json-output', type=str, default=None, help='将 benchmark final summary 写入 JSON 文件')
+    parser.add_argument('--experiment-label', type=str, default=None, help='为 benchmark / supervision 记录候选实验标签')
+    parser.add_argument('--baseline-ref', type=str, default=None, help='为 benchmark / supervision 记录对照 baseline 引用')
+    parser.add_argument('--candidate-ref', type=str, default=None, help='为 benchmark / supervision 记录候选代码/配置引用')
+    parser.add_argument('--single-variable-under-test', type=str, default=None, help='说明本轮只改变的单一变量')
     parser.add_argument('--deadlock-limit', type=int, default=2, help='连续回 depot 且无可服务节点时的终止阈值')
     parser.add_argument('--max-concurrent-open-orders', type=int, default=6, help='共享主线：允许的最大并发 open 单数量')
     parser.add_argument('--enable-delivery-viability', action='store_true', default=True, help='共享主线：启用 delivery viability')
@@ -1525,6 +1750,7 @@ def parse_args():
                         metavar=('MORNING_START', 'MORNING_END', 'MIDDAY_START', 'MIDDAY_END', 'EVENING_START', 'EVENING_END'),
                         help='覆盖默认 cargo 三时段 pickup TW 区间')
     parser.add_argument('--enable-rideshare-curriculum', action='store_true', help='按 epoch 使用轻量共享导向 curriculum')
+    parser.add_argument('--disable-rideshare-curriculum', action='store_true', help='显式关闭 rideshare curriculum；用于 frozen checkpoint 保守微调')
     parser.add_argument('--curriculum-warmup-epochs', type=int, default=5, help='curriculum 第 1 阶段持续 epoch 数')
     parser.add_argument('--curriculum-mix-epochs', type=int, default=10, help='curriculum 第 2 阶段持续 epoch 数')
     parser.add_argument('--curriculum-phase1-passenger-ratio', type=float, default=0.8, help='curriculum phase1 passenger ratio override')
@@ -1567,6 +1793,42 @@ def _normalize_ratio_triplet(values):
     if total <= 0:
         return tuple(1.0 / len(values) for _ in values)
     return tuple(max(float(v), 0.0) / total for v in values)
+
+
+def _resolve_curriculum_config(cli_args, phase):
+    phase_curriculum = dict(CURRICULUM_DEFAULTS)
+    phase_curriculum.update(phase.get('curriculum', {}))
+    enabled = phase_curriculum.get('enabled', False)
+    use_cli_curriculum = bool(cli_args.enable_rideshare_curriculum) and not bool(cli_args.disable_rideshare_curriculum)
+    if cli_args.enable_rideshare_curriculum:
+        enabled = True
+    if cli_args.disable_rideshare_curriculum:
+        enabled = False
+    return {
+        'enabled': bool(enabled),
+        'warmup_epochs': int(cli_args.curriculum_warmup_epochs) if use_cli_curriculum else int(phase_curriculum['warmup_epochs']),
+        'mix_epochs': int(cli_args.curriculum_mix_epochs) if use_cli_curriculum else int(phase_curriculum['mix_epochs']),
+        'phase1_passenger_ratio': float(cli_args.curriculum_phase1_passenger_ratio) if use_cli_curriculum else float(phase_curriculum['phase1_passenger_ratio']),
+        'phase1_short_ratio': float(cli_args.curriculum_phase1_short_ratio) if use_cli_curriculum else float(phase_curriculum['phase1_short_ratio']),
+        'phase1_mid_ratio': float(cli_args.curriculum_phase1_mid_ratio) if use_cli_curriculum else float(phase_curriculum['phase1_mid_ratio']),
+        'phase1_long_ratio': float(cli_args.curriculum_phase1_long_ratio) if use_cli_curriculum else float(phase_curriculum['phase1_long_ratio']),
+        'phase1_passenger_tw_morning': float(cli_args.curriculum_phase1_passenger_tw_morning) if use_cli_curriculum else float(phase_curriculum['phase1_passenger_tw_morning']),
+        'phase1_passenger_tw_midday': float(cli_args.curriculum_phase1_passenger_tw_midday) if use_cli_curriculum else float(phase_curriculum['phase1_passenger_tw_midday']),
+        'phase1_passenger_tw_evening': float(cli_args.curriculum_phase1_passenger_tw_evening) if use_cli_curriculum else float(phase_curriculum['phase1_passenger_tw_evening']),
+        'phase1_cargo_tw_morning': float(cli_args.curriculum_phase1_cargo_tw_morning) if use_cli_curriculum else float(phase_curriculum['phase1_cargo_tw_morning']),
+        'phase1_cargo_tw_midday': float(cli_args.curriculum_phase1_cargo_tw_midday) if use_cli_curriculum else float(phase_curriculum['phase1_cargo_tw_midday']),
+        'phase1_cargo_tw_evening': float(cli_args.curriculum_phase1_cargo_tw_evening) if use_cli_curriculum else float(phase_curriculum['phase1_cargo_tw_evening']),
+        'phase2_passenger_ratio': float(cli_args.curriculum_phase2_passenger_ratio) if use_cli_curriculum else float(phase_curriculum['phase2_passenger_ratio']),
+        'phase2_short_ratio': float(cli_args.curriculum_phase2_short_ratio) if use_cli_curriculum else float(phase_curriculum['phase2_short_ratio']),
+        'phase2_mid_ratio': float(cli_args.curriculum_phase2_mid_ratio) if use_cli_curriculum else float(phase_curriculum['phase2_mid_ratio']),
+        'phase2_long_ratio': float(cli_args.curriculum_phase2_long_ratio) if use_cli_curriculum else float(phase_curriculum['phase2_long_ratio']),
+        'phase2_passenger_tw_morning': float(cli_args.curriculum_phase2_passenger_tw_morning) if use_cli_curriculum else float(phase_curriculum['phase2_passenger_tw_morning']),
+        'phase2_passenger_tw_midday': float(cli_args.curriculum_phase2_passenger_tw_midday) if use_cli_curriculum else float(phase_curriculum['phase2_passenger_tw_midday']),
+        'phase2_passenger_tw_evening': float(cli_args.curriculum_phase2_passenger_tw_evening) if use_cli_curriculum else float(phase_curriculum['phase2_passenger_tw_evening']),
+        'phase2_cargo_tw_morning': float(cli_args.curriculum_phase2_cargo_tw_morning) if use_cli_curriculum else float(phase_curriculum['phase2_cargo_tw_morning']),
+        'phase2_cargo_tw_midday': float(cli_args.curriculum_phase2_cargo_tw_midday) if use_cli_curriculum else float(phase_curriculum['phase2_cargo_tw_midday']),
+        'phase2_cargo_tw_evening': float(cli_args.curriculum_phase2_cargo_tw_evening) if use_cli_curriculum else float(phase_curriculum['phase2_cargo_tw_evening']),
+    }
 
 
 def _parse_period_bounds(values):
@@ -1612,46 +1874,47 @@ def build_phase_args(cli_args, graph_size):
     rank = int(os.environ.get('RANK', '0')) if distributed else 0
     local_rank = int(os.environ.get('LOCAL_RANK', cli_args.local_rank)) if distributed else int(cli_args.local_rank)
     use_cuda = torch.cuda.is_available() and not cli_args.no_cuda
+    curriculum_config = _resolve_curriculum_config(cli_args, phase)
     phase1_distance_mix = _normalize_ratio_triplet((
-        cli_args.curriculum_phase1_short_ratio,
-        cli_args.curriculum_phase1_mid_ratio,
-        cli_args.curriculum_phase1_long_ratio,
+        curriculum_config['phase1_short_ratio'],
+        curriculum_config['phase1_mid_ratio'],
+        curriculum_config['phase1_long_ratio'],
     ))
     default_passenger_tw = None if cli_args.passenger_tw_period_weights is None else _normalize_ratio_triplet(cli_args.passenger_tw_period_weights)
     default_cargo_tw = None if cli_args.cargo_tw_period_weights is None else _normalize_ratio_triplet(cli_args.cargo_tw_period_weights)
     default_passenger_tw_bounds = _parse_period_bounds(cli_args.passenger_tw_period_bounds)
     default_cargo_tw_bounds = _parse_period_bounds(cli_args.cargo_tw_period_bounds)
     phase2_distance_mix = _normalize_ratio_triplet((
-        cli_args.curriculum_phase2_short_ratio,
-        cli_args.curriculum_phase2_mid_ratio,
-        cli_args.curriculum_phase2_long_ratio,
+        curriculum_config['phase2_short_ratio'],
+        curriculum_config['phase2_mid_ratio'],
+        curriculum_config['phase2_long_ratio'],
     ))
     phase1_passenger_tw = _normalize_ratio_triplet((
-        cli_args.curriculum_phase1_passenger_tw_morning,
-        cli_args.curriculum_phase1_passenger_tw_midday,
-        cli_args.curriculum_phase1_passenger_tw_evening,
+        curriculum_config['phase1_passenger_tw_morning'],
+        curriculum_config['phase1_passenger_tw_midday'],
+        curriculum_config['phase1_passenger_tw_evening'],
     ))
     phase1_cargo_tw = _normalize_ratio_triplet((
-        cli_args.curriculum_phase1_cargo_tw_morning,
-        cli_args.curriculum_phase1_cargo_tw_midday,
-        cli_args.curriculum_phase1_cargo_tw_evening,
+        curriculum_config['phase1_cargo_tw_morning'],
+        curriculum_config['phase1_cargo_tw_midday'],
+        curriculum_config['phase1_cargo_tw_evening'],
     ))
     phase2_passenger_tw = _normalize_ratio_triplet((
-        cli_args.curriculum_phase2_passenger_tw_morning,
-        cli_args.curriculum_phase2_passenger_tw_midday,
-        cli_args.curriculum_phase2_passenger_tw_evening,
+        curriculum_config['phase2_passenger_tw_morning'],
+        curriculum_config['phase2_passenger_tw_midday'],
+        curriculum_config['phase2_passenger_tw_evening'],
     ))
     phase2_cargo_tw = _normalize_ratio_triplet((
-        cli_args.curriculum_phase2_cargo_tw_morning,
-        cli_args.curriculum_phase2_cargo_tw_midday,
-        cli_args.curriculum_phase2_cargo_tw_evening,
+        curriculum_config['phase2_cargo_tw_morning'],
+        curriculum_config['phase2_cargo_tw_midday'],
+        curriculum_config['phase2_cargo_tw_evening'],
     ))
     return argparse.Namespace(
         embedding_dim=cli_args.embedding_dim,
         hidden_dim=cli_args.hidden_dim or phase['hidden_dim'],
         n_encode_layers=cli_args.n_encode_layers or phase['n_encode_layers'],
         n_heads=cli_args.n_heads,
-        checkpoint_encoder=cli_args.checkpoint_encoder,
+        checkpoint_encoder=cli_args.checkpoint_encoder or phase.get('checkpoint_encoder', False),
         shrink_size=None if (cli_args.shrink_size is not None and cli_args.shrink_size <= 0) else cli_args.shrink_size,
         max_decode_steps=cli_args.max_decode_steps,
         max_consecutive_depot=cli_args.max_consecutive_depot,
@@ -1682,10 +1945,10 @@ def build_phase_args(cli_args, graph_size):
         cargo_tw_period_weights_override=default_cargo_tw,
         passenger_tw_period_bounds_override=default_passenger_tw_bounds,
         cargo_tw_period_bounds_override=default_cargo_tw_bounds,
-        enable_rideshare_curriculum=cli_args.enable_rideshare_curriculum,
-        curriculum_warmup_epochs=cli_args.curriculum_warmup_epochs,
-        curriculum_mix_epochs=cli_args.curriculum_mix_epochs,
-        curriculum_phase1_passenger_ratio=cli_args.curriculum_phase1_passenger_ratio,
+        enable_rideshare_curriculum=curriculum_config['enabled'],
+        curriculum_warmup_epochs=curriculum_config['warmup_epochs'],
+        curriculum_mix_epochs=curriculum_config['mix_epochs'],
+        curriculum_phase1_passenger_ratio=curriculum_config['phase1_passenger_ratio'],
         curriculum_phase1_short_ratio=phase1_distance_mix[0],
         curriculum_phase1_mid_ratio=phase1_distance_mix[1],
         curriculum_phase1_long_ratio=phase1_distance_mix[2],
@@ -1695,7 +1958,7 @@ def build_phase_args(cli_args, graph_size):
         curriculum_phase1_cargo_tw_morning=phase1_cargo_tw[0],
         curriculum_phase1_cargo_tw_midday=phase1_cargo_tw[1],
         curriculum_phase1_cargo_tw_evening=phase1_cargo_tw[2],
-        curriculum_phase2_passenger_ratio=cli_args.curriculum_phase2_passenger_ratio,
+        curriculum_phase2_passenger_ratio=curriculum_config['phase2_passenger_ratio'],
         curriculum_phase2_short_ratio=phase2_distance_mix[0],
         curriculum_phase2_mid_ratio=phase2_distance_mix[1],
         curriculum_phase2_long_ratio=phase2_distance_mix[2],
@@ -1713,7 +1976,7 @@ def build_phase_args(cli_args, graph_size):
         epoch_size=cli_args.epoch_size or phase['epoch_size'],
         val_size=cli_args.val_size,
         pomo_size=cli_args.pomo_size or phase['pomo_size'],
-        lr=phase['lr'],
+        lr=float(cli_args.lr) if cli_args.lr is not None else float(phase['lr']),
         weight_decay=cli_args.weight_decay,
         max_grad_norm=cli_args.max_grad_norm,
         seed=cli_args.seed,
@@ -1724,7 +1987,7 @@ def build_phase_args(cli_args, graph_size):
         world_size=world_size,
         rank=rank,
         local_rank=local_rank,
-        amp=cli_args.amp,
+        amp=phase.get('amp', False) if not cli_args.amp else True,
         amp_dtype=cli_args.amp_dtype,
         grad_accum_steps=cli_args.grad_accum_steps,
         dist_eval=cli_args.dist_eval,
@@ -1749,6 +2012,11 @@ def build_phase_args(cli_args, graph_size):
         benchmark_warmup_epochs=cli_args.benchmark_warmup_epochs,
         benchmark_batch_timing=cli_args.benchmark_batch_timing,
         benchmark_json=cli_args.benchmark_json,
+        benchmark_json_output=cli_args.benchmark_json_output,
+        experiment_label=cli_args.experiment_label,
+        baseline_ref=cli_args.baseline_ref,
+        candidate_ref=cli_args.candidate_ref,
+        single_variable_under_test=cli_args.single_variable_under_test,
         deadlock_limit=cli_args.deadlock_limit,
         resume_path=cli_args.resume_path,
         resume_weights_only=cli_args.resume_weights_only,

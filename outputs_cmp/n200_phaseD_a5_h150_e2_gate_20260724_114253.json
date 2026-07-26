@@ -1,0 +1,24 @@
+{
+  "baseline_path": "outputs_cmp/code_sync_reval_20260723_104059/n200_eval500_newcode.json",
+  "candidate_eval500_path": "outputs_cmp/n200_phaseD_a5_h150_e2_eval500_20260724_114253.json",
+  "baseline": {
+    "service": 0.86499,
+    "unfulfilled": 0.0283,
+    "clean": false
+  },
+  "candidate": {
+    "service": 0.66305,
+    "unfulfilled": 0.00098,
+    "clean": false
+  },
+  "rules": {
+    "service_not_drop": "candidate_service >= baseline_service - 0.01",
+    "unf_down": "candidate_unfulfilled <= baseline_unfulfilled - 0.005",
+    "clean_improved": "baseline false -> candidate true, or both true"
+  },
+  "service_floor": 0.85499,
+  "service_not_drop": false,
+  "unf_down": true,
+  "clean_improved": false,
+  "go_eval2000": false
+}

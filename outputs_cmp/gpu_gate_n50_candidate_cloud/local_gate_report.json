@@ -1,0 +1,457 @@
+{
+  "type": "local_candidate_gate",
+  "repo_root": "/root/autodl-tmp/project-vrp-v6-4-main",
+  "graph_size": 50,
+  "seed": 1234,
+  "output_dir": "/root/autodl-tmp/project-vrp-v6-4-main/outputs_cmp/gpu_gate_n50_candidate",
+  "artifacts": {
+    "candidate_benchmark": "/root/autodl-tmp/project-vrp-v6-4-main/outputs_cmp/gpu_gate_n50_candidate/candidate_benchmark_final.json",
+    "compare_report": "/root/autodl-tmp/project-vrp-v6-4-main/outputs_cmp/gpu_gate_n50_candidate/candidate_vs_baseline_compare.json",
+    "final_report": "/root/autodl-tmp/project-vrp-v6-4-main/outputs_cmp/gpu_gate_n50_candidate/local_gate_report.json"
+  },
+  "metadata": {
+    "experiment_label": "n50-gpu-gate-candidate",
+    "baseline_ref": "frozen-n50",
+    "candidate_ref": "local-working-tree",
+    "single_variable_under_test": "harness-readiness"
+  },
+  "steps": {
+    "compile": {
+      "name": "compile",
+      "argv": [
+        "/root/miniconda3/bin/python3",
+        "-m",
+        "py_compile",
+        "/root/autodl-tmp/project-vrp-v6-4-main/state_mcvrptw_v2.py",
+        "/root/autodl-tmp/project-vrp-v6-4-main/dry_run_test.py",
+        "/root/autodl-tmp/project-vrp-v6-4-main/profile_mask_hotspots.py",
+        "/root/autodl-tmp/project-vrp-v6-4-main/run_training_optimized.py",
+        "/root/autodl-tmp/project-vrp-v6-4-main/evaluate_model.py",
+        "/root/autodl-tmp/project-vrp-v6-4-main/tools/compare_experiment_runs.py",
+        "/root/autodl-tmp/project-vrp-v6-4-main/tools/run_local_candidate_gate.py"
+      ],
+      "returncode": 0,
+      "ok": true,
+      "log_path": "/root/autodl-tmp/project-vrp-v6-4-main/outputs_cmp/gpu_gate_n50_candidate/compile.log"
+    },
+    "dry_run": {
+      "name": "dry_run",
+      "argv": [
+        "/root/miniconda3/bin/python3",
+        "/root/autodl-tmp/project-vrp-v6-4-main/dry_run_test.py"
+      ],
+      "returncode": 0,
+      "ok": true,
+      "log_path": "/root/autodl-tmp/project-vrp-v6-4-main/outputs_cmp/gpu_gate_n50_candidate/dry_run.log"
+    },
+    "profile_runs": [
+      {
+        "name": "profile_run_1",
+        "argv": [
+          "/root/miniconda3/bin/python3",
+          "/root/autodl-tmp/project-vrp-v6-4-main/profile_mask_hotspots.py",
+          "--graph-sizes",
+          "50",
+          "--batch-size",
+          "8",
+          "--seed",
+          "1234",
+          "--repeats",
+          "5",
+          "--steps",
+          "20"
+        ],
+        "returncode": 0,
+        "ok": true,
+        "log_path": "/root/autodl-tmp/project-vrp-v6-4-main/outputs_cmp/gpu_gate_n50_candidate/profile_run_1.log",
+        "parsed_summary": {
+          "avg_top_level_get_mask_ms": 9.9,
+          "avg_rollout_update_ms": 0.74,
+          "metrics": {
+            "get_mask_top": {
+              "calls": 100,
+              "total_ms": 990.37,
+              "per_top_ms": 9.9
+            },
+            "get_mask_nested_skip": {
+              "calls": 0,
+              "total_ms": 0.0,
+              "per_top_ms": 0.0
+            },
+            "get_mask_nested_full": {
+              "calls": 0,
+              "total_ms": 0.0,
+              "per_top_ms": 0.0
+            },
+            "update_rollout": {
+              "calls": 100,
+              "total_ms": 73.92,
+              "per_top_ms": 0.74
+            },
+            "update_nested_in_get_mask": {
+              "calls": 0,
+              "total_ms": 0.0,
+              "per_top_ms": 0.0
+            },
+            "_has_feasible_open_completion": {
+              "calls": 3655,
+              "total_ms": 500.64,
+              "per_top_ms": 5.01
+            },
+            "_get_legal_delivery_orders": {
+              "calls": 800,
+              "total_ms": 97.98,
+              "per_top_ms": 0.98
+            },
+            "_has_legal_delivery_path": {
+              "calls": 960,
+              "total_ms": 45.91,
+              "per_top_ms": 0.46
+            },
+            "_has_any_physical_delivery_step": {
+              "calls": 0,
+              "total_ms": 0.0,
+              "per_top_ms": 0.0
+            },
+            "_delivery_step_feasible": {
+              "calls": 960,
+              "total_ms": 20.21,
+              "per_top_ms": 0.2
+            },
+            "_build_completion_scalar_caches": {
+              "calls": 100,
+              "total_ms": 17.77,
+              "per_top_ms": 0.18
+            }
+          }
+        }
+      },
+      {
+        "name": "profile_run_2",
+        "argv": [
+          "/root/miniconda3/bin/python3",
+          "/root/autodl-tmp/project-vrp-v6-4-main/profile_mask_hotspots.py",
+          "--graph-sizes",
+          "50",
+          "--batch-size",
+          "8",
+          "--seed",
+          "1234",
+          "--repeats",
+          "5",
+          "--steps",
+          "20"
+        ],
+        "returncode": 0,
+        "ok": true,
+        "log_path": "/root/autodl-tmp/project-vrp-v6-4-main/outputs_cmp/gpu_gate_n50_candidate/profile_run_2.log",
+        "parsed_summary": {
+          "avg_top_level_get_mask_ms": 9.89,
+          "avg_rollout_update_ms": 0.74,
+          "metrics": {
+            "get_mask_top": {
+              "calls": 100,
+              "total_ms": 988.78,
+              "per_top_ms": 9.89
+            },
+            "get_mask_nested_skip": {
+              "calls": 0,
+              "total_ms": 0.0,
+              "per_top_ms": 0.0
+            },
+            "get_mask_nested_full": {
+              "calls": 0,
+              "total_ms": 0.0,
+              "per_top_ms": 0.0
+            },
+            "update_rollout": {
+              "calls": 100,
+              "total_ms": 73.91,
+              "per_top_ms": 0.74
+            },
+            "update_nested_in_get_mask": {
+              "calls": 0,
+              "total_ms": 0.0,
+              "per_top_ms": 0.0
+            },
+            "_has_feasible_open_completion": {
+              "calls": 3655,
+              "total_ms": 498.16,
+              "per_top_ms": 4.98
+            },
+            "_get_legal_delivery_orders": {
+              "calls": 800,
+              "total_ms": 98.24,
+              "per_top_ms": 0.98
+            },
+            "_has_legal_delivery_path": {
+              "calls": 960,
+              "total_ms": 45.86,
+              "per_top_ms": 0.46
+            },
+            "_has_any_physical_delivery_step": {
+              "calls": 0,
+              "total_ms": 0.0,
+              "per_top_ms": 0.0
+            },
+            "_delivery_step_feasible": {
+              "calls": 960,
+              "total_ms": 20.29,
+              "per_top_ms": 0.2
+            },
+            "_build_completion_scalar_caches": {
+              "calls": 100,
+              "total_ms": 18.31,
+              "per_top_ms": 0.18
+            }
+          }
+        }
+      },
+      {
+        "name": "profile_run_3",
+        "argv": [
+          "/root/miniconda3/bin/python3",
+          "/root/autodl-tmp/project-vrp-v6-4-main/profile_mask_hotspots.py",
+          "--graph-sizes",
+          "50",
+          "--batch-size",
+          "8",
+          "--seed",
+          "1234",
+          "--repeats",
+          "5",
+          "--steps",
+          "20"
+        ],
+        "returncode": 0,
+        "ok": true,
+        "log_path": "/root/autodl-tmp/project-vrp-v6-4-main/outputs_cmp/gpu_gate_n50_candidate/profile_run_3.log",
+        "parsed_summary": {
+          "avg_top_level_get_mask_ms": 10.19,
+          "avg_rollout_update_ms": 0.75,
+          "metrics": {
+            "get_mask_top": {
+              "calls": 100,
+              "total_ms": 1019.07,
+              "per_top_ms": 10.19
+            },
+            "get_mask_nested_skip": {
+              "calls": 0,
+              "total_ms": 0.0,
+              "per_top_ms": 0.0
+            },
+            "get_mask_nested_full": {
+              "calls": 0,
+              "total_ms": 0.0,
+              "per_top_ms": 0.0
+            },
+            "update_rollout": {
+              "calls": 100,
+              "total_ms": 75.21,
+              "per_top_ms": 0.75
+            },
+            "update_nested_in_get_mask": {
+              "calls": 0,
+              "total_ms": 0.0,
+              "per_top_ms": 0.0
+            },
+            "_has_feasible_open_completion": {
+              "calls": 3655,
+              "total_ms": 515.97,
+              "per_top_ms": 5.16
+            },
+            "_get_legal_delivery_orders": {
+              "calls": 800,
+              "total_ms": 98.38,
+              "per_top_ms": 0.98
+            },
+            "_has_legal_delivery_path": {
+              "calls": 960,
+              "total_ms": 45.56,
+              "per_top_ms": 0.46
+            },
+            "_has_any_physical_delivery_step": {
+              "calls": 0,
+              "total_ms": 0.0,
+              "per_top_ms": 0.0
+            },
+            "_delivery_step_feasible": {
+              "calls": 960,
+              "total_ms": 20.53,
+              "per_top_ms": 0.21
+            },
+            "_build_completion_scalar_caches": {
+              "calls": 100,
+              "total_ms": 18.32,
+              "per_top_ms": 0.18
+            }
+          }
+        }
+      }
+    ],
+    "benchmark": {
+      "name": "benchmark",
+      "argv": [
+        "/root/miniconda3/bin/python3",
+        "/root/autodl-tmp/project-vrp-v6-4-main/run_training_optimized.py",
+        "--graph_sizes",
+        "50",
+        "--epochs",
+        "1",
+        "--epoch-size",
+        "32",
+        "--batch-size",
+        "8",
+        "--val-size",
+        "8",
+        "--seed",
+        "1234",
+        "--benchmark-mode",
+        "--benchmark-skip-validation",
+        "--benchmark-disable-checkpoint",
+        "--benchmark-disable-log-save",
+        "--benchmark-json",
+        "--benchmark-json-output",
+        "/root/autodl-tmp/project-vrp-v6-4-main/outputs_cmp/gpu_gate_n50_candidate/candidate_benchmark_final.json",
+        "--benchmark-warmup-epochs",
+        "1",
+        "--output-root",
+        "/root/autodl-tmp/project-vrp-v6-4-main/outputs_cmp/gpu_gate_n50_candidate/training_outputs",
+        "--candidate-ref",
+        "local-working-tree",
+        "--experiment-label",
+        "n50-gpu-gate-candidate",
+        "--baseline-ref",
+        "frozen-n50",
+        "--single-variable-under-test",
+        "harness-readiness",
+        "--benchmark-batch-timing"
+      ],
+      "returncode": 0,
+      "ok": true,
+      "log_path": "/root/autodl-tmp/project-vrp-v6-4-main/outputs_cmp/gpu_gate_n50_candidate/benchmark.log"
+    }
+  },
+  "profile_summary": {
+    "runs": 3,
+    "avg_top_level_get_mask_ms_mean": 9.993333333333334,
+    "avg_top_level_get_mask_ms_min": 9.89,
+    "avg_top_level_get_mask_ms_max": 10.19,
+    "pc_has_feasible_open_completion_ms_mean": 5.05,
+    "pc_has_feasible_open_completion_ms_min": 4.98,
+    "pc_has_feasible_open_completion_ms_max": 5.16,
+    "build_completion_scalar_caches_ms_mean": 0.18000000000000002
+  },
+  "benchmark_summary": {
+    "type": "benchmark_final",
+    "measured_epochs": 1,
+    "warmup_epochs": 1,
+    "run_context": {
+      "experiment_label": "n50-gpu-gate-candidate",
+      "baseline_ref": "frozen-n50",
+      "candidate_ref": "local-working-tree",
+      "single_variable_under_test": "harness-readiness",
+      "graph_size": 50,
+      "seed": 1234,
+      "host": "autodl-container-b9014e9b33-191d3059",
+      "world_size": 1,
+      "distributed": false,
+      "device": "cuda:0",
+      "output_dir": "/root/autodl-tmp/project-vrp-v6-4-main/outputs_cmp/gpu_gate_n50_candidate/training_outputs/pomo_n50_optimized",
+      "resume_path": null,
+      "resume_weights_only": false,
+      "benchmark_config": {
+        "warmup_epochs": 1,
+        "skip_validation": true,
+        "disable_checkpoint": true,
+        "disable_log_save": true,
+        "batch_timing": true,
+        "json": true
+      },
+      "training_config": {
+        "batch_size": 8,
+        "epoch_size": 32,
+        "n_epochs": 1,
+        "pomo_size": 1,
+        "lr": 5e-05,
+        "amp": false,
+        "amp_dtype": "fp32",
+        "checkpoint_encoder": false,
+        "num_workers": 4,
+        "prefetch_factor": 2,
+        "persistent_workers": true,
+        "pin_memory": true
+      },
+      "state_kwargs": {
+        "max_concurrent_open_orders": 6,
+        "min_orders_per_dispatch": 4,
+        "enable_delivery_viability": true,
+        "enable_viability_fallback": false,
+        "relax_pickup_commitment_trip_time": false
+      }
+    },
+    "avg_epoch_total_s": 11.68272627145052,
+    "avg_train_s": 11.27173052355647,
+    "avg_validate_s": 0.0,
+    "avg_checkpoint_s": 0.0,
+    "avg_dataset_build_s": 0.4036264047026634,
+    "avg_dataloader_build_s": 0.000113707035779953,
+    "avg_mean_batch_total_ms": 2772.2317995503545,
+    "avg_mean_batch_forward_ms": 2653.8388123735785,
+    "avg_mean_batch_backward_ms": 99.9029939994216,
+    "avg_mean_batch_optimizer_ms": 12.711691670119762,
+    "avg_mean_model_init_embed_ms": 37.99655847251415,
+    "avg_mean_model_encoder_ms": 16.53451193124056,
+    "avg_mean_model_decode_inner_ms": 2481.7024720832705,
+    "avg_mean_decode_make_state_ms": 16.863001510500908,
+    "avg_mean_decode_precompute_fixed_ms": 0.3492962568998337,
+    "avg_mean_decode_get_log_p_total_ms": 2179.1912503540516,
+    "avg_mean_decode_get_mask_ms": 2018.6897348612547,
+    "avg_mean_mask_pickup_tw_ms": 27.85330079495907,
+    "avg_mean_mask_ride_time_ms": 20.357544533908367,
+    "avg_mean_mask_trip_time_ms": 14.390122145414352,
+    "avg_mean_mask_ops_end_ms": 3.385487012565136,
+    "avg_mean_mask_pickup_commitment_ms": 1393.859514966607,
+    "avg_mean_pc_has_feasible_open_completion_ms": 714.6185114979744,
+    "avg_mean_pc_delivery_step_feasible_ms": 0.0,
+    "avg_mean_pc_evaluate_post_pickup_open_delivery_ms": 0.0,
+    "avg_mean_pc_get_legal_delivery_orders_ms": 0.0,
+    "avg_mean_pc_has_legal_delivery_path_ms": 0.0,
+    "avg_mean_pc_has_any_physical_delivery_step_ms": 0.0,
+    "avg_mean_pc_has_feasible_open_completion_calls": 1886.25,
+    "avg_mean_pc_completion_memo_hit_rate": 0.0,
+    "avg_mean_pc_completion_branch_attempts": 0.0,
+    "avg_mean_pc_completion_open_bits": 2.585685884691849,
+    "avg_mean_pc_completion_avg_recursion_depth": 0.0,
+    "avg_mean_pc_completion_max_recursion_depth": 0.0,
+    "avg_mean_pc_pruned_by_ride_time": 2582.0,
+    "avg_mean_pc_pruned_by_trip_time": 115.0,
+    "avg_mean_pc_pruned_by_ops_end": 0.0,
+    "avg_mean_pc_delivery_step_feasible_calls": 0.0,
+    "avg_mean_pc_step_memo_hit_rate": 0.0,
+    "avg_mean_pc_step_reason_ok": 0.0,
+    "avg_mean_pc_step_reason_trip_time": 0.0,
+    "avg_mean_pc_step_reason_ride_time": 0.0,
+    "avg_mean_pc_step_reason_ops_end": 0.0,
+    "avg_mean_mask_delivery_viability_ms": 366.30587186664343,
+    "avg_mean_mask_finalize_ms": 124.84072428196669,
+    "avg_mean_decode_state_update_ms": 184.2249296605587,
+    "avg_mean_decode_logits_ms": 79.11997195333242,
+    "avg_mean_model_get_costs_ms": 112.67644166946411,
+    "avg_mean_validate_model_forward_ms": 0.0,
+    "avg_mean_validate_get_costs_ms": 0.0,
+    "avg_batches_per_s": 0.3548700877509902,
+    "avg_samples_per_s": 2.8389607020079217,
+    "key_metrics": {
+      "epoch_total_s": 11.68272627145052,
+      "train_s": 11.27173052355647,
+      "samples_per_s": 2.8389607020079217,
+      "decode_get_mask_ms": 2018.6897348612547,
+      "mask_pickup_commitment_ms": 1393.859514966607,
+      "mask_delivery_viability_ms": 366.30587186664343,
+      "pc_has_feasible_open_completion_ms": 714.6185114979744
+    }
+  },
+  "compare_report": null,
+  "overall_verdict": "local_preflight_passed_no_baseline_compare"
+}

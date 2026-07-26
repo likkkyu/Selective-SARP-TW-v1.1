@@ -93,6 +93,14 @@ def parse_args():
                         help='解码打分：pickup 紧迫度窗口 horizon（小时，默认沿用 checkpoint）')
     parser.add_argument('--json-output', type=str, default=None,
                         help='将评估摘要写入 JSON 文件，便于多 checkpoint 正式对比')
+    parser.add_argument('--experiment-label', type=str, default=None,
+                        help='为 supervision / formal eval 记录实验标签')
+    parser.add_argument('--baseline-ref', type=str, default=None,
+                        help='记录本次 formal eval 对照的 baseline 引用')
+    parser.add_argument('--candidate-ref', type=str, default=None,
+                        help='记录本次 formal eval 的候选引用')
+    parser.add_argument('--single-variable-under-test', type=str, default=None,
+                        help='记录本轮只改变的单一变量')
     return parser.parse_args()
 
 
@@ -671,6 +679,10 @@ def _build_eval_summary(args, checkpoint, device, state_kwargs,
             'checkpoint_role': checkpoint.get('checkpoint_role'),
             'selection_rule': checkpoint.get('selection_rule'),
             'business_clean': checkpoint.get('business_clean'),
+            'experiment_label': getattr(args, 'experiment_label', None),
+            'baseline_ref': getattr(args, 'baseline_ref', None),
+            'candidate_ref': getattr(args, 'candidate_ref', None),
+            'single_variable_under_test': getattr(args, 'single_variable_under_test', None),
         },
         'aggregate': aggregate,
         'audit': audit,
@@ -684,6 +696,78 @@ def _build_eval_summary(args, checkpoint, device, state_kwargs,
             }
             for key, values in all_diagnostics.items()
         }
+        blocker_groups = {
+            'pickup_commitment_completion_total': [
+                'diag_pickup_commitment_block_by_completion',
+                'diag_pickup_commitment_block_by_completion_ride_time',
+                'diag_pickup_commitment_block_by_completion_trip_time',
+                'diag_pickup_commitment_block_by_completion_ops_end',
+                'diag_pickup_commitment_block_by_completion_open_over_6',
+                'diag_pickup_commitment_block_by_completion_other',
+            ],
+            'pickup_commitment_next_state_total': [
+                'diag_pickup_commitment_block_by_next_state',
+                'diag_pickup_commitment_block_by_next_state_precedence',
+                'diag_pickup_commitment_block_by_next_state_ride_time',
+                'diag_pickup_commitment_block_by_next_state_trip_time',
+                'diag_pickup_commitment_block_by_next_state_ops_end',
+                'diag_pickup_commitment_block_by_next_state_delivery_viability',
+                'diag_pickup_commitment_block_by_next_state_vehicle_limit',
+                'diag_pickup_commitment_block_by_next_state_mixed',
+                'diag_pickup_commitment_block_by_next_state_other',
+            ],
+            'delivery_viability_total': [
+                'diag_delivery_viability_masked',
+                'diag_delivery_viability_fallback',
+            ],
+        }
+        summary['blocker_groups'] = {
+            group: {
+                'mean_total': sum((summary['diagnostics'].get(key, {}).get('mean') or 0.0) for key in keys),
+                'components': {
+                    key: summary['diagnostics'].get(key, {'mean': None, 'std': None})
+                    for key in keys if key in summary['diagnostics']
+                },
+            }
+            for group, keys in blocker_groups.items()
+        }
+        blocker_ratio_groups = {
+            'pickup_commitment_completion_reason_share': {
+                'total_key': 'diag_pickup_commitment_block_by_completion',
+                'components': [
+                    'diag_pickup_commitment_block_by_completion_ride_time',
+                    'diag_pickup_commitment_block_by_completion_trip_time',
+                    'diag_pickup_commitment_block_by_completion_ops_end',
+                    'diag_pickup_commitment_block_by_completion_open_over_6',
+                    'diag_pickup_commitment_block_by_completion_other',
+                ],
+            },
+            'pickup_commitment_next_state_reason_share': {
+                'total_key': 'diag_pickup_commitment_block_by_next_state',
+                'components': [
+                    'diag_pickup_commitment_block_by_next_state_precedence',
+                    'diag_pickup_commitment_block_by_next_state_ride_time',
+                    'diag_pickup_commitment_block_by_next_state_trip_time',
+                    'diag_pickup_commitment_block_by_next_state_ops_end',
+                    'diag_pickup_commitment_block_by_next_state_delivery_viability',
+                    'diag_pickup_commitment_block_by_next_state_vehicle_limit',
+                    'diag_pickup_commitment_block_by_next_state_mixed',
+                    'diag_pickup_commitment_block_by_next_state_other',
+                ],
+            },
+        }
+        summary['blocker_ratios'] = {}
+        for group, config in blocker_ratio_groups.items():
+            total_mean = summary['diagnostics'].get(config['total_key'], {}).get('mean')
+            if total_mean is None or abs(float(total_mean)) <= 1e-9:
+                continue
+            summary['blocker_ratios'][group] = {
+                key: {
+                    'mean_share': float((summary['diagnostics'].get(key, {}).get('mean') or 0.0) / total_mean),
+                    'mean': summary['diagnostics'].get(key, {}).get('mean'),
+                }
+                for key in config['components'] if key in summary['diagnostics']
+            }
     return summary
 
 

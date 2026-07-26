@@ -278,24 +278,25 @@ class MCVRPPDTW:
         segment_weights_kg = []
 
         for t in range(seq_len - 1):
-            # v6: 货物单位改为 1 kg / 单位（外卖/快递包裹）
-            weight_p = cumulative_demand_p * Config.PASSENGER_CAPACITY * Config.PASSENGER_WEIGHT_KG
-            weight_c = cumulative_demand_c * Config.CARGO_CAPACITY * Config.CARGO_UNIT_WEIGHT_KG
-            total_weight_kg = weight_p + weight_c
-            segment_weights_kg.append(total_weight_kg)
+            current_node = pi[:, t:t + 1]
+            current_is_depot = (current_node == 0).float()
 
-            # 累加当前节点的需求 (delivery 为负，会自动抵扣)
+            # 当前节点是 depot 时，代表新一趟 dispatch 起点，载量应从 0 开始。
+            cumulative_demand_p = cumulative_demand_p * (1.0 - current_is_depot)
+            cumulative_demand_c = cumulative_demand_c * (1.0 - current_is_depot)
+
+            # 先落实当前节点服务对载量的影响，再计费当前弧段 (t -> t+1) 的载重能耗。
+            # 这样 pickup 之后的第一段弧会立即带上新增载量，delivery 之后的弧会及时卸载。
             cumulative_demand_p = cumulative_demand_p + demand_p_in_order[:, t:t + 1]
             cumulative_demand_c = cumulative_demand_c + demand_c_in_order[:, t:t + 1]
             cumulative_demand_p = torch.clamp(cumulative_demand_p, min=0.0)
             cumulative_demand_c = torch.clamp(cumulative_demand_c, min=0.0)
 
-            # ★ v5 关键修复：若下一步是 depot（pi==0），代表车辆切换，强制清零累计载量
-            #   原版本依赖 pickup/delivery 自然抵消，违规解会把残余载量带给下一辆车，造成能耗计费失真
-            next_node = pi[:, t + 1:t + 2]
-            is_next_depot = (next_node == 0).float()
-            cumulative_demand_p = cumulative_demand_p * (1.0 - is_next_depot)
-            cumulative_demand_c = cumulative_demand_c * (1.0 - is_next_depot)
+            # v6: 货物单位改为 1 kg / 单位（外卖/快递包裹）
+            weight_p = cumulative_demand_p * Config.PASSENGER_CAPACITY * Config.PASSENGER_WEIGHT_KG
+            weight_c = cumulative_demand_c * Config.CARGO_CAPACITY * Config.CARGO_UNIT_WEIGHT_KG
+            total_weight_kg = weight_p + weight_c
+            segment_weights_kg.append(total_weight_kg)
 
         if segment_weights_kg:
             segment_weights_kg = torch.cat(segment_weights_kg, dim=1)
@@ -497,13 +498,24 @@ class MCVRPPDTW:
             dim=1,
         )
         vehicle_starts = pickup_mask & prev_is_depot
-        used_vehicles = torch.clamp(vehicle_starts.sum(1).float(), min=1.0)
+        used_vehicles = vehicle_starts.sum(1).float()
 
         vehicle_cost_raw = used_vehicles * Config.VEHICLE_COST
 
-        order_idx = torch.arange(graph_size, device=device)
-        pickup_visit = (pi[:, :, None] == (order_idx + 1).view(1, 1, -1)).any(dim=1)
-        delivery_visit = (pi[:, :, None] == (order_idx + graph_size + 1).view(1, 1, -1)).any(dim=1)
+        pickup_hit = (pi >= 1) & (pi <= graph_size)
+        delivery_hit = (pi >= graph_size + 1) & (pi <= 2 * graph_size)
+
+        pickup_visit_count = torch.zeros(batch_size, graph_size, device=device)
+        if pickup_hit.any():
+            pickup_indices = torch.where(pickup_hit, pi - 1, torch.zeros_like(pi))
+            pickup_visit_count.scatter_add_(1, pickup_indices, pickup_hit.float())
+        pickup_visit = pickup_visit_count > 0
+
+        delivery_visit_count = torch.zeros(batch_size, graph_size, device=device)
+        if delivery_hit.any():
+            delivery_indices = torch.where(delivery_hit, pi - (graph_size + 1), torch.zeros_like(pi))
+            delivery_visit_count.scatter_add_(1, delivery_indices, delivery_hit.float())
+        delivery_visit = delivery_visit_count > 0
         completed_orders_mask = pickup_visit & delivery_visit
         completed_orders = completed_orders_mask.float().sum(1)
         unserved_orders = torch.clamp(graph_size - completed_orders, min=0.0)

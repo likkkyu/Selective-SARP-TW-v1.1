@@ -1,0 +1,26 @@
+{
+  "baseline_path": "outputs_cmp/code_sync_reval_20260723_104059/n200_eval500_newcode.json",
+  "a4_eval500_path": "outputs_cmp/n200_phaseD_a4_r620_e2_eval500_\"$TS\".json",
+  "a4_eval2000_path": "outputs_cmp/n200_phaseD_a4_r620_e2_eval2000_20260723_221750.json",
+  "baseline": {
+    "service": 0.86499,
+    "unfulfilled": 0.0283,
+    "clean": false
+  },
+  "a4_eval500": {
+    "service": 0.81765,
+    "unfulfilled": 0.00098,
+    "clean": false
+  },
+  "a4_eval2000": {
+    "service": 0.8200475,
+    "unfulfilled": 0.0013325,
+    "clean": false
+  },
+  "gate": {
+    "service_floor": 0.85499,
+    "pass500": false,
+    "pass2000": false
+  },
+  "decision": "FAIL_STOP_A4"
+}

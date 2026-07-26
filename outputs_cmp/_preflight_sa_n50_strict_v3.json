@@ -1,0 +1,233 @@
+{
+  "num_instances": 1,
+  "avg_objective_cost": 14851.20703125,
+  "avg_objective_cost_legacy": 14851.20703125,
+  "avg_objective_cost_aligned": 14851.20703125,
+  "avg_raw_total_cost": 14491.20703125,
+  "avg_raw_total_cost_legacy": 14491.20703125,
+  "avg_raw_total_cost_aligned": 14491.20703125,
+  "avg_energy_cost": 61.20657730102539,
+  "avg_passenger_delivery_delay_cost": 0.0,
+  "avg_cargo_delay": 0.0,
+  "avg_trip_overtime_penalty": 0.0,
+  "avg_reject_penalty": 0.0,
+  "avg_unfulfilled_penalty": 14250.0,
+  "avg_completed_orders": 31.0,
+  "avg_rejected_orders": 0.0,
+  "avg_unfulfilled_orders": 19.0,
+  "avg_untouched_orders": 19.0,
+  "avg_untouched_unrejected_orders": 19.0,
+  "avg_pickup_only_orders": 0.0,
+  "avg_started_not_completed_orders": 0.0,
+  "avg_vehicle_cost": 180.0,
+  "avg_total_distance": 338.95556640625,
+  "avg_used_vehicles": 9.0,
+  "avg_passenger_pickup_hard_violations": 0.0,
+  "avg_passenger_total_ride_time_violations": 0.0,
+  "avg_passenger_excess_ride_time_violations": 0.0,
+  "avg_hard_violation_count": 0.0,
+  "avg_hard_violation_penalty": 0.0,
+  "hard_feasible_rate": 1.0,
+  "business_clean_rate": 0.0,
+  "protocol_versions": [
+    "drl_aligned_v1"
+  ],
+  "comparable_to_drl": true,
+  "results": [
+    {
+      "algorithm": "SA",
+      "objective_cost": 14851.20703125,
+      "objective_cost_legacy": 14851.20703125,
+      "objective_cost_aligned": 14851.20703125,
+      "raw_total_cost": 14491.20703125,
+      "raw_total_cost_legacy": 14491.20703125,
+      "raw_total_cost_aligned": 14491.20703125,
+      "energy_cost": 61.20657730102539,
+      "passenger_delivery_delay_cost": 0.0,
+      "cargo_delay": 0.0,
+      "trip_overtime_penalty": 0.0,
+      "reject_penalty": 0.0,
+      "unfulfilled_penalty": 14250.0,
+      "completed_orders": 31.0,
+      "rejected_orders": 0.0,
+      "unfulfilled_orders": 19.0,
+      "untouched_orders": 19.0,
+      "untouched_unrejected_orders": 19.0,
+      "pickup_only_orders": 0.0,
+      "started_not_completed_orders": 0.0,
+      "vehicle_cost": 180.0,
+      "total_distance": 338.95556640625,
+      "used_vehicles": 9,
+      "passenger_pickup_hard_violations": 0.0,
+      "passenger_total_ride_time_violations": 0.0,
+      "passenger_excess_ride_time_violations": 0.0,
+      "hard_violation_count": 0.0,
+      "hard_violation_penalty_weight": 575.0,
+      "hard_violation_penalty": 0.0,
+      "is_hard_feasible": true,
+      "hard_constraint_mode": "strict",
+      "strict_rejected_by_hard": false,
+      "strict_infeasible_cost": 1000000000000.0,
+      "strict_pruned_orders": 19.0,
+      "protocol_version": "drl_aligned_v1",
+      "comparable_to_drl": true,
+      "comparability_notes": [],
+      "routes": [
+        [
+          32,
+          82,
+          41,
+          91,
+          28,
+          78
+        ],
+        [
+          27,
+          77,
+          13,
+          63,
+          12,
+          62,
+          11,
+          61
+        ],
+        [
+          21,
+          71,
+          33,
+          83,
+          9,
+          59,
+          15,
+          65
+        ],
+        [
+          24,
+          74,
+          20,
+          70,
+          37,
+          87
+        ],
+        [
+          25,
+          75,
+          5,
+          55,
+          43,
+          93,
+          29,
+          79
+        ],
+        [
+          36,
+          86,
+          49,
+          99,
+          16,
+          66,
+          50,
+          100
+        ],
+        [
+          39,
+          89,
+          3,
+          53
+        ],
+        [
+          47,
+          97,
+          30,
+          80,
+          7,
+          57,
+          6,
+          56
+        ],
+        [
+          4,
+          54,
+          31,
+          81,
+          38,
+          88
+        ]
+      ],
+      "service_rate": 31.0,
+      "business_clean": false,
+      "order_routes": [
+        [
+          31,
+          40,
+          27
+        ],
+        [
+          26,
+          12,
+          11,
+          10
+        ],
+        [
+          20,
+          32,
+          8,
+          14
+        ],
+        [
+          23,
+          19,
+          36
+        ],
+        [
+          24,
+          4,
+          42,
+          28
+        ],
+        [
+          35,
+          48,
+          15,
+          49
+        ],
+        [
+          38,
+          2
+        ],
+        [
+          46,
+          29,
+          6,
+          5
+        ],
+        [
+          3,
+          30,
+          37
+        ]
+      ],
+      "instance_id": 0,
+      "solve_time": 0.8689770698547363,
+      "iterations": 80
+    }
+  ],
+  "service_rate_mean": 0.62,
+  "rejected_rate_mean": 0.0,
+  "unfulfilled_rate_mean": 0.38,
+  "untouched_unrejected_rate_mean": 0.38,
+  "served_plus_rejected_rate_mean": 0.62,
+  "business_clean": false,
+  "graph_size": 50,
+  "num_samples": 1,
+  "iterations": 80,
+  "initial_temperature": 20.0,
+  "cooling_rate": 0.99,
+  "num_vehicles": 9,
+  "protocol_version": "drl_aligned_v1",
+  "fill_missing_orders": false,
+  "hard_violation_penalty_weight": 575.0,
+  "hard_constraint_mode": "strict",
+  "strict_infeasible_cost": 1000000000000.0,
+  "comparability_notes": []
+}

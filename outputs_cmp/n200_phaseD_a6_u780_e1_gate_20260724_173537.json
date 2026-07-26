@@ -1,0 +1,19 @@
+{
+  "baseline_path": "outputs_cmp/code_sync_reval_20260723_104059/n200_eval500_newcode.json",
+  "candidate_eval500_path": "outputs_cmp/n200_phaseD_a6_u780_e1_eval500_20260724_173537.json",
+  "baseline": {
+    "service": 0.86499,
+    "unfulfilled": 0.0283,
+    "clean": false
+  },
+  "candidate": {
+    "service": 0.63409,
+    "unfulfilled": 0.0059499999999999996,
+    "clean": false
+  },
+  "service_floor": 0.85499,
+  "service_not_drop": false,
+  "unf_down": true,
+  "clean_improved": false,
+  "go_eval2000": false
+}

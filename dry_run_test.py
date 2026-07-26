@@ -82,6 +82,33 @@ def _build_three_order_case():
     }
 
 
+def _build_five_order_case():
+    n_orders = 5
+    depot = torch.tensor([[0.20, 0.20]], dtype=torch.float)
+    pickup_locs = torch.tensor(
+        [[0.24, 0.24], [0.27, 0.25], [0.30, 0.26], [0.33, 0.27], [0.36, 0.28]], dtype=torch.float
+    )
+    delivery_locs = torch.tensor(
+        [[0.24, 0.34], [0.27, 0.35], [0.30, 0.36], [0.33, 0.37], [0.36, 0.38]], dtype=torch.float
+    )
+    loc = torch.cat([pickup_locs, delivery_locs], dim=0).unsqueeze(0)
+    node_type = torch.ones(1, 2 * n_orders, dtype=torch.float)
+    demand_passenger = torch.zeros(1, 2 * n_orders, dtype=torch.float)
+    demand_cargo = torch.zeros(1, 2 * n_orders, dtype=torch.float)
+    per_order = 1.0 / Config.PASSENGER_CAPACITY
+    demand_passenger[0, :n_orders] = per_order
+    demand_passenger[0, n_orders:] = -per_order
+    time_windows = torch.tensor([[[10.0, 16.0]] * (2 * n_orders)], dtype=torch.float)
+    return {
+        'depot': depot,
+        'loc': loc,
+        'node_type': node_type,
+        'demand_passenger': demand_passenger,
+        'demand_cargo': demand_cargo,
+        'time_windows': time_windows,
+    }
+
+
 def _collate_dataset(dataset, batch_size):
     sample0 = dataset[0]
     return {
@@ -279,6 +306,7 @@ def pickup_commitment_next_delivery_equivalence_regression():
     )
     state = state.update(torch.tensor([1]))
 
+    full_mask = state.get_mask()
     mask = state.get_mask(skip_pickup_commitment=True)
     n_orders = state.n_orders
     ids_flat, coords_active, node_type_active, time_windows_active, _, _ = state._active_views()
@@ -369,13 +397,18 @@ def pickup_commitment_next_delivery_equivalence_regression():
         next_mask = next_state.get_mask(skip_pickup_commitment=True)
         next_feasible_deliveries = int((~next_mask[0, 0, n_orders + 1:2 * n_orders + 1]).sum().item())
         full_mask_has_delivery = next_feasible_deliveries > 0
+        full_pickup_masked = bool(full_mask[0, 0, candidate_node].item())
+        helper_pickup_masked = not helper_completion
         print(
             f'candidate pickup={candidate_node} helper_has_delivery={helper_has_delivery} '
             f'full_mask_has_delivery={full_mask_has_delivery} completion={helper_completion} '
-            f'reason={helper_completion_reason[1]}'
+            f'reason={helper_completion_reason[1]} full_pickup_masked={full_pickup_masked}'
         )
         assert helper_has_delivery == full_mask_has_delivery, (
             f'pickup {candidate_node} 的 next-delivery helper 与 full next_mask 不一致'
+        )
+        assert full_pickup_masked == helper_pickup_masked, (
+            f'pickup {candidate_node} 的 full pickup commitment mask 与 completion helper 不一致'
         )
 
 
@@ -873,6 +906,372 @@ def dead_end_reject_under_min_dispatch_regression():
         Config.HARD_CARGO_PICKUP_TIMEWINDOW = old_hard
 
 
+def completion_scalar_cache_device_regression():
+    print('\n' + '=' * 60)
+    print('completion scalar cache device 回归测试')
+    print('=' * 60)
+
+    input_data = _build_three_order_case()
+    state = StateMCVRPPDTW.initialize(
+        input_data,
+        max_concurrent_open_orders=6,
+        enable_delivery_viability=True,
+        enable_viability_fallback=True,
+    )
+    state = state.update(torch.tensor([1]))
+
+    ids_flat, coords_active, node_type_active, time_windows_active, _, _ = state._active_views()
+    del ids_flat
+    n_orders = state.n_orders
+    pickup_coords = coords_active[:, 1:n_orders + 1, :]
+    delivery_coords = coords_active[:, n_orders + 1:2 * n_orders + 1, :]
+    passenger_orders = (node_type_active[:, 1:n_orders + 1] == 1)
+    passenger_pickup_times = state.passenger_pickup_time.squeeze(1)
+    direct_ride_time = (
+        (pickup_coords - delivery_coords).norm(p=2, dim=-1) * state.AREA_SIZE / state.VEHICLE_SPEED
+    )
+    delivery_earliest = time_windows_active[:, n_orders + 1:2 * n_orders + 1, 0]
+    delivery_to_depot_time = (
+        (delivery_coords - coords_active[:, 0:1, :]).norm(p=2, dim=-1) * state.AREA_SIZE / state.VEHICLE_SPEED
+    )
+
+    caches = state._build_completion_scalar_caches(
+        pickup_coords,
+        delivery_coords,
+        passenger_orders,
+        passenger_pickup_times,
+        direct_ride_time,
+        delivery_earliest,
+        delivery_to_depot_time,
+    )
+    cache = caches[0]
+    expected_device = state.coords.device
+    for key in ['passenger_orders', 'pickup_times', 'direct_ride_time', 'delivery_earliest', 'delivery_to_depot_time', 'latest_delivery_arrival', 'travel_time_to_delivery_matrix']:
+        assert cache[key].device == expected_device, f'{key} 应保留在活动 device 上'
+
+    candidate_cache = state._scalar_cache_with_candidate_pickup(cache, 1, 12.5, 13.25)
+    assert candidate_cache['pickup_times'].data_ptr() == cache['pickup_times'].data_ptr(), 'override 路径不应复制 pickup_times'
+    assert candidate_cache['latest_delivery_arrival'].data_ptr() == cache['latest_delivery_arrival'].data_ptr(), 'override 路径不应复制 latest_delivery_arrival'
+    assert state._scalar_cache_pickup_time(candidate_cache, 1) == 12.5, 'override pickup time 读取错误'
+    assert state._scalar_cache_latest_delivery_arrival(candidate_cache, 1) == 13.25, 'override latest arrival 读取错误'
+
+    base_pickup_time = float(cache['pickup_times'][1].item())
+    base_latest_arrival = float(cache['latest_delivery_arrival'][1].item())
+    state._scalar_cache_set_candidate_pickup_override(cache, 1, 15.5, 16.25)
+    assert state._scalar_cache_pickup_time(cache, 1) == 15.5, 'in-place override pickup time 读取错误'
+    assert state._scalar_cache_latest_delivery_arrival(cache, 1) == 16.25, 'in-place override latest arrival 读取错误'
+    state._scalar_cache_clear_candidate_pickup_override(cache)
+    assert state._scalar_cache_pickup_time(cache, 1) == base_pickup_time, 'clear override 后 pickup time 应恢复基值'
+    assert state._scalar_cache_latest_delivery_arrival(cache, 1) == base_latest_arrival, 'clear override 后 latest arrival 应恢复基值'
+
+
+
+def completion_small_cached_four_order_equivalence_regression():
+    print('\n' + '=' * 60)
+    print('completion small-cache 四单等价回归测试')
+    print('=' * 60)
+
+    input_data = _build_three_order_case()
+    state = StateMCVRPPDTW.initialize(
+        input_data,
+        max_concurrent_open_orders=6,
+        enable_delivery_viability=True,
+        enable_viability_fallback=True,
+    )
+    for node in [1, 2, 3, 4]:
+        state = state.update(torch.tensor([node]))
+
+    ids_flat, coords_active, node_type_active, time_windows_active, _, _ = state._active_views()
+    del ids_flat
+    n_orders = state.n_orders
+    delivery_coords = coords_active[0, n_orders + 1:2 * n_orders + 1, :]
+    delivery_earliest = time_windows_active[0, n_orders + 1:2 * n_orders + 1, 0]
+    passenger_orders = (node_type_active[0, 1:n_orders + 1] == 1)
+    passenger_pickup_times = state.passenger_pickup_time.squeeze(1)[0]
+    direct_ride_time = (
+        (coords_active[0, 1:n_orders + 1, :] - delivery_coords).norm(p=2, dim=-1) * state.AREA_SIZE / state.VEHICLE_SPEED
+    )
+    delivery_to_depot_time = (
+        (delivery_coords - coords_active[0, 0:1, :]).norm(p=2, dim=-1) * state.AREA_SIZE / state.VEHICLE_SPEED
+    )
+    trip_start = state.trip_start_time[0, 0] if state.prev_a[0, 0].item() != 0 else state.current_time[0, 0]
+    open_mask = state.get_open_started_mask()[0]
+    open_bits = state._open_mask_to_bits(open_mask)
+    scalar_cache = state._build_completion_scalar_cache(
+        coords_active[0, 1:n_orders + 1, :],
+        delivery_coords,
+        passenger_orders,
+        passenger_pickup_times,
+        direct_ride_time,
+        delivery_earliest,
+        delivery_to_depot_time,
+    )
+    start_node = state._current_start_node_key(state.prev_a[0, 0].item())
+
+    small_result = state._has_feasible_open_completion_small_cached(
+        state.current_time[0, 0],
+        trip_start,
+        open_bits,
+        scalar_cache,
+        start_node,
+    )
+    dp_result = state._has_feasible_open_completion_bool_dp(
+        state.cur_coord[0, 0],
+        state.current_time[0, 0],
+        trip_start,
+        open_mask,
+        delivery_coords,
+        delivery_earliest,
+        delivery_to_depot_time,
+        passenger_orders,
+        passenger_pickup_times,
+        direct_ride_time,
+        open_bits=open_bits,
+        start_node=start_node,
+        scalar_cache=scalar_cache,
+    )
+    print(f'small_result={small_result}, dp_result={dp_result}, open_bits={open_bits}')
+    assert small_result is not None, '四单 small cached 路径不应返回 None'
+    assert small_result == dp_result, '四单 small cached 与 DP bool 路径结果应一致'
+
+
+
+def completion_cached_problem_override_regression():
+    print('\n' + '=' * 60)
+    print('completion cached problem override 回归测试')
+    print('=' * 60)
+
+    input_data = _build_five_order_case()
+    state = StateMCVRPPDTW.initialize(
+        input_data,
+        max_concurrent_open_orders=6,
+        enable_delivery_viability=True,
+        enable_viability_fallback=True,
+    )
+    for node in [1, 2, 3, 4, 5]:
+        state = state.update(torch.tensor([node]))
+
+    ids_flat, coords_active, node_type_active, time_windows_active, _, _ = state._active_views()
+    del ids_flat
+    n_orders = state.n_orders
+    delivery_coords = coords_active[0, n_orders + 1:2 * n_orders + 1, :]
+    delivery_earliest = time_windows_active[0, n_orders + 1:2 * n_orders + 1, 0]
+    passenger_orders = (node_type_active[0, 1:n_orders + 1] == 1)
+    passenger_pickup_times = state.passenger_pickup_time.squeeze(1)[0]
+    direct_ride_time = (
+        (coords_active[0, 1:n_orders + 1, :] - delivery_coords).norm(p=2, dim=-1) * state.AREA_SIZE / state.VEHICLE_SPEED
+    )
+    delivery_to_depot_time = (
+        (delivery_coords - coords_active[0, 0:1, :]).norm(p=2, dim=-1) * state.AREA_SIZE / state.VEHICLE_SPEED
+    )
+    scalar_cache = state._build_completion_scalar_cache(
+        coords_active[0, 1:n_orders + 1, :],
+        delivery_coords,
+        passenger_orders,
+        passenger_pickup_times,
+        direct_ride_time,
+        delivery_earliest,
+        delivery_to_depot_time,
+    )
+
+    order_indices = (0, 1, 2)
+    base_problem = state._prepare_cached_completion_problem(order_indices, state._current_start_node_key(state.prev_a[0, 0].item()), scalar_cache)
+    base_pickup_times = list(base_problem['pickup_times'])
+    base_latest_arrival = list(base_problem['latest_arrival'])
+
+    state._scalar_cache_set_candidate_pickup_override(scalar_cache, 1, 15.5, 16.25)
+    try:
+        override_problem = state._prepare_cached_completion_problem(order_indices, state._current_start_node_key(state.prev_a[0, 0].item()), scalar_cache)
+    finally:
+        state._scalar_cache_clear_candidate_pickup_override(scalar_cache)
+
+    print(f'base_pickup_times={base_pickup_times}, override_pickup_times={override_problem["pickup_times"]}')
+    print(f'base_latest_arrival={base_latest_arrival}, override_latest_arrival={override_problem["latest_arrival"]}')
+    assert base_pickup_times[1] != 15.5, '测试前提失败：基准 pickup_time 不应等于 override 值'
+    assert override_problem['pickup_times'][1] == 15.5, 'cached problem 应反映 pickup override'
+    assert override_problem['latest_arrival'][1] == 16.25, 'cached problem 应反映 latest arrival override'
+    assert override_problem['pickup_times'][0] == base_pickup_times[0], '非目标订单 pickup_time 不应被污染'
+    assert override_problem['latest_arrival'][0] == base_latest_arrival[0], '非目标订单 latest arrival 不应被污染'
+
+
+
+def completion_bool_dp_five_order_equivalence_regression():
+    print('\n' + '=' * 60)
+    print('completion bool DP 五单等价回归测试')
+    print('=' * 60)
+
+    input_data = _build_five_order_case()
+    state = StateMCVRPPDTW.initialize(
+        input_data,
+        max_concurrent_open_orders=6,
+        enable_delivery_viability=True,
+        enable_viability_fallback=True,
+    )
+    for node in [1, 2, 3, 4, 5]:
+        state = state.update(torch.tensor([node]))
+
+    ids_flat, coords_active, node_type_active, time_windows_active, _, _ = state._active_views()
+    del ids_flat
+    n_orders = state.n_orders
+    delivery_coords = coords_active[0, n_orders + 1:2 * n_orders + 1, :]
+    delivery_earliest = time_windows_active[0, n_orders + 1:2 * n_orders + 1, 0]
+    passenger_orders = (node_type_active[0, 1:n_orders + 1] == 1)
+    passenger_pickup_times = state.passenger_pickup_time.squeeze(1)[0]
+    direct_ride_time = (
+        (coords_active[0, 1:n_orders + 1, :] - delivery_coords).norm(p=2, dim=-1) * state.AREA_SIZE / state.VEHICLE_SPEED
+    )
+    delivery_to_depot_time = (
+        (delivery_coords - coords_active[0, 0:1, :]).norm(p=2, dim=-1) * state.AREA_SIZE / state.VEHICLE_SPEED
+    )
+    trip_start = state.trip_start_time[0, 0] if state.prev_a[0, 0].item() != 0 else state.current_time[0, 0]
+    open_mask = state.get_open_started_mask()[0]
+    open_bits = state._open_mask_to_bits(open_mask)
+    scalar_cache = state._build_completion_scalar_cache(
+        coords_active[0, 1:n_orders + 1, :],
+        delivery_coords,
+        passenger_orders,
+        passenger_pickup_times,
+        direct_ride_time,
+        delivery_earliest,
+        delivery_to_depot_time,
+    )
+    start_node = state._current_start_node_key(state.prev_a[0, 0].item())
+
+    dp_cached_result = state._has_feasible_open_completion_bool_dp(
+        state.cur_coord[0, 0],
+        state.current_time[0, 0],
+        trip_start,
+        open_mask,
+        delivery_coords,
+        delivery_earliest,
+        delivery_to_depot_time,
+        passenger_orders,
+        passenger_pickup_times,
+        direct_ride_time,
+        open_bits=open_bits,
+        start_node=start_node,
+        scalar_cache=scalar_cache,
+    )
+    dp_uncached_result = state._has_feasible_open_completion_bool_dp(
+        state.cur_coord[0, 0],
+        state.current_time[0, 0],
+        trip_start,
+        open_mask,
+        delivery_coords,
+        delivery_earliest,
+        delivery_to_depot_time,
+        passenger_orders,
+        passenger_pickup_times,
+        direct_ride_time,
+        open_bits=open_bits,
+        start_node=start_node,
+        scalar_cache=None,
+    )
+    print(f'dp_cached_result={dp_cached_result}, dp_uncached_result={dp_uncached_result}, open_bits={open_bits}')
+    assert dp_cached_result == dp_uncached_result, '优化后的 bool DP 在 cached/uncached 路径下应保持一致'
+
+
+
+def legal_delivery_bitmap_equivalence_regression():
+    print('\n' + '=' * 60)
+    print('legal delivery bitmap 等价回归测试')
+    print('=' * 60)
+
+    input_data = _build_three_order_case()
+    state = StateMCVRPPDTW.initialize(
+        input_data,
+        max_concurrent_open_orders=6,
+        enable_delivery_viability=True,
+        enable_viability_fallback=True,
+    )
+    state = state.update(torch.tensor([1]))
+    state = state.update(torch.tensor([2]))
+
+    ids_flat, coords_active, node_type_active, time_windows_active, _, _ = state._active_views()
+    del ids_flat
+    n_orders = state.n_orders
+    delivery_coords = coords_active[0, n_orders + 1:2 * n_orders + 1, :]
+    delivery_earliest = time_windows_active[0, n_orders + 1:2 * n_orders + 1, 0]
+    passenger_orders = (node_type_active[0, 1:n_orders + 1] == 1)
+    passenger_pickup_times = state.passenger_pickup_time.squeeze(1)[0]
+    direct_ride_time = (
+        (coords_active[0, 1:n_orders + 1, :] - delivery_coords).norm(p=2, dim=-1) * state.AREA_SIZE / state.VEHICLE_SPEED
+    )
+    delivery_to_depot_time = (
+        (delivery_coords - coords_active[0, 0:1, :]).norm(p=2, dim=-1) * state.AREA_SIZE / state.VEHICLE_SPEED
+    )
+    trip_start = state.trip_start_time[0, 0] if state.prev_a[0, 0].item() != 0 else state.current_time[0, 0]
+    open_mask = state.get_open_started_mask()[0]
+    open_bits = state._open_mask_to_bits(open_mask)
+    scalar_cache = state._build_completion_scalar_cache(
+        coords_active[0, 1:n_orders + 1, :],
+        delivery_coords,
+        passenger_orders,
+        passenger_pickup_times,
+        direct_ride_time,
+        delivery_earliest,
+        delivery_to_depot_time,
+    )
+
+    legal_orders, physical_orders, used_fallback = state._get_legal_delivery_orders(
+        state.cur_coord[0, 0],
+        state.current_time[0, 0],
+        trip_start,
+        open_mask,
+        delivery_coords,
+        delivery_earliest,
+        delivery_to_depot_time,
+        passenger_orders,
+        passenger_pickup_times,
+        direct_ride_time,
+        allow_fallback=True,
+        open_bits=open_bits,
+        start_node=state._current_start_node_key(state.prev_a[0, 0].item()),
+        scalar_cache=scalar_cache,
+    )
+    legal_bitmap, physical_bitmap, used_fallback_bitmap = state._get_legal_delivery_orders(
+        state.cur_coord[0, 0],
+        state.current_time[0, 0],
+        trip_start,
+        open_mask,
+        delivery_coords,
+        delivery_earliest,
+        delivery_to_depot_time,
+        passenger_orders,
+        passenger_pickup_times,
+        direct_ride_time,
+        allow_fallback=True,
+        open_bits=open_bits,
+        start_node=state._current_start_node_key(state.prev_a[0, 0].item()),
+        scalar_cache=scalar_cache,
+        return_bitmap=True,
+    )
+
+    has_legal_path = state._has_legal_delivery_path(
+        state.cur_coord[0, 0],
+        state.current_time[0, 0],
+        trip_start,
+        open_mask,
+        delivery_coords,
+        delivery_earliest,
+        delivery_to_depot_time,
+        passenger_orders,
+        passenger_pickup_times,
+        direct_ride_time,
+        open_bits=open_bits,
+        start_node=state._current_start_node_key(state.prev_a[0, 0].item()),
+        scalar_cache=scalar_cache,
+    )
+
+    legal_from_bitmap = torch.nonzero(legal_bitmap, as_tuple=False).squeeze(-1).tolist()
+    physical_from_bitmap = torch.nonzero(physical_bitmap, as_tuple=False).squeeze(-1).tolist()
+    print(f'list legal={legal_orders}, bitmap legal={legal_from_bitmap}, fallback={used_fallback}, has_legal_path={has_legal_path}')
+    assert legal_orders == legal_from_bitmap, 'bitmap legal orders 应与 list 版本一致'
+    assert physical_orders == physical_from_bitmap, 'bitmap physical orders 应与 list 版本一致'
+    assert used_fallback == used_fallback_bitmap, 'bitmap/list fallback 标志应一致'
+    assert has_legal_path == (len(legal_orders) > 0), 'bool-only legal path 结果应与 legal orders 非空判定一致'
+
+
 def dry_run():
     basic_dry_run()
     shared_mask_regression()
@@ -889,6 +1288,11 @@ def dry_run():
     cargo_piecewise_delay_cost_regression()
     min_orders_per_dispatch_regression()
     dead_end_reject_under_min_dispatch_regression()
+    completion_scalar_cache_device_regression()
+    completion_small_cached_four_order_equivalence_regression()
+    completion_cached_problem_override_regression()
+    completion_bool_dp_five_order_equivalence_regression()
+    legal_delivery_bitmap_equivalence_regression()
     print('\nDry-run 验证完成！')
 
 

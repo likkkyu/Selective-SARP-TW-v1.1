@@ -1,0 +1,31 @@
+{
+  "candidates": [
+    {
+      "seed": 1234,
+      "eval500": "outputs_cmp/n100_mainline_overnight_n100-mainline-20260725_023150-a00180e_20260725_023428_e6_s1234_eval500.json",
+      "service": 0.8253,
+      "rejected": 0.17452,
+      "unfulfilled": 0.00017999999999999998,
+      "raw": 10560.349601074218,
+      "clean_metric": false
+    },
+    {
+      "seed": 4321,
+      "eval500": "outputs_cmp/n100_mainline_overnight_n100-mainline-20260725_023150-a00180e_20260725_023428_e6_s4321_eval500.json",
+      "service": 0.80414,
+      "rejected": 0.16192,
+      "unfulfilled": 0.03394,
+      "raw": 12293.268717285157,
+      "clean_metric": false
+    }
+  ],
+  "selected": {
+    "seed": 1234,
+    "eval500": "outputs_cmp/n100_mainline_overnight_n100-mainline-20260725_023150-a00180e_20260725_023428_e6_s1234_eval500.json",
+    "service": 0.8253,
+    "rejected": 0.17452,
+    "unfulfilled": 0.00017999999999999998,
+    "raw": 10560.349601074218,
+    "clean_metric": false
+  }
+}

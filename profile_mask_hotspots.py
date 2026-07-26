@@ -22,7 +22,7 @@ class MethodProfiler:
 
 def parse_args():
     parser = argparse.ArgumentParser(description='Profile get_mask hotspots on sampled states')
-    parser.add_argument('--graph-sizes', nargs='+', type=int, default=[25, 50])
+    parser.add_argument('--graph-sizes', nargs='+', type=int, default=[25, 50, 100, 200])
     parser.add_argument('--batch-size', type=int, default=8)
     parser.add_argument('--seed', type=int, default=1234)
     parser.add_argument('--repeats', type=int, default=5)
@@ -88,6 +88,7 @@ def _profile_graph_size(args, graph_size):
         '_has_legal_delivery_path',
         '_has_any_physical_delivery_step',
         '_delivery_step_feasible',
+        '_build_completion_scalar_caches',
     ]
     originals = {name: getattr(StateMCVRPPDTW, name) for name in methods}
 
@@ -141,6 +142,7 @@ def _profile_graph_size(args, graph_size):
         '_has_legal_delivery_path',
         '_has_any_physical_delivery_step',
         '_delivery_step_feasible',
+        '_build_completion_scalar_caches',
     ]
 
     print('=' * 72)
