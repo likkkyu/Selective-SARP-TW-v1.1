@@ -1,0 +1,89 @@
+{
+  "avg_cost": Infinity,
+  "avg_solve_time": 1503.7489240169525,
+  "objective_mode": "distance",
+  "num_total": 10,
+  "num_feasible": 0,
+  "results": [
+    {
+      "instance_id": 0,
+      "status": "time_limit",
+      "obj_value": Infinity,
+      "solve_time": 1913.824275970459,
+      "routes": [],
+      "feasible": false
+    },
+    {
+      "instance_id": 1,
+      "status": "time_limit",
+      "obj_value": Infinity,
+      "solve_time": 2012.4626350402832,
+      "routes": [],
+      "feasible": false
+    },
+    {
+      "instance_id": 2,
+      "status": "time_limit",
+      "obj_value": Infinity,
+      "solve_time": 1206.6285951137543,
+      "routes": [],
+      "feasible": false
+    },
+    {
+      "instance_id": 3,
+      "status": "time_limit",
+      "obj_value": Infinity,
+      "solve_time": 1508.7311832904816,
+      "routes": [],
+      "feasible": false
+    },
+    {
+      "instance_id": 4,
+      "status": "time_limit",
+      "obj_value": Infinity,
+      "solve_time": 1208.0307109355927,
+      "routes": [],
+      "feasible": false
+    },
+    {
+      "instance_id": 5,
+      "status": "time_limit",
+      "obj_value": Infinity,
+      "solve_time": 1207.1716032028198,
+      "routes": [],
+      "feasible": false
+    },
+    {
+      "instance_id": 6,
+      "status": "time_limit",
+      "obj_value": Infinity,
+      "solve_time": 1206.0013167858124,
+      "routes": [],
+      "feasible": false
+    },
+    {
+      "instance_id": 7,
+      "status": "time_limit",
+      "obj_value": Infinity,
+      "solve_time": 1711.980784893036,
+      "routes": [],
+      "feasible": false
+    },
+    {
+      "instance_id": 8,
+      "status": "time_limit",
+      "obj_value": Infinity,
+      "solve_time": 1742.8207359313965,
+      "routes": [],
+      "feasible": false
+    },
+    {
+      "instance_id": 9,
+      "status": "time_limit",
+      "obj_value": Infinity,
+      "solve_time": 1319.83739900589,
+      "routes": [],
+      "feasible": false
+    }
+  ]
+}

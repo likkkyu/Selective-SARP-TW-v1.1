@@ -1,0 +1,89 @@
+{
+  "avg_cost": Infinity,
+  "avg_solve_time": 1220.910182619095,
+  "objective_mode": "cost",
+  "num_total": 10,
+  "num_feasible": 0,
+  "results": [
+    {
+      "instance_id": 0,
+      "status": "time_limit",
+      "obj_value": Infinity,
+      "solve_time": 1206.9388580322266,
+      "routes": [],
+      "feasible": false
+    },
+    {
+      "instance_id": 1,
+      "status": "time_limit",
+      "obj_value": Infinity,
+      "solve_time": 1207.357411146164,
+      "routes": [],
+      "feasible": false
+    },
+    {
+      "instance_id": 2,
+      "status": "time_limit",
+      "obj_value": Infinity,
+      "solve_time": 1208.264441728592,
+      "routes": [],
+      "feasible": false
+    },
+    {
+      "instance_id": 3,
+      "status": "time_limit",
+      "obj_value": Infinity,
+      "solve_time": 1334.9656789302826,
+      "routes": [],
+      "feasible": false
+    },
+    {
+      "instance_id": 4,
+      "status": "time_limit",
+      "obj_value": Infinity,
+      "solve_time": 1208.8426523208618,
+      "routes": [],
+      "feasible": false
+    },
+    {
+      "instance_id": 5,
+      "status": "time_limit",
+      "obj_value": Infinity,
+      "solve_time": 1211.0358138084412,
+      "routes": [],
+      "feasible": false
+    },
+    {
+      "instance_id": 6,
+      "status": "time_limit",
+      "obj_value": Infinity,
+      "solve_time": 1206.3599150180817,
+      "routes": [],
+      "feasible": false
+    },
+    {
+      "instance_id": 7,
+      "status": "time_limit",
+      "obj_value": Infinity,
+      "solve_time": 1209.2781250476837,
+      "routes": [],
+      "feasible": false
+    },
+    {
+      "instance_id": 8,
+      "status": "time_limit",
+      "obj_value": Infinity,
+      "solve_time": 1210.8058891296387,
+      "routes": [],
+      "feasible": false
+    },
+    {
+      "instance_id": 9,
+      "status": "time_limit",
+      "obj_value": Infinity,
+      "solve_time": 1205.2530410289764,
+      "routes": [],
+      "feasible": false
+    }
+  ]
+}

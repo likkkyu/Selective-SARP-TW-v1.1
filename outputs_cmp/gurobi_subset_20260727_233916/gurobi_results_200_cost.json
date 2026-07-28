@@ -1,0 +1,17 @@
+{
+  "avg_cost": Infinity,
+  "avg_solve_time": 4699.739598989487,
+  "objective_mode": "cost",
+  "num_total": 1,
+  "num_feasible": 0,
+  "results": [
+    {
+      "instance_id": 0,
+      "status": "time_limit",
+      "obj_value": Infinity,
+      "solve_time": 4699.739598989487,
+      "routes": [],
+      "feasible": false
+    }
+  ]
+}
