@@ -1,0 +1,1261 @@
+{
+  "num_instances": 10,
+  "avg_objective_cost": 359.2970428466797,
+  "avg_raw_total_cost": 161.7153518676758,
+  "avg_energy_cost": 45.52870483398438,
+  "avg_passenger_delivery_delay_cost": 0.6566700398921966,
+  "avg_cargo_delay": 0.39779158532619474,
+  "avg_trip_overtime_penalty": 17.132186889648438,
+  "avg_reject_penalty": 0.0,
+  "avg_unfulfilled_penalty": 0.0,
+  "avg_completed_orders": 25.0,
+  "avg_rejected_orders": 0.0,
+  "avg_unfulfilled_orders": 0.0,
+  "avg_untouched_orders": 0.0,
+  "avg_untouched_unrejected_orders": 0.0,
+  "avg_pickup_only_orders": 0.0,
+  "avg_started_not_completed_orders": 0.0,
+  "avg_vehicle_cost": 98.0,
+  "avg_total_distance": 252.01533050537108,
+  "avg_used_vehicles": 4.9,
+  "results": [
+    {
+      "algorithm": "SA",
+      "objective_cost": 341.1912841796875,
+      "raw_total_cost": 141.19129943847656,
+      "energy_cost": 41.19129943847656,
+      "passenger_delivery_delay_cost": 0.0,
+      "cargo_delay": 0.0,
+      "trip_overtime_penalty": 0.0,
+      "reject_penalty": 0.0,
+      "unfulfilled_penalty": 0.0,
+      "completed_orders": 25.0,
+      "rejected_orders": 0.0,
+      "unfulfilled_orders": 0.0,
+      "untouched_orders": 0.0,
+      "untouched_unrejected_orders": 0.0,
+      "pickup_only_orders": 0.0,
+      "started_not_completed_orders": 0.0,
+      "vehicle_cost": 100.0,
+      "total_distance": 228.25115966796875,
+      "used_vehicles": 5,
+      "routes": [
+        [
+          4,
+          29,
+          12,
+          37,
+          16,
+          41,
+          22,
+          47,
+          7,
+          32,
+          13,
+          38
+        ],
+        [
+          23,
+          48,
+          21,
+          46,
+          1,
+          26,
+          8,
+          33,
+          20,
+          45,
+          9,
+          34
+        ],
+        [
+          24,
+          49,
+          10,
+          35,
+          11,
+          36,
+          6,
+          31
+        ],
+        [
+          3,
+          28,
+          19,
+          44,
+          17,
+          42,
+          15,
+          40
+        ],
+        [
+          25,
+          50,
+          5,
+          30,
+          18,
+          43,
+          14,
+          39,
+          2,
+          27
+        ]
+      ],
+      "order_routes": [
+        [
+          3,
+          11,
+          15,
+          21,
+          6,
+          12
+        ],
+        [
+          22,
+          20,
+          0,
+          7,
+          19,
+          8
+        ],
+        [
+          23,
+          9,
+          10,
+          5
+        ],
+        [
+          2,
+          18,
+          16,
+          14
+        ],
+        [
+          24,
+          4,
+          17,
+          13,
+          1
+        ]
+      ],
+      "instance_id": 0,
+      "solve_time": 9.382859945297241,
+      "iterations": 600
+    },
+    {
+      "algorithm": "SA",
+      "objective_cost": 371.2083740234375,
+      "raw_total_cost": 164.77520751953125,
+      "energy_cost": 50.5401725769043,
+      "passenger_delivery_delay_cost": 3.6480791568756104,
+      "cargo_delay": 0.6407020688056946,
+      "trip_overtime_penalty": 9.946250915527344,
+      "reject_penalty": 0.0,
+      "unfulfilled_penalty": 0.0,
+      "completed_orders": 25.0,
+      "rejected_orders": 0.0,
+      "unfulfilled_orders": 0.0,
+      "untouched_orders": 0.0,
+      "untouched_unrejected_orders": 0.0,
+      "pickup_only_orders": 0.0,
+      "started_not_completed_orders": 0.0,
+      "vehicle_cost": 100.0,
+      "total_distance": 279.6966247558594,
+      "used_vehicles": 5,
+      "routes": [
+        [
+          21,
+          46,
+          6,
+          31,
+          11,
+          36,
+          8,
+          33,
+          24,
+          49
+        ],
+        [
+          10,
+          35,
+          18,
+          43,
+          1,
+          26,
+          15,
+          40,
+          19,
+          44,
+          12,
+          37
+        ],
+        [
+          17,
+          42,
+          16,
+          41,
+          22,
+          47,
+          7,
+          32,
+          4,
+          29
+        ],
+        [
+          23,
+          48,
+          25,
+          50,
+          2,
+          27,
+          9,
+          34
+        ],
+        [
+          13,
+          38,
+          3,
+          28,
+          14,
+          39,
+          20,
+          45,
+          5,
+          30
+        ]
+      ],
+      "order_routes": [
+        [
+          20,
+          5,
+          10,
+          7,
+          23
+        ],
+        [
+          9,
+          17,
+          0,
+          14,
+          18,
+          11
+        ],
+        [
+          16,
+          15,
+          21,
+          6,
+          3
+        ],
+        [
+          22,
+          24,
+          1,
+          8
+        ],
+        [
+          12,
+          2,
+          13,
+          19,
+          4
+        ]
+      ],
+      "instance_id": 1,
+      "solve_time": 8.656221866607666,
+      "iterations": 600
+    },
+    {
+      "algorithm": "SA",
+      "objective_cost": 354.4794921875,
+      "raw_total_cost": 154.06040954589844,
+      "energy_cost": 46.11614990234375,
+      "passenger_delivery_delay_cost": 0.0,
+      "cargo_delay": 0.2793823182582855,
+      "trip_overtime_penalty": 7.6648712158203125,
+      "reject_penalty": 0.0,
+      "unfulfilled_penalty": 0.0,
+      "completed_orders": 25.0,
+      "rejected_orders": 0.0,
+      "unfulfilled_orders": 0.0,
+      "untouched_orders": 0.0,
+      "untouched_unrejected_orders": 0.0,
+      "pickup_only_orders": 0.0,
+      "started_not_completed_orders": 0.0,
+      "vehicle_cost": 100.0,
+      "total_distance": 255.09486389160156,
+      "used_vehicles": 5,
+      "routes": [
+        [
+          2,
+          27,
+          18,
+          43,
+          17,
+          42,
+          11,
+          36,
+          9,
+          34
+        ],
+        [
+          7,
+          32,
+          4,
+          29,
+          6,
+          31,
+          21,
+          46,
+          24,
+          49
+        ],
+        [
+          5,
+          30,
+          1,
+          26,
+          25,
+          50,
+          20,
+          45,
+          10,
+          35
+        ],
+        [
+          8,
+          33,
+          13,
+          38,
+          12,
+          37,
+          16,
+          41
+        ],
+        [
+          3,
+          28,
+          19,
+          44,
+          22,
+          47,
+          14,
+          39,
+          23,
+          48,
+          15,
+          40
+        ]
+      ],
+      "order_routes": [
+        [
+          1,
+          17,
+          16,
+          10,
+          8
+        ],
+        [
+          6,
+          3,
+          5,
+          20,
+          23
+        ],
+        [
+          4,
+          0,
+          24,
+          19,
+          9
+        ],
+        [
+          7,
+          12,
+          11,
+          15
+        ],
+        [
+          2,
+          18,
+          21,
+          13,
+          22,
+          14
+        ]
+      ],
+      "instance_id": 2,
+      "solve_time": 8.536447286605835,
+      "iterations": 600
+    },
+    {
+      "algorithm": "SA",
+      "objective_cost": 340.3626403808594,
+      "raw_total_cost": 140.36264038085938,
+      "energy_cost": 40.362648010253906,
+      "passenger_delivery_delay_cost": 0.0,
+      "cargo_delay": 0.0,
+      "trip_overtime_penalty": 0.0,
+      "reject_penalty": 0.0,
+      "unfulfilled_penalty": 0.0,
+      "completed_orders": 25.0,
+      "rejected_orders": 0.0,
+      "unfulfilled_orders": 0.0,
+      "untouched_orders": 0.0,
+      "untouched_unrejected_orders": 0.0,
+      "pickup_only_orders": 0.0,
+      "started_not_completed_orders": 0.0,
+      "vehicle_cost": 100.0,
+      "total_distance": 223.47055053710938,
+      "used_vehicles": 5,
+      "routes": [
+        [
+          5,
+          30,
+          4,
+          29,
+          20,
+          45,
+          8,
+          33,
+          13,
+          38
+        ],
+        [
+          3,
+          28,
+          14,
+          39,
+          22,
+          47,
+          10,
+          35
+        ],
+        [
+          21,
+          46,
+          18,
+          43,
+          12,
+          37,
+          2,
+          27
+        ],
+        [
+          24,
+          49,
+          1,
+          26,
+          15,
+          40,
+          23,
+          48,
+          9,
+          34
+        ],
+        [
+          19,
+          44,
+          25,
+          50,
+          16,
+          41,
+          17,
+          42,
+          6,
+          31,
+          7,
+          32,
+          11,
+          36
+        ]
+      ],
+      "order_routes": [
+        [
+          4,
+          3,
+          19,
+          7,
+          12
+        ],
+        [
+          2,
+          13,
+          21,
+          9
+        ],
+        [
+          20,
+          17,
+          11,
+          1
+        ],
+        [
+          23,
+          0,
+          14,
+          22,
+          8
+        ],
+        [
+          18,
+          24,
+          15,
+          16,
+          5,
+          6,
+          10
+        ]
+      ],
+      "instance_id": 3,
+      "solve_time": 8.291514158248901,
+      "iterations": 600
+    },
+    {
+      "algorithm": "SA",
+      "objective_cost": 349.66973876953125,
+      "raw_total_cost": 148.823974609375,
+      "energy_cost": 48.26012420654297,
+      "passenger_delivery_delay_cost": 0.0,
+      "cargo_delay": 0.5638526678085327,
+      "trip_overtime_penalty": 0.0,
+      "reject_penalty": 0.0,
+      "unfulfilled_penalty": 0.0,
+      "completed_orders": 25.0,
+      "rejected_orders": 0.0,
+      "unfulfilled_orders": 0.0,
+      "untouched_orders": 0.0,
+      "untouched_unrejected_orders": 0.0,
+      "pickup_only_orders": 0.0,
+      "started_not_completed_orders": 0.0,
+      "vehicle_cost": 100.0,
+      "total_distance": 267.2498779296875,
+      "used_vehicles": 5,
+      "routes": [
+        [
+          16,
+          41,
+          25,
+          50,
+          7,
+          32,
+          13,
+          38
+        ],
+        [
+          12,
+          37,
+          11,
+          36,
+          3,
+          28,
+          15,
+          40,
+          23,
+          48
+        ],
+        [
+          1,
+          26,
+          6,
+          31,
+          9,
+          34,
+          4,
+          29,
+          20,
+          45
+        ],
+        [
+          24,
+          49,
+          14,
+          39,
+          10,
+          35,
+          21,
+          46,
+          22,
+          47
+        ],
+        [
+          2,
+          27,
+          19,
+          44,
+          17,
+          42,
+          5,
+          30,
+          18,
+          43,
+          8,
+          33
+        ]
+      ],
+      "order_routes": [
+        [
+          15,
+          24,
+          6,
+          12
+        ],
+        [
+          11,
+          10,
+          2,
+          14,
+          22
+        ],
+        [
+          0,
+          5,
+          8,
+          3,
+          19
+        ],
+        [
+          23,
+          13,
+          9,
+          20,
+          21
+        ],
+        [
+          1,
+          18,
+          16,
+          4,
+          17,
+          7
+        ]
+      ],
+      "instance_id": 4,
+      "solve_time": 8.290239810943604,
+      "iterations": 600
+    },
+    {
+      "algorithm": "SA",
+      "objective_cost": 359.9979248046875,
+      "raw_total_cost": 154.68661499023438,
+      "energy_cost": 51.145748138427734,
+      "passenger_delivery_delay_cost": 1.971737027168274,
+      "cargo_delay": 1.5691325664520264,
+      "trip_overtime_penalty": 0.0,
+      "reject_penalty": 0.0,
+      "unfulfilled_penalty": 0.0,
+      "completed_orders": 25.0,
+      "rejected_orders": 0.0,
+      "unfulfilled_orders": 0.0,
+      "untouched_orders": 0.0,
+      "untouched_unrejected_orders": 0.0,
+      "pickup_only_orders": 0.0,
+      "started_not_completed_orders": 0.0,
+      "vehicle_cost": 100.0,
+      "total_distance": 283.0221862792969,
+      "used_vehicles": 5,
+      "routes": [
+        [
+          11,
+          36,
+          19,
+          44,
+          16,
+          41,
+          4,
+          29,
+          14,
+          39
+        ],
+        [
+          9,
+          34,
+          7,
+          32,
+          21,
+          46,
+          13,
+          38,
+          10,
+          35
+        ],
+        [
+          3,
+          28,
+          23,
+          48,
+          22,
+          47,
+          8,
+          33,
+          1,
+          26
+        ],
+        [
+          20,
+          45,
+          24,
+          49,
+          17,
+          42,
+          15,
+          40,
+          2,
+          27
+        ],
+        [
+          5,
+          30,
+          25,
+          50,
+          18,
+          43,
+          12,
+          37,
+          6,
+          31
+        ]
+      ],
+      "order_routes": [
+        [
+          10,
+          18,
+          15,
+          3,
+          13
+        ],
+        [
+          8,
+          6,
+          20,
+          12,
+          9
+        ],
+        [
+          2,
+          22,
+          21,
+          7,
+          0
+        ],
+        [
+          19,
+          23,
+          16,
+          14,
+          1
+        ],
+        [
+          4,
+          24,
+          17,
+          11,
+          5
+        ]
+      ],
+      "instance_id": 5,
+      "solve_time": 8.454766988754272,
+      "iterations": 600
+    },
+    {
+      "algorithm": "SA",
+      "objective_cost": 312.67041015625,
+      "raw_total_cost": 152.67037963867188,
+      "energy_cost": 40.79668045043945,
+      "passenger_delivery_delay_cost": 0.0,
+      "cargo_delay": 0.0,
+      "trip_overtime_penalty": 31.873703002929688,
+      "reject_penalty": 0.0,
+      "unfulfilled_penalty": 0.0,
+      "completed_orders": 25.0,
+      "rejected_orders": 0.0,
+      "unfulfilled_orders": 0.0,
+      "untouched_orders": 0.0,
+      "untouched_unrejected_orders": 0.0,
+      "pickup_only_orders": 0.0,
+      "started_not_completed_orders": 0.0,
+      "vehicle_cost": 80.0,
+      "total_distance": 225.7538604736328,
+      "used_vehicles": 4,
+      "routes": [
+        [
+          7,
+          32,
+          5,
+          30,
+          4,
+          29,
+          9,
+          34,
+          14,
+          39,
+          15,
+          40,
+          22,
+          47
+        ],
+        [
+          20,
+          45,
+          12,
+          37,
+          23,
+          48,
+          13,
+          38,
+          24,
+          49
+        ],
+        [
+          11,
+          36,
+          16,
+          41,
+          18,
+          43,
+          2,
+          27,
+          17,
+          42,
+          6,
+          31
+        ],
+        [
+          25,
+          50,
+          1,
+          26,
+          19,
+          44,
+          3,
+          28,
+          21,
+          46,
+          10,
+          35,
+          8,
+          33
+        ]
+      ],
+      "order_routes": [
+        [
+          6,
+          4,
+          3,
+          8,
+          13,
+          14,
+          21
+        ],
+        [
+          19,
+          11,
+          22,
+          12,
+          23
+        ],
+        [
+          10,
+          15,
+          17,
+          1,
+          16,
+          5
+        ],
+        [
+          24,
+          0,
+          18,
+          2,
+          20,
+          9,
+          7
+        ]
+      ],
+      "instance_id": 6,
+      "solve_time": 8.152728796005249,
+      "iterations": 600
+    },
+    {
+      "algorithm": "SA",
+      "objective_cost": 342.6277160644531,
+      "raw_total_cost": 142.6277313232422,
+      "energy_cost": 42.62772750854492,
+      "passenger_delivery_delay_cost": 0.0,
+      "cargo_delay": 0.0,
+      "trip_overtime_penalty": 0.0,
+      "reject_penalty": 0.0,
+      "unfulfilled_penalty": 0.0,
+      "completed_orders": 25.0,
+      "rejected_orders": 0.0,
+      "unfulfilled_orders": 0.0,
+      "untouched_orders": 0.0,
+      "untouched_unrejected_orders": 0.0,
+      "pickup_only_orders": 0.0,
+      "started_not_completed_orders": 0.0,
+      "vehicle_cost": 100.0,
+      "total_distance": 235.84461975097656,
+      "used_vehicles": 5,
+      "routes": [
+        [
+          21,
+          46,
+          8,
+          33,
+          3,
+          28,
+          15,
+          40,
+          6,
+          31
+        ],
+        [
+          4,
+          29,
+          17,
+          42,
+          23,
+          48,
+          20,
+          45
+        ],
+        [
+          2,
+          27,
+          10,
+          35,
+          16,
+          41,
+          1,
+          26,
+          11,
+          36,
+          24,
+          49
+        ],
+        [
+          9,
+          34,
+          14,
+          39,
+          18,
+          43,
+          13,
+          38
+        ],
+        [
+          12,
+          37,
+          25,
+          50,
+          19,
+          44,
+          5,
+          30,
+          7,
+          32,
+          22,
+          47
+        ]
+      ],
+      "order_routes": [
+        [
+          20,
+          7,
+          2,
+          14,
+          5
+        ],
+        [
+          3,
+          16,
+          22,
+          19
+        ],
+        [
+          1,
+          9,
+          15,
+          0,
+          10,
+          23
+        ],
+        [
+          8,
+          13,
+          17,
+          12
+        ],
+        [
+          11,
+          24,
+          18,
+          4,
+          6,
+          21
+        ]
+      ],
+      "instance_id": 7,
+      "solve_time": 8.693981885910034,
+      "iterations": 600
+    },
+    {
+      "algorithm": "SA",
+      "objective_cost": 476.4488830566406,
+      "raw_total_cost": 273.64129638671875,
+      "energy_cost": 49.932525634765625,
+      "passenger_delivery_delay_cost": 0.9468842148780823,
+      "cargo_delay": 0.9248462319374084,
+      "trip_overtime_penalty": 121.83704376220703,
+      "reject_penalty": 0.0,
+      "unfulfilled_penalty": 0.0,
+      "completed_orders": 25.0,
+      "rejected_orders": 0.0,
+      "unfulfilled_orders": 0.0,
+      "untouched_orders": 0.0,
+      "untouched_unrejected_orders": 0.0,
+      "pickup_only_orders": 0.0,
+      "started_not_completed_orders": 0.0,
+      "vehicle_cost": 100.0,
+      "total_distance": 276.4022521972656,
+      "used_vehicles": 5,
+      "routes": [
+        [
+          13,
+          38,
+          6,
+          31,
+          5,
+          30,
+          23,
+          48,
+          22,
+          47
+        ],
+        [
+          20,
+          45,
+          17,
+          42,
+          16,
+          41,
+          14,
+          39,
+          15,
+          40
+        ],
+        [
+          3,
+          28,
+          1,
+          26,
+          8,
+          33,
+          21,
+          46
+        ],
+        [
+          25,
+          50,
+          10,
+          35,
+          12,
+          37,
+          24,
+          49,
+          19,
+          44,
+          7,
+          32
+        ],
+        [
+          2,
+          27,
+          4,
+          29,
+          9,
+          34,
+          18,
+          43,
+          11,
+          36
+        ]
+      ],
+      "order_routes": [
+        [
+          12,
+          5,
+          4,
+          22,
+          21
+        ],
+        [
+          19,
+          16,
+          15,
+          13,
+          14
+        ],
+        [
+          2,
+          0,
+          7,
+          20
+        ],
+        [
+          24,
+          9,
+          11,
+          23,
+          18,
+          6
+        ],
+        [
+          1,
+          3,
+          8,
+          17,
+          10
+        ]
+      ],
+      "instance_id": 8,
+      "solve_time": 8.724537134170532,
+      "iterations": 600
+    },
+    {
+      "algorithm": "SA",
+      "objective_cost": 344.31396484375,
+      "raw_total_cost": 144.31396484375,
+      "energy_cost": 44.31397247314453,
+      "passenger_delivery_delay_cost": 0.0,
+      "cargo_delay": 0.0,
+      "trip_overtime_penalty": 0.0,
+      "reject_penalty": 0.0,
+      "unfulfilled_penalty": 0.0,
+      "completed_orders": 25.0,
+      "rejected_orders": 0.0,
+      "unfulfilled_orders": 0.0,
+      "untouched_orders": 0.0,
+      "untouched_unrejected_orders": 0.0,
+      "pickup_only_orders": 0.0,
+      "started_not_completed_orders": 0.0,
+      "vehicle_cost": 100.0,
+      "total_distance": 245.3673095703125,
+      "used_vehicles": 5,
+      "routes": [
+        [
+          17,
+          42,
+          14,
+          39,
+          13,
+          38,
+          16,
+          41,
+          18,
+          43
+        ],
+        [
+          20,
+          45,
+          24,
+          49,
+          4,
+          29,
+          8,
+          33,
+          1,
+          26
+        ],
+        [
+          2,
+          27,
+          9,
+          34,
+          7,
+          32,
+          11,
+          36,
+          15,
+          40
+        ],
+        [
+          23,
+          48,
+          25,
+          50,
+          3,
+          28,
+          10,
+          35,
+          22,
+          47
+        ],
+        [
+          21,
+          46,
+          6,
+          31,
+          19,
+          44,
+          5,
+          30,
+          12,
+          37
+        ]
+      ],
+      "order_routes": [
+        [
+          16,
+          13,
+          12,
+          15,
+          17
+        ],
+        [
+          19,
+          23,
+          3,
+          7,
+          0
+        ],
+        [
+          1,
+          8,
+          6,
+          10,
+          14
+        ],
+        [
+          22,
+          24,
+          2,
+          9,
+          21
+        ],
+        [
+          20,
+          5,
+          18,
+          4,
+          11
+        ]
+      ],
+      "instance_id": 9,
+      "solve_time": 8.373358964920044,
+      "iterations": 600
+    }
+  ],
+  "service_rate_mean": 1.0,
+  "rejected_rate_mean": 0.0,
+  "unfulfilled_rate_mean": 0.0,
+  "untouched_unrejected_rate_mean": 0.0,
+  "served_plus_rejected_rate_mean": 1.0,
+  "business_clean": true,
+  "graph_size": 25,
+  "num_samples": 10,
+  "iterations": 600,
+  "initial_temperature": 50.0,
+  "cooling_rate": 0.995,
+  "num_vehicles": 5
+}
