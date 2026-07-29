@@ -571,6 +571,13 @@ def build_solution_info(objective_cost, details, node_routes, algorithm, extra=N
     if eval_meta.get('strict_rejected_by_hard', False):
         objective_effective = float(eval_meta.get('strict_infeasible_cost', objective_effective))
 
+    graph_size = None
+    if isinstance(extra, dict) and 'graph_size' in extra:
+        try:
+            graph_size = int(extra.get('graph_size'))
+        except Exception:
+            graph_size = None
+
     unfulfilled_orders = _detail_scalar(details, 'unfulfilled_orders', 0.0)
     pickup_only_orders = _detail_scalar(details, 'pickup_only_orders', 0.0)
     started_not_completed_orders = _detail_scalar(details, 'started_not_completed_orders', 0.0)
@@ -626,7 +633,13 @@ def build_solution_info(objective_cost, details, node_routes, algorithm, extra=N
         'routes': node_routes,
     }
 
+    info['metrics_schema_version'] = 'fair_v1'
+    info['service_count'] = float(info['completed_orders'])
     info['service_rate'] = float(info['completed_orders'])
+    if graph_size is not None and graph_size > 0:
+        info['service_rate_norm'] = float(info['completed_orders']) / float(graph_size)
+    else:
+        info['service_rate_norm'] = None
     info['business_clean'] = bool(
         info['is_hard_feasible']
         and abs(unfulfilled_orders) <= 1e-9
@@ -702,6 +715,8 @@ def summarize_results(results, graph_size=None):
         'protocol_versions': sorted({result.get('protocol_version', LEGACY_PROTOCOL) for result in results}),
         'semantic_modes': sorted({result.get('semantic_mode', LEGACY_SEMANTIC_MODE) for result in results}),
         'comparable_to_drl': bool(all(result.get('comparable_to_drl', False) for result in results)),
+        'metrics_schema_version': 'fair_v1',
+        'completed_orders_mean': float(np.mean([result['completed_orders'] for result in results])),
         'results': results,
     }
 
@@ -713,7 +728,9 @@ def summarize_results(results, graph_size=None):
     if graph_size is not None and int(graph_size) > 0:
         g = float(graph_size)
         summary.update({
+            'denominator_graph_size': int(graph_size),
             'service_rate_mean': summary['avg_completed_orders'] / g,
+            'service_rate_mean_normalized': summary['avg_completed_orders'] / g,
             'rejected_rate_mean': summary['avg_rejected_orders'] / g,
             'unfulfilled_rate_mean': summary['avg_unfulfilled_orders'] / g,
             'untouched_unrejected_rate_mean': summary['avg_untouched_unrejected_orders'] / g,

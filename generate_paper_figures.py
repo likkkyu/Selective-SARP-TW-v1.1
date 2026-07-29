@@ -330,13 +330,21 @@ def plot_baseline_comparison():
         gurobi_reevaluated = gurobi_comparison.get('gurobi_reevaluated', {})
         for size_str, data in gurobi_reevaluated.items():
             size = int(data['graph_size'])
-            # 优先从 gurobi_results_{size}.json 读取真实求解时间（完整求解时间）
+            # 优先从 gurobi_results 文件读取真实求解时间（完整求解时间）
             solve_time = data.get('avg_solve_time')
-            gurobi_results_path = f'gurobi_results_{size}.json'
-            if solve_time is None and os.path.exists(gurobi_results_path):
-                with open(gurobi_results_path, 'r') as fg:
-                    gr = json.load(fg)
-                solve_time = gr.get('avg_solve_time')
+            gurobi_time_candidates = [
+                f'gurobi_results_{size}_distance.json',
+                f'gurobi_results_{size}_cost.json',
+                f'gurobi_results_{size}.json',
+            ]
+            if solve_time is None:
+                for gurobi_results_path in gurobi_time_candidates:
+                    if os.path.exists(gurobi_results_path):
+                        with open(gurobi_results_path, 'r') as fg:
+                            gr = json.load(fg)
+                        solve_time = gr.get('avg_solve_time')
+                        if solve_time is not None:
+                            break
             if solve_time is None:
                 solve_time = 300  # 兜底默认
             gurobi_data[size] = {

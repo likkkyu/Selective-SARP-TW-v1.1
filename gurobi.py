@@ -16,7 +16,7 @@ import numpy as np
 import time
 from gurobipy import Model, GRB, quicksum
 import torch
-from typing import List, Tuple, Dict
+from typing import List, Tuple, Dict, Optional
 import json
 
 from problem_mcvrptw_v2 import MCVRPPDTW, MCVRPPDTWDataset, Config
@@ -27,14 +27,15 @@ class GurobiMCVRPPDTWSolver:
 
     def __init__(
         self,
-        time_limit: int = 3600,
+        time_limit: Optional[int] = 3600,
         mip_gap: float = 0.01,
         threads: int = 4,
         verbose: bool = True,
         relax_constraints: bool = False,    # v5 默认不放宽
         objective_mode: str = 'distance',   # 'distance' | 'cost'   v5 新增
     ):
-        self.time_limit = time_limit
+        # time_limit=None 表示不设置 TimeLimit（无限时）
+        self.time_limit = None if time_limit is None else int(time_limit)
         self.mip_gap = mip_gap
         self.threads = threads
         self.verbose = verbose
@@ -73,7 +74,8 @@ class GurobiMCVRPPDTWSolver:
 
         # ==================== 模型 ====================
         model = Model("MCVRPPDTW_v5")
-        model.setParam('TimeLimit', self.time_limit)
+        if self.time_limit is not None:
+            model.setParam('TimeLimit', self.time_limit)
         model.setParam('MIPGap', self.mip_gap)
         model.setParam('Threads', self.threads)
         model.setParam('MIPFocus', 1)
@@ -350,7 +352,7 @@ def convert_torch_to_gurobi_format(data):
 
 
 def evaluate_gurobi_baseline(dataset, time_limit=600, output_file='gurobi_result.json',
-                             objective_mode='distance', relax_constraints=False):
+                             objective_mode='distance', relax_constraints=False, budget_seconds=None):
     solver = GurobiMCVRPPDTWSolver(
         time_limit=time_limit,
         verbose=True,
@@ -360,7 +362,8 @@ def evaluate_gurobi_baseline(dataset, time_limit=600, output_file='gurobi_result
     results = []
 
     print(f"\n>> v5 严格模式: PD 同车硬约束已恢复, objective={objective_mode}")
-    print(f">> 开始处理数据集 (共 {len(dataset)} 个样本)")
+    limit_text = 'unlimited' if time_limit is None else f'{int(time_limit)}s'
+    print(f">> 开始处理数据集 (共 {len(dataset)} 个样本), time_limit={limit_text}")
 
     for i, data in enumerate(dataset):
         print(f"\nProcessing instance {i + 1}/{len(dataset)}...")
@@ -372,6 +375,9 @@ def evaluate_gurobi_baseline(dataset, time_limit=600, output_file='gurobi_result
         info.setdefault('status', 'unknown')
         if info['status'] in ['optimal', 'time_limit'] and obj < 1e10:
             info['feasible'] = True
+            info['time_limit_seconds'] = int(time_limit) if time_limit is not None else None
+            if budget_seconds is not None:
+                info['budget_seconds'] = int(budget_seconds)
             results.append(info)
         else:
             print("  ⚠️ 该实例未找到解，跳过统计 (instance_id 已记录)。")
@@ -383,6 +389,8 @@ def evaluate_gurobi_baseline(dataset, time_limit=600, output_file='gurobi_result
                 'solve_time': info.get('solve_time', 0.0),
                 'routes': [],
                 'feasible': False,
+                'time_limit_seconds': int(time_limit) if time_limit is not None else None,
+                'budget_seconds': int(budget_seconds) if budget_seconds is not None else None,
             })
 
     if not results:
@@ -390,6 +398,11 @@ def evaluate_gurobi_baseline(dataset, time_limit=600, output_file='gurobi_result
         return None
 
     feasible_results = [r for r in results if r.get('feasible', False)]
+    status_counts = {}
+    for record in results:
+        status = str(record.get('status', 'unknown'))
+        status_counts[status] = status_counts.get(status, 0) + 1
+
     if not feasible_results:
         print("\n❌ 所有实例均未找到可行解 (但已写入 instance_id 用于对齐)。")
         avg_cost = float('inf')
@@ -397,12 +410,24 @@ def evaluate_gurobi_baseline(dataset, time_limit=600, output_file='gurobi_result
     else:
         avg_cost = float(np.mean([r['obj_value'] for r in feasible_results]))
         avg_time = float(np.mean([r['solve_time'] for r in feasible_results]))
+
+    num_total = len(results)
+    num_feasible = len(feasible_results)
+    feasible_rate = float(num_feasible / num_total) if num_total > 0 else 0.0
+
     summary = {
+        'metrics_schema_version': 'fair_v1',
         'avg_cost': avg_cost,
+        'avg_cost_feasible_only': avg_cost,
         'avg_solve_time': avg_time,
         'objective_mode': objective_mode,
-        'num_total': len(results),
-        'num_feasible': len(feasible_results),
+        'num_total': num_total,
+        'num_feasible': num_feasible,
+        'feasible_rate': feasible_rate,
+        'coverage_solver_feasible': feasible_rate,
+        'status_counts': status_counts,
+        'time_limit_seconds': int(time_limit) if time_limit is not None else None,
+        'budget_seconds': int(budget_seconds) if budget_seconds is not None else None,
         'results': results,
     }
     with open(output_file, 'w') as f:
@@ -428,6 +453,13 @@ if __name__ == '__main__':
     parser.add_argument('--time-limit-25', type=int, default=600)
     parser.add_argument('--time-limit-50', type=int, default=1800)
     parser.add_argument('--time-limit-100', type=int, default=3600)
+    parser.add_argument('--time-limit-200', type=int, default=1800)
+    parser.add_argument('--time-limit-default', type=int, default=1800,
+                        help='未显式指定规模的默认 time limit (s)')
+    parser.add_argument('--no-time-limit', action='store_true',
+                        help='不设置 TimeLimit（无限时，直到求解器自然结束）')
+    parser.add_argument('--time-budgets', type=int, nargs='*', default=None,
+                        help='可选: 预算 sweep (秒)。提供后会按 budget 生成多组结果文件')
     parser.add_argument('--relax', action='store_true',
                         help='放宽时间窗 ±20% (default: False)')
     args = parser.parse_args()
@@ -436,25 +468,47 @@ if __name__ == '__main__':
     print(f"MCVRP-PDTW 完整基准测试 v6 (Gurobi, objective_mode={args.objective_mode})")
     print("=" * 80)
 
-    time_limit_map = {25: args.time_limit_25, 50: args.time_limit_50, 100: args.time_limit_100}
+    time_limit_map = {
+        25: args.time_limit_25,
+        50: args.time_limit_50,
+        100: args.time_limit_100,
+        200: args.time_limit_200,
+    }
 
     datasets = {}
     for size in args.graph_sizes:
         print(f"生成 {size} 节点测试数据集...")
         datasets[size] = MCVRPPDTWDataset(num_samples=args.num_samples, graph_size=size, seed=args.seed)
 
+    budgets = [int(value) for value in args.time_budgets] if args.time_budgets else None
+
     for size in args.graph_sizes:
         print(f"\n求解 {size} 节点问题...")
-        time_limit = time_limit_map.get(size, 1800)
-        # v6: 双轨结果文件命名 gurobi_results_{size}_{mode}.json
-        output_file = f'gurobi_results_{size}_{args.objective_mode}.json'
-        try:
-            evaluate_gurobi_baseline(
-                dataset=datasets[size],
-                time_limit=time_limit,
-                output_file=output_file,
-                objective_mode=args.objective_mode,
-                relax_constraints=args.relax,
-            )
-        except Exception as e:
-            print(f"✗ {size} 节点求解失败: {e}")
+        default_limit = int(time_limit_map.get(size, args.time_limit_default))
+
+        if args.no_time_limit:
+            run_budgets = [None]
+        else:
+            run_budgets = budgets if budgets else [default_limit]
+
+        for budget in run_budgets:
+            # 默认保持历史文件名；开启预算 sweep 时附加 budget 后缀
+            if budget is None:
+                output_file = f'gurobi_results_{size}_{args.objective_mode}.json'
+            elif budgets:
+                output_file = f'gurobi_results_{size}_{args.objective_mode}_budget{int(budget)}.json'
+            else:
+                output_file = f'gurobi_results_{size}_{args.objective_mode}.json'
+
+            budget_label = 'unlimited' if budget is None else str(int(budget))
+            try:
+                evaluate_gurobi_baseline(
+                    dataset=datasets[size],
+                    time_limit=None if budget is None else int(budget),
+                    output_file=output_file,
+                    objective_mode=args.objective_mode,
+                    relax_constraints=args.relax,
+                    budget_seconds=None if budget is None else int(budget),
+                )
+            except Exception as e:
+                print(f"✗ {size} 节点求解失败 (budget={budget_label}): {e}")
