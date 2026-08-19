@@ -1,0 +1,877 @@
+diff --git a/dry_run_test.py b/dry_run_test.py
+index 5cb23e2..a0db368 100644
+--- a/dry_run_test.py
++++ b/dry_run_test.py
+@@ -518,8 +518,7 @@ def _attach_flat_logits(model):
+     def _flat_logits(self, query, step_context, glimpse_K, glimpse_V, logit_K, mask):
+         logits = torch.zeros(mask.size(), device=mask.device, dtype=query.dtype)
+         logits = logits.masked_fill(mask, -float('inf'))
+-        glimpse = torch.zeros(query.size(0), query.size(1), query.size(-1), device=query.device, dtype=query.dtype)
+-        return logits, glimpse
++        return logits
+ 
+     model._one_to_many_logits = types.MethodType(_flat_logits, model)
+ 
+@@ -543,8 +542,8 @@ def urgency_bias_changes_greedy_choice_regression():
+     with torch.no_grad():
+         log_p_base, mask_base, _ = model_base._get_log_p(fixed_base, state, normalize=True, return_debug=False)
+         log_p_urgency, mask_urgency, _ = model_urgency._get_log_p(fixed_urgency, state, normalize=True, return_debug=False)
+-        selected_base = model_base._select_node(log_p_base.exp()[:, 0, :], mask_base[:, 0, :])
+-        selected_urgency = model_urgency._select_node(log_p_urgency.exp()[:, 0, :], mask_urgency[:, 0, :])
++        selected_base = model_base._select_node(log_p_base[:, 0, :], mask_base[:, 0, :])
++        selected_urgency = model_urgency._select_node(log_p_urgency[:, 0, :], mask_urgency[:, 0, :])
+ 
+     print(f'base selected={int(selected_base.item())}, urgency selected={int(selected_urgency.item())}')
+     assert bool(mask_base[0, 0, 1].item()) is False and bool(mask_base[0, 0, 2].item()) is False, '测试前提失败：两个 pickup 应都可行'
+@@ -564,8 +563,7 @@ def urgency_bias_preserves_mask_semantics_regression():
+ 
+     with torch.no_grad():
+         log_p, mask, _ = model_urgency._get_log_p(fixed, state, normalize=False, return_debug=False)
+-        probs = torch.softmax(log_p[:, 0, :], dim=-1)
+-        selected = model_urgency._select_node(probs, mask[:, 0, :])
++        selected = model_urgency._select_node(log_p[:, 0, :], mask[:, 0, :])
+ 
+     print(f'masked pickup2={bool(mask[0,0,2].item())}, selected={int(selected.item())}')
+     assert bool(mask[0, 0, 2].item()) is True, '测试前提失败：pickup2 应被 pickup TW 硬屏蔽'
+@@ -608,8 +606,8 @@ def urgency_bias_training_path_slack_available_regression():
+         with torch.no_grad():
+             log_p_base, mask_base, _ = model_base._get_log_p(fixed_base, state_base, normalize=True, return_debug=False)
+             log_p_urgency, mask_urgency, _ = model_urgency._get_log_p(fixed_urgency, state_urgency, normalize=True, return_debug=False)
+-            selected_base = model_base._select_node(log_p_base.exp()[:, 0, :], mask_base[:, 0, :])
+-            selected_urgency = model_urgency._select_node(log_p_urgency.exp()[:, 0, :], mask_urgency[:, 0, :])
++            selected_base = model_base._select_node(log_p_base[:, 0, :], mask_base[:, 0, :])
++            selected_urgency = model_urgency._select_node(log_p_urgency[:, 0, :], mask_urgency[:, 0, :])
+     finally:
+         StateMCVRPPDTW.get_mask = original_get_mask
+ 
+diff --git a/nets/attention_model.py b/nets/attention_model.py
+index 327fb68..2e640e5 100644
+--- a/nets/attention_model.py
++++ b/nets/attention_model.py
+@@ -263,7 +263,8 @@ class AttentionModel(nn.Module):
+                 benchmark = _merge_benchmark_stats(benchmark, debug.pop('benchmark_timing', None))
+ 
+         costs_start = time.perf_counter() if benchmark_enabled else None
+-        cost_input = input if logical_pomo_size <= 1 else self._repeat_batch_for_pomo(input, logical_pomo_size)
++        # logical_pomo_size > 1 时，model_input 已经 repeat 过，避免重复构造大张量
++        cost_input = model_input
+         cost, mask = self.problem.get_costs(cost_input, pi)
+         if benchmark_enabled:
+             _record('model_get_costs', time.perf_counter() - costs_start)
+@@ -503,7 +504,7 @@ class AttentionModel(nn.Module):
+             if benchmark_enabled:
+                 _record('decode_get_log_p_total', time.perf_counter() - get_log_p_start)
+             select_start = time.perf_counter() if benchmark_enabled else None
+-            selected = self._select_node(log_p.exp()[:, 0, :], mask[:, 0, :])
++            selected = self._select_node(log_p[:, 0, :], mask[:, 0, :])
+             if benchmark_enabled:
+                 _record('decode_select_node', time.perf_counter() - select_start)
+             if return_debug:
+@@ -622,18 +623,18 @@ class AttentionModel(nn.Module):
+             batch_rep, iter_rep
+         )
+ 
+-    def _select_node(self, probs, mask):
+-        assert (probs == probs).all(), "Probs should not contain any nans"
++    def _select_node(self, log_p, mask):
++        assert (log_p == log_p).all(), "Log probs should not contain any nans"
+ 
+         if self.decode_type == "greedy":
+-            _, selected = probs.max(1)
++            _, selected = log_p.max(1)
+             assert not mask.gather(1, selected.unsqueeze(-1)).data.any(), "Decode greedy: infeasible action has maximum probability"
+ 
+         elif self.decode_type == "sampling":
+-            selected = probs.multinomial(1).squeeze(1)
++            selected = torch.distributions.Categorical(logits=log_p).sample()
+             while mask.gather(1, selected.unsqueeze(-1)).data.any():
+                 print('Sampled bad values, resampling!')
+-                selected = probs.multinomial(1).squeeze(1)
++                selected = torch.distributions.Categorical(logits=log_p).sample()
+ 
+         else:
+             assert False, "Unknown decode type"
+@@ -654,7 +655,7 @@ class AttentionModel(nn.Module):
+         return AttentionModelFixed(embeddings, fixed_context, *fixed_attention_node_data)
+ 
+     def _get_log_p_topk(self, fixed, state, k=None, normalize=True):
+-        log_p, _ = self._get_log_p(fixed, state, normalize=normalize)
++        log_p, _, _ = self._get_log_p(fixed, state, normalize=normalize)
+ 
+         if k is not None and k < log_p.size(-1):
+             return log_p.topk(k, -1)
+@@ -745,7 +746,7 @@ class AttentionModel(nn.Module):
+             step_debug['diag_reject_available_rate'] = (~mask[:, 0, -1]).float()
+ 
+         logits_start = time.perf_counter() if benchmark_stats is not None else None
+-        log_p, glimpse = self._one_to_many_logits(query, step_context, glimpse_K, glimpse_V, logit_K, mask)
++        log_p = self._one_to_many_logits(query, step_context, glimpse_K, glimpse_V, logit_K, mask)
+         urgency_bias = self._build_pickup_urgency_bias(
+             state,
+             mask,
+@@ -753,7 +754,9 @@ class AttentionModel(nn.Module):
+             dtype=log_p.dtype,
+         )
+         if urgency_bias is not None:
+-            log_p = log_p + urgency_bias
++            pickup_start = 1
++            pickup_end = 1 + state.n_orders
++            log_p[:, :, pickup_start:pickup_end] = log_p[:, :, pickup_start:pickup_end] + urgency_bias
+             if self.mask_logits:
+                 log_p = log_p.masked_fill(mask, -math.inf)
+         if benchmark_stats is not None:
+@@ -767,7 +770,14 @@ class AttentionModel(nn.Module):
+             benchmark_stats['seconds']['decode_log_softmax'] = benchmark_stats['seconds'].get('decode_log_softmax', 0.0) + (time.perf_counter() - normalize_start)
+             benchmark_stats['calls']['decode_log_softmax'] = benchmark_stats['calls'].get('decode_log_softmax', 0) + 1
+ 
+-        assert not torch.isnan(log_p).any()
++        invalid_value_rows = (~(torch.isfinite(log_p) | torch.isneginf(log_p))).any(dim=-1).squeeze(1)
++        if invalid_value_rows.any():
++            mask = mask.clone()
++            mask[invalid_value_rows, :, :] = True
++            mask[invalid_value_rows, :, 0] = False
++            log_p = log_p.clone()
++            log_p[invalid_value_rows, :, :] = -math.inf
++            log_p[invalid_value_rows, :, 0] = 0.0
+ 
+         return log_p, mask, step_debug
+ 
+@@ -882,10 +892,7 @@ class AttentionModel(nn.Module):
+         pickup_end = 1 + n_orders
+         pickup_mask = mask[:, :, pickup_start:pickup_end]
+         urgency = torch.where(pickup_mask, torch.zeros_like(urgency), urgency)
+-
+-        bias = torch.zeros(mask.size(), device=mask.device, dtype=dtype)
+-        bias[:, :, pickup_start:pickup_end] = float(self.decode_pickup_urgency_bias) * urgency.to(dtype)
+-        return bias
++        return float(self.decode_pickup_urgency_bias) * urgency.to(dtype)
+ 
+     def _one_to_many_logits(self, query, step_context, glimpse_K, glimpse_V, logit_K, mask):
+         batch_size, num_steps, embed_dim = query.size()
+@@ -902,11 +909,10 @@ class AttentionModel(nn.Module):
+             compatibility[node_mask[:, :, None, :][None, :, :, :, :].expand_as(compatibility)] = -math.inf
+ 
+         heads = torch.matmul(torch.softmax(compatibility, dim=-1), glimpse_V)
+-        glimpse = self.project_out(
++        final_Q = self.project_out(
+             heads.permute(1, 2, 3, 0, 4).contiguous().view(-1, num_steps, 1, self.n_heads * val_size)
+         )
+ 
+-        final_Q = glimpse
+         node_logits = torch.matmul(final_Q, logit_K.transpose(-2, -1)).squeeze(-2) / math.sqrt(final_Q.size(-1))
+         reject_logit = self.reject_proj(step_context)
+         logits = torch.cat((node_logits, reject_logit), dim=-1)
+@@ -916,7 +922,7 @@ class AttentionModel(nn.Module):
+         if self.mask_logits:
+             logits[mask] = -math.inf
+ 
+-        return logits, glimpse.squeeze(-2)
++        return logits
+ 
+     def _get_attention_node_data(self, fixed, state):
+         if self.is_vrp and self.allow_partial:
+diff --git a/outputs/normalization_profiles/normalization_n25.json b/outputs/normalization_profiles/normalization_n25.json
+index bfd40c0..2fadb1d 100644
+--- a/outputs/normalization_profiles/normalization_n25.json
++++ b/outputs/normalization_profiles/normalization_n25.json
+@@ -1,10 +1,10 @@
+ {
+   "graph_size": 25,
+-  "energy_cost_raw": 50.4685378074646,
+-  "passenger_delivery_delay_cost_raw": 377.09337759017944,
+-  "cargo_delay_cost_raw": 22.4868825674057,
++  "energy_cost_raw": 49.729427292943,
++  "passenger_delivery_delay_cost_raw": 233.19402625784278,
++  "cargo_delay_cost_raw": 84.39554656163091,
+   "vehicle_cost_norm": 100.0,
+-  "num_samples": 8,
++  "num_samples": 256,
+   "seed": 1234,
+   "num_vehicles": 5
+ }
+\ No newline at end of file
+diff --git a/run_training_optimized.py b/run_training_optimized.py
+index ee95ab1..be4da90 100644
+--- a/run_training_optimized.py
++++ b/run_training_optimized.py
+@@ -327,7 +327,10 @@ class POMOTrainerOptimized:
+         )
+ 
+     def _to_device(self, batch):
+-        return {key: value.to(self.device) if torch.is_tensor(value) else value for key, value in batch.items()}
++        return {
++            key: value.to(self.device, non_blocking=True) if torch.is_tensor(value) else value
++            for key, value in batch.items()
++        }
+ 
+     def _build_state_kwargs(self, allow_reject, benchmark_timing=False):
+         return {
+@@ -981,6 +984,9 @@ class POMOTrainerOptimized:
+             print(f"Baseline mode: {self.args.baseline_mode}")
+             print(f"Shared env: {self._build_state_kwargs(allow_reject=True)}")
+             print(f"Curriculum enabled: {self.args.enable_rideshare_curriculum}")
++            if self.args.n_epochs <= self.args.reject_warmup_epochs:
++                print("[Warning] n_epochs <= reject_warmup_epochs: 训练期间 reject 始终被屏蔽，")
++                print("          train/val 行为可能出现偏差（短训 smoke 建议显式设置 --reject-warmup-epochs 0）。")
+             print('=' * 70)
+ 
+         os.makedirs(self.args.save_dir, exist_ok=True)
+diff --git a/state_mcvrptw_v2.py b/state_mcvrptw_v2.py
+index 796e088..7b3f01f 100644
+--- a/state_mcvrptw_v2.py
++++ b/state_mcvrptw_v2.py
+@@ -28,6 +28,8 @@ class StateMCVRPPDTW(NamedTuple):
+     demand_cargo: torch.Tensor
+     time_windows: torch.Tensor
+     n_orders: int
++    pickup_to_delivery_time_static: torch.Tensor
++    delivery_to_delivery_time_static: torch.Tensor
+     ids: torch.Tensor
+     current_time: torch.Tensor
+     trip_start_time: torch.Tensor
+@@ -263,9 +265,9 @@ class StateMCVRPPDTW(NamedTuple):
+         delivery_earliest_batch = delivery_earliest.detach().cpu().numpy()
+         delivery_to_depot_batch = delivery_to_depot_time.detach().cpu().numpy()
+ 
+-        travel_time_scale = self.AREA_SIZE / self.VEHICLE_SPEED
+-        pickup_to_delivery_batch = (torch.cdist(pickup_coords, delivery_coords, p=2) * travel_time_scale).detach().cpu().numpy()
+-        delivery_to_delivery_batch = (torch.cdist(delivery_coords, delivery_coords, p=2) * travel_time_scale).detach().cpu().numpy()
++        ids_flat = self.ids.squeeze(-1)
++        pickup_to_delivery_batch = self.pickup_to_delivery_time_static[ids_flat].detach().cpu().numpy()
++        delivery_to_delivery_batch = self.delivery_to_delivery_time_static[ids_flat].detach().cpu().numpy()
+ 
+         latest_delivery_arrival_batch = [[None] * self.n_orders for _ in range(batch_size)]
+         if Config.HARD_PASSENGER_MAX_RIDE_TIME:
+@@ -348,6 +350,54 @@ class StateMCVRPPDTW(NamedTuple):
+             return False, None
+         return True, finish_time
+ 
++    def _has_feasible_open_completion_small_cached(self, start_time, trip_start_time, open_bits,
++                                                   scalar_cache, start_node, ignore_trip_time=False,
++                                                   benchmark_stats=None):
++        order_indices = tuple(self._iter_open_bits(open_bits))
++        open_count = len(order_indices)
++        if open_count > 3:
++            return None
++
++        if benchmark_stats is not None:
++            self._record_benchmark_count(benchmark_stats, 'pc_completion_small_calls')
++
++        if open_count == 0:
++            return True
++
++        def _run_sequence(sequence):
++            current_time = start_time
++            current_start_node = start_node
++            for order_idx in sequence:
++                feasible_step, finish_time = self._completion_step_feasible_from_cache(
++                    current_time,
++                    trip_start_time,
++                    order_idx,
++                    scalar_cache,
++                    current_start_node,
++                    ignore_trip_time=ignore_trip_time,
++                )
++                if not feasible_step:
++                    return False
++                current_time = finish_time
++                current_start_node = self._delivery_node_key(order_idx)
++            return True
++
++        if open_count == 1:
++            return _run_sequence(order_indices)
++        if open_count == 2:
++            a, b = order_indices
++            return _run_sequence((a, b)) or _run_sequence((b, a))
++
++        a, b, c = order_indices
++        return (
++            _run_sequence((a, b, c))
++            or _run_sequence((a, c, b))
++            or _run_sequence((b, a, c))
++            or _run_sequence((b, c, a))
++            or _run_sequence((c, a, b))
++            or _run_sequence((c, b, a))
++        )
++
+     def _has_feasible_open_completion_bool_dp(self, start_coord, start_time, trip_start_time, open_mask,
+                                               delivery_coords, delivery_earliest, delivery_to_depot_time,
+                                               passenger_orders, passenger_pickup_times, direct_ride_time,
+@@ -540,6 +590,47 @@ class StateMCVRPPDTW(NamedTuple):
+                 self._record_benchmark_count(benchmark_stats, 'pc_completion_pruned_open_over_6')
+             return _finalize((False, 'open_over_6') if return_reason else False)
+ 
++        if (not return_reason) and (not ignore_trip_time):
++            # Hot path in training: cache-key construction/lookup overhead is high and hit-rate is near zero.
++            # Go straight to deterministic feasibility checks.
++            small_cached_result = None
++            if scalar_cache is not None and start_node is not None:
++                small_cached_result = self._has_feasible_open_completion_small_cached(
++                    start_time,
++                    trip_start_time,
++                    open_bits,
++                    scalar_cache,
++                    start_node,
++                    ignore_trip_time=False,
++                    benchmark_stats=benchmark_stats,
++                )
++            if small_cached_result is not None:
++                if benchmark_stats is not None:
++                    self._record_benchmark_count(benchmark_stats, 'pc_completion_small_path_used')
++                return _finalize(small_cached_result)
++
++            dp_result = self._has_feasible_open_completion_bool_dp(
++                start_coord,
++                start_time,
++                trip_start_time,
++                None,
++                delivery_coords,
++                delivery_earliest,
++                delivery_to_depot_time,
++                passenger_orders,
++                passenger_pickup_times,
++                direct_ride_time,
++                ignore_trip_time=False,
++                memo=None,
++                open_bits=open_bits,
++                start_node=start_node,
++                benchmark_stats=benchmark_stats,
++                scalar_cache=scalar_cache,
++            )
++            if benchmark_stats is not None:
++                self._record_benchmark_count(benchmark_stats, 'pc_completion_dp_path_used')
++            return _finalize(dp_result)
++
+         completion_memo_name = 'completion' if return_reason else 'completion_bool'
+         completion_memo = self._memo_bucket(memo, completion_memo_name)
+         exact_completion_memo = None if return_reason or memo is None else memo.get('completion')
+@@ -565,32 +656,6 @@ class StateMCVRPPDTW(NamedTuple):
+                 return _finalize(cached if return_reason else cached[0])
+             self._record_benchmark_count(benchmark_stats, 'pc_completion_memo_misses')
+ 
+-        if (not return_reason) and (not ignore_trip_time):
+-            dp_result = self._has_feasible_open_completion_bool_dp(
+-                start_coord,
+-                start_time,
+-                trip_start_time,
+-                None,
+-                delivery_coords,
+-                delivery_earliest,
+-                delivery_to_depot_time,
+-                passenger_orders,
+-                passenger_pickup_times,
+-                direct_ride_time,
+-                ignore_trip_time=False,
+-                memo=memo,
+-                open_bits=open_bits,
+-                start_node=start_node,
+-                benchmark_stats=benchmark_stats,
+-                scalar_cache=scalar_cache,
+-            )
+-            if completion_memo is not None and cache_key is not None:
+-                completion_memo[cache_key] = (dp_result, None)
+-                self._record_benchmark_count(benchmark_stats, 'pc_completion_memo_stores')
+-            if benchmark_stats is not None:
+-                self._record_benchmark_count(benchmark_stats, 'pc_completion_dp_path_used')
+-            return _finalize(dp_result)
+-
+         if open_bits & (open_bits - 1) == 0:
+             if benchmark_stats is not None:
+                 self._record_benchmark_count(benchmark_stats, 'pc_completion_single_open_cases')
+@@ -1348,6 +1413,16 @@ class StateMCVRPPDTW(NamedTuple):
+ 
+         visited_shape = (batch_size, 1, 2 * n_orders + 2)
+ 
++        if n_orders > 0:
++            travel_time_scale = StateMCVRPPDTW.AREA_SIZE / StateMCVRPPDTW.VEHICLE_SPEED
++            pickup_coords = coords[:, 1:n_orders + 1, :]
++            delivery_coords = coords[:, n_orders + 1:2 * n_orders + 1, :]
++            pickup_to_delivery_time_static = torch.cdist(pickup_coords, delivery_coords, p=2) * travel_time_scale
++            delivery_to_delivery_time_static = torch.cdist(delivery_coords, delivery_coords, p=2) * travel_time_scale
++        else:
++            pickup_to_delivery_time_static = torch.zeros(batch_size, 0, 0, device=device)
++            delivery_to_delivery_time_static = torch.zeros(batch_size, 0, 0, device=device)
++
+         return StateMCVRPPDTW(
+             coords=coords,
+             node_type=type_with_depot,
+@@ -1355,6 +1430,8 @@ class StateMCVRPPDTW(NamedTuple):
+             demand_cargo=demand_c_with_depot,
+             time_windows=tw_with_depot,
+             n_orders=n_orders,
++            pickup_to_delivery_time_static=pickup_to_delivery_time_static,
++            delivery_to_delivery_time_static=delivery_to_delivery_time_static,
+             ids=torch.arange(batch_size, dtype=torch.int64, device=device)[:, None],
+             current_time=torch.full((batch_size, 1), StateMCVRPPDTW.OPERATION_START, device=device),
+             trip_start_time=torch.full((batch_size, 1), StateMCVRPPDTW.OPERATION_START, device=device),
+@@ -1520,10 +1597,14 @@ class StateMCVRPPDTW(NamedTuple):
+                 direct_ride_time,
+                 allow_fallback=next_state.enable_viability_fallback,
+             )
+-            legal_set = set(legal_orders)
+-            for order_idx in physical_orders:
+-                if order_idx not in legal_set:
+-                    delivery_viability_mask[order_idx] = True
++            legal_bitmap = torch.zeros(n_orders, dtype=torch.bool, device=device)
++            if len(legal_orders) > 0:
++                legal_bitmap[torch.as_tensor(legal_orders, dtype=torch.long, device=device)] = True
++            if len(physical_orders) > 0:
++                physical_tensor = torch.as_tensor(physical_orders, dtype=torch.long, device=device)
++                blocked = ~legal_bitmap[physical_tensor]
++                if blocked.any():
++                    delivery_viability_mask[physical_tensor[blocked]] = True
+ 
+         vehicle_limit_mask = torch.zeros(n_orders, dtype=torch.bool, device=device)
+         if Config.HARD_VEHICLE_LIMIT:
+@@ -1637,12 +1718,11 @@ class StateMCVRPPDTW(NamedTuple):
+         phase_start = time.perf_counter() if benchmark_stats is not None else None
+         pickup_not_done = (self.picked_up_ == 0).squeeze(1).bool()
+         rejected = self.rejected_.squeeze(1).bool()
+-        precedence_mask = torch.zeros_like(service_mask)
++        if return_debug:
++            before_mask = service_mask.clone()
+         if n_orders > 0:
+-            precedence_mask[:, :n_orders] = rejected
+-            precedence_mask[:, n_orders:] = pickup_not_done | rejected
+-        before_mask = service_mask.clone()
+-        service_mask |= precedence_mask
++            service_mask[:, :n_orders] |= rejected
++            service_mask[:, n_orders:] |= (pickup_not_done | rejected)
+         if return_debug:
+             debug['diag_mask_precedence'] = (service_mask & ~before_mask).sum(1).float()
+         _record('mask_precedence', phase_start)
+@@ -1655,13 +1735,15 @@ class StateMCVRPPDTW(NamedTuple):
+         demand_c_real = demand_c_full[:, 1:2 * n_orders + 1]
+ 
+         cap_mask_p = (node_type_real == 1) & (demand_p_real > remaining_cap_p + 1e-5)
+-        before_mask = service_mask.clone()
++        if return_debug:
++            before_mask = service_mask.clone()
+         service_mask |= cap_mask_p
+         if return_debug:
+             debug['diag_mask_cap_passenger'] = (service_mask & ~before_mask).sum(1).float()
+ 
+         cap_mask_c = (node_type_real == 0) & (demand_c_real > remaining_cap_c + 1e-5)
+-        before_mask = service_mask.clone()
++        if return_debug:
++            before_mask = service_mask.clone()
+         service_mask |= cap_mask_c
+         if return_debug:
+             debug['diag_mask_cap_cargo'] = (service_mask & ~before_mask).sum(1).float()
+@@ -1688,7 +1770,8 @@ class StateMCVRPPDTW(NamedTuple):
+             pickup_tw_slack_hours = tw_end[:, 1:n_orders + 1] - arrival_time[:, 1:n_orders + 1]
+         if return_urgency_slack and pickup_tw_slack_hours is None:
+             pickup_tw_slack_hours = torch.zeros(batch_size, n_orders, device=device, dtype=arrival_time.dtype)
+-        before_mask = service_mask.clone()
++        if return_debug:
++            before_mask = service_mask.clone()
+         service_mask |= pickup_hard_mask_full[:, 1:2 * n_orders + 1]
+         if return_debug:
+             debug['diag_mask_pickup_tw'] = (service_mask & ~before_mask).sum(1).float()
+@@ -1712,12 +1795,9 @@ class StateMCVRPPDTW(NamedTuple):
+             pickup_finish_time = self.passenger_pickup_time.squeeze(1)
+             valid_pickup_time = pickup_finish_time >= 0
+             ride_time_hours = delivery_arrival - pickup_finish_time
+-            direct_distance = torch.norm(
+-                coords_active[:, 1:n_orders + 1, :] - coords_active[:, n_orders + 1:2 * n_orders + 1, :],
+-                dim=-1
+-            ) * self.AREA_SIZE
+-            direct_ride_time_hours = direct_distance / self.VEHICLE_SPEED
+-            excess_ride_time_hours = torch.clamp(ride_time_hours - direct_ride_time_hours, min=0.0)
++            pickup_to_delivery_time = self.pickup_to_delivery_time_static[ids_flat]
++            direct_ride_time = pickup_to_delivery_time[:, order_indices, order_indices]
++            excess_ride_time_hours = torch.clamp(ride_time_hours - direct_ride_time, min=0.0)
+             passenger_total_ride_time_limit = Config.PASSENGER_MAX_RIDE_TIME_MINUTES / 60.0
+             passenger_excess_ride_time_limit = Config.PASSENGER_MAX_EXCESS_RIDE_TIME_MINUTES / 60.0
+             ride_time_violation = (
+@@ -1729,18 +1809,20 @@ class StateMCVRPPDTW(NamedTuple):
+                     | (excess_ride_time_hours > passenger_excess_ride_time_limit + 1e-5)
+                 )
+             )
+-            ride_time_mask_full = torch.zeros(batch_size, coords_active.size(1), dtype=torch.bool, device=device)
+-            ride_time_mask_full.scatter_(1, delivery_indices.unsqueeze(0).expand(batch_size, -1), ride_time_violation)
++            if return_debug:
++                before_delivery = service_mask[:, n_orders:2 * n_orders].clone()
++            service_mask[:, n_orders:2 * n_orders] |= ride_time_violation
++            if return_debug:
++                debug['diag_mask_ride_time'] = (service_mask[:, n_orders:2 * n_orders] & ~before_delivery).sum(1).float()
+         else:
+-            ride_time_mask_full = torch.zeros(batch_size, coords_active.size(1), dtype=torch.bool, device=device)
+-        before_mask = service_mask.clone()
+-        service_mask |= ride_time_mask_full[:, 1:2 * n_orders + 1]
+-        if return_debug:
+-            debug['diag_mask_ride_time'] = (service_mask & ~before_mask).sum(1).float()
++            direct_ride_time = torch.zeros(batch_size, 0, device=device)
++            passenger_orders = node_type_active[:, 1:1]
++            delivery_indices = torch.zeros(0, dtype=torch.long, device=device)
++            if return_debug:
++                debug['diag_mask_ride_time'] = torch.zeros(batch_size, device=device)
+         _record('mask_ride_time', phase_start)
+ 
+         phase_start = time.perf_counter() if benchmark_stats is not None else None
+-        trip_mask_full = torch.zeros(batch_size, coords_active.size(1), dtype=torch.bool, device=device)
+         if Config.HARD_MAX_TRIP_TIME:
+             depot_coord = coords_active[:, 0:1, :]
+             dist_back = (coords_active - depot_coord).norm(p=2, dim=-1) * self.AREA_SIZE
+@@ -1748,27 +1830,31 @@ class StateMCVRPPDTW(NamedTuple):
+             ongoing_trip_total = (arrival_time + self.SERVICE_TIME + time_back) - self.trip_start_time
+             fresh_trip_total = travel_time + self.SERVICE_TIME + time_back
+             predicted_total = torch.where(self.prev_a == 0, fresh_trip_total, ongoing_trip_total)
+-            trip_mask_full = predicted_total > self.MAX_TRIP_TIME + 1e-5
+-            trip_mask_full[:, 0] = False
+-        before_mask = service_mask.clone()
+-        service_mask |= trip_mask_full[:, 1:2 * n_orders + 1]
+-        if return_debug:
+-            debug['diag_mask_trip_time'] = (service_mask & ~before_mask).sum(1).float()
++            trip_block = predicted_total[:, 1:2 * n_orders + 1] > self.MAX_TRIP_TIME + 1e-5
++            if return_debug:
++                before_service = service_mask.clone()
++            service_mask |= trip_block
++            if return_debug:
++                debug['diag_mask_trip_time'] = (service_mask & ~before_service).sum(1).float()
++        elif return_debug:
++            debug['diag_mask_trip_time'] = torch.zeros(batch_size, device=device)
+         _record('mask_trip_time', phase_start)
+ 
+         phase_start = time.perf_counter() if benchmark_stats is not None else None
+-        ops_end_mask_full = torch.zeros(batch_size, coords_active.size(1), dtype=torch.bool, device=device)
+         if Config.HARD_OPERATION_END:
+-            depot_coord_v6 = coords_active[:, 0:1, :]
+-            dist_back_v6 = (coords_active - depot_coord_v6).norm(p=2, dim=-1) * self.AREA_SIZE
+-            time_back_v6 = dist_back_v6 / self.VEHICLE_SPEED
+-            predicted_finish = arrival_time + self.SERVICE_TIME + time_back_v6
+-            ops_end_mask_full = predicted_finish > self.OPERATION_END + 1e-5
+-            ops_end_mask_full[:, 0] = False
+-        before_mask = service_mask.clone()
+-        service_mask |= ops_end_mask_full[:, 1:2 * n_orders + 1]
+-        if return_debug:
+-            debug['diag_mask_ops_end'] = (service_mask & ~before_mask).sum(1).float()
++            if not Config.HARD_MAX_TRIP_TIME:
++                depot_coord = coords_active[:, 0:1, :]
++                dist_back = (coords_active - depot_coord).norm(p=2, dim=-1) * self.AREA_SIZE
++                time_back = dist_back / self.VEHICLE_SPEED
++            predicted_finish = arrival_time + self.SERVICE_TIME + time_back
++            ops_block = predicted_finish[:, 1:2 * n_orders + 1] > self.OPERATION_END + 1e-5
++            if return_debug:
++                before_service = service_mask.clone()
++            service_mask |= ops_block
++            if return_debug:
++                debug['diag_mask_ops_end'] = (service_mask & ~before_service).sum(1).float()
++        elif return_debug:
++            debug['diag_mask_ops_end'] = torch.zeros(batch_size, device=device)
+         _record('mask_ops_end', phase_start)
+ 
+         phase_start = time.perf_counter() if benchmark_stats is not None else None
+@@ -1787,22 +1873,24 @@ class StateMCVRPPDTW(NamedTuple):
+             )
+             trip_start_after_pickup = torch.where(self.prev_a == 0, self.current_time, self.trip_start_time).squeeze(1)
+             passenger_pickup_times_before = self.passenger_pickup_time.squeeze(1)
+-            direct_ride_time = direct_distance / self.VEHICLE_SPEED
+             current_time_flat = self.current_time.squeeze(1)
+             trip_start_time_flat = self.trip_start_time.squeeze(1)
+             prev_a_flat = self.prev_a.squeeze(1)
+             cur_coord_flat = self.cur_coord.squeeze(1)
+             open_mask_full = open_started_mask
+             shared_search_memo = {}
+-            batch_scalar_caches = self._build_completion_scalar_caches(
+-                pickup_coords,
+-                delivery_coords,
+-                passenger_orders,
+-                passenger_pickup_times_before,
+-                direct_ride_time,
+-                delivery_earliest,
+-                delivery_to_depot_time,
+-            )
++            batch_scalar_caches = None
++            requires_scalar_cache = (not skip_pickup_commitment) or self.enable_delivery_viability
++            if requires_scalar_cache:
++                batch_scalar_caches = self._build_completion_scalar_caches(
++                    pickup_coords,
++                    delivery_coords,
++                    passenger_orders,
++                    passenger_pickup_times_before,
++                    direct_ride_time,
++                    delivery_earliest,
++                    delivery_to_depot_time,
++                )
+             requires_post_pickup_delivery_check = self.relax_pickup_commitment_trip_time
+ 
+         if n_orders > 0 and (not skip_pickup_commitment):
+@@ -1841,10 +1929,84 @@ class StateMCVRPPDTW(NamedTuple):
+                     passenger_total_limit = Config.PASSENGER_MAX_RIDE_TIME_MINUTES / 60.0 if Config.HARD_PASSENGER_MAX_RIDE_TIME else None
+                     passenger_excess_limit = Config.PASSENGER_MAX_EXCESS_RIDE_TIME_MINUTES / 60.0 if Config.HARD_PASSENGER_MAX_RIDE_TIME else None
+ 
++                    candidate_tensor = candidate_indices
++                    candidate_pickup_finish = batch_pickup_finish[candidate_tensor]
++                    candidate_direct_ride_time = batch_direct_ride_time[candidate_tensor]
++                    candidate_arrival = candidate_pickup_finish + candidate_direct_ride_time
++                    candidate_service_start = torch.maximum(
++                        candidate_arrival,
++                        batch_delivery_earliest[candidate_tensor],
++                    )
++                    candidate_finish_with_return = (
++                        candidate_service_start + self.SERVICE_TIME + batch_delivery_to_depot_time[candidate_tensor]
++                    )
++
++                    blocked_by_ride = torch.zeros_like(candidate_pickup_finish, dtype=torch.bool)
++                    blocked_by_trip = torch.zeros_like(candidate_pickup_finish, dtype=torch.bool)
++                    blocked_by_ops = torch.zeros_like(candidate_pickup_finish, dtype=torch.bool)
++
++                    if Config.HARD_PASSENGER_MAX_RIDE_TIME:
++                        passenger_candidate = batch_passenger_orders[candidate_tensor]
++                        latest_arrival = candidate_pickup_finish + torch.minimum(
++                            torch.full_like(candidate_direct_ride_time, passenger_total_limit),
++                            candidate_direct_ride_time + passenger_excess_limit,
++                        )
++                        blocked_by_ride = passenger_candidate & (candidate_arrival > latest_arrival + 1e-5)
++
++                    if Config.HARD_MAX_TRIP_TIME:
++                        blocked_by_trip = (
++                            candidate_finish_with_return - batch_trip_start_after_pickup
++                        ) > self.MAX_TRIP_TIME + 1e-5
++
++                    if Config.HARD_OPERATION_END:
++                        blocked_by_ops = candidate_finish_with_return > self.OPERATION_END + 1e-5
++
++                    # 必要条件：pickup 后直接送达自身 delivery 都不可行，则任何更长路径也不可行。
++                    candidate_necessary_block = blocked_by_ride | blocked_by_trip | blocked_by_ops
++                    candidate_block_ride_full = torch.zeros(n_orders, dtype=torch.bool, device=device)
++                    candidate_block_trip_full = torch.zeros(n_orders, dtype=torch.bool, device=device)
++                    candidate_block_ops_full = torch.zeros(n_orders, dtype=torch.bool, device=device)
++                    candidate_necessary_block_full = torch.zeros(n_orders, dtype=torch.bool, device=device)
++                    candidate_block_ride_full[candidate_tensor] = blocked_by_ride
++                    candidate_block_trip_full[candidate_tensor] = blocked_by_trip
++                    candidate_block_ops_full[candidate_tensor] = blocked_by_ops
++                    candidate_necessary_block_full[candidate_tensor] = candidate_necessary_block
++
+                     if return_debug:
+                         batch_state = self[batch_idx:batch_idx + 1]
+                         batch_mask = batch_state.get_mask(skip_pickup_commitment=True)
+ 
++                    if batch_open_count == 0 and (not requires_post_pickup_delivery_check):
++                        # Fast path (语义等价): 没有 open 订单时，pickup commitment 退化为“该订单单独闭环是否可行”。
++                        blocked_candidates = candidate_necessary_block
++                        pickup_commitment_mask[batch_idx, candidate_tensor] = blocked_candidates
++
++                        blocked_count = int(blocked_candidates.sum().item())
++                        second_pickup_blocked += blocked_count
++                        second_pickup_feasible += len(candidate_index_list) - blocked_count
++
++                        if return_debug and blocked_count > 0:
++                            debug['diag_pickup_commitment_block_by_completion'][batch_idx] += float(blocked_count)
++                            blocked_remaining = blocked_candidates
++                            ride_count = int((blocked_remaining & blocked_by_ride).sum().item())
++                            blocked_remaining = blocked_remaining & (~blocked_by_ride)
++                            trip_count = int((blocked_remaining & blocked_by_trip).sum().item())
++                            blocked_remaining = blocked_remaining & (~blocked_by_trip)
++                            ops_count = int((blocked_remaining & blocked_by_ops).sum().item())
++                            other_count = int((blocked_remaining & (~blocked_by_ops)).sum().item())
++
++                            if ride_count > 0:
++                                debug['diag_pickup_commitment_block_by_completion_ride_time'][batch_idx] += float(ride_count)
++                            if trip_count > 0:
++                                debug['diag_pickup_commitment_block_by_completion_trip_time'][batch_idx] += float(trip_count)
++                            if ops_count > 0:
++                                debug['diag_pickup_commitment_block_by_completion_ops_end'][batch_idx] += float(ops_count)
++                            if other_count > 0:
++                                debug['diag_pickup_commitment_block_by_completion_other'][batch_idx] += float(other_count)
++                        continue
++
++                    trip_start_after_pickup_value = float(batch_trip_start_after_pickup.item())
++
+                     for candidate_idx in candidate_index_list:
+                         if batch_over_k:
+                             pickup_commitment_mask[batch_idx, candidate_idx] = True
+@@ -1853,6 +2015,21 @@ class StateMCVRPPDTW(NamedTuple):
+                                 debug['diag_pickup_commitment_block_by_k'][batch_idx] += 1.0
+                             continue
+ 
++                        if bool(candidate_necessary_block_full[candidate_idx].item()):
++                            pickup_commitment_mask[batch_idx, candidate_idx] = True
++                            second_pickup_blocked += 1
++                            if return_debug:
++                                debug['diag_pickup_commitment_block_by_completion'][batch_idx] += 1.0
++                                if bool(candidate_block_ride_full[candidate_idx].item()):
++                                    debug['diag_pickup_commitment_block_by_completion_ride_time'][batch_idx] += 1.0
++                                elif bool(candidate_block_trip_full[candidate_idx].item()):
++                                    debug['diag_pickup_commitment_block_by_completion_trip_time'][batch_idx] += 1.0
++                                elif bool(candidate_block_ops_full[candidate_idx].item()):
++                                    debug['diag_pickup_commitment_block_by_completion_ops_end'][batch_idx] += 1.0
++                                else:
++                                    debug['diag_pickup_commitment_block_by_completion_other'][batch_idx] += 1.0
++                            continue
++
+                         open_after_bits = batch_open_bits | (1 << candidate_idx)
+                         candidate_is_passenger = batch_scalar_cache['passenger_orders'][candidate_idx]
+                         passenger_pickup_times_after = batch_passenger_pickup_times_before
+@@ -1861,8 +2038,8 @@ class StateMCVRPPDTW(NamedTuple):
+ 
+                         restore_pickup_time = None
+                         restore_latest_arrival = None
++                        candidate_pickup_finish = float(batch_pickup_finish[candidate_idx].item())
+                         if candidate_is_passenger:
+-                            candidate_pickup_finish = float(batch_pickup_finish[candidate_idx].item())
+                             pickup_times_cache = batch_scalar_cache['pickup_times']
+                             latest_arrival_cache = batch_scalar_cache['latest_delivery_arrival']
+                             restore_pickup_time = pickup_times_cache[candidate_idx]
+@@ -1877,45 +2054,78 @@ class StateMCVRPPDTW(NamedTuple):
+                                 latest_arrival_cache[candidate_idx] = None
+ 
+                         try:
+-                            completion_feasible, completion_block_reason = self._has_feasible_open_completion(
+-                                batch_pickup_coords[candidate_idx],
+-                                batch_pickup_finish[candidate_idx],
+-                                batch_trip_start_after_pickup,
+-                                None,
+-                                batch_delivery_coords,
+-                                batch_delivery_earliest,
+-                                batch_delivery_to_depot_time,
+-                                batch_passenger_orders,
+-                                passenger_pickup_times_after,
+-                                batch_direct_ride_time,
+-                                return_reason=return_debug,
+-                                ignore_trip_time=self.relax_pickup_commitment_trip_time,
+-                                memo=batch_completion_memo,
+-                                open_bits=open_after_bits,
+-                                start_node=start_node_key,
+-                                benchmark_stats=benchmark_stats,
+-                                scalar_cache=candidate_scalar_cache,
+-                            ) if return_debug else (
+-                                self._has_feasible_open_completion(
+-                                    batch_pickup_coords[candidate_idx],
+-                                    batch_pickup_finish[candidate_idx],
+-                                    batch_trip_start_after_pickup,
+-                                    None,
+-                                    batch_delivery_coords,
+-                                    batch_delivery_earliest,
+-                                    batch_delivery_to_depot_time,
+-                                    batch_passenger_orders,
+-                                    passenger_pickup_times_after,
+-                                    batch_direct_ride_time,
+-                                    ignore_trip_time=self.relax_pickup_commitment_trip_time,
+-                                    memo=batch_completion_memo,
+-                                    open_bits=open_after_bits,
+-                                    start_node=start_node_key,
+-                                    benchmark_stats=benchmark_stats,
+-                                    scalar_cache=candidate_scalar_cache,
+-                                    ),
+-                                None,
+-                            )
++                            # Necessary-condition prune: 若某 open 订单从当前起点“直达 delivery”已违反硬约束，
++                            # 则任何包含额外停靠的路径都不可能可行（到达时间只会更晚）。
++                            necessary_blocked = False
++                            completion_block_reason = None
++                            travel_to_delivery = batch_scalar_cache['travel_time_to_delivery_by_start_node'][start_node_key]
++                            delivery_earliest_cache = batch_scalar_cache['delivery_earliest']
++                            delivery_to_depot_cache = batch_scalar_cache['delivery_to_depot_time']
++                            latest_arrival_cache = batch_scalar_cache['latest_delivery_arrival']
++                            for open_order_idx in self._iter_open_bits(open_after_bits):
++                                arrival_lb = candidate_pickup_finish + float(travel_to_delivery[open_order_idx])
++                                latest_arrival = latest_arrival_cache[open_order_idx]
++                                if latest_arrival is not None and arrival_lb > latest_arrival + 1e-5:
++                                    necessary_blocked = True
++                                    completion_block_reason = 'ride_time'
++                                    break
++
++                                service_start_lb = max(arrival_lb, float(delivery_earliest_cache[open_order_idx]))
++                                finish_with_return_lb = service_start_lb + self.SERVICE_TIME + float(delivery_to_depot_cache[open_order_idx])
++                                if (not self.relax_pickup_commitment_trip_time) and Config.HARD_MAX_TRIP_TIME and (
++                                    finish_with_return_lb - trip_start_after_pickup_value > self.MAX_TRIP_TIME + 1e-5
++                                ):
++                                    necessary_blocked = True
++                                    completion_block_reason = 'trip_time'
++                                    break
++                                if Config.HARD_OPERATION_END and (finish_with_return_lb > self.OPERATION_END + 1e-5):
++                                    necessary_blocked = True
++                                    completion_block_reason = 'ops_end'
++                                    break
++
++                            if necessary_blocked:
++                                completion_feasible = False
++                            else:
++                                if return_debug:
++                                    completion_feasible, completion_block_reason = self._has_feasible_open_completion(
++                                        batch_pickup_coords[candidate_idx],
++                                        batch_pickup_finish[candidate_idx],
++                                        batch_trip_start_after_pickup,
++                                        None,
++                                        batch_delivery_coords,
++                                        batch_delivery_earliest,
++                                        batch_delivery_to_depot_time,
++                                        batch_passenger_orders,
++                                        passenger_pickup_times_after,
++                                        batch_direct_ride_time,
++                                        return_reason=True,
++                                        ignore_trip_time=self.relax_pickup_commitment_trip_time,
++                                        memo=batch_completion_memo,
++                                        open_bits=open_after_bits,
++                                        start_node=start_node_key,
++                                        benchmark_stats=benchmark_stats,
++                                        scalar_cache=candidate_scalar_cache,
++                                    )
++                                else:
++                                    completion_feasible = self._has_feasible_open_completion(
++                                        batch_pickup_coords[candidate_idx],
++                                        batch_pickup_finish[candidate_idx],
++                                        batch_trip_start_after_pickup,
++                                        None,
++                                        batch_delivery_coords,
++                                        batch_delivery_earliest,
++                                        batch_delivery_to_depot_time,
++                                        batch_passenger_orders,
++                                        passenger_pickup_times_after,
++                                        batch_direct_ride_time,
++                                        ignore_trip_time=self.relax_pickup_commitment_trip_time,
++                                        memo=batch_completion_memo,
++                                        open_bits=open_after_bits,
++                                        start_node=start_node_key,
++                                        benchmark_stats=benchmark_stats,
++                                        scalar_cache=candidate_scalar_cache,
++                                    )
++                                    completion_block_reason = None
+ 
+                             next_state_feasible = True
+                             fallback_safe = True
+@@ -1992,11 +2202,10 @@ class StateMCVRPPDTW(NamedTuple):
+                     debug['diag_second_pickup_feasible'][batch_idx] = float(second_pickup_feasible)
+                     debug['diag_second_pickup_blocked_by_commitment'][batch_idx] = float(second_pickup_blocked)
+ 
+-        commitment_mask_full = torch.zeros(batch_size, coords_active.size(1), dtype=torch.bool, device=device)
++        if return_debug:
++            before_mask = service_mask.clone()
+         if n_orders > 0:
+-            commitment_mask_full[:, 1:n_orders + 1] = pickup_commitment_mask
+-        before_mask = service_mask.clone()
+-        service_mask |= commitment_mask_full[:, 1:2 * n_orders + 1]
++            service_mask[:, :n_orders] |= pickup_commitment_mask
+         if return_debug:
+             debug['diag_mask_pickup_commitment'] = (service_mask & ~before_mask).sum(1).float()
+         _record('mask_pickup_commitment', phase_start)
+@@ -2025,16 +2234,19 @@ class StateMCVRPPDTW(NamedTuple):
+                 )
+                 if len(physical_orders) == 0:
+                     continue
+-                legal_set = set(legal_orders)
+-                for order_idx in physical_orders:
+-                    if order_idx not in legal_set:
+-                        delivery_viability_mask[batch_idx, order_idx] = True
++                legal_bitmap = torch.zeros(n_orders, dtype=torch.bool, device=device)
++                if len(legal_orders) > 0:
++                    legal_bitmap[torch.as_tensor(legal_orders, dtype=torch.long, device=device)] = True
++                if len(physical_orders) > 0:
++                    physical_tensor = torch.as_tensor(physical_orders, dtype=torch.long, device=device)
++                    blocked = ~legal_bitmap[physical_tensor]
++                    if blocked.any():
++                        delivery_viability_mask[batch_idx, physical_tensor[blocked]] = True
+                 if used_fallback and return_debug:
+                     debug['diag_delivery_viability_fallback'][batch_idx] = 1.0
+-            delivery_viability_mask_full = torch.zeros(batch_size, coords_active.size(1), dtype=torch.bool, device=device)
+-            delivery_viability_mask_full[:, n_orders + 1:2 * n_orders + 1] = delivery_viability_mask
+-            before_viability = service_mask.clone()
+-            service_mask |= delivery_viability_mask_full[:, 1:2 * n_orders + 1]
++            if return_debug:
++                before_viability = service_mask.clone()
++            service_mask[:, n_orders:2 * n_orders] |= delivery_viability_mask
+             if return_debug:
+                 debug['diag_delivery_viability_masked'] = (service_mask & ~before_viability).sum(1).float()
+         _record('mask_delivery_viability', phase_start)

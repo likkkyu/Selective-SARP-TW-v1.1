@@ -1,0 +1,74 @@
+{
+  "record_type": "ga_n200_run_record",
+  "record_version": "v1",
+  "record_date": "2026-08-15",
+  "git": {
+    "branch": "reject-split-doc-sync",
+    "head": "d241eaf0dc9771e9cfe6704f0cfb9a1ac175c471"
+  },
+  "ga_run": {
+    "result_file": "outputs_cmp/ga_results_200_aligned_strict_100_fast.json",
+    "log_file": "logs/ga_n200_aligned_strict100_fast.log",
+    "config": {
+      "graph_size": 200,
+      "num_samples": 100,
+      "seed": 99999,
+      "population_size": 24,
+      "generations": 40,
+      "mutation_rate": 0.2,
+      "elite_size": 4,
+      "eval_protocol": "drl_aligned_v1",
+      "semantic_mode": "drl_aligned",
+      "hard_constraint_mode": "strict",
+      "strict_infeasible_cost": 1000000000000,
+      "max_concurrent_open_orders": 6,
+      "min_orders_per_dispatch": 4,
+      "enable_delivery_viability": true
+    },
+    "aggregate": {
+      "num_instances": 100,
+      "service_rate": 0.6173,
+      "rejected_rate": 0.38270000000000004,
+      "unfulfilled_rate": 0.0,
+      "avg_raw_total_cost": 44680.8564453125,
+      "avg_objective_cost": 44013.02208984375,
+      "avg_used_vehicles": 21.9,
+      "avg_cargo_delay": 36.71840264201164,
+      "avg_passenger_delivery_delay_minutes": 0.0,
+      "avg_trip_overtime_penalty": 0.0,
+      "hard_feasible_rate": 1.0,
+      "business_clean_rate": 1.0,
+      "semantic_modes": [
+        "drl_aligned"
+      ],
+      "protocol_versions": [
+        "drl_aligned_v1"
+      ]
+    }
+  },
+  "drl_reference": {
+    "source": "outputs_cmp/n200_eval2000_multiseed_20260727_120637/eval2000_seed*.json",
+    "seeds_count": 4,
+    "aggregate_mean": {
+      "service_rate": 0.857080625,
+      "rejected_rate": 0.115786875,
+      "unfulfilled_rate": 0.0271325,
+      "raw_total_cost": 18511.70352609253,
+      "used_vehicles": 27.4975,
+      "cargo_delay_cost": 212.40209431973284,
+      "passenger_delivery_delay_cost": 0.0,
+      "trip_overtime_penalty": 104.4633863697052
+    }
+  },
+  "ga_vs_drl_delta": {
+    "service_rate": -0.23978062500000008,
+    "rejected_rate": 0.26691312500000003,
+    "raw_total_cost": 26169.15291921997,
+    "raw_total_cost_pct": 141.365449605079,
+    "used_vehicles": -5.5975
+  },
+  "notes": [
+    "GA N200 fast run completed; this record is for reproducible paper tracking.",
+    "Interpretation: GA lowers vehicles but with sharply higher reject rate and much higher raw total cost than DRL multiseed baseline."
+  ]
+}

@@ -1,0 +1,103 @@
+[START] Fri Jul 24 12:51:42 CST 2026
+[GA] instance=0 objective=4084.48 raw=3884.48 CNY vehicles=5
+[GA] instance=1 objective=6325.42 raw=6125.42 CNY vehicles=5
+[GA] instance=2 objective=2586.15 raw=2386.15 CNY vehicles=5
+[GA] instance=3 objective=7072.68 raw=6872.68 CNY vehicles=5
+[GA] instance=4 objective=7078.29 raw=6878.29 CNY vehicles=5
+[GA] instance=5 objective=4831.82 raw=4631.82 CNY vehicles=5
+[GA] instance=6 objective=5579.49 raw=5379.49 CNY vehicles=5
+[GA] instance=7 objective=1837.68 raw=1637.68 CNY vehicles=5
+[GA] instance=8 objective=7075.67 raw=6875.67 CNY vehicles=5
+[GA] instance=9 objective=5576.36 raw=5376.36 CNY vehicles=5
+[GA] instance=10 objective=7076.47 raw=6876.47 CNY vehicles=5
+[GA] instance=11 objective=2584.40 raw=2384.40 CNY vehicles=5
+[GA] instance=12 objective=6325.65 raw=6125.65 CNY vehicles=5
+[GA] instance=13 objective=6331.05 raw=6131.05 CNY vehicles=5
+[GA] instance=14 objective=6329.80 raw=6129.80 CNY vehicles=5
+[GA] instance=15 objective=3333.10 raw=3133.10 CNY vehicles=5
+[GA] instance=16 objective=4079.66 raw=3879.66 CNY vehicles=5
+[GA] instance=17 objective=4832.23 raw=4632.23 CNY vehicles=5
+[GA] instance=18 objective=2585.60 raw=2385.60 CNY vehicles=5
+[GA] instance=19 objective=3330.94 raw=3130.94 CNY vehicles=5
+[GA] instance=20 objective=4830.23 raw=4630.23 CNY vehicles=5
+[GA] instance=21 objective=4825.25 raw=4625.25 CNY vehicles=5
+[GA] instance=22 objective=5580.56 raw=5380.56 CNY vehicles=5
+[GA] instance=23 objective=4828.17 raw=4628.17 CNY vehicles=5
+[GA] instance=24 objective=4829.69 raw=4629.69 CNY vehicles=5
+[GA] instance=25 objective=6327.28 raw=6127.28 CNY vehicles=5
+[GA] instance=26 objective=6326.54 raw=6126.54 CNY vehicles=5
+[GA] instance=27 objective=4828.09 raw=4628.09 CNY vehicles=5
+[GA] instance=28 objective=7076.32 raw=6876.32 CNY vehicles=5
+[GA] instance=29 objective=5578.23 raw=5378.23 CNY vehicles=5
+[GA] instance=30 objective=6326.38 raw=6126.38 CNY vehicles=5
+[GA] instance=31 objective=7824.16 raw=7624.16 CNY vehicles=5
+[GA] instance=32 objective=7074.06 raw=6874.06 CNY vehicles=5
+[GA] instance=33 objective=6334.35 raw=6134.35 CNY vehicles=5
+[GA] instance=34 objective=4833.24 raw=4633.24 CNY vehicles=5
+[GA] instance=35 objective=2584.17 raw=2384.17 CNY vehicles=5
+[GA] instance=36 objective=5576.73 raw=5376.73 CNY vehicles=5
+[GA] instance=37 objective=6327.55 raw=6127.55 CNY vehicles=5
+[GA] instance=38 objective=4081.15 raw=3881.15 CNY vehicles=5
+[GA] instance=39 objective=7823.37 raw=7623.37 CNY vehicles=5
+[GA] instance=40 objective=4077.77 raw=3877.77 CNY vehicles=5
+[GA] instance=41 objective=4826.14 raw=4626.14 CNY vehicles=5
+[GA] instance=42 objective=7820.61 raw=7620.61 CNY vehicles=5
+[GA] instance=43 objective=4082.81 raw=3882.81 CNY vehicles=5
+[GA] instance=44 objective=4083.24 raw=3883.24 CNY vehicles=5
+[GA] instance=45 objective=3328.21 raw=3128.21 CNY vehicles=5
+[GA] instance=46 objective=4084.47 raw=3884.47 CNY vehicles=5
+[GA] instance=47 objective=6323.01 raw=6123.01 CNY vehicles=5
+[GA] instance=48 objective=4831.92 raw=4631.92 CNY vehicles=5
+[GA] instance=49 objective=4083.47 raw=3883.47 CNY vehicles=5
+[GA] instance=50 objective=7071.34 raw=6871.34 CNY vehicles=5
+[GA] instance=51 objective=6323.92 raw=6123.92 CNY vehicles=5
+[GA] instance=52 objective=6328.28 raw=6128.28 CNY vehicles=5
+[GA] instance=53 objective=1836.38 raw=1636.38 CNY vehicles=5
+[GA] instance=54 objective=4833.08 raw=4633.08 CNY vehicles=5
+[GA] instance=55 objective=5577.44 raw=5377.44 CNY vehicles=5
+[GA] instance=56 objective=5580.06 raw=5380.06 CNY vehicles=5
+[GA] instance=57 objective=5576.40 raw=5376.40 CNY vehicles=5
+[GA] instance=58 objective=4082.34 raw=3882.34 CNY vehicles=5
+[GA] instance=59 objective=7073.66 raw=6873.66 CNY vehicles=5
+[GA] instance=60 objective=3332.04 raw=3132.04 CNY vehicles=5
+[GA] instance=61 objective=6332.83 raw=6132.83 CNY vehicles=5
+[GA] instance=62 objective=7075.66 raw=6875.66 CNY vehicles=5
+[GA] instance=63 objective=5575.94 raw=5375.94 CNY vehicles=5
+[GA] instance=64 objective=4828.62 raw=4628.62 CNY vehicles=5
+[GA] instance=65 objective=5578.32 raw=5378.32 CNY vehicles=5
+[GA] instance=66 objective=7824.11 raw=7624.11 CNY vehicles=5
+[GA] instance=67 objective=6326.53 raw=6126.53 CNY vehicles=5
+[GA] instance=68 objective=6325.94 raw=6125.94 CNY vehicles=5
+[GA] instance=69 objective=4831.48 raw=4631.48 CNY vehicles=5
+[GA] instance=70 objective=4079.63 raw=3879.63 CNY vehicles=5
+[GA] instance=71 objective=8570.29 raw=8370.29 CNY vehicles=5
+[GA] instance=72 objective=2583.26 raw=2383.26 CNY vehicles=5
+[GA] instance=73 objective=7075.80 raw=6875.80 CNY vehicles=5
+[GA] instance=74 objective=2580.76 raw=2380.76 CNY vehicles=5
+[GA] instance=75 objective=5576.50 raw=5376.50 CNY vehicles=5
+[GA] instance=76 objective=4832.75 raw=4632.75 CNY vehicles=5
+[GA] instance=77 objective=6328.19 raw=6128.19 CNY vehicles=5
+[GA] instance=78 objective=4827.47 raw=4627.47 CNY vehicles=5
+[GA] instance=79 objective=4832.19 raw=4632.19 CNY vehicles=5
+[GA] instance=80 objective=4084.74 raw=3884.74 CNY vehicles=5
+[GA] instance=81 objective=5577.19 raw=5377.19 CNY vehicles=5
+[GA] instance=82 objective=7823.49 raw=7623.49 CNY vehicles=5
+[GA] instance=83 objective=4082.81 raw=3882.81 CNY vehicles=5
+Traceback (most recent call last):
+  File "/Users/bytedance/Downloads/project-vrp-v6-4-main/ga_mcvrppdtw.py", line 343, in <module>
+    run_ga_benchmark(parse_args())
+  File "/Users/bytedance/Downloads/project-vrp-v6-4-main/ga_mcvrppdtw.py", line 284, in run_ga_benchmark
+    info = solver.solve(sample)
+  File "/Users/bytedance/Downloads/project-vrp-v6-4-main/ga_mcvrppdtw.py", line 244, in solve
+    cost, info = self.evaluate_chromosome(sample, chromosome)
+  File "/Users/bytedance/Downloads/project-vrp-v6-4-main/ga_mcvrppdtw.py", line 180, in evaluate_chromosome
+    objective_cost, details, _, repaired_routes, node_routes, eval_meta = evaluate_order_routes(
+  File "/Users/bytedance/Downloads/project-vrp-v6-4-main/baseline_utils.py", line 543, in evaluate_order_routes
+    objective_cost, details, pi, eval_meta = evaluate_node_routes(
+  File "/Users/bytedance/Downloads/project-vrp-v6-4-main/baseline_utils.py", line 477, in evaluate_node_routes
+    objective_cost, details = MCVRPPDTW.get_costs(batch, pi, return_details=True)
+  File "/Users/bytedance/Downloads/project-vrp-v6-4-main/problem_mcvrptw_v2.py", line 614, in get_costs
+    time_dict = MCVRPPDTW._compute_time_and_delay(pi_for_cost, segment_distances, tw_in_order, type_in_order, graph_size, dataset)
+  File "/Users/bytedance/Downloads/project-vrp-v6-4-main/problem_mcvrptw_v2.py", line 367, in _compute_time_and_delay
+    current_time = current_time + travel_times[:, t - 1]
+KeyboardInterrupt

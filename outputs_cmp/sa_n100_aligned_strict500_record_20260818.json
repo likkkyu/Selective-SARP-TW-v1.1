@@ -1,0 +1,74 @@
+{
+  "record_type": "sa_n100_run_record",
+  "record_version": "v1",
+  "record_date": "2026-08-18",
+  "git": {
+    "branch": "reject-split-doc-sync",
+    "head": "d241eaf0dc9771e9cfe6704f0cfb9a1ac175c471"
+  },
+  "sa_run": {
+    "result_file": "outputs_cmp/sa_results_100_aligned_strict_500.json",
+    "log_file": "logs/sa_n100_aligned_strict500_rerun.log",
+    "config": {
+      "graph_size": 100,
+      "num_samples": 500,
+      "seed": 99999,
+      "iterations": 1500,
+      "initial_temperature": 50.0,
+      "cooling_rate": 0.995,
+      "eval_protocol": "drl_aligned_v1",
+      "semantic_mode": "drl_aligned",
+      "hard_constraint_mode": "strict",
+      "strict_infeasible_cost": 1000000000000,
+      "max_concurrent_open_orders": 6,
+      "min_orders_per_dispatch": 4,
+      "enable_delivery_viability": true
+    },
+    "aggregate": {
+      "num_instances": 500,
+      "service_rate": 0.80542,
+      "rejected_rate": 0.19366,
+      "unfulfilled_rate": 0.00092,
+      "avg_raw_total_cost": 11644.692187988281,
+      "avg_objective_cost": 12255.820149414063,
+      "avg_used_vehicles": 14.916,
+      "avg_cargo_delay": 9.658641619920731,
+      "avg_passenger_delivery_delay_minutes": 0.0,
+      "avg_trip_overtime_penalty": 0.0,
+      "hard_feasible_rate": 1.0,
+      "business_clean_rate": 0.986,
+      "semantic_modes": [
+        "drl_aligned"
+      ],
+      "protocol_versions": [
+        "drl_aligned_v1"
+      ]
+    }
+  },
+  "drl_reference": {
+    "source": "outputs_cmp/n100_eval2000_multiseed_20260727_120637/eval2000_seed*.json",
+    "seeds_count": 4,
+    "aggregate_mean": {
+      "service_rate": 0.8438912500000001,
+      "rejected_rate": 0.15569125,
+      "unfulfilled_rate": 0.0004175,
+      "raw_total_cost": 9733.869222526551,
+      "used_vehicles": 14.838125,
+      "cargo_delay_cost": 15.348817136960264,
+      "passenger_delivery_delay_cost": 0.0,
+      "trip_overtime_penalty": 301.8521395921707
+    }
+  },
+  "sa_vs_drl_delta": {
+    "service_rate": -0.03847125000000007,
+    "rejected_rate": 0.037968749999999996,
+    "unfulfilled_rate": 0.0005025,
+    "raw_total_cost": 1910.8229654617298,
+    "raw_total_cost_pct": 19.630661988344976,
+    "used_vehicles": 0.07787500000000058
+  },
+  "notes": [
+    "SA N100 strict500 rerun completed and is comparable-to-DRL by protocol metadata.",
+    "Compared with DRL multiseed reference, SA shows lower service and higher cost under this setting."
+  ]
+}

@@ -1,0 +1,10 @@
+{
+  "graph_size": 200,
+  "energy_cost_raw": 391.7165250778198,
+  "passenger_delivery_delay_cost_raw": 2635.802686691284,
+  "cargo_delay_cost_raw": 1017.049578666687,
+  "vehicle_cost_norm": 680.0,
+  "num_samples": 64,
+  "seed": 1234,
+  "num_vehicles": 34
+}

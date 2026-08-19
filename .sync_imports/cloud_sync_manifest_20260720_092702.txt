@@ -1,0 +1,17 @@
+sync_time=20260720_092702
+branch=reject-split-doc-sync
+commit=2796c3f549c51c4559e47cf8c1c954afe29ce1df
+
+[git status]
+ M dry_run_test.py
+ M evaluate_model.py
+ M problem_mcvrptw_v2.py
+ M run_training_optimized.py
+ M state_mcvrptw_v2.py
+
+[sha256]
+0c745cebf35d36a59e9ee5905d786ed569806c7c05252be2f2f996b6bbd52a0b  state_mcvrptw_v2.py
+823fc0a0f831898180cf1c4d84bd4429e7b5f8b0c2fac42383a5f6c9aa717722  dry_run_test.py
+1d4176d35fe73b4ce3ab543c08e7f16b5fe5dacb8bad11cee750e66215e62097  run_training_optimized.py
+7a8ac1239fb68ac7a226f2909caa0ef222d3941e90c59c8bba5342ef68179512  evaluate_model.py
+d003d1bb87a89e414df4c5921f275f97ff5d586dbf5174140e1bc29a8033cc43  problem_mcvrptw_v2.py
