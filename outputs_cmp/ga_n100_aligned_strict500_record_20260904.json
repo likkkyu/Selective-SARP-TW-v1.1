@@ -1,0 +1,74 @@
+{
+  "record_type": "ga_n100_strict500_run_record",
+  "record_version": "v1",
+  "record_date": "2026-09-04",
+  "git": {
+    "branch": "reject-split-doc-sync",
+    "head": "4788c0fb188776e5bceb287eac31a04fd7dbed61"
+  },
+  "ga_run": {
+    "result_file": "outputs_cmp/ga_results_100_aligned_strict_500.json",
+    "log_file": "logs/ga_n100_aligned_strict500_rerun.log",
+    "config": {
+      "graph_size": 100,
+      "num_samples": 500,
+      "seed": 99999,
+      "population_size": 48,
+      "generations": 120,
+      "mutation_rate": 0.2,
+      "elite_size": 4,
+      "eval_protocol": "drl_aligned_v1",
+      "semantic_mode": "drl_aligned",
+      "hard_constraint_mode": "strict",
+      "strict_infeasible_cost": 1000000000000,
+      "max_concurrent_open_orders": 6,
+      "min_orders_per_dispatch": 4,
+      "enable_delivery_viability": true
+    },
+    "aggregate": {
+      "num_instances": 500,
+      "service_rate": 0.7882399999999999,
+      "rejected_rate": 0.21175999999999998,
+      "unfulfilled_rate": 0.0,
+      "avg_raw_total_cost": 12598.5415546875,
+      "avg_objective_cost": 13182.8534765625,
+      "avg_used_vehicles": 14.22,
+      "avg_cargo_delay": 10.341303682580591,
+      "avg_passenger_delivery_delay_minutes": 0.0,
+      "avg_trip_overtime_penalty": 0.0,
+      "hard_feasible_rate": 1.0,
+      "business_clean_rate": 1.0,
+      "semantic_modes": [
+        "drl_aligned"
+      ],
+      "protocol_versions": [
+        "drl_aligned_v1"
+      ]
+    }
+  },
+  "drl_reference": {
+    "source": "outputs_cmp/n100_eval2000_multiseed_20260727_120637/eval2000_seed*.json",
+    "seeds_count": 4,
+    "aggregate_mean": {
+      "service_rate": 0.8438912500000001,
+      "rejected_rate": 0.15569125,
+      "unfulfilled_rate": 0.0004175,
+      "raw_total_cost": 9733.869222526551,
+      "used_vehicles": 14.838125,
+      "cargo_delay_cost": 15.348817136960264,
+      "passenger_delivery_delay_cost": 0.0,
+      "trip_overtime_penalty": 301.8521395921707
+    }
+  },
+  "ga_vs_drl_delta": {
+    "service_rate": -0.05565125000000015,
+    "rejected_rate": 0.05606874999999997,
+    "raw_total_cost": 2864.672332160948,
+    "raw_total_cost_pct": 29.42994472877647,
+    "used_vehicles": -0.6181249999999991
+  },
+  "notes": [
+    "GA N100 strict500 formal run completed (pop=48, gen=120, num_samples=500).",
+    "Compared with DRL multiseed reference: GA shows lower service rate (-5.6pp) and higher raw cost (+29.4%), but zero unfulfilled and zero trip overtime."
+  ]
+}

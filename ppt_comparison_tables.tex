@@ -1,0 +1,117 @@
+% === DRL vs SA vs GA 对比主表 (LaTeX) ===
+% 口径: drl_aligned_v1 / strict / eval2000
+
+% --- N25 ---
+\begin{table}[htbp]
+\centering
+\caption{N25 规模下三方方法对比 (5-seed eval2000 / strict500)}
+\label{tab:comparison-n25}
+\begin{tabular}{lccc}
+\toprule
+指标 & DRL & SA & GA \\
+\midrule
+Service Rate        & 0.8526          & \textbf{0.8947} & 0.8832          \\
+Rejected Rate       & 0.1474          & \textbf{0.1053} & 0.1168          \\
+Unfulfilled Rate    & 0.0000          & 0.0000          & 0.0000          \\
+Raw Total Cost      & 2256.27         & \textbf{1645.08}& 1805.19         \\
+Used Vehicles       & \textbf{4.19}   & 4.69            & 4.51            \\
+Cargo Delay Cost    & \textbf{0.04}   & 0.28            & 0.26            \\
+Trip Overtime       & 15.87           & \textbf{0}      & \textbf{0}      \\
+Hard Feasible Rate  & 1.0             & 1.0             & 1.0             \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+% --- N50 ---
+\begin{table}[htbp]
+\centering
+\caption{N50 规模下三方方法对比}
+\label{tab:comparison-n50}
+\begin{tabular}{lccc}
+\toprule
+指标 & DRL & SA & GA \\
+\midrule
+Service Rate        & \textbf{0.8885} & 0.8684          & 0.8493          \\
+Rejected Rate       & \textbf{0.1115} & 0.1306          & 0.1507          \\
+Unfulfilled Rate    & \textbf{0.0000} & 0.0011          & \textbf{0.0000} \\
+Raw Total Cost      & \textbf{3463.08}& 4037.90         & 4564.84         \\
+Used Vehicles       & \textbf{7.96}   & 8.45            & 8.04            \\
+Cargo Delay Cost    & 10.18           & \textbf{1.85}   & 1.39            \\
+Trip Overtime       & 14.24           & \textbf{0}      & \textbf{0}      \\
+Hard Feasible Rate  & 1.0             & 1.0             & 1.0             \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+% --- N100 ---
+\begin{table}[htbp]
+\centering
+\caption{N100 规模下三方方法对比}
+\label{tab:comparison-n100}
+\begin{tabular}{lccc}
+\toprule
+指标 & DRL & SA & GA \\
+\midrule
+Service Rate        & \textbf{0.8439} & 0.8054          & 0.7882          \\
+Rejected Rate       & \textbf{0.1557} & 0.1937          & 0.2118          \\
+Unfulfilled Rate    & 0.0004          & 0.0009          & \textbf{0.0000} \\
+Raw Total Cost      & \textbf{9734.10}& 11644.69        & 12598.54        \\
+Used Vehicles       & 14.84           & 14.92           & \textbf{14.22}  \\
+Cargo Delay Cost    & 15.32           & \textbf{9.66}   & 10.34           \\
+Trip Overtime       & 301.16          & \textbf{0}      & \textbf{0}      \\
+Hard Feasible Rate  & 1.0             & 1.0             & 1.0             \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+% --- N200 ---
+\begin{table}[htbp]
+\centering
+\caption{N200 规模下 DRL vs SA 对比 (GA 严格版运行中)}
+\label{tab:comparison-n200}
+\begin{tabular}{lcc}
+\toprule
+指标 & DRL & SA \\
+\midrule
+Service Rate        & \textbf{0.8586} & 0.7056          \\
+Rejected Rate       & \textbf{0.1142} & 0.2942          \\
+Unfulfilled Rate    & 0.0272          & 0.0002          \\
+Raw Total Cost      & \textbf{18339.78}& 34629.94       \\
+Used Vehicles       & 27.55           & 25.15           \\
+Cargo Delay Cost    & 213.43          & \textbf{34.88}  \\
+Trip Overtime       & 105.30          & \textbf{$\approx$0} \\
+Hard Feasible Rate  & 1.0             & 1.0             \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+% --- 合并总表 (紧凑版) ---
+\begin{table}[htbp]
+\centering
+\caption{不同规模下 DRL / SA / GA 服务率与成本对比}
+\label{tab:comparison-all}
+\begin{tabular}{clcccc}
+\toprule
+规模 & 方法 & Service Rate$\uparrow$ & Rejected Rate$\downarrow$ & Raw Cost$\downarrow$ & Vehicles \\
+\midrule
+\multirow{3}{*}{N25}
+  & DRL & 0.8526          & 0.1474          & 2256            & 4.19 \\
+  & SA  & \textbf{0.8947} & \textbf{0.1053} & \textbf{1645}   & 4.69 \\
+  & GA  & 0.8832          & 0.1168          & 1805            & 4.51 \\
+\midrule
+\multirow{3}{*}{N50}
+  & DRL & \textbf{0.8885} & \textbf{0.1115} & \textbf{3463}   & \textbf{7.96} \\
+  & SA  & 0.8684          & 0.1306          & 4038            & 8.45 \\
+  & GA  & 0.8493          & 0.1507          & 4565            & 8.04 \\
+\midrule
+\multirow{3}{*}{N100}
+  & DRL & \textbf{0.8439} & \textbf{0.1557} & \textbf{9734}   & 14.84 \\
+  & SA  & 0.8054          & 0.1937          & 11645           & 14.92 \\
+  & GA  & 0.7882          & 0.2118          & 12599           & \textbf{14.22} \\
+\midrule
+\multirow{2}{*}{N200}
+  & DRL & \textbf{0.8586} & \textbf{0.1142} & \textbf{18340}  & 27.55 \\
+  & SA  & 0.7056          & 0.2942          & 34630           & \textbf{25.15} \\
+\bottomrule
+\end{tabular}
+\end{table}
