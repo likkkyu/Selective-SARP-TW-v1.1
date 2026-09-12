@@ -22,3 +22,5 @@ logs/*.pid
 .Rhistory
 outputs_cmp/sa_results_*.json
 outputs_cmp/ga_results_*.json
+ppt_data_summary.md
+ppt_comparison_tables.tex
