@@ -1,0 +1,26 @@
+{
+  "scope": "Cloud files missing by content from local project, source compared against origin/main and origin/reject-split-doc-sync",
+  "source_files": [
+    "project-vrp-v6-4-main/ga_mcvrppdtw.py",
+    "project-vrp-v6-4-main/baseline_utils.py",
+    "project-vrp-v6-4-main/attention_model.py",
+    "project-vrp-v6-4-main/compare_drl_vs_gurobi.py",
+    "pre_sync_backup_20260701_191822/dry_run_test.py",
+    "project-vrp-v6-4-main/compare_experiment_runs.py",
+    "project-vrp-v6-4-main/run_local_candidate_gate.py",
+    "project-vrp-v6-4-main/evaluate_gurobi_real_cost.py",
+    "pre_sync_backup_20260701_191822/state_mcvrptw_v2.py",
+    "pre_sync_backup_20260701_191822/nets/attention_model.py",
+    "pre_sync_backup_20260701_191822/run_training_optimized.py",
+    "analysis_bundle_n100_20260706_202322/code/evaluate_model.py",
+    "analysis_bundle_n100_20260706_202322/code/attention_model.py",
+    "analysis_bundle_n100_20260706_202322/code/problem_mcvrptw_v2.py",
+    "project-vrp-v6-4-main/logs/overnight_n100_stateopt_rw0_queue.sh",
+    "analysis_bundle_n100_20260706_202322/code/run_training_optimized.py"
+  ],
+  "excluded_pending_review": [],
+  "remote_file_count": 1502,
+  "local_unique_missing_count": 854,
+  "verified_small_files": 463,
+  "large_recovery_pending": 391
+}
