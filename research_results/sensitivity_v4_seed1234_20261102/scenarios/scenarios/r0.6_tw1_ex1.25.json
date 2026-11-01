@@ -1,0 +1,13 @@
+{
+  "graph_size": 50,
+  "samples": 500,
+  "seed": 928631,
+  "passenger_ratio": 0.6,
+  "pickup_window_multiplier": 1.0,
+  "excess_multiplier": 1.25,
+  "excess_minutes": 37.5,
+  "total_ride_minutes": 70.0,
+  "pairing": "TW/excess: same base orders; ratio: regenerated distribution, not identical orders",
+  "scope": "frozen-policy robustness; pickup deadlines only, delivery windows unchanged",
+  "sha256": "811f6a579d9e46fc25ce7fa5b8f5a5f2290da58dfe3b4cbae6be871e70b6435e"
+}

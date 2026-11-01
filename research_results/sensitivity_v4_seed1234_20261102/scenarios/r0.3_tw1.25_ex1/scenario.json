@@ -1,0 +1,22 @@
+{
+  "graph_size": 50,
+  "samples": 500,
+  "seed": 928631,
+  "passenger_ratio": 0.3,
+  "pickup_window_multiplier": 1.25,
+  "excess_multiplier": 1.0,
+  "excess_minutes": 30.0,
+  "total_ride_minutes": 70.0,
+  "pairing": "TW/excess: same base orders; ratio: regenerated distribution, not identical orders",
+  "scope": "frozen-policy robustness; pickup deadlines only, delivery windows unchanged",
+  "sha256": "1e0887dadc1ec0f336c789bee9715fe79bc77df3eb937c34ae456612be3db93c",
+  "argv": [
+    "--checkpoint",
+    "formal_learned_1234/outputs/pomo_n50_optimized/model_best.pt",
+    "--batch-size",
+    "16",
+    "--max-concurrent-open-orders",
+    "6",
+    "--enable-delivery-viability"
+  ]
+}

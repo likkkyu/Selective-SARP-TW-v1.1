@@ -1,0 +1,7 @@
+{
+  "status": "passed",
+  "unsafe_prefix_blocked_at_step": 35,
+  "synthetic_cases": 4,
+  "audit_tolerance_unchanged": true,
+  "lookahead_margin_seconds": 0.036
+}

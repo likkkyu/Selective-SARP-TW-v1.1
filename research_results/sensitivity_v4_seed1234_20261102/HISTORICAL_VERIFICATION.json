@@ -1,0 +1,6 @@
+{
+  "status": "passed",
+  "files_verified": 77,
+  "archive_sha256": "5bfd244c3a7e7c149ffdb99d74cb7f9ac1a1c3c8d7adffe952d1edaa9119028c",
+  "scope": "interrupted v4 run and preliminary regressions"
+}

@@ -1,0 +1,31 @@
+# MCVRP-PDTW v6 conda 环境 (pip-based)
+# 安装：
+#   conda env create -f environment.yml
+#   conda activate mcvrp_pdtw_v6
+#
+# 仅在创建环境时安装 conda-forge 上的 python 与基础科学栈，
+# 其它依赖一律通过 pip 安装，避免渠道不一致问题。
+name: mcvrp_pdtw_v6
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - python=3.10
+  - pip
+  - pip:
+      # PyTorch (GPU 用户请改用 PyTorch 官方 index 安装匹配 CUDA 版本)
+      # pip install torch==2.1.* --index-url https://download.pytorch.org/whl/cu121
+      - torch>=2.0
+      - torchvision
+      - numpy>=1.23
+      - scipy>=1.10
+      - tqdm>=4.65
+      - tensorboard_logger
+      - tensorboard
+      # MILP 基线 (需要 Gurobi 学术许可证)
+      - gurobipy>=10.0
+      # 可视化
+      - matplotlib>=3.7
+      - seaborn>=0.12
+      # 元启发式基线
+      - scikit-learn>=1.3

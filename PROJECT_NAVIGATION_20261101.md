@@ -24,3 +24,9 @@
 ## GitHub整理
 
 分支 codex/cloud-recovery-20261031 保留历史回收；research_snapshot_20261101/ 是按本地源码哈希冻结的可运行代码快照，包含核心依赖、实验入口和归一化配置。与仓库根目录旧版本明确区分，运行时从快照根目录执行。模型、原始大日志与私有论文不纳入源码快照。发布结果只含已观察的阶段性数据，不宣称最终统计优势。
+
+## 2026-11-02敏感性完成归档
+
+- artifacts/sensitivity_v4_final_20261102/：最终完整证据包、匹配模型、场景/路线/审计和逐文件校验；265文件通过，17×500最终审计通过。
+- experiments/sensitivity_20261030/v4_results_review/：结果表、分类服务率、条件配对区间、四联图及论文可用性报告。
+- GitHub对应research_snapshot_20261102/与research_results/sensitivity_v4_seed1234_20261102/；单训练种子结果，不代表消融或其余种子完成。

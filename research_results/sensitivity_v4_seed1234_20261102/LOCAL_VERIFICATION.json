@@ -1,0 +1,11 @@
+{
+  "archive_sha256": "d9085734da961fd4e7c3b27ce6bf8cc8f68176202257ff9c17fcefd3c861ad8b",
+  "archive_bytes": 97545660,
+  "files_verified": 265,
+  "scenarios_verified": 17,
+  "routes_verified": 8500,
+  "hard_valid": 8500,
+  "unfulfilled": 0,
+  "checkpoint_present": true,
+  "status": "passed"
+}

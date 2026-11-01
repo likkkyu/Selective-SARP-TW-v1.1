@@ -1,0 +1,74 @@
+[
+  {
+    "path": "project-vrp-v6-4-main/outputs/pomo_n50_optimized/model_best.pt",
+    "size": 33364059,
+    "sha256": "0b4b1c1f2d65cd5d361cf7fcfdc007cc22489eeeb26b53f3e306833c6a19e36d",
+    "reason": "scale baseline/release checkpoint"
+  },
+  {
+    "path": "reject_ablation_formal_20261030/formal_learned_1234/outputs/pomo_n50_optimized/model_best.pt",
+    "size": 33364763,
+    "sha256": "d4d35886100c64604d592be3353563748d3fadb364f684a73444bf077230370c",
+    "reason": "historical cost-v3 checkpoint; reproducibility only"
+  },
+  {
+    "path": "reject_ablation_formal_20261030/formal_learned_1234/outputs/pomo_n50_optimized/model_final.pt",
+    "size": 33365163,
+    "sha256": "eb210368ee1a66e98bc4ebbb1608523425a5b1aac9e3406b55bc09973f8aaabe",
+    "reason": "historical cost-v3 checkpoint; reproducibility only"
+  },
+  {
+    "path": "reject_ablation_formal_20261030/formal_learned_4321/outputs/pomo_n50_optimized/model_best.pt",
+    "size": 33364763,
+    "sha256": "e62a4a02487ce43789f87d8616efab3fad22e8f06b20bdaae88a97d44724c85a",
+    "reason": "historical cost-v3 checkpoint; reproducibility only"
+  },
+  {
+    "path": "reject_ablation_formal_20261030/formal_learned_4321/outputs/pomo_n50_optimized/model_final.pt",
+    "size": 33365163,
+    "sha256": "7abfe86c95ca573ce99f51f72893c1dc5a01e34ef8b973f204dae4cb43ac951e",
+    "reason": "historical cost-v3 checkpoint; reproducibility only"
+  },
+  {
+    "path": "reject_ablation_formal_20261030/formal_service_first_1234/outputs/pomo_n50_optimized/model_best.pt",
+    "size": 33364763,
+    "sha256": "77775ed78477c9cf1134e2b0fdae4c1f5cce38a10b058800873b398a89caccea",
+    "reason": "historical cost-v3 checkpoint; reproducibility only"
+  },
+  {
+    "path": "reject_ablation_formal_20261030/formal_service_first_1234/outputs/pomo_n50_optimized/model_final.pt",
+    "size": 33365163,
+    "sha256": "a50be1ef6002afded99fceb154df1f3572967d32b2aca7ade8fb01adc03651ab",
+    "reason": "historical cost-v3 checkpoint; reproducibility only"
+  },
+  {
+    "path": "reject_ablation_formal_20261030/formal_service_first_4321/outputs/pomo_n50_optimized/model_best.pt",
+    "size": 33364763,
+    "sha256": "edb7fab103bee4b285c1e75f44669c1b1bf0776a427ceffcc015493e47cc8372",
+    "reason": "historical cost-v3 checkpoint; reproducibility only"
+  },
+  {
+    "path": "reject_ablation_v3_20261030/diagnostic_learned/outputs/pomo_n50_optimized/model_best.pt",
+    "size": 33364827,
+    "sha256": "908e8d124da0a31e2b4e5dfdf352b8c851044183f39c72e2c2dc7722cfd626bc",
+    "reason": "historical cost-v3 checkpoint; reproducibility only"
+  },
+  {
+    "path": "reject_ablation_v3_20261030/diagnostic_learned/outputs/pomo_n50_optimized/model_final.pt",
+    "size": 33365227,
+    "sha256": "fd0ad599cdf199ad7089c4351a9534cc7d8f1187c97d155ead127817fe712b5a",
+    "reason": "historical cost-v3 checkpoint; reproducibility only"
+  },
+  {
+    "path": "reject_ablation_v3_20261030/diagnostic_service_first/outputs/pomo_n50_optimized/model_best.pt",
+    "size": 33364827,
+    "sha256": "cd85602b71db81f21369c1c5c275a7ed4e5787cf8e7a4bf398691504260f1ac9",
+    "reason": "historical cost-v3 checkpoint; reproducibility only"
+  },
+  {
+    "path": "reject_ablation_v3_20261030/diagnostic_service_first/outputs/pomo_n50_optimized/model_final.pt",
+    "size": 33365227,
+    "sha256": "01a9190bf4195901ebc10c6fedd320549c8ae4fd698228545abd2ae019561991",
+    "reason": "historical cost-v3 checkpoint; reproducibility only"
+  }
+]

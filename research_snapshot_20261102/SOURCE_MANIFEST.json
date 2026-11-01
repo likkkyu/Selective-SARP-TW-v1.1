@@ -1,0 +1,166 @@
+[
+  {
+    "path": "evaluate_model.py",
+    "sha256": "151277b33128a094061fb953657612a41f35518607910eabacc4b42d56bebdb1"
+  },
+  {
+    "path": "environment.yml",
+    "sha256": "386c9ebb72b3d38e138b1ba5f574edfec49783b1b3c1e84a4b3adc705f686f68"
+  },
+  {
+    "path": "review_tolerance.py",
+    "sha256": "72d2fb478a15b004ffb73ce5ca7d011cb1a4f11ede9cc7dd9c98f077da3c7d43"
+  },
+  {
+    "path": "run_training_optimized.py",
+    "sha256": "4d5f65cd8afd7dfd3f9d06215b2f94d9b80debbce19555692297b0433bdd523d"
+  },
+  {
+    "path": "state_mcvrptw_v2.py",
+    "sha256": "bb5668b2aa65c70558293b61fe9d596f942fd827207c023a15e8f57b00f90e96"
+  },
+  {
+    "path": "problem_mcvrptw_v2.py",
+    "sha256": "d003d1bb87a89e414df4c5921f275f97ff5d586dbf5174140e1bc29a8033cc43"
+  },
+  {
+    "path": "run_sensitivity.sh",
+    "sha256": "8589f1acadf6ddfd3a4440e3500ce91651dcd598a7841fecb010336866199a7e"
+  },
+  {
+    "path": "utils/functions.py",
+    "sha256": "7b63ad1837783c013dd6eb7c069e1a53352d364cfa219af618ad4d97a7813a14"
+  },
+  {
+    "path": "utils/__init__.py",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "path": "utils/beam_search.py",
+    "sha256": "5c5f0191335089e33b27c4f3bb0c58ebf992c40060fe361e1ba4080e2b4d8302"
+  },
+  {
+    "path": "utils/tensor_functions.py",
+    "sha256": "ccb654ea1c80949bfc7fbec304a39e345b8b8cf2e8dafecaa72c579ea20fc960"
+  },
+  {
+    "path": "utils/lexsort.py",
+    "sha256": "c0d84f5b8a6d2a8c97a75b63c7796699dd3fec7440a43f7c191028c2ec064bcc"
+  },
+  {
+    "path": "nets/graph_encoder.py",
+    "sha256": "8336742f3dba41c3f0695a16e56c35a5b42542a43f2110f41f0952a8e5505785"
+  },
+  {
+    "path": "nets/__init__.py",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "path": "nets/attention_model.py",
+    "sha256": "c2556d6c4baf0aaaa0d847b6033cc5ccc8b0d28daed8a5ea6ecb2c1dacfaee25"
+  },
+  {
+    "path": "guard_regression/check_and_resume.sh",
+    "sha256": "9127e89a369aae5d3d67ae9c881468dcdf73b635ce41845093f553206f68da19"
+  },
+  {
+    "path": "guard_regression/launch_v2.sh",
+    "sha256": "d6d848b8e2648ca8e29f63d52f859fb00190294bebbd310748c2807f39b7044a"
+  },
+  {
+    "path": "guard_regression/check_and_resume_v2.sh",
+    "sha256": "ec33cc2c90a546ce68721028db70835f282e8928ba3a542aabef260c97a8f6c9"
+  },
+  {
+    "path": "experiments/reject_ablation_20261029/run_v3.py",
+    "sha256": "c7b93a1de34da9b433b83a826586bcd1363ca910c8d84f42bd878d4add32c47b"
+  },
+  {
+    "path": "experiments/reject_ablation_20261029/audit_eval_v3.py",
+    "sha256": "8b24adcd7fee7fcfd8a27642083722f57c60093cca8017794194484e31eb477a"
+  },
+  {
+    "path": "experiments/reject_ablation_20261029/depot_noop.py",
+    "sha256": "1c14b205a31d37a351eeaaa59e7d810fb74c8d4eae68a4ccf13f2292e7067ba5"
+  },
+  {
+    "path": "experiments/reject_ablation_20261029/evaluate_v3.py",
+    "sha256": "9ab0d81da0fbbe46c63eb13ad63987ba77f3434c30d45f71b185345492b8e28f"
+  },
+  {
+    "path": "experiments/reject_ablation_20261029/route_audit.py",
+    "sha256": "8aee9732d151bd0f170788bff0ef8dc2bb150f22a95e04b5472e25758fb205ef"
+  },
+  {
+    "path": "experiments/sensitivity_20261030/scenarios.py",
+    "sha256": "7b3021d0e2fe6af58fc7256e76f31df7105b768ba8f9c72d8acad2549b16259a"
+  },
+  {
+    "path": "experiments/sensitivity_20261030/batch_v4_guarded.py",
+    "sha256": "93048cec6742d1a2c8c4b099fa542020e6746a7c5a29ed853cc4794650167f73"
+  },
+  {
+    "path": "experiments/sensitivity_20261030/test_completion_guard.py",
+    "sha256": "ebee858b3c96bbe5297cc64d04a9673b540ef3e06841f85252db91556f2fbc96"
+  },
+  {
+    "path": "experiments/sensitivity_20261030/batch.py",
+    "sha256": "5ad9fe3a55ce7e597fc6b6f25582ce141bbb0e3390d459ac022b5c916896c9dc"
+  },
+  {
+    "path": "experiments/sensitivity_20261030/timing_candidate.py",
+    "sha256": "fe43b6c1896f4d3eb5e2318c9f2f33c9acfc3508625b22ecf7799bb5b708e6b6"
+  },
+  {
+    "path": "experiments/sensitivity_20261030/evaluate_v4_guarded.py",
+    "sha256": "8c72847d3002292e5fd3b8f55643c42c9822d26b06fb4ac552fa1ae8e9bf333e"
+  },
+  {
+    "path": "experiments/sensitivity_20261030/test_scenarios.py",
+    "sha256": "f004c27afbaac191ba13ce4eae5bfe27a3018436a9a13bdbd307850e2a78f36e"
+  },
+  {
+    "path": "experiments/sensitivity_20261030/evaluate_v4.py",
+    "sha256": "a98643a41520317e72ce145d025e1bcc238b60d6c60ba4dd8596920a8653e591"
+  },
+  {
+    "path": "experiments/sensitivity_20261030/corrected_entry.py",
+    "sha256": "579638e83e255f9361c3555ce4b1a7e2204ad0662c27880fcdb82e0961dce09c"
+  },
+  {
+    "path": "experiments/sensitivity_20261030/evaluate.py",
+    "sha256": "3d277abd3afc4383167e9f74b9ac0b95889f9ae8d129ff9b611be5821dc06e3c"
+  },
+  {
+    "path": "experiments/sensitivity_20261030/completion_guard.py",
+    "sha256": "e6698d86a40aa7455ff1da4ae18e443ae00a20f3bce7d37584942b32a31db090"
+  },
+  {
+    "path": "experiments/sensitivity_20261030/batch_v4.py",
+    "sha256": "ec45a24e09522f0b2cea610872711fa339c1184b5a5295f5f00e175455e3ebc4"
+  },
+  {
+    "path": "experiments/sensitivity_20261030/guard_regression/failure317.json",
+    "sha256": "cd39a608fcc7abebe9dc4e7e94a161b1f1500d13a2f5a85ef3ed6bc5c0a9bdc1"
+  },
+  {
+    "path": "experiments/sensitivity_20261030/guard_regression/local_checks.json",
+    "sha256": "ae1cb9fa2067e8b5d2575ddc03ef77ee094daccce9fe8ab62ffec69477c56ce1"
+  },
+  {
+    "path": "outputs/normalization_profiles/normalization_n25.json",
+    "sha256": "f8d81a309c28209dcdff9054fbdb2ff8be1b0f6412cc90834de2aecbaa847a91"
+  },
+  {
+    "path": "outputs/normalization_profiles/normalization_n200.json",
+    "sha256": "8b828550ae7c9e1fe57db2c98d4bf932711784ac8eeab5e6d38ebc4fcbae3cf7"
+  },
+  {
+    "path": "outputs/normalization_profiles/normalization_n100.json",
+    "sha256": "51313f12ca85cb402419ff3c15454457fc0884b96fde50b338dad54d66163316"
+  },
+  {
+    "path": "outputs/normalization_profiles/normalization_n50.json",
+    "sha256": "38a2525333c605c885077c7ccb915b4afffa54bd6c148e6d89738e8346d251d3"
+  }
+]

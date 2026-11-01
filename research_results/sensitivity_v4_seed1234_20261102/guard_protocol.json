@@ -1,0 +1,16 @@
+{
+  "cost_semantics_version": 4,
+  "inference_safety_version": 1,
+  "lookahead_margin_seconds": 0.036,
+  "audit_tolerance_seconds": 0.36,
+  "training_modified": false,
+  "all_comparisons_require_same_safety_rule": true,
+  "first_full_scenario": "r0.5_tw1_ex1",
+  "scenarios": 17,
+  "samples_per_scenario": 500,
+  "source_sha256": {
+    "completion_guard.py": "e6698d86a40aa7455ff1da4ae18e443ae00a20f3bce7d37584942b32a31db090",
+    "evaluate_v4_guarded.py": "8c72847d3002292e5fd3b8f55643c42c9822d26b06fb4ac552fa1ae8e9bf333e",
+    "batch_v4_guarded.py": "93048cec6742d1a2c8c4b099fa542020e6746a7c5a29ed853cc4794650167f73"
+  }
+}

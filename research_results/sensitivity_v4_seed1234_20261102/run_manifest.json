@@ -1,0 +1,184 @@
+{
+  "status": "completed",
+  "samples": 500,
+  "seed": 928631,
+  "settings": [
+    [
+      0.5,
+      1.0,
+      1.0
+    ],
+    [
+      0.6,
+      1.0,
+      1.0
+    ],
+    [
+      0.3,
+      1.0,
+      1.0
+    ],
+    [
+      0.7,
+      1.0,
+      1.0
+    ],
+    [
+      0.9,
+      1.0,
+      1.0
+    ],
+    [
+      0.6,
+      0.5,
+      1.0
+    ],
+    [
+      0.6,
+      0.75,
+      1.0
+    ],
+    [
+      0.6,
+      1.25,
+      1.0
+    ],
+    [
+      0.6,
+      1.5,
+      1.0
+    ],
+    [
+      0.6,
+      1.0,
+      0.5
+    ],
+    [
+      0.6,
+      1.0,
+      0.75
+    ],
+    [
+      0.6,
+      1.0,
+      1.25
+    ],
+    [
+      0.6,
+      1.0,
+      1.5
+    ],
+    [
+      0.3,
+      0.75,
+      1.0
+    ],
+    [
+      0.3,
+      1.25,
+      1.0
+    ],
+    [
+      0.9,
+      0.75,
+      1.0
+    ],
+    [
+      0.9,
+      1.25,
+      1.0
+    ]
+  ],
+  "checkpoint_sha256": "116e9b67cdd8cc5c1464d54b466693ddbfe7f4475625ca4350744201be8125f1",
+  "scope": "cost-v4 single-model frozen-policy sensitivity; multi-seed comparison pending",
+  "cost_semantics_version": 4,
+  "completion_guard_version": 1,
+  "started": 1793522589.3024378,
+  "completed": [
+    {
+      "scenario": "r0.5_tw1_ex1",
+      "seconds": 1723.1854753494263
+    },
+    {
+      "scenario": "r0.6_tw1_ex1",
+      "seconds": 1234.624977350235
+    },
+    {
+      "scenario": "r0.3_tw1_ex1",
+      "seconds": 2821.8842267990112
+    },
+    {
+      "scenario": "r0.7_tw1_ex1",
+      "seconds": 925.7102158069611
+    },
+    {
+      "scenario": "r0.9_tw1_ex1",
+      "seconds": 586.2244787216187
+    },
+    {
+      "scenario": "r0.6_tw0.5_ex1",
+      "seconds": 921.1465458869934
+    },
+    {
+      "scenario": "r0.6_tw0.75_ex1",
+      "seconds": 1018.7509734630585
+    },
+    {
+      "scenario": "r0.6_tw1.25_ex1",
+      "seconds": 1384.2335755825043
+    },
+    {
+      "scenario": "r0.6_tw1.5_ex1",
+      "seconds": 1627.4120903015137
+    },
+    {
+      "scenario": "r0.6_tw1_ex0.5",
+      "seconds": 1010.963062286377
+    },
+    {
+      "scenario": "r0.6_tw1_ex0.75",
+      "seconds": 1085.480143547058
+    },
+    {
+      "scenario": "r0.6_tw1_ex1.25",
+      "seconds": 1360.3404726982117
+    },
+    {
+      "scenario": "r0.6_tw1_ex1.5",
+      "seconds": 1471.7831654548645
+    },
+    {
+      "scenario": "r0.3_tw0.75_ex1",
+      "seconds": 2646.7429895401
+    },
+    {
+      "scenario": "r0.3_tw1.25_ex1",
+      "seconds": 2893.542334318161
+    },
+    {
+      "scenario": "r0.9_tw0.75_ex1",
+      "seconds": 518.1141493320465
+    },
+    {
+      "scenario": "r0.9_tw1.25_ex1",
+      "seconds": 645.9441559314728
+    }
+  ],
+  "source_sha256": {
+    "evaluate_model.py": "151277b33128a094061fb953657612a41f35518607910eabacc4b42d56bebdb1",
+    "state_mcvrptw_v2.py": "bb5668b2aa65c70558293b61fe9d596f942fd827207c023a15e8f57b00f90e96",
+    "problem_mcvrptw_v2.py": "d003d1bb87a89e414df4c5921f275f97ff5d586dbf5174140e1bc29a8033cc43",
+    "experiments/sensitivity_20261030/batch.py": "5ad9fe3a55ce7e597fc6b6f25582ce141bbb0e3390d459ac022b5c916896c9dc",
+    "experiments/sensitivity_20261030/corrected_entry.py": "579638e83e255f9361c3555ce4b1a7e2204ad0662c27880fcdb82e0961dce09c",
+    "experiments/sensitivity_20261030/evaluate.py": "3d277abd3afc4383167e9f74b9ac0b95889f9ae8d129ff9b611be5821dc06e3c",
+    "experiments/sensitivity_20261030/scenarios.py": "7b3021d0e2fe6af58fc7256e76f31df7105b768ba8f9c72d8acad2549b16259a",
+    "experiments/sensitivity_20261030/test_scenarios.py": "f004c27afbaac191ba13ce4eae5bfe27a3018436a9a13bdbd307850e2a78f36e",
+    "experiments/sensitivity_20261030/timing_candidate.py": "fe43b6c1896f4d3eb5e2318c9f2f33c9acfc3508625b22ecf7799bb5b708e6b6",
+    "experiments/sensitivity_20261030/batch_v4.py": "ec45a24e09522f0b2cea610872711fa339c1184b5a5295f5f00e175455e3ebc4",
+    "experiments/sensitivity_20261030/evaluate_v4.py": "a98643a41520317e72ce145d025e1bcc238b60d6c60ba4dd8596920a8653e591",
+    "experiments/sensitivity_20261030/completion_guard.py": "e6698d86a40aa7455ff1da4ae18e443ae00a20f3bce7d37584942b32a31db090",
+    "experiments/sensitivity_20261030/evaluate_v4_guarded.py": "8c72847d3002292e5fd3b8f55643c42c9822d26b06fb4ac552fa1ae8e9bf333e",
+    "experiments/sensitivity_20261030/batch_v4_guarded.py": "93048cec6742d1a2c8c4b099fa542020e6746a7c5a29ed853cc4794650167f73"
+  },
+  "ended": 1793546667.3889816
+}

@@ -1,0 +1,7 @@
+{
+  "version": 1,
+  "recoveries": 0,
+  "failed_recoveries": 0,
+  "physical_tolerance_hours": 1e-05,
+  "lookahead_margin_seconds": 0.036
+}

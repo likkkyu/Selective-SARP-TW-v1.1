@@ -1,0 +1,54 @@
+[
+  {
+    "low": "r0.6_tw0.5_ex1",
+    "high": "r0.6_tw1.5_ex1",
+    "difference_pp": 4.112,
+    "conditional_instance_bootstrap_95pct": [
+      3.324,
+      4.908
+    ],
+    "training_seeds": 1,
+    "paired_instances": 500,
+    "bootstrap_repetitions": 10000,
+    "scope": "exploratory; uncertainty across instances conditional on this fixed policy, not training variability"
+  },
+  {
+    "low": "r0.6_tw1_ex0.5",
+    "high": "r0.6_tw1_ex1.5",
+    "difference_pp": -0.524,
+    "conditional_instance_bootstrap_95pct": [
+      -1.148,
+      0.084
+    ],
+    "training_seeds": 1,
+    "paired_instances": 500,
+    "bootstrap_repetitions": 10000,
+    "scope": "exploratory; uncertainty across instances conditional on this fixed policy, not training variability"
+  },
+  {
+    "low": "r0.3_tw0.75_ex1",
+    "high": "r0.3_tw1.25_ex1",
+    "difference_pp": 0.332,
+    "conditional_instance_bootstrap_95pct": [
+      -0.276,
+      0.944
+    ],
+    "training_seeds": 1,
+    "paired_instances": 500,
+    "bootstrap_repetitions": 10000,
+    "scope": "exploratory; uncertainty across instances conditional on this fixed policy, not training variability"
+  },
+  {
+    "low": "r0.9_tw0.75_ex1",
+    "high": "r0.9_tw1.25_ex1",
+    "difference_pp": 4.568,
+    "conditional_instance_bootstrap_95pct": [
+      3.78,
+      5.4
+    ],
+    "training_seeds": 1,
+    "paired_instances": 500,
+    "bootstrap_repetitions": 10000,
+    "scope": "exploratory; uncertainty across instances conditional on this fixed policy, not training variability"
+  }
+]

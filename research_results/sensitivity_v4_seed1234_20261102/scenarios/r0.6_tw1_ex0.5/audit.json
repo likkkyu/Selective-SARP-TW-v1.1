@@ -1,0 +1,5708 @@
+{
+  "samples": 500,
+  "strict_all_settings_valid": 217,
+  "hard_valid": 500,
+  "dispatch_target_shortfalls": 283,
+  "unfulfilled_total": 0,
+  "rows": [
+    {
+      "violations": [
+        {
+          "kind": "min_dispatch",
+          "step": 104,
+          "value": 3
+        }
+      ],
+      "completed": 47,
+      "rejected": 3,
+      "unfulfilled": 0,
+      "vehicles": 8,
+      "sample_index": 0
+    },
+    {
+      "violations": [
+        {
+          "kind": "min_dispatch",
+          "step": 106,
+          "value": 2
+        }
+      ],
+      "completed": 48,
+      "rejected": 2,
+      "unfulfilled": 0,
+      "vehicles": 9,
+      "sample_index": 1
+    },
+    {
+      "violations": [
+        {
+          "kind": "min_dispatch",
+          "step": 102,
+          "value": 3
+        }
+      ],
+      "completed": 46,
+      "rejected": 4,
+      "unfulfilled": 0,
+      "vehicles": 7,
+      "sample_index": 2
+    },
+    {
+      "violations": [
+        {
+          "kind": "min_dispatch",
+          "step": 100,
+          "value": 3
+        }
+      ],
+      "completed": 43,
+      "rejected": 7,
+      "unfulfilled": 0,
+      "vehicles": 8,
+      "sample_index": 3
+    },
+    {
+      "violations": [],
+      "completed": 47,
+      "rejected": 3,
+      "unfulfilled": 0,
+      "vehicles": 8,
+      "sample_index": 4
+    },
+    {
+      "violations": [],
+      "completed": 47,
+      "rejected": 3,
+      "unfulfilled": 0,
+      "vehicles": 8,
+      "sample_index": 5
+    },
+    {
+      "violations": [],
+      "completed": 47,
+      "rejected": 3,
+      "unfulfilled": 0,
+      "vehicles": 8,
+      "sample_index": 6
+    },
+    {
+      "violations": [],
+      "completed": 48,
+      "rejected": 2,
+      "unfulfilled": 0,
+      "vehicles": 8,
+      "sample_index": 7
+    },
+    {
+      "violations": [
+        {
+          "kind": "min_dispatch",
+          "step": 102,
+          "value": 2
+        }
+      ],
+      "completed": 45,
+      "rejected": 5,
+      "unfulfilled": 0,
+      "vehicles": 8,
+      "sample_index": 8
+    },
+    {
+      "violations": [
+        {
+          "kind": "min_dispatch",
+          "step": 101,
+          "value": 3
+        }
+      ],
+      "completed": 44,
+      "rejected": 6,
+      "unfulfilled": 0,
+      "vehicles": 8,
+      "sample_index": 9
+    },
+    {
+      "violations": [
+        {
+          "kind": "min_dispatch",
+          "step": 106,
+          "value": 3
+        }
+      ],
+      "completed": 48,
+      "rejected": 2,
+      "unfulfilled": 0,
+      "vehicles": 9,
+      "sample_index": 10
+    },
+    {
+      "violations": [
+        {
+          "kind": "min_dispatch",
+          "step": 106,
+          "value": 2
+        }
+      ],
+      "completed": 48,
+      "rejected": 2,
+      "unfulfilled": 0,
+      "vehicles": 9,
+      "sample_index": 11
+    },
+    {
+      "violations": [
+        {
+          "kind": "min_dispatch",
+          "step": 105,
+          "value": 3
+        }
+      ],
+      "completed": 47,
+      "rejected": 3,
+      "unfulfilled": 0,
+      "vehicles": 9,
+      "sample_index": 12
+    },
+    {
+      "violations": [
+        {
+          "kind": "min_dispatch",
+          "step": 101,
+          "value": 3
+        }
+      ],
+      "completed": 44,
+      "rejected": 6,
+      "unfulfilled": 0,
+      "vehicles": 8,
+      "sample_index": 13
+    },
+    {
+      "violations": [
+        {
+          "kind": "min_dispatch",
+          "step": 106,
+          "value": 3
+        }
+      ],
+      "completed": 48,
+      "rejected": 2,
+      "unfulfilled": 0,
+      "vehicles": 9,
+      "sample_index": 14
+    },
+    {
+      "violations": [],
+      "completed": 47,
+      "rejected": 3,
+      "unfulfilled": 0,
+      "vehicles": 8,
+      "sample_index": 15
+    },
+    {
+      "violations": [
+        {
+          "kind": "min_dispatch",
+          "step": 102,
+          "value": 3
+        }
+      ],
+      "completed": 45,
+      "rejected": 5,
+      "unfulfilled": 0,
+      "vehicles": 8,
+      "sample_index": 16
+    },
+    {
+      "violations": [
+        {
+          "kind": "min_dispatch",
+          "step": 104,
+          "value": 3
+        }
+      ],
+      "completed": 47,
+      "rejected": 3,
+      "unfulfilled": 0,
+      "vehicles": 8,
+      "sample_index": 17
+    },
+    {
+      "violations": [],
+      "completed": 48,
+      "rejected": 2,
+      "unfulfilled": 0,
+      "vehicles": 9,
+      "sample_index": 18
+    },
+    {
+      "violations": [
+        {
+          "kind": "min_dispatch",
+          "step": 103,
+          "value": 3
+        }
+      ],
+      "completed": 46,
+      "rejected": 4,
+      "unfulfilled": 0,
+      "vehicles": 8,
+      "sample_index": 19
+    },
+    {
+      "violations": [
+        {
+          "kind": "min_dispatch",
+          "step": 102,
+          "value": 3
+        }
+      ],
+      "completed": 45,
+      "rejected": 5,
+      "unfulfilled": 0,
+      "vehicles": 8,
+      "sample_index": 20
+    },
+    {
+      "violations": [
+        {
+          "kind": "min_dispatch",
+          "step": 103,
+          "value": 2
+        }
+      ],
+      "completed": 46,
+      "rejected": 4,
+      "unfulfilled": 0,
+      "vehicles": 8,
+      "sample_index": 21
+    },
+    {
+      "violations": [
+        {
+          "kind": "min_dispatch",
+          "step": 106,
+          "value": 3
+        }
+      ],
+      "completed": 49,
+      "rejected": 1,
+      "unfulfilled": 0,
+      "vehicles": 8,
+      "sample_index": 22
+    },
+    {
+      "violations": [
+        {
+          "kind": "min_dispatch",
+          "step": 99,
+          "value": 3
+        }
+      ],
+      "completed": 43,
+      "rejected": 7,
+      "unfulfilled": 0,
+      "vehicles": 7,
+      "sample_index": 23
+    },
+    {
+      "violations": [
+        {
+          "kind": "min_dispatch",
+          "step": 107,
+          "value": 3
+        }
+      ],
+      "completed": 49,
+      "rejected": 1,
+      "unfulfilled": 0,
+      "vehicles": 9,
+      "sample_index": 24
+    },
+    {
+      "violations": [
+        {
+          "kind": "min_dispatch",
+          "step": 105,
+          "value": 2
+        }
+      ],
+      "completed": 48,
+      "rejected": 2,
+      "unfulfilled": 0,
+      "vehicles": 8,
+      "sample_index": 25
+    },
+    {
+      "violations": [],
+      "completed": 48,
+      "rejected": 2,
+      "unfulfilled": 0,
+      "vehicles": 8,
+      "sample_index": 26
+    },
+    {
+      "violations": [
+        {
+          "kind": "min_dispatch",
+          "step": 96,
+          "value": 2
+        }
+      ],
+      "completed": 40,
+      "rejected": 10,
+      "unfulfilled": 0,
+      "vehicles": 7,
+      "sample_index": 27
+    },
+    {
+      "violations": [],
+      "completed": 46,
+      "rejected": 4,
+      "unfulfilled": 0,
+      "vehicles": 9,
+      "sample_index": 28
+    },
+    {
+      "violations": [
+        {
+          "kind": "min_dispatch",
+          "step": 97,
+          "value": 3
+        }
+      ],
+      "completed": 41,
+      "rejected": 9,
+      "unfulfilled": 0,
+      "vehicles": 7,
+      "sample_index": 29
+    },
+    {
+      "violations": [
+        {
+          "kind": "min_dispatch",
+          "step": 106,
+          "value": 3
+        }
+      ],
+      "completed": 49,
+      "rejected": 1,
+      "unfulfilled": 0,
+      "vehicles": 8,
+      "sample_index": 30
+    },
+    {
+      "violations": [],
+      "completed": 40,
+      "rejected": 10,
+      "unfulfilled": 0,
+      "vehicles": 7,
+      "sample_index": 31
+    },
+    {
+      "violations": [],
+      "completed": 46,
+      "rejected": 4,
+      "unfulfilled": 0,
+      "vehicles": 8,
+      "sample_index": 32
+    },
+    {
+      "violations": [],
+      "completed": 48,
+      "rejected": 2,
+      "unfulfilled": 0,
+      "vehicles": 8,
+      "sample_index": 33
+    },
+    {
+      "violations": [
+        {
+          "kind": "min_dispatch",
+          "step": 104,
+          "value": 1
+        }
+      ],
+      "completed": 46,
+      "rejected": 4,
+      "unfulfilled": 0,
+      "vehicles": 9,
+      "sample_index": 34
+    },
+    {
+      "violations": [],
+      "completed": 47,
+      "rejected": 3,
+      "unfulfilled": 0,
+      "vehicles": 8,
+      "sample_index": 35
+    },
+    {
+      "violations": [
+        {
+          "kind": "min_dispatch",
+          "step": 102,
+          "value": 3
+        }
+      ],
+      "completed": 45,
+      "rejected": 5,
+      "unfulfilled": 0,
+      "vehicles": 8,
+      "sample_index": 36
+    },
+    {
+      "violations": [
+        {
+          "kind": "min_dispatch",
+          "step": 99,
+          "value": 3
+        }
+      ],
+      "completed": 43,
+      "rejected": 7,
+      "unfulfilled": 0,
+      "vehicles": 7,
+      "sample_index": 37
+    },
+    {
+      "violations": [
+        {
+          "kind": "min_dispatch",
+          "step": 93,
+          "value": 3
+        }
+      ],
+      "completed": 38,
+      "rejected": 12,
+      "unfulfilled": 0,
+      "vehicles": 6,
+      "sample_index": 38
+    },
+    {
+      "violations": [
+        {
+          "kind": "min_dispatch",
+          "step": 105,
+          "value": 2
+        }
+      ],
+      "completed": 48,
+      "rejected": 2,
+      "unfulfilled": 0,
+      "vehicles": 8,
+      "sample_index": 39
+    },
+    {
+      "violations": [
+        {
+          "kind": "min_dispatch",
+          "step": 103,
+          "value": 2
+        }
+      ],
+      "completed": 46,
+      "rejected": 4,
+      "unfulfilled": 0,
+      "vehicles": 8,
+      "sample_index": 40
+    },
+    {
+      "violations": [],
+      "completed": 47,
+      "rejected": 3,
+      "unfulfilled": 0,
+      "vehicles": 8,
+      "sample_index": 41
+    },
+    {
+      "violations": [],
+      "completed": 45,
+      "rejected": 5,
+      "unfulfilled": 0,
+      "vehicles": 8,
+      "sample_index": 42
+    },
+    {
+      "violations": [
+        {
+          "kind": "min_dispatch",
+          "step": 99,
+          "value": 3
+        }
+      ],
+      "completed": 42,
+      "rejected": 8,
+      "unfulfilled": 0,
+      "vehicles": 8,
+      "sample_index": 43
+    },
+    {
+      "violations": [
+        {
+          "kind": "min_dispatch",
+          "step": 106,
+          "value": 2
+        }
+      ],
+      "completed": 48,
+      "rejected": 2,
+      "unfulfilled": 0,
+      "vehicles": 9,
+      "sample_index": 44
+    },
+    {
+      "violations": [
+        {
+          "kind": "min_dispatch",
+          "step": 103,
+          "value": 3
+        }
+      ],
+      "completed": 46,
+      "rejected": 4,
+      "unfulfilled": 0,
+      "vehicles": 8,
+      "sample_index": 45
+    },
+    {
+      "violations": [
+        {
+          "kind": "min_dispatch",
+          "step": 101,
+          "value": 2
+        }
+      ],
+      "completed": 44,
+      "rejected": 6,
+      "unfulfilled": 0,
+      "vehicles": 8,
+      "sample_index": 46
+    },
+    {
+      "violations": [
+        {
+          "kind": "min_dispatch",
+          "step": 107,
+          "value": 3
+        }
+      ],
+      "completed": 49,
+      "rejected": 1,
+      "unfulfilled": 0,
+      "vehicles": 9,
+      "sample_index": 47
+    },
+    {
+      "violations": [],
+      "completed": 47,
+      "rejected": 3,
+      "unfulfilled": 0,
+      "vehicles": 8,
+      "sample_index": 48
+    },
+    {
+      "violations": [],
+      "completed": 44,
+      "rejected": 6,
+      "unfulfilled": 0,
+      "vehicles": 7,
+      "sample_index": 49
+    },
+    {
+      "violations": [],
+      "completed": 47,
+      "rejected": 3,
+      "unfulfilled": 0,
+      "vehicles": 8,
+      "sample_index": 50
+    },
+    {
+      "violations": [],
+      "completed": 49,
+      "rejected": 1,
+      "unfulfilled": 0,
+      "vehicles": 8,
+      "sample_index": 51
+    },
+    {
+      "violations": [],
+      "completed": 47,
+      "rejected": 3,
+      "unfulfilled": 0,
+      "vehicles": 8,
+      "sample_index": 52
+    },
+    {
+      "violations": [
+        {
+          "kind": "min_dispatch",
+          "step": 102,
+          "value": 3
+        }
+      ],
+      "completed": 45,
+      "rejected": 5,
+      "unfulfilled": 0,
+      "vehicles": 8,
+      "sample_index": 53
+    },
+    {
+      "violations": [],
+      "completed": 47,
+      "rejected": 3,
+      "unfulfilled": 0,
+      "vehicles": 8,
+      "sample_index": 54
+    },
+    {
+      "violations": [
+        {
+          "kind": "min_dispatch",
+          "step": 102,
+          "value": 3
+        }
+      ],
+      "completed": 45,
+      "rejected": 5,
+      "unfulfilled": 0,
+      "vehicles": 8,
+      "sample_index": 55
+    },
+    {
+      "violations": [
+        {
+          "kind": "min_dispatch",
+          "step": 99,
+          "value": 3
+        }
+      ],
+      "completed": 43,
+      "rejected": 7,
+      "unfulfilled": 0,
+      "vehicles": 7,
+      "sample_index": 56
+    },
+    {
+      "violations": [
+        {
+          "kind": "min_dispatch",
+          "step": 100,
+          "value": 1
+        }
+      ],
+      "completed": 43,
+      "rejected": 7,
+      "unfulfilled": 0,
+      "vehicles": 8,
+      "sample_index": 57
+    },
+    {
+      "violations": [
+        {
+          "kind": "min_dispatch",
+          "step": 104,
+          "value": 2
+        }
+      ],
+      "completed": 47,
+      "rejected": 3,
+      "unfulfilled": 0,
+      "vehicles": 8,
+      "sample_index": 58
+    },
+    {
+      "violations": [
+        {
+          "kind": "min_dispatch",
+          "step": 100,
+          "value": 3
+        }
+      ],
+      "completed": 43,
+      "rejected": 7,
+      "unfulfilled": 0,
+      "vehicles": 8,
+      "sample_index": 59
+    },
+    {
+      "violations": [
+        {
+          "kind": "min_dispatch",
+          "step": 105,
+          "value": 3
+        }
+      ],
+      "completed": 48,
+      "rejected": 2,
+      "unfulfilled": 0,
+      "vehicles": 8,
+      "sample_index": 60
+    },
+    {
+      "violations": [
+        {
+          "kind": "min_dispatch",
+          "step": 105,
+          "value": 3
+        }
+      ],
+      "completed": 47,
+      "rejected": 3,
+      "unfulfilled": 0,
+      "vehicles": 9,
+      "sample_index": 61
+    },
+    {
+      "violations": [
+        {
+          "kind": "min_dispatch",
+          "step": 101,
+          "value": 3
+        }
+      ],
+      "completed": 44,
+      "rejected": 6,
+      "unfulfilled": 0,
+      "vehicles": 8,
+      "sample_index": 62
+    },
+    {
+      "violations": [],
+      "completed": 49,
+      "rejected": 1,
+      "unfulfilled": 0,
+      "vehicles": 9,
+      "sample_index": 63
+    },
+    {
+      "violations": [
+        {
+          "kind": "min_dispatch",
+          "step": 104,
+          "value": 3
+        }
+      ],
+      "completed": 47,
+      "rejected": 3,
+      "unfulfilled": 0,
+      "vehicles": 8,
+      "sample_index": 64
+    },
+    {
+      "violations": [],
+      "completed": 48,
+      "rejected": 2,
+      "unfulfilled": 0,
+      "vehicles": 9,
+      "sample_index": 65
+    },
+    {
+      "violations": [],
+      "completed": 50,
+      "rejected": 0,
+      "unfulfilled": 0,
+      "vehicles": 9,
+      "sample_index": 66
+    },
+    {
+      "violations": [
+        {
+          "kind": "min_dispatch",
+          "step": 106,
+          "value": 3
+        }
+      ],
+      "completed": 48,
+      "rejected": 2,
+      "unfulfilled": 0,
+      "vehicles": 9,
+      "sample_index": 67
+    },
+    {
+      "violations": [],
+      "completed": 47,
+      "rejected": 3,
+      "unfulfilled": 0,
+      "vehicles": 8,
+      "sample_index": 68
+    },
+    {
+      "violations": [],
+      "completed": 47,
+      "rejected": 3,
+      "unfulfilled": 0,
+      "vehicles": 7,
+      "sample_index": 69
+    },
+    {
+      "violations": [],
+      "completed": 50,
+      "rejected": 0,
+      "unfulfilled": 0,
+      "vehicles": 9,
+      "sample_index": 70
+    },
+    {
+      "violations": [],
+      "completed": 44,
+      "rejected": 6,
+      "unfulfilled": 0,
+      "vehicles": 8,
+      "sample_index": 71
+    },
+    {
+      "violations": [],
+      "completed": 49,
+      "rejected": 1,
+      "unfulfilled": 0,
+      "vehicles": 8,
+      "sample_index": 72
+    },
+    {
+      "violations": [],
+      "completed": 47,
+      "rejected": 3,
+      "unfulfilled": 0,
+      "vehicles": 8,
+      "sample_index": 73
+    },
+    {
+      "violations": [],
+      "completed": 48,
+      "rejected": 2,
+      "unfulfilled": 0,
+      "vehicles": 8,
+      "sample_index": 74
+    },
+    {
+      "violations": [],
+      "completed": 49,
+      "rejected": 1,
+      "unfulfilled": 0,
+      "vehicles": 8,
+      "sample_index": 75
+    },
+    {
+      "violations": [],
+      "completed": 47,
+      "rejected": 3,
+      "unfulfilled": 0,
+      "vehicles": 8,
+      "sample_index": 76
+    },
+    {
+      "violations": [
+        {
+          "kind": "min_dispatch",
+          "step": 102,
+          "value": 3
+        }
+      ],
+      "completed": 45,
+      "rejected": 5,
+      "unfulfilled": 0,
+      "vehicles": 8,
+      "sample_index": 77
+    },
+    {
+      "violations": [],
+      "completed": 50,
+      "rejected": 0,
+      "unfulfilled": 0,
+      "vehicles": 9,
+      "sample_index": 78
+    },
+    {
+      "violations": [
+        {
+          "kind": "min_dispatch",
+          "step": 99,
+          "value": 2
+        }
+      ],
+      "completed": 42,
+      "rejected": 8,
+      "unfulfilled": 0,
+      "vehicles": 8,
+      "sample_index": 79
+    },
+    {
+      "violations": [
+        {
+          "kind": "min_dispatch",
+          "step": 107,
+          "value": 3
+        }
+      ],
+      "completed": 49,
+      "rejected": 1,
+      "unfulfilled": 0,
+      "vehicles": 9,
+      "sample_index": 80
+    },
+    {
+      "violations": [],
+      "completed": 45,
+      "rejected": 5,
+      "unfulfilled": 0,
+      "vehicles": 8,
+      "sample_index": 81
+    },
+    {
+      "violations": [],
+      "completed": 48,
+      "rejected": 2,
+      "unfulfilled": 0,
+      "vehicles": 9,
+      "sample_index": 82
+    },
+    {
+      "violations": [],
+      "completed": 48,
+      "rejected": 2,
+      "unfulfilled": 0,
+      "vehicles": 8,
+      "sample_index": 83
+    },
+    {
+      "violations": [],
+      "completed": 49,
+      "rejected": 1,
+      "unfulfilled": 0,
+      "vehicles": 8,
+      "sample_index": 84
+    },
+    {
+      "violations": [
+        {
+          "kind": "min_dispatch",
+          "step": 97,
+          "value": 3
+        }
+      ],
+      "completed": 41,
+      "rejected": 9,
+      "unfulfilled": 0,
+      "vehicles": 7,
+      "sample_index": 85
+    },
+    {
+      "violations": [],
+      "completed": 49,
+      "rejected": 1,
+      "unfulfilled": 0,
+      "vehicles": 9,
+      "sample_index": 86
+    },
+    {
+      "violations": [
+        {
+          "kind": "min_dispatch",
+          "step": 106,
+          "value": 2
+        }
+      ],
+      "completed": 48,
+      "rejected": 2,
+      "unfulfilled": 0,
+      "vehicles": 9,
+      "sample_index": 87
+    },
+    {
+      "violations": [],
+      "completed": 47,
+      "rejected": 3,
+      "unfulfilled": 0,
+      "vehicles": 8,
+      "sample_index": 88
+    },
+    {
+      "violations": [],
+      "completed": 48,
+      "rejected": 2,
+      "unfulfilled": 0,
+      "vehicles": 7,
+      "sample_index": 89
+    },
+    {
+      "violations": [
+        {
+          "kind": "min_dispatch",
+          "step": 100,
+          "value": 3
+        }
+      ],
+      "completed": 43,
+      "rejected": 7,
+      "unfulfilled": 0,
+      "vehicles": 8,
+      "sample_index": 90
+    },
+    {
+      "violations": [
+        {
+          "kind": "min_dispatch",
+          "step": 105,
+          "value": 2
+        }
+      ],
+      "completed": 47,
+      "rejected": 3,
+      "unfulfilled": 0,
+      "vehicles": 9,
+      "sample_index": 91
+    },
+    {
+      "violations": [],
+      "completed": 48,
+      "rejected": 2,
+      "unfulfilled": 0,
+      "vehicles": 9,
+      "sample_index": 92
+    },
+    {
+      "violations": [
+        {
+          "kind": "min_dispatch",
+          "step": 103,
+          "value": 3
+        }
+      ],
+      "completed": 46,
+      "rejected": 4,
+      "unfulfilled": 0,
+      "vehicles": 8,
+      "sample_index": 93
+    },
+    {
+      "violations": [
+        {
+          "kind": "min_dispatch",
+          "step": 98,
+          "value": 3
+        }
+      ],
+      "completed": 42,
+      "rejected": 8,
+      "unfulfilled": 0,
+      "vehicles": 7,
+      "sample_index": 94
+    },
+    {
+      "violations": [],
+      "completed": 49,
+      "rejected": 1,
+      "unfulfilled": 0,
+      "vehicles": 9,
+      "sample_index": 95
+    },
+    {
+      "violations": [],
+      "completed": 50,
+      "rejected": 0,
+      "unfulfilled": 0,
+      "vehicles": 9,
+      "sample_index": 96
+    },
+    {
+      "violations": [],
+      "completed": 49,
+      "rejected": 1,
+      "unfulfilled": 0,
+      "vehicles": 8,
+      "sample_index": 97
+    },
+    {
+      "violations": [
+        {
+          "kind": "min_dispatch",
+          "step": 107,
+          "value": 3
+        }
+      ],
+      "completed": 49,
+      "rejected": 1,
+      "unfulfilled": 0,
+      "vehicles": 9,
+      "sample_index": 98
+    },
+    {
+      "violations": [
+        {
+          "kind": "min_dispatch",
+          "step": 94,
+          "value": 3
+        }
+      ],
+      "completed": 38,
+      "rejected": 12,
+      "unfulfilled": 0,
+      "vehicles": 7,
+      "sample_index": 99
+    },
+    {
+      "violations": [],
+      "completed": 49,
+      "rejected": 1,
+      "unfulfilled": 0,
+      "vehicles": 9,
+      "sample_index": 100
+    },
+    {
+      "violations": [],
+      "completed": 49,
+      "rejected": 1,
+      "unfulfilled": 0,
+      "vehicles": 9,
+      "sample_index": 101
+    },
+    {
+      "violations": [
+        {
+          "kind": "min_dispatch",
+          "step": 102,
+          "value": 3
+        }
+      ],
+      "completed": 45,
+      "rejected": 5,
+      "unfulfilled": 0,
+      "vehicles": 8,
+      "sample_index": 102
+    },
+    {
+      "violations": [],
+      "completed": 45,
+      "rejected": 5,
+      "unfulfilled": 0,
+      "vehicles": 7,
+      "sample_index": 103
+    },
+    {
+      "violations": [],
+      "completed": 44,
+      "rejected": 6,
+      "unfulfilled": 0,
+      "vehicles": 9,
+      "sample_index": 104
+    },
+    {
+      "violations": [
+        {
+          "kind": "min_dispatch",
+          "step": 107,
+          "value": 3
+        }
+      ],
+      "completed": 49,
+      "rejected": 1,
+      "unfulfilled": 0,
+      "vehicles": 9,
+      "sample_index": 105
+    },
+    {
+      "violations": [],
+      "completed": 47,
+      "rejected": 3,
+      "unfulfilled": 0,
+      "vehicles": 8,
+      "sample_index": 106
+    },
+    {
+      "violations": [],
+      "completed": 48,
+      "rejected": 2,
+      "unfulfilled": 0,
+      "vehicles": 8,
+      "sample_index": 107
+    },
+    {
+      "violations": [],
+      "completed": 47,
+      "rejected": 3,
+      "unfulfilled": 0,
+      "vehicles": 8,
+      "sample_index": 108
+    },
+    {
+      "violations": [
+        {
+          "kind": "min_dispatch",
+          "step": 105,
+          "value": 3
+        }
+      ],
+      "completed": 47,
+      "rejected": 3,
+      "unfulfilled": 0,
+      "vehicles": 9,
+      "sample_index": 109
+    },
+    {
+      "violations": [
+        {
+          "kind": "min_dispatch",
+          "step": 99,
+          "value": 3
+        }
+      ],
+      "completed": 42,
+      "rejected": 8,
+      "unfulfilled": 0,
+      "vehicles": 8,
+      "sample_index": 110
+    },
+    {
+      "violations": [],
+      "completed": 42,
+      "rejected": 8,
+      "unfulfilled": 0,
+      "vehicles": 7,
+      "sample_index": 111
+    },
+    {
+      "violations": [],
+      "completed": 47,
+      "rejected": 3,
+      "unfulfilled": 0,
+      "vehicles": 8,
+      "sample_index": 112
+    },
+    {
+      "violations": [
+        {
+          "kind": "min_dispatch",
+          "step": 103,
+          "value": 2
+        }
+      ],
+      "completed": 46,
+      "rejected": 4,
+      "unfulfilled": 0,
+      "vehicles": 8,
+      "sample_index": 113
+    },
+    {
+      "violations": [
+        {
+          "kind": "min_dispatch",
+          "step": 106,
+          "value": 3
+        }
+      ],
+      "completed": 48,
+      "rejected": 2,
+      "unfulfilled": 0,
+      "vehicles": 9,
+      "sample_index": 114
+    },
+    {
+      "violations": [],
+      "completed": 49,
+      "rejected": 1,
+      "unfulfilled": 0,
+      "vehicles": 8,
+      "sample_index": 115
+    },
+    {
+      "violations": [
+        {
+          "kind": "min_dispatch",
+          "step": 104,
+          "value": 3
+        }
+      ],
+      "completed": 47,
+      "rejected": 3,
+      "unfulfilled": 0,
+      "vehicles": 8,
+      "sample_index": 116
+    },
+    {
+      "violations": [],
+      "completed": 47,
+      "rejected": 3,
+      "unfulfilled": 0,
+      "vehicles": 8,
+      "sample_index": 117
+    },
+    {
+      "violations": [
+        {
+          "kind": "min_dispatch",
+          "step": 103,
+          "value": 3
+        }
+      ],
+      "completed": 46,
+      "rejected": 4,
+      "unfulfilled": 0,
+      "vehicles": 8,
+      "sample_index": 118
+    },
+    {
+      "violations": [
+        {
+          "kind": "min_dispatch",
+          "step": 105,
+          "value": 1
+        }
+      ],
+      "completed": 47,
+      "rejected": 3,
+      "unfulfilled": 0,
+      "vehicles": 9,
+      "sample_index": 119
+    },
+    {
+      "violations": [
+        {
+          "kind": "min_dispatch",
+          "step": 106,
+          "value": 2
+        }
+      ],
+      "completed": 48,
+      "rejected": 2,
+      "unfulfilled": 0,
+      "vehicles": 9,
+      "sample_index": 120
+    },
+    {
+      "violations": [
+        {
+          "kind": "min_dispatch",
+          "step": 102,
+          "value": 3
+        }
+      ],
+      "completed": 45,
+      "rejected": 5,
+      "unfulfilled": 0,
+      "vehicles": 8,
+      "sample_index": 121
+    },
+    {
+      "violations": [
+        {
+          "kind": "min_dispatch",
+          "step": 102,
+          "value": 3
+        }
+      ],
+      "completed": 45,
+      "rejected": 5,
+      "unfulfilled": 0,
+      "vehicles": 8,
+      "sample_index": 122
+    },
+    {
+      "violations": [
+        {
+          "kind": "min_dispatch",
+          "step": 102,
+          "value": 3
+        }
+      ],
+      "completed": 45,
+      "rejected": 5,
+      "unfulfilled": 0,
+      "vehicles": 8,
+      "sample_index": 123
+    },
+    {
+      "violations": [
+        {
+          "kind": "min_dispatch",
+          "step": 105,
+          "value": 2
+        }
+      ],
+      "completed": 47,
+      "rejected": 3,
+      "unfulfilled": 0,
+      "vehicles": 9,
+      "sample_index": 124
+    },
+    {
+      "violations": [
+        {
+          "kind": "min_dispatch",
+          "step": 107,
+          "value": 3
+        }
+      ],
+      "completed": 49,
+      "rejected": 1,
+      "unfulfilled": 0,
+      "vehicles": 9,
+      "sample_index": 125
+    },
+    {
+      "violations": [
+        {
+          "kind": "min_dispatch",
+          "step": 101,
+          "value": 3
+        }
+      ],
+      "completed": 44,
+      "rejected": 6,
+      "unfulfilled": 0,
+      "vehicles": 8,
+      "sample_index": 126
+    },
+    {
+      "violations": [],
+      "completed": 47,
+      "rejected": 3,
+      "unfulfilled": 0,
+      "vehicles": 8,
+      "sample_index": 127
+    },
+    {
+      "violations": [
+        {
+          "kind": "min_dispatch",
+          "step": 101,
+          "value": 3
+        }
+      ],
+      "completed": 44,
+      "rejected": 6,
+      "unfulfilled": 0,
+      "vehicles": 8,
+      "sample_index": 128
+    },
+    {
+      "violations": [],
+      "completed": 40,
+      "rejected": 10,
+      "unfulfilled": 0,
+      "vehicles": 7,
+      "sample_index": 129
+    },
+    {
+      "violations": [],
+      "completed": 47,
+      "rejected": 3,
+      "unfulfilled": 0,
+      "vehicles": 8,
+      "sample_index": 130
+    },
+    {
+      "violations": [
+        {
+          "kind": "min_dispatch",
+          "step": 105,
+          "value": 3
+        }
+      ],
+      "completed": 47,
+      "rejected": 3,
+      "unfulfilled": 0,
+      "vehicles": 9,
+      "sample_index": 131
+    },
+    {
+      "violations": [],
+      "completed": 47,
+      "rejected": 3,
+      "unfulfilled": 0,
+      "vehicles": 8,
+      "sample_index": 132
+    },
+    {
+      "violations": [
+        {
+          "kind": "min_dispatch",
+          "step": 104,
+          "value": 3
+        }
+      ],
+      "completed": 47,
+      "rejected": 3,
+      "unfulfilled": 0,
+      "vehicles": 8,
+      "sample_index": 133
+    },
+    {
+      "violations": [],
+      "completed": 48,
+      "rejected": 2,
+      "unfulfilled": 0,
+      "vehicles": 8,
+      "sample_index": 134
+    },
+    {
+      "violations": [],
+      "completed": 48,
+      "rejected": 2,
+      "unfulfilled": 0,
+      "vehicles": 8,
+      "sample_index": 135
+    },
+    {
+      "violations": [],
+      "completed": 47,
+      "rejected": 3,
+      "unfulfilled": 0,
+      "vehicles": 8,
+      "sample_index": 136
+    },
+    {
+      "violations": [],
+      "completed": 49,
+      "rejected": 1,
+      "unfulfilled": 0,
+      "vehicles": 8,
+      "sample_index": 137
+    },
+    {
+      "violations": [],
+      "completed": 47,
+      "rejected": 3,
+      "unfulfilled": 0,
+      "vehicles": 8,
+      "sample_index": 138
+    },
+    {
+      "violations": [],
+      "completed": 40,
+      "rejected": 10,
+      "unfulfilled": 0,
+      "vehicles": 6,
+      "sample_index": 139
+    },
+    {
+      "violations": [
+        {
+          "kind": "min_dispatch",
+          "step": 104,
+          "value": 3
+        }
+      ],
+      "completed": 46,
+      "rejected": 4,
+      "unfulfilled": 0,
+      "vehicles": 9,
+      "sample_index": 140
+    },
+    {
+      "violations": [
+        {
+          "kind": "min_dispatch",
+          "step": 106,
+          "value": 3
+        }
+      ],
+      "completed": 48,
+      "rejected": 2,
+      "unfulfilled": 0,
+      "vehicles": 9,
+      "sample_index": 141
+    },
+    {
+      "violations": [
+        {
+          "kind": "min_dispatch",
+          "step": 102,
+          "value": 3
+        }
+      ],
+      "completed": 45,
+      "rejected": 5,
+      "unfulfilled": 0,
+      "vehicles": 8,
+      "sample_index": 142
+    },
+    {
+      "violations": [
+        {
+          "kind": "min_dispatch",
+          "step": 104,
+          "value": 3
+        }
+      ],
+      "completed": 47,
+      "rejected": 3,
+      "unfulfilled": 0,
+      "vehicles": 8,
+      "sample_index": 143
+    },
+    {
+      "violations": [
+        {
+          "kind": "min_dispatch",
+          "step": 104,
+          "value": 3
+        }
+      ],
+      "completed": 47,
+      "rejected": 3,
+      "unfulfilled": 0,
+      "vehicles": 8,
+      "sample_index": 144
+    },
+    {
+      "violations": [],
+      "completed": 49,
+      "rejected": 1,
+      "unfulfilled": 0,
+      "vehicles": 9,
+      "sample_index": 145
+    },
+    {
+      "violations": [
+        {
+          "kind": "min_dispatch",
+          "step": 102,
+          "value": 1
+        }
+      ],
+      "completed": 45,
+      "rejected": 5,
+      "unfulfilled": 0,
+      "vehicles": 8,
+      "sample_index": 146
+    },
+    {
+      "violations": [
+        {
+          "kind": "min_dispatch",
+          "step": 106,
+          "value": 3
+        }
+      ],
+      "completed": 48,
+      "rejected": 2,
+      "unfulfilled": 0,
+      "vehicles": 9,
+      "sample_index": 147
+    },
+    {
+      "violations": [
+        {
+          "kind": "min_dispatch",
+          "step": 107,
+          "value": 3
+        }
+      ],
+      "completed": 49,
+      "rejected": 1,
+      "unfulfilled": 0,
+      "vehicles": 9,
+      "sample_index": 148
+    },
+    {
+      "violations": [],
+      "completed": 50,
+      "rejected": 0,
+      "unfulfilled": 0,
+      "vehicles": 9,
+      "sample_index": 149
+    },
+    {
+      "violations": [],
+      "completed": 48,
+      "rejected": 2,
+      "unfulfilled": 0,
+      "vehicles": 8,
+      "sample_index": 150
+    },
+    {
+      "violations": [
+        {
+          "kind": "min_dispatch",
+          "step": 106,
+          "value": 3
+        }
+      ],
+      "completed": 48,
+      "rejected": 2,
+      "unfulfilled": 0,
+      "vehicles": 9,
+      "sample_index": 151
+    },
+    {
+      "violations": [
+        {
+          "kind": "min_dispatch",
+          "step": 105,
+          "value": 3
+        }
+      ],
+      "completed": 47,
+      "rejected": 3,
+      "unfulfilled": 0,
+      "vehicles": 9,
+      "sample_index": 152
+    },
+    {
+      "violations": [
+        {
+          "kind": "min_dispatch",
+          "step": 99,
+          "value": 2
+        }
+      ],
+      "completed": 42,
+      "rejected": 8,
+      "unfulfilled": 0,
+      "vehicles": 8,
+      "sample_index": 153
+    },
+    {
+      "violations": [
+        {
+          "kind": "min_dispatch",
+          "step": 104,
+          "value": 3
+        }
+      ],
+      "completed": 47,
+      "rejected": 3,
+      "unfulfilled": 0,
+      "vehicles": 8,
+      "sample_index": 154
+    },
+    {
+      "violations": [
+        {
+          "kind": "min_dispatch",
+          "step": 105,
+          "value": 3
+        }
+      ],
+      "completed": 48,
+      "rejected": 2,
+      "unfulfilled": 0,
+      "vehicles": 8,
+      "sample_index": 155
+    },
+    {
+      "violations": [
+        {
+          "kind": "min_dispatch",
+          "step": 106,
+          "value": 3
+        }
+      ],
+      "completed": 48,
+      "rejected": 2,
+      "unfulfilled": 0,
+      "vehicles": 9,
+      "sample_index": 156
+    },
+    {
+      "violations": [],
+      "completed": 48,
+      "rejected": 2,
+      "unfulfilled": 0,
+      "vehicles": 8,
+      "sample_index": 157
+    },
+    {
+      "violations": [
+        {
+          "kind": "min_dispatch",
+          "step": 105,
+          "value": 3
+        }
+      ],
+      "completed": 48,
+      "rejected": 2,
+      "unfulfilled": 0,
+      "vehicles": 8,
+      "sample_index": 158
+    },
+    {
+      "violations": [
+        {
+          "kind": "min_dispatch",
+          "step": 106,
+          "value": 3
+        }
+      ],
+      "completed": 48,
+      "rejected": 2,
+      "unfulfilled": 0,
+      "vehicles": 9,
+      "sample_index": 159
+    },
+    {
+      "violations": [
+        {
+          "kind": "min_dispatch",
+          "step": 102,
+          "value": 2
+        }
+      ],
+      "completed": 45,
+      "rejected": 5,
+      "unfulfilled": 0,
+      "vehicles": 8,
+      "sample_index": 160
+    },
+    {
+      "violations": [],
+      "completed": 42,
+      "rejected": 8,
+      "unfulfilled": 0,
+      "vehicles": 7,
+      "sample_index": 161
+    },
+    {
+      "violations": [],
+      "completed": 48,
+      "rejected": 2,
+      "unfulfilled": 0,
+      "vehicles": 8,
+      "sample_index": 162
+    },
+    {
+      "violations": [
+        {
+          "kind": "min_dispatch",
+          "step": 107,
+          "value": 3
+        }
+      ],
+      "completed": 49,
+      "rejected": 1,
+      "unfulfilled": 0,
+      "vehicles": 9,
+      "sample_index": 163
+    },
+    {
+      "violations": [
+        {
+          "kind": "min_dispatch",
+          "step": 106,
+          "value": 3
+        }
+      ],
+      "completed": 49,
+      "rejected": 1,
+      "unfulfilled": 0,
+      "vehicles": 8,
+      "sample_index": 164
+    },
+    {
+      "violations": [],
+      "completed": 46,
+      "rejected": 4,
+      "unfulfilled": 0,
+      "vehicles": 8,
+      "sample_index": 165
+    },
+    {
+      "violations": [],
+      "completed": 47,
+      "rejected": 3,
+      "unfulfilled": 0,
+      "vehicles": 8,
+      "sample_index": 166
+    },
+    {
+      "violations": [],
+      "completed": 47,
+      "rejected": 3,
+      "unfulfilled": 0,
+      "vehicles": 8,
+      "sample_index": 167
+    },
+    {
+      "violations": [
+        {
+          "kind": "min_dispatch",
+          "step": 99,
+          "value": 3
+        }
+      ],
+      "completed": 42,
+      "rejected": 8,
+      "unfulfilled": 0,
+      "vehicles": 8,
+      "sample_index": 168
+    },
+    {
+      "violations": [
+        {
+          "kind": "min_dispatch",
+          "step": 104,
+          "value": 2
+        }
+      ],
+      "completed": 47,
+      "rejected": 3,
+      "unfulfilled": 0,
+      "vehicles": 8,
+      "sample_index": 169
+    },
+    {
+      "violations": [
+        {
+          "kind": "min_dispatch",
+          "step": 102,
+          "value": 3
+        }
+      ],
+      "completed": 45,
+      "rejected": 5,
+      "unfulfilled": 0,
+      "vehicles": 8,
+      "sample_index": 170
+    },
+    {
+      "violations": [
+        {
+          "kind": "min_dispatch",
+          "step": 106,
+          "value": 2
+        }
+      ],
+      "completed": 48,
+      "rejected": 2,
+      "unfulfilled": 0,
+      "vehicles": 9,
+      "sample_index": 171
+    },
+    {
+      "violations": [],
+      "completed": 48,
+      "rejected": 2,
+      "unfulfilled": 0,
+      "vehicles": 8,
+      "sample_index": 172
+    },
+    {
+      "violations": [],
+      "completed": 46,
+      "rejected": 4,
+      "unfulfilled": 0,
+      "vehicles": 8,
+      "sample_index": 173
+    },
+    {
+      "violations": [],
+      "completed": 49,
+      "rejected": 1,
+      "unfulfilled": 0,
+      "vehicles": 8,
+      "sample_index": 174
+    },
+    {
+      "violations": [
+        {
+          "kind": "min_dispatch",
+          "step": 107,
+          "value": 3
+        }
+      ],
+      "completed": 49,
+      "rejected": 1,
+      "unfulfilled": 0,
+      "vehicles": 9,
+      "sample_index": 175
+    },
+    {
+      "violations": [
+        {
+          "kind": "min_dispatch",
+          "step": 101,
+          "value": 3
+        }
+      ],
+      "completed": 44,
+      "rejected": 6,
+      "unfulfilled": 0,
+      "vehicles": 8,
+      "sample_index": 176
+    },
+    {
+      "violations": [
+        {
+          "kind": "min_dispatch",
+          "step": 100,
+          "value": 3
+        }
+      ],
+      "completed": 43,
+      "rejected": 7,
+      "unfulfilled": 0,
+      "vehicles": 8,
+      "sample_index": 177
+    },
+    {
+      "violations": [],
+      "completed": 48,
+      "rejected": 2,
+      "unfulfilled": 0,
+      "vehicles": 8,
+      "sample_index": 178
+    },
+    {
+      "violations": [
+        {
+          "kind": "min_dispatch",
+          "step": 102,
+          "value": 3
+        }
+      ],
+      "completed": 45,
+      "rejected": 5,
+      "unfulfilled": 0,
+      "vehicles": 8,
+      "sample_index": 179
+    },
+    {
+      "violations": [],
+      "completed": 47,
+      "rejected": 3,
+      "unfulfilled": 0,
+      "vehicles": 8,
+      "sample_index": 180
+    },
+    {
+      "violations": [],
+      "completed": 48,
+      "rejected": 2,
+      "unfulfilled": 0,
+      "vehicles": 8,
+      "sample_index": 181
+    },
+    {
+      "violations": [
+        {
+          "kind": "min_dispatch",
+          "step": 96,
+          "value": 3
+        }
+      ],
+      "completed": 40,
+      "rejected": 10,
+      "unfulfilled": 0,
+      "vehicles": 7,
+      "sample_index": 182
+    },
+    {
+      "violations": [],
+      "completed": 42,
+      "rejected": 8,
+      "unfulfilled": 0,
+      "vehicles": 7,
+      "sample_index": 183
+    },
+    {
+      "violations": [
+        {
+          "kind": "min_dispatch",
+          "step": 106,
+          "value": 3
+        }
+      ],
+      "completed": 48,
+      "rejected": 2,
+      "unfulfilled": 0,
+      "vehicles": 9,
+      "sample_index": 184
+    },
+    {
+      "violations": [
+        {
+          "kind": "min_dispatch",
+          "step": 103,
+          "value": 3
+        }
+      ],
+      "completed": 45,
+      "rejected": 5,
+      "unfulfilled": 0,
+      "vehicles": 9,
+      "sample_index": 185
+    },
+    {
+      "violations": [
+        {
+          "kind": "min_dispatch",
+          "step": 107,
+          "value": 3
+        }
+      ],
+      "completed": 49,
+      "rejected": 1,
+      "unfulfilled": 0,
+      "vehicles": 9,
+      "sample_index": 186
+    },
+    {
+      "violations": [],
+      "completed": 47,
+      "rejected": 3,
+      "unfulfilled": 0,
+      "vehicles": 9,
+      "sample_index": 187
+    },
+    {
+      "violations": [
+        {
+          "kind": "min_dispatch",
+          "step": 102,
+          "value": 3
+        }
+      ],
+      "completed": 45,
+      "rejected": 5,
+      "unfulfilled": 0,
+      "vehicles": 8,
+      "sample_index": 188
+    },
+    {
+      "violations": [],
+      "completed": 48,
+      "rejected": 2,
+      "unfulfilled": 0,
+      "vehicles": 8,
+      "sample_index": 189
+    },
+    {
+      "violations": [
+        {
+          "kind": "min_dispatch",
+          "step": 104,
+          "value": 3
+        }
+      ],
+      "completed": 47,
+      "rejected": 3,
+      "unfulfilled": 0,
+      "vehicles": 8,
+      "sample_index": 190
+    },
+    {
+      "violations": [
+        {
+          "kind": "min_dispatch",
+          "step": 105,
+          "value": 2
+        }
+      ],
+      "completed": 47,
+      "rejected": 3,
+      "unfulfilled": 0,
+      "vehicles": 9,
+      "sample_index": 191
+    },
+    {
+      "violations": [
+        {
+          "kind": "min_dispatch",
+          "step": 106,
+          "value": 2
+        }
+      ],
+      "completed": 48,
+      "rejected": 2,
+      "unfulfilled": 0,
+      "vehicles": 9,
+      "sample_index": 192
+    },
+    {
+      "violations": [],
+      "completed": 48,
+      "rejected": 2,
+      "unfulfilled": 0,
+      "vehicles": 9,
+      "sample_index": 193
+    },
+    {
+      "violations": [
+        {
+          "kind": "min_dispatch",
+          "step": 102,
+          "value": 3
+        }
+      ],
+      "completed": 45,
+      "rejected": 5,
+      "unfulfilled": 0,
+      "vehicles": 8,
+      "sample_index": 194
+    },
+    {
+      "violations": [
+        {
+          "kind": "min_dispatch",
+          "step": 101,
+          "value": 2
+        }
+      ],
+      "completed": 44,
+      "rejected": 6,
+      "unfulfilled": 0,
+      "vehicles": 8,
+      "sample_index": 195
+    },
+    {
+      "violations": [
+        {
+          "kind": "min_dispatch",
+          "step": 97,
+          "value": 3
+        }
+      ],
+      "completed": 41,
+      "rejected": 9,
+      "unfulfilled": 0,
+      "vehicles": 7,
+      "sample_index": 196
+    },
+    {
+      "violations": [],
+      "completed": 47,
+      "rejected": 3,
+      "unfulfilled": 0,
+      "vehicles": 8,
+      "sample_index": 197
+    },
+    {
+      "violations": [
+        {
+          "kind": "min_dispatch",
+          "step": 102,
+          "value": 2
+        }
+      ],
+      "completed": 45,
+      "rejected": 5,
+      "unfulfilled": 0,
+      "vehicles": 8,
+      "sample_index": 198
+    },
+    {
+      "violations": [
+        {
+          "kind": "min_dispatch",
+          "step": 103,
+          "value": 3
+        }
+      ],
+      "completed": 46,
+      "rejected": 4,
+      "unfulfilled": 0,
+      "vehicles": 8,
+      "sample_index": 199
+    },
+    {
+      "violations": [
+        {
+          "kind": "min_dispatch",
+          "step": 104,
+          "value": 3
+        }
+      ],
+      "completed": 47,
+      "rejected": 3,
+      "unfulfilled": 0,
+      "vehicles": 8,
+      "sample_index": 200
+    },
+    {
+      "violations": [
+        {
+          "kind": "min_dispatch",
+          "step": 105,
+          "value": 2
+        }
+      ],
+      "completed": 47,
+      "rejected": 3,
+      "unfulfilled": 0,
+      "vehicles": 9,
+      "sample_index": 201
+    },
+    {
+      "violations": [],
+      "completed": 50,
+      "rejected": 0,
+      "unfulfilled": 0,
+      "vehicles": 9,
+      "sample_index": 202
+    },
+    {
+      "violations": [
+        {
+          "kind": "min_dispatch",
+          "step": 97,
+          "value": 3
+        }
+      ],
+      "completed": 41,
+      "rejected": 9,
+      "unfulfilled": 0,
+      "vehicles": 7,
+      "sample_index": 203
+    },
+    {
+      "violations": [
+        {
+          "kind": "min_dispatch",
+          "step": 105,
+          "value": 1
+        }
+      ],
+      "completed": 47,
+      "rejected": 3,
+      "unfulfilled": 0,
+      "vehicles": 9,
+      "sample_index": 204
+    },
+    {
+      "violations": [],
+      "completed": 47,
+      "rejected": 3,
+      "unfulfilled": 0,
+      "vehicles": 8,
+      "sample_index": 205
+    },
+    {
+      "violations": [],
+      "completed": 47,
+      "rejected": 3,
+      "unfulfilled": 0,
+      "vehicles": 8,
+      "sample_index": 206
+    },
+    {
+      "violations": [],
+      "completed": 48,
+      "rejected": 2,
+      "unfulfilled": 0,
+      "vehicles": 8,
+      "sample_index": 207
+    },
+    {
+      "violations": [
+        {
+          "kind": "min_dispatch",
+          "step": 96,
+          "value": 3
+        }
+      ],
+      "completed": 40,
+      "rejected": 10,
+      "unfulfilled": 0,
+      "vehicles": 7,
+      "sample_index": 208
+    },
+    {
+      "violations": [
+        {
+          "kind": "min_dispatch",
+          "step": 98,
+          "value": 2
+        }
+      ],
+      "completed": 42,
+      "rejected": 8,
+      "unfulfilled": 0,
+      "vehicles": 7,
+      "sample_index": 209
+    },
+    {
+      "violations": [
+        {
+          "kind": "min_dispatch",
+          "step": 103,
+          "value": 2
+        }
+      ],
+      "completed": 46,
+      "rejected": 4,
+      "unfulfilled": 0,
+      "vehicles": 8,
+      "sample_index": 210
+    },
+    {
+      "violations": [
+        {
+          "kind": "min_dispatch",
+          "step": 98,
+          "value": 1
+        }
+      ],
+      "completed": 41,
+      "rejected": 9,
+      "unfulfilled": 0,
+      "vehicles": 8,
+      "sample_index": 211
+    },
+    {
+      "violations": [
+        {
+          "kind": "min_dispatch",
+          "step": 100,
+          "value": 3
+        }
+      ],
+      "completed": 43,
+      "rejected": 7,
+      "unfulfilled": 0,
+      "vehicles": 8,
+      "sample_index": 212
+    },
+    {
+      "violations": [
+        {
+          "kind": "min_dispatch",
+          "step": 106,
+          "value": 2
+        }
+      ],
+      "completed": 48,
+      "rejected": 2,
+      "unfulfilled": 0,
+      "vehicles": 9,
+      "sample_index": 213
+    },
+    {
+      "violations": [
+        {
+          "kind": "min_dispatch",
+          "step": 102,
+          "value": 3
+        }
+      ],
+      "completed": 45,
+      "rejected": 5,
+      "unfulfilled": 0,
+      "vehicles": 8,
+      "sample_index": 214
+    },
+    {
+      "violations": [
+        {
+          "kind": "min_dispatch",
+          "step": 100,
+          "value": 2
+        }
+      ],
+      "completed": 43,
+      "rejected": 7,
+      "unfulfilled": 0,
+      "vehicles": 8,
+      "sample_index": 215
+    },
+    {
+      "violations": [],
+      "completed": 47,
+      "rejected": 3,
+      "unfulfilled": 0,
+      "vehicles": 8,
+      "sample_index": 216
+    },
+    {
+      "violations": [
+        {
+          "kind": "min_dispatch",
+          "step": 93,
+          "value": 3
+        }
+      ],
+      "completed": 37,
+      "rejected": 13,
+      "unfulfilled": 0,
+      "vehicles": 7,
+      "sample_index": 217
+    },
+    {
+      "violations": [
+        {
+          "kind": "min_dispatch",
+          "step": 102,
+          "value": 2
+        }
+      ],
+      "completed": 45,
+      "rejected": 5,
+      "unfulfilled": 0,
+      "vehicles": 8,
+      "sample_index": 218
+    },
+    {
+      "violations": [
+        {
+          "kind": "min_dispatch",
+          "step": 87,
+          "value": 2
+        }
+      ],
+      "completed": 32,
+      "rejected": 18,
+      "unfulfilled": 0,
+      "vehicles": 6,
+      "sample_index": 219
+    },
+    {
+      "violations": [],
+      "completed": 48,
+      "rejected": 2,
+      "unfulfilled": 0,
+      "vehicles": 9,
+      "sample_index": 220
+    },
+    {
+      "violations": [],
+      "completed": 49,
+      "rejected": 1,
+      "unfulfilled": 0,
+      "vehicles": 9,
+      "sample_index": 221
+    },
+    {
+      "violations": [
+        {
+          "kind": "min_dispatch",
+          "step": 105,
+          "value": 3
+        }
+      ],
+      "completed": 48,
+      "rejected": 2,
+      "unfulfilled": 0,
+      "vehicles": 8,
+      "sample_index": 222
+    },
+    {
+      "violations": [
+        {
+          "kind": "min_dispatch",
+          "step": 106,
+          "value": 2
+        }
+      ],
+      "completed": 48,
+      "rejected": 2,
+      "unfulfilled": 0,
+      "vehicles": 9,
+      "sample_index": 223
+    },
+    {
+      "violations": [
+        {
+          "kind": "min_dispatch",
+          "step": 105,
+          "value": 2
+        }
+      ],
+      "completed": 47,
+      "rejected": 3,
+      "unfulfilled": 0,
+      "vehicles": 9,
+      "sample_index": 224
+    },
+    {
+      "violations": [],
+      "completed": 41,
+      "rejected": 9,
+      "unfulfilled": 0,
+      "vehicles": 7,
+      "sample_index": 225
+    },
+    {
+      "violations": [],
+      "completed": 47,
+      "rejected": 3,
+      "unfulfilled": 0,
+      "vehicles": 8,
+      "sample_index": 226
+    },
+    {
+      "violations": [
+        {
+          "kind": "min_dispatch",
+          "step": 107,
+          "value": 3
+        }
+      ],
+      "completed": 49,
+      "rejected": 1,
+      "unfulfilled": 0,
+      "vehicles": 9,
+      "sample_index": 227
+    },
+    {
+      "violations": [
+        {
+          "kind": "min_dispatch",
+          "step": 105,
+          "value": 1
+        }
+      ],
+      "completed": 47,
+      "rejected": 3,
+      "unfulfilled": 0,
+      "vehicles": 9,
+      "sample_index": 228
+    },
+    {
+      "violations": [
+        {
+          "kind": "min_dispatch",
+          "step": 101,
+          "value": 2
+        }
+      ],
+      "completed": 44,
+      "rejected": 6,
+      "unfulfilled": 0,
+      "vehicles": 8,
+      "sample_index": 229
+    },
+    {
+      "violations": [],
+      "completed": 48,
+      "rejected": 2,
+      "unfulfilled": 0,
+      "vehicles": 8,
+      "sample_index": 230
+    },
+    {
+      "violations": [
+        {
+          "kind": "min_dispatch",
+          "step": 103,
+          "value": 2
+        }
+      ],
+      "completed": 46,
+      "rejected": 4,
+      "unfulfilled": 0,
+      "vehicles": 8,
+      "sample_index": 231
+    },
+    {
+      "violations": [],
+      "completed": 46,
+      "rejected": 4,
+      "unfulfilled": 0,
+      "vehicles": 8,
+      "sample_index": 232
+    },
+    {
+      "violations": [
+        {
+          "kind": "min_dispatch",
+          "step": 103,
+          "value": 2
+        }
+      ],
+      "completed": 46,
+      "rejected": 4,
+      "unfulfilled": 0,
+      "vehicles": 8,
+      "sample_index": 233
+    },
+    {
+      "violations": [],
+      "completed": 44,
+      "rejected": 6,
+      "unfulfilled": 0,
+      "vehicles": 8,
+      "sample_index": 234
+    },
+    {
+      "violations": [
+        {
+          "kind": "min_dispatch",
+          "step": 100,
+          "value": 3
+        }
+      ],
+      "completed": 43,
+      "rejected": 7,
+      "unfulfilled": 0,
+      "vehicles": 8,
+      "sample_index": 235
+    },
+    {
+      "violations": [
+        {
+          "kind": "min_dispatch",
+          "step": 103,
+          "value": 3
+        }
+      ],
+      "completed": 46,
+      "rejected": 4,
+      "unfulfilled": 0,
+      "vehicles": 8,
+      "sample_index": 236
+    },
+    {
+      "violations": [],
+      "completed": 45,
+      "rejected": 5,
+      "unfulfilled": 0,
+      "vehicles": 8,
+      "sample_index": 237
+    },
+    {
+      "violations": [
+        {
+          "kind": "min_dispatch",
+          "step": 106,
+          "value": 2
+        }
+      ],
+      "completed": 48,
+      "rejected": 2,
+      "unfulfilled": 0,
+      "vehicles": 9,
+      "sample_index": 238
+    },
+    {
+      "violations": [],
+      "completed": 47,
+      "rejected": 3,
+      "unfulfilled": 0,
+      "vehicles": 8,
+      "sample_index": 239
+    },
+    {
+      "violations": [
+        {
+          "kind": "min_dispatch",
+          "step": 102,
+          "value": 3
+        }
+      ],
+      "completed": 45,
+      "rejected": 5,
+      "unfulfilled": 0,
+      "vehicles": 8,
+      "sample_index": 240
+    },
+    {
+      "violations": [
+        {
+          "kind": "min_dispatch",
+          "step": 105,
+          "value": 2
+        }
+      ],
+      "completed": 47,
+      "rejected": 3,
+      "unfulfilled": 0,
+      "vehicles": 9,
+      "sample_index": 241
+    },
+    {
+      "violations": [
+        {
+          "kind": "min_dispatch",
+          "step": 102,
+          "value": 3
+        }
+      ],
+      "completed": 45,
+      "rejected": 5,
+      "unfulfilled": 0,
+      "vehicles": 8,
+      "sample_index": 242
+    },
+    {
+      "violations": [
+        {
+          "kind": "min_dispatch",
+          "step": 101,
+          "value": 3
+        }
+      ],
+      "completed": 44,
+      "rejected": 6,
+      "unfulfilled": 0,
+      "vehicles": 8,
+      "sample_index": 243
+    },
+    {
+      "violations": [
+        {
+          "kind": "min_dispatch",
+          "step": 100,
+          "value": 2
+        }
+      ],
+      "completed": 43,
+      "rejected": 7,
+      "unfulfilled": 0,
+      "vehicles": 8,
+      "sample_index": 244
+    },
+    {
+      "violations": [],
+      "completed": 48,
+      "rejected": 2,
+      "unfulfilled": 0,
+      "vehicles": 8,
+      "sample_index": 245
+    },
+    {
+      "violations": [
+        {
+          "kind": "min_dispatch",
+          "step": 103,
+          "value": 3
+        }
+      ],
+      "completed": 46,
+      "rejected": 4,
+      "unfulfilled": 0,
+      "vehicles": 8,
+      "sample_index": 246
+    },
+    {
+      "violations": [],
+      "completed": 47,
+      "rejected": 3,
+      "unfulfilled": 0,
+      "vehicles": 8,
+      "sample_index": 247
+    },
+    {
+      "violations": [],
+      "completed": 47,
+      "rejected": 3,
+      "unfulfilled": 0,
+      "vehicles": 8,
+      "sample_index": 248
+    },
+    {
+      "violations": [
+        {
+          "kind": "min_dispatch",
+          "step": 103,
+          "value": 1
+        }
+      ],
+      "completed": 45,
+      "rejected": 5,
+      "unfulfilled": 0,
+      "vehicles": 9,
+      "sample_index": 249
+    },
+    {
+      "violations": [],
+      "completed": 44,
+      "rejected": 6,
+      "unfulfilled": 0,
+      "vehicles": 7,
+      "sample_index": 250
+    },
+    {
+      "violations": [],
+      "completed": 47,
+      "rejected": 3,
+      "unfulfilled": 0,
+      "vehicles": 8,
+      "sample_index": 251
+    },
+    {
+      "violations": [],
+      "completed": 48,
+      "rejected": 2,
+      "unfulfilled": 0,
+      "vehicles": 8,
+      "sample_index": 252
+    },
+    {
+      "violations": [],
+      "completed": 44,
+      "rejected": 6,
+      "unfulfilled": 0,
+      "vehicles": 8,
+      "sample_index": 253
+    },
+    {
+      "violations": [],
+      "completed": 47,
+      "rejected": 3,
+      "unfulfilled": 0,
+      "vehicles": 8,
+      "sample_index": 254
+    },
+    {
+      "violations": [],
+      "completed": 47,
+      "rejected": 3,
+      "unfulfilled": 0,
+      "vehicles": 8,
+      "sample_index": 255
+    },
+    {
+      "violations": [
+        {
+          "kind": "min_dispatch",
+          "step": 104,
+          "value": 3
+        }
+      ],
+      "completed": 47,
+      "rejected": 3,
+      "unfulfilled": 0,
+      "vehicles": 8,
+      "sample_index": 256
+    },
+    {
+      "violations": [
+        {
+          "kind": "min_dispatch",
+          "step": 100,
+          "value": 3
+        }
+      ],
+      "completed": 43,
+      "rejected": 7,
+      "unfulfilled": 0,
+      "vehicles": 8,
+      "sample_index": 257
+    },
+    {
+      "violations": [
+        {
+          "kind": "min_dispatch",
+          "step": 106,
+          "value": 3
+        }
+      ],
+      "completed": 48,
+      "rejected": 2,
+      "unfulfilled": 0,
+      "vehicles": 9,
+      "sample_index": 258
+    },
+    {
+      "violations": [
+        {
+          "kind": "min_dispatch",
+          "step": 101,
+          "value": 3
+        }
+      ],
+      "completed": 44,
+      "rejected": 6,
+      "unfulfilled": 0,
+      "vehicles": 8,
+      "sample_index": 259
+    },
+    {
+      "violations": [],
+      "completed": 47,
+      "rejected": 3,
+      "unfulfilled": 0,
+      "vehicles": 9,
+      "sample_index": 260
+    },
+    {
+      "violations": [],
+      "completed": 47,
+      "rejected": 3,
+      "unfulfilled": 0,
+      "vehicles": 8,
+      "sample_index": 261
+    },
+    {
+      "violations": [],
+      "completed": 47,
+      "rejected": 3,
+      "unfulfilled": 0,
+      "vehicles": 9,
+      "sample_index": 262
+    },
+    {
+      "violations": [],
+      "completed": 48,
+      "rejected": 2,
+      "unfulfilled": 0,
+      "vehicles": 8,
+      "sample_index": 263
+    },
+    {
+      "violations": [],
+      "completed": 47,
+      "rejected": 3,
+      "unfulfilled": 0,
+      "vehicles": 8,
+      "sample_index": 264
+    },
+    {
+      "violations": [],
+      "completed": 48,
+      "rejected": 2,
+      "unfulfilled": 0,
+      "vehicles": 8,
+      "sample_index": 265
+    },
+    {
+      "violations": [],
+      "completed": 43,
+      "rejected": 7,
+      "unfulfilled": 0,
+      "vehicles": 7,
+      "sample_index": 266
+    },
+    {
+      "violations": [
+        {
+          "kind": "min_dispatch",
+          "step": 105,
+          "value": 2
+        }
+      ],
+      "completed": 47,
+      "rejected": 3,
+      "unfulfilled": 0,
+      "vehicles": 9,
+      "sample_index": 267
+    },
+    {
+      "violations": [
+        {
+          "kind": "min_dispatch",
+          "step": 102,
+          "value": 3
+        }
+      ],
+      "completed": 45,
+      "rejected": 5,
+      "unfulfilled": 0,
+      "vehicles": 8,
+      "sample_index": 268
+    },
+    {
+      "violations": [],
+      "completed": 49,
+      "rejected": 1,
+      "unfulfilled": 0,
+      "vehicles": 9,
+      "sample_index": 269
+    },
+    {
+      "violations": [],
+      "completed": 47,
+      "rejected": 3,
+      "unfulfilled": 0,
+      "vehicles": 8,
+      "sample_index": 270
+    },
+    {
+      "violations": [],
+      "completed": 49,
+      "rejected": 1,
+      "unfulfilled": 0,
+      "vehicles": 9,
+      "sample_index": 271
+    },
+    {
+      "violations": [
+        {
+          "kind": "min_dispatch",
+          "step": 105,
+          "value": 3
+        }
+      ],
+      "completed": 48,
+      "rejected": 2,
+      "unfulfilled": 0,
+      "vehicles": 8,
+      "sample_index": 272
+    },
+    {
+      "violations": [
+        {
+          "kind": "min_dispatch",
+          "step": 104,
+          "value": 3
+        }
+      ],
+      "completed": 46,
+      "rejected": 4,
+      "unfulfilled": 0,
+      "vehicles": 9,
+      "sample_index": 273
+    },
+    {
+      "violations": [
+        {
+          "kind": "min_dispatch",
+          "step": 105,
+          "value": 1
+        }
+      ],
+      "completed": 47,
+      "rejected": 3,
+      "unfulfilled": 0,
+      "vehicles": 9,
+      "sample_index": 274
+    },
+    {
+      "violations": [],
+      "completed": 47,
+      "rejected": 3,
+      "unfulfilled": 0,
+      "vehicles": 8,
+      "sample_index": 275
+    },
+    {
+      "violations": [
+        {
+          "kind": "min_dispatch",
+          "step": 105,
+          "value": 2
+        }
+      ],
+      "completed": 47,
+      "rejected": 3,
+      "unfulfilled": 0,
+      "vehicles": 9,
+      "sample_index": 276
+    },
+    {
+      "violations": [
+        {
+          "kind": "min_dispatch",
+          "step": 104,
+          "value": 3
+        }
+      ],
+      "completed": 46,
+      "rejected": 4,
+      "unfulfilled": 0,
+      "vehicles": 9,
+      "sample_index": 277
+    },
+    {
+      "violations": [
+        {
+          "kind": "min_dispatch",
+          "step": 103,
+          "value": 3
+        }
+      ],
+      "completed": 46,
+      "rejected": 4,
+      "unfulfilled": 0,
+      "vehicles": 8,
+      "sample_index": 278
+    },
+    {
+      "violations": [],
+      "completed": 46,
+      "rejected": 4,
+      "unfulfilled": 0,
+      "vehicles": 7,
+      "sample_index": 279
+    },
+    {
+      "violations": [
+        {
+          "kind": "min_dispatch",
+          "step": 105,
+          "value": 2
+        }
+      ],
+      "completed": 48,
+      "rejected": 2,
+      "unfulfilled": 0,
+      "vehicles": 8,
+      "sample_index": 280
+    },
+    {
+      "violations": [
+        {
+          "kind": "min_dispatch",
+          "step": 103,
+          "value": 3
+        }
+      ],
+      "completed": 46,
+      "rejected": 4,
+      "unfulfilled": 0,
+      "vehicles": 8,
+      "sample_index": 281
+    },
+    {
+      "violations": [
+        {
+          "kind": "min_dispatch",
+          "step": 103,
+          "value": 3
+        }
+      ],
+      "completed": 46,
+      "rejected": 4,
+      "unfulfilled": 0,
+      "vehicles": 8,
+      "sample_index": 282
+    },
+    {
+      "violations": [],
+      "completed": 50,
+      "rejected": 0,
+      "unfulfilled": 0,
+      "vehicles": 9,
+      "sample_index": 283
+    },
+    {
+      "violations": [
+        {
+          "kind": "min_dispatch",
+          "step": 94,
+          "value": 3
+        }
+      ],
+      "completed": 38,
+      "rejected": 12,
+      "unfulfilled": 0,
+      "vehicles": 7,
+      "sample_index": 284
+    },
+    {
+      "violations": [
+        {
+          "kind": "min_dispatch",
+          "step": 98,
+          "value": 3
+        }
+      ],
+      "completed": 42,
+      "rejected": 8,
+      "unfulfilled": 0,
+      "vehicles": 7,
+      "sample_index": 285
+    },
+    {
+      "violations": [],
+      "completed": 47,
+      "rejected": 3,
+      "unfulfilled": 0,
+      "vehicles": 8,
+      "sample_index": 286
+    },
+    {
+      "violations": [
+        {
+          "kind": "min_dispatch",
+          "step": 102,
+          "value": 3
+        }
+      ],
+      "completed": 45,
+      "rejected": 5,
+      "unfulfilled": 0,
+      "vehicles": 8,
+      "sample_index": 287
+    },
+    {
+      "violations": [
+        {
+          "kind": "min_dispatch",
+          "step": 100,
+          "value": 3
+        }
+      ],
+      "completed": 43,
+      "rejected": 7,
+      "unfulfilled": 0,
+      "vehicles": 8,
+      "sample_index": 288
+    },
+    {
+      "violations": [
+        {
+          "kind": "min_dispatch",
+          "step": 105,
+          "value": 3
+        }
+      ],
+      "completed": 48,
+      "rejected": 2,
+      "unfulfilled": 0,
+      "vehicles": 8,
+      "sample_index": 289
+    },
+    {
+      "violations": [],
+      "completed": 48,
+      "rejected": 2,
+      "unfulfilled": 0,
+      "vehicles": 9,
+      "sample_index": 290
+    },
+    {
+      "violations": [
+        {
+          "kind": "min_dispatch",
+          "step": 96,
+          "value": 3
+        }
+      ],
+      "completed": 40,
+      "rejected": 10,
+      "unfulfilled": 0,
+      "vehicles": 7,
+      "sample_index": 291
+    },
+    {
+      "violations": [
+        {
+          "kind": "min_dispatch",
+          "step": 99,
+          "value": 2
+        }
+      ],
+      "completed": 42,
+      "rejected": 8,
+      "unfulfilled": 0,
+      "vehicles": 8,
+      "sample_index": 292
+    },
+    {
+      "violations": [
+        {
+          "kind": "min_dispatch",
+          "step": 103,
+          "value": 2
+        }
+      ],
+      "completed": 45,
+      "rejected": 5,
+      "unfulfilled": 0,
+      "vehicles": 9,
+      "sample_index": 293
+    },
+    {
+      "violations": [
+        {
+          "kind": "min_dispatch",
+          "step": 104,
+          "value": 2
+        }
+      ],
+      "completed": 47,
+      "rejected": 3,
+      "unfulfilled": 0,
+      "vehicles": 8,
+      "sample_index": 294
+    },
+    {
+      "violations": [],
+      "completed": 48,
+      "rejected": 2,
+      "unfulfilled": 0,
+      "vehicles": 8,
+      "sample_index": 295
+    },
+    {
+      "violations": [],
+      "completed": 47,
+      "rejected": 3,
+      "unfulfilled": 0,
+      "vehicles": 8,
+      "sample_index": 296
+    },
+    {
+      "violations": [
+        {
+          "kind": "min_dispatch",
+          "step": 104,
+          "value": 2
+        }
+      ],
+      "completed": 47,
+      "rejected": 3,
+      "unfulfilled": 0,
+      "vehicles": 8,
+      "sample_index": 297
+    },
+    {
+      "violations": [],
+      "completed": 48,
+      "rejected": 2,
+      "unfulfilled": 0,
+      "vehicles": 8,
+      "sample_index": 298
+    },
+    {
+      "violations": [],
+      "completed": 47,
+      "rejected": 3,
+      "unfulfilled": 0,
+      "vehicles": 8,
+      "sample_index": 299
+    },
+    {
+      "violations": [
+        {
+          "kind": "min_dispatch",
+          "step": 105,
+          "value": 3
+        }
+      ],
+      "completed": 48,
+      "rejected": 2,
+      "unfulfilled": 0,
+      "vehicles": 8,
+      "sample_index": 300
+    },
+    {
+      "violations": [
+        {
+          "kind": "min_dispatch",
+          "step": 104,
+          "value": 3
+        }
+      ],
+      "completed": 46,
+      "rejected": 4,
+      "unfulfilled": 0,
+      "vehicles": 9,
+      "sample_index": 301
+    },
+    {
+      "violations": [
+        {
+          "kind": "min_dispatch",
+          "step": 105,
+          "value": 2
+        }
+      ],
+      "completed": 47,
+      "rejected": 3,
+      "unfulfilled": 0,
+      "vehicles": 9,
+      "sample_index": 302
+    },
+    {
+      "violations": [],
+      "completed": 41,
+      "rejected": 9,
+      "unfulfilled": 0,
+      "vehicles": 7,
+      "sample_index": 303
+    },
+    {
+      "violations": [],
+      "completed": 46,
+      "rejected": 4,
+      "unfulfilled": 0,
+      "vehicles": 8,
+      "sample_index": 304
+    },
+    {
+      "violations": [],
+      "completed": 48,
+      "rejected": 2,
+      "unfulfilled": 0,
+      "vehicles": 8,
+      "sample_index": 305
+    },
+    {
+      "violations": [],
+      "completed": 48,
+      "rejected": 2,
+      "unfulfilled": 0,
+      "vehicles": 8,
+      "sample_index": 306
+    },
+    {
+      "violations": [],
+      "completed": 39,
+      "rejected": 11,
+      "unfulfilled": 0,
+      "vehicles": 7,
+      "sample_index": 307
+    },
+    {
+      "violations": [],
+      "completed": 44,
+      "rejected": 6,
+      "unfulfilled": 0,
+      "vehicles": 8,
+      "sample_index": 308
+    },
+    {
+      "violations": [],
+      "completed": 47,
+      "rejected": 3,
+      "unfulfilled": 0,
+      "vehicles": 8,
+      "sample_index": 309
+    },
+    {
+      "violations": [
+        {
+          "kind": "min_dispatch",
+          "step": 99,
+          "value": 3
+        }
+      ],
+      "completed": 42,
+      "rejected": 8,
+      "unfulfilled": 0,
+      "vehicles": 8,
+      "sample_index": 310
+    },
+    {
+      "violations": [
+        {
+          "kind": "min_dispatch",
+          "step": 105,
+          "value": 2
+        }
+      ],
+      "completed": 47,
+      "rejected": 3,
+      "unfulfilled": 0,
+      "vehicles": 9,
+      "sample_index": 311
+    },
+    {
+      "violations": [],
+      "completed": 48,
+      "rejected": 2,
+      "unfulfilled": 0,
+      "vehicles": 8,
+      "sample_index": 312
+    },
+    {
+      "violations": [
+        {
+          "kind": "min_dispatch",
+          "step": 102,
+          "value": 3
+        }
+      ],
+      "completed": 45,
+      "rejected": 5,
+      "unfulfilled": 0,
+      "vehicles": 8,
+      "sample_index": 313
+    },
+    {
+      "violations": [
+        {
+          "kind": "min_dispatch",
+          "step": 105,
+          "value": 3
+        }
+      ],
+      "completed": 48,
+      "rejected": 2,
+      "unfulfilled": 0,
+      "vehicles": 8,
+      "sample_index": 314
+    },
+    {
+      "violations": [],
+      "completed": 47,
+      "rejected": 3,
+      "unfulfilled": 0,
+      "vehicles": 8,
+      "sample_index": 315
+    },
+    {
+      "violations": [
+        {
+          "kind": "min_dispatch",
+          "step": 101,
+          "value": 2
+        }
+      ],
+      "completed": 44,
+      "rejected": 6,
+      "unfulfilled": 0,
+      "vehicles": 8,
+      "sample_index": 316
+    },
+    {
+      "violations": [],
+      "completed": 47,
+      "rejected": 3,
+      "unfulfilled": 0,
+      "vehicles": 8,
+      "sample_index": 317
+    },
+    {
+      "violations": [
+        {
+          "kind": "min_dispatch",
+          "step": 104,
+          "value": 2
+        }
+      ],
+      "completed": 46,
+      "rejected": 4,
+      "unfulfilled": 0,
+      "vehicles": 9,
+      "sample_index": 318
+    },
+    {
+      "violations": [
+        {
+          "kind": "min_dispatch",
+          "step": 107,
+          "value": 3
+        }
+      ],
+      "completed": 49,
+      "rejected": 1,
+      "unfulfilled": 0,
+      "vehicles": 9,
+      "sample_index": 319
+    },
+    {
+      "violations": [],
+      "completed": 49,
+      "rejected": 1,
+      "unfulfilled": 0,
+      "vehicles": 8,
+      "sample_index": 320
+    },
+    {
+      "violations": [],
+      "completed": 48,
+      "rejected": 2,
+      "unfulfilled": 0,
+      "vehicles": 9,
+      "sample_index": 321
+    },
+    {
+      "violations": [
+        {
+          "kind": "min_dispatch",
+          "step": 104,
+          "value": 2
+        }
+      ],
+      "completed": 46,
+      "rejected": 4,
+      "unfulfilled": 0,
+      "vehicles": 9,
+      "sample_index": 322
+    },
+    {
+      "violations": [],
+      "completed": 37,
+      "rejected": 13,
+      "unfulfilled": 0,
+      "vehicles": 6,
+      "sample_index": 323
+    },
+    {
+      "violations": [
+        {
+          "kind": "min_dispatch",
+          "step": 99,
+          "value": 3
+        }
+      ],
+      "completed": 42,
+      "rejected": 8,
+      "unfulfilled": 0,
+      "vehicles": 8,
+      "sample_index": 324
+    },
+    {
+      "violations": [],
+      "completed": 49,
+      "rejected": 1,
+      "unfulfilled": 0,
+      "vehicles": 9,
+      "sample_index": 325
+    },
+    {
+      "violations": [],
+      "completed": 46,
+      "rejected": 4,
+      "unfulfilled": 0,
+      "vehicles": 9,
+      "sample_index": 326
+    },
+    {
+      "violations": [],
+      "completed": 47,
+      "rejected": 3,
+      "unfulfilled": 0,
+      "vehicles": 8,
+      "sample_index": 327
+    },
+    {
+      "violations": [
+        {
+          "kind": "min_dispatch",
+          "step": 102,
+          "value": 2
+        }
+      ],
+      "completed": 45,
+      "rejected": 5,
+      "unfulfilled": 0,
+      "vehicles": 8,
+      "sample_index": 328
+    },
+    {
+      "violations": [
+        {
+          "kind": "min_dispatch",
+          "step": 104,
+          "value": 3
+        }
+      ],
+      "completed": 46,
+      "rejected": 4,
+      "unfulfilled": 0,
+      "vehicles": 9,
+      "sample_index": 329
+    },
+    {
+      "violations": [],
+      "completed": 44,
+      "rejected": 6,
+      "unfulfilled": 0,
+      "vehicles": 8,
+      "sample_index": 330
+    },
+    {
+      "violations": [],
+      "completed": 49,
+      "rejected": 1,
+      "unfulfilled": 0,
+      "vehicles": 9,
+      "sample_index": 331
+    },
+    {
+      "violations": [],
+      "completed": 48,
+      "rejected": 2,
+      "unfulfilled": 0,
+      "vehicles": 8,
+      "sample_index": 332
+    },
+    {
+      "violations": [
+        {
+          "kind": "min_dispatch",
+          "step": 106,
+          "value": 2
+        }
+      ],
+      "completed": 48,
+      "rejected": 2,
+      "unfulfilled": 0,
+      "vehicles": 9,
+      "sample_index": 333
+    },
+    {
+      "violations": [
+        {
+          "kind": "min_dispatch",
+          "step": 103,
+          "value": 1
+        }
+      ],
+      "completed": 46,
+      "rejected": 4,
+      "unfulfilled": 0,
+      "vehicles": 8,
+      "sample_index": 334
+    },
+    {
+      "violations": [],
+      "completed": 47,
+      "rejected": 3,
+      "unfulfilled": 0,
+      "vehicles": 8,
+      "sample_index": 335
+    },
+    {
+      "violations": [
+        {
+          "kind": "min_dispatch",
+          "step": 104,
+          "value": 3
+        }
+      ],
+      "completed": 47,
+      "rejected": 3,
+      "unfulfilled": 0,
+      "vehicles": 8,
+      "sample_index": 336
+    },
+    {
+      "violations": [
+        {
+          "kind": "min_dispatch",
+          "step": 86,
+          "value": 3
+        }
+      ],
+      "completed": 31,
+      "rejected": 19,
+      "unfulfilled": 0,
+      "vehicles": 6,
+      "sample_index": 337
+    },
+    {
+      "violations": [
+        {
+          "kind": "min_dispatch",
+          "step": 101,
+          "value": 2
+        }
+      ],
+      "completed": 44,
+      "rejected": 6,
+      "unfulfilled": 0,
+      "vehicles": 8,
+      "sample_index": 338
+    },
+    {
+      "violations": [],
+      "completed": 41,
+      "rejected": 9,
+      "unfulfilled": 0,
+      "vehicles": 7,
+      "sample_index": 339
+    },
+    {
+      "violations": [],
+      "completed": 45,
+      "rejected": 5,
+      "unfulfilled": 0,
+      "vehicles": 8,
+      "sample_index": 340
+    },
+    {
+      "violations": [],
+      "completed": 47,
+      "rejected": 3,
+      "unfulfilled": 0,
+      "vehicles": 8,
+      "sample_index": 341
+    },
+    {
+      "violations": [],
+      "completed": 48,
+      "rejected": 2,
+      "unfulfilled": 0,
+      "vehicles": 8,
+      "sample_index": 342
+    },
+    {
+      "violations": [],
+      "completed": 49,
+      "rejected": 1,
+      "unfulfilled": 0,
+      "vehicles": 8,
+      "sample_index": 343
+    },
+    {
+      "violations": [],
+      "completed": 49,
+      "rejected": 1,
+      "unfulfilled": 0,
+      "vehicles": 9,
+      "sample_index": 344
+    },
+    {
+      "violations": [],
+      "completed": 49,
+      "rejected": 1,
+      "unfulfilled": 0,
+      "vehicles": 9,
+      "sample_index": 345
+    },
+    {
+      "violations": [],
+      "completed": 48,
+      "rejected": 2,
+      "unfulfilled": 0,
+      "vehicles": 8,
+      "sample_index": 346
+    },
+    {
+      "violations": [],
+      "completed": 48,
+      "rejected": 2,
+      "unfulfilled": 0,
+      "vehicles": 8,
+      "sample_index": 347
+    },
+    {
+      "violations": [],
+      "completed": 46,
+      "rejected": 4,
+      "unfulfilled": 0,
+      "vehicles": 8,
+      "sample_index": 348
+    },
+    {
+      "violations": [],
+      "completed": 43,
+      "rejected": 7,
+      "unfulfilled": 0,
+      "vehicles": 8,
+      "sample_index": 349
+    },
+    {
+      "violations": [
+        {
+          "kind": "min_dispatch",
+          "step": 106,
+          "value": 2
+        }
+      ],
+      "completed": 48,
+      "rejected": 2,
+      "unfulfilled": 0,
+      "vehicles": 9,
+      "sample_index": 350
+    },
+    {
+      "violations": [],
+      "completed": 40,
+      "rejected": 10,
+      "unfulfilled": 0,
+      "vehicles": 7,
+      "sample_index": 351
+    },
+    {
+      "violations": [
+        {
+          "kind": "min_dispatch",
+          "step": 104,
+          "value": 1
+        }
+      ],
+      "completed": 46,
+      "rejected": 4,
+      "unfulfilled": 0,
+      "vehicles": 9,
+      "sample_index": 352
+    },
+    {
+      "violations": [],
+      "completed": 48,
+      "rejected": 2,
+      "unfulfilled": 0,
+      "vehicles": 8,
+      "sample_index": 353
+    },
+    {
+      "violations": [
+        {
+          "kind": "min_dispatch",
+          "step": 105,
+          "value": 3
+        }
+      ],
+      "completed": 48,
+      "rejected": 2,
+      "unfulfilled": 0,
+      "vehicles": 8,
+      "sample_index": 354
+    },
+    {
+      "violations": [
+        {
+          "kind": "min_dispatch",
+          "step": 105,
+          "value": 3
+        }
+      ],
+      "completed": 47,
+      "rejected": 3,
+      "unfulfilled": 0,
+      "vehicles": 9,
+      "sample_index": 355
+    },
+    {
+      "violations": [],
+      "completed": 43,
+      "rejected": 7,
+      "unfulfilled": 0,
+      "vehicles": 7,
+      "sample_index": 356
+    },
+    {
+      "violations": [],
+      "completed": 42,
+      "rejected": 8,
+      "unfulfilled": 0,
+      "vehicles": 7,
+      "sample_index": 357
+    },
+    {
+      "violations": [],
+      "completed": 47,
+      "rejected": 3,
+      "unfulfilled": 0,
+      "vehicles": 8,
+      "sample_index": 358
+    },
+    {
+      "violations": [],
+      "completed": 46,
+      "rejected": 4,
+      "unfulfilled": 0,
+      "vehicles": 9,
+      "sample_index": 359
+    },
+    {
+      "violations": [
+        {
+          "kind": "min_dispatch",
+          "step": 100,
+          "value": 3
+        }
+      ],
+      "completed": 43,
+      "rejected": 7,
+      "unfulfilled": 0,
+      "vehicles": 8,
+      "sample_index": 360
+    },
+    {
+      "violations": [],
+      "completed": 49,
+      "rejected": 1,
+      "unfulfilled": 0,
+      "vehicles": 8,
+      "sample_index": 361
+    },
+    {
+      "violations": [],
+      "completed": 46,
+      "rejected": 4,
+      "unfulfilled": 0,
+      "vehicles": 7,
+      "sample_index": 362
+    },
+    {
+      "violations": [
+        {
+          "kind": "min_dispatch",
+          "step": 105,
+          "value": 2
+        }
+      ],
+      "completed": 47,
+      "rejected": 3,
+      "unfulfilled": 0,
+      "vehicles": 9,
+      "sample_index": 363
+    },
+    {
+      "violations": [
+        {
+          "kind": "min_dispatch",
+          "step": 105,
+          "value": 2
+        }
+      ],
+      "completed": 47,
+      "rejected": 3,
+      "unfulfilled": 0,
+      "vehicles": 9,
+      "sample_index": 364
+    },
+    {
+      "violations": [],
+      "completed": 48,
+      "rejected": 2,
+      "unfulfilled": 0,
+      "vehicles": 8,
+      "sample_index": 365
+    },
+    {
+      "violations": [],
+      "completed": 47,
+      "rejected": 3,
+      "unfulfilled": 0,
+      "vehicles": 8,
+      "sample_index": 366
+    },
+    {
+      "violations": [],
+      "completed": 43,
+      "rejected": 7,
+      "unfulfilled": 0,
+      "vehicles": 7,
+      "sample_index": 367
+    },
+    {
+      "violations": [
+        {
+          "kind": "min_dispatch",
+          "step": 104,
+          "value": 3
+        }
+      ],
+      "completed": 47,
+      "rejected": 3,
+      "unfulfilled": 0,
+      "vehicles": 8,
+      "sample_index": 368
+    },
+    {
+      "violations": [
+        {
+          "kind": "min_dispatch",
+          "step": 103,
+          "value": 2
+        }
+      ],
+      "completed": 46,
+      "rejected": 4,
+      "unfulfilled": 0,
+      "vehicles": 8,
+      "sample_index": 369
+    },
+    {
+      "violations": [],
+      "completed": 49,
+      "rejected": 1,
+      "unfulfilled": 0,
+      "vehicles": 9,
+      "sample_index": 370
+    },
+    {
+      "violations": [],
+      "completed": 45,
+      "rejected": 5,
+      "unfulfilled": 0,
+      "vehicles": 8,
+      "sample_index": 371
+    },
+    {
+      "violations": [
+        {
+          "kind": "min_dispatch",
+          "step": 101,
+          "value": 3
+        }
+      ],
+      "completed": 44,
+      "rejected": 6,
+      "unfulfilled": 0,
+      "vehicles": 8,
+      "sample_index": 372
+    },
+    {
+      "violations": [],
+      "completed": 49,
+      "rejected": 1,
+      "unfulfilled": 0,
+      "vehicles": 9,
+      "sample_index": 373
+    },
+    {
+      "violations": [
+        {
+          "kind": "min_dispatch",
+          "step": 105,
+          "value": 1
+        }
+      ],
+      "completed": 47,
+      "rejected": 3,
+      "unfulfilled": 0,
+      "vehicles": 9,
+      "sample_index": 374
+    },
+    {
+      "violations": [],
+      "completed": 49,
+      "rejected": 1,
+      "unfulfilled": 0,
+      "vehicles": 8,
+      "sample_index": 375
+    },
+    {
+      "violations": [
+        {
+          "kind": "min_dispatch",
+          "step": 101,
+          "value": 3
+        }
+      ],
+      "completed": 44,
+      "rejected": 6,
+      "unfulfilled": 0,
+      "vehicles": 8,
+      "sample_index": 376
+    },
+    {
+      "violations": [
+        {
+          "kind": "min_dispatch",
+          "step": 101,
+          "value": 2
+        }
+      ],
+      "completed": 44,
+      "rejected": 6,
+      "unfulfilled": 0,
+      "vehicles": 8,
+      "sample_index": 377
+    },
+    {
+      "violations": [],
+      "completed": 47,
+      "rejected": 3,
+      "unfulfilled": 0,
+      "vehicles": 8,
+      "sample_index": 378
+    },
+    {
+      "violations": [
+        {
+          "kind": "min_dispatch",
+          "step": 101,
+          "value": 3
+        }
+      ],
+      "completed": 44,
+      "rejected": 6,
+      "unfulfilled": 0,
+      "vehicles": 8,
+      "sample_index": 379
+    },
+    {
+      "violations": [
+        {
+          "kind": "min_dispatch",
+          "step": 98,
+          "value": 3
+        }
+      ],
+      "completed": 42,
+      "rejected": 8,
+      "unfulfilled": 0,
+      "vehicles": 7,
+      "sample_index": 380
+    },
+    {
+      "violations": [],
+      "completed": 49,
+      "rejected": 1,
+      "unfulfilled": 0,
+      "vehicles": 8,
+      "sample_index": 381
+    },
+    {
+      "violations": [
+        {
+          "kind": "min_dispatch",
+          "step": 104,
+          "value": 2
+        }
+      ],
+      "completed": 46,
+      "rejected": 4,
+      "unfulfilled": 0,
+      "vehicles": 9,
+      "sample_index": 382
+    },
+    {
+      "violations": [
+        {
+          "kind": "min_dispatch",
+          "step": 105,
+          "value": 2
+        }
+      ],
+      "completed": 47,
+      "rejected": 3,
+      "unfulfilled": 0,
+      "vehicles": 9,
+      "sample_index": 383
+    },
+    {
+      "violations": [
+        {
+          "kind": "min_dispatch",
+          "step": 103,
+          "value": 3
+        }
+      ],
+      "completed": 46,
+      "rejected": 4,
+      "unfulfilled": 0,
+      "vehicles": 8,
+      "sample_index": 384
+    },
+    {
+      "violations": [
+        {
+          "kind": "min_dispatch",
+          "step": 104,
+          "value": 3
+        }
+      ],
+      "completed": 47,
+      "rejected": 3,
+      "unfulfilled": 0,
+      "vehicles": 8,
+      "sample_index": 385
+    },
+    {
+      "violations": [
+        {
+          "kind": "min_dispatch",
+          "step": 106,
+          "value": 3
+        }
+      ],
+      "completed": 48,
+      "rejected": 2,
+      "unfulfilled": 0,
+      "vehicles": 9,
+      "sample_index": 386
+    },
+    {
+      "violations": [
+        {
+          "kind": "min_dispatch",
+          "step": 98,
+          "value": 3
+        }
+      ],
+      "completed": 42,
+      "rejected": 8,
+      "unfulfilled": 0,
+      "vehicles": 7,
+      "sample_index": 387
+    },
+    {
+      "violations": [
+        {
+          "kind": "min_dispatch",
+          "step": 105,
+          "value": 1
+        }
+      ],
+      "completed": 47,
+      "rejected": 3,
+      "unfulfilled": 0,
+      "vehicles": 9,
+      "sample_index": 388
+    },
+    {
+      "violations": [
+        {
+          "kind": "min_dispatch",
+          "step": 96,
+          "value": 3
+        }
+      ],
+      "completed": 39,
+      "rejected": 11,
+      "unfulfilled": 0,
+      "vehicles": 8,
+      "sample_index": 389
+    },
+    {
+      "violations": [
+        {
+          "kind": "min_dispatch",
+          "step": 99,
+          "value": 2
+        }
+      ],
+      "completed": 42,
+      "rejected": 8,
+      "unfulfilled": 0,
+      "vehicles": 8,
+      "sample_index": 390
+    },
+    {
+      "violations": [],
+      "completed": 46,
+      "rejected": 4,
+      "unfulfilled": 0,
+      "vehicles": 8,
+      "sample_index": 391
+    },
+    {
+      "violations": [
+        {
+          "kind": "min_dispatch",
+          "step": 105,
+          "value": 2
+        }
+      ],
+      "completed": 47,
+      "rejected": 3,
+      "unfulfilled": 0,
+      "vehicles": 9,
+      "sample_index": 392
+    },
+    {
+      "violations": [
+        {
+          "kind": "min_dispatch",
+          "step": 101,
+          "value": 3
+        }
+      ],
+      "completed": 43,
+      "rejected": 7,
+      "unfulfilled": 0,
+      "vehicles": 9,
+      "sample_index": 393
+    },
+    {
+      "violations": [
+        {
+          "kind": "min_dispatch",
+          "step": 105,
+          "value": 2
+        }
+      ],
+      "completed": 48,
+      "rejected": 2,
+      "unfulfilled": 0,
+      "vehicles": 8,
+      "sample_index": 394
+    },
+    {
+      "violations": [
+        {
+          "kind": "min_dispatch",
+          "step": 107,
+          "value": 3
+        }
+      ],
+      "completed": 49,
+      "rejected": 1,
+      "unfulfilled": 0,
+      "vehicles": 9,
+      "sample_index": 395
+    },
+    {
+      "violations": [
+        {
+          "kind": "min_dispatch",
+          "step": 96,
+          "value": 3
+        }
+      ],
+      "completed": 40,
+      "rejected": 10,
+      "unfulfilled": 0,
+      "vehicles": 7,
+      "sample_index": 396
+    },
+    {
+      "violations": [],
+      "completed": 47,
+      "rejected": 3,
+      "unfulfilled": 0,
+      "vehicles": 8,
+      "sample_index": 397
+    },
+    {
+      "violations": [],
+      "completed": 47,
+      "rejected": 3,
+      "unfulfilled": 0,
+      "vehicles": 8,
+      "sample_index": 398
+    },
+    {
+      "violations": [
+        {
+          "kind": "min_dispatch",
+          "step": 103,
+          "value": 3
+        }
+      ],
+      "completed": 46,
+      "rejected": 4,
+      "unfulfilled": 0,
+      "vehicles": 8,
+      "sample_index": 399
+    },
+    {
+      "violations": [
+        {
+          "kind": "min_dispatch",
+          "step": 104,
+          "value": 3
+        }
+      ],
+      "completed": 46,
+      "rejected": 4,
+      "unfulfilled": 0,
+      "vehicles": 9,
+      "sample_index": 400
+    },
+    {
+      "violations": [],
+      "completed": 44,
+      "rejected": 6,
+      "unfulfilled": 0,
+      "vehicles": 7,
+      "sample_index": 401
+    },
+    {
+      "violations": [
+        {
+          "kind": "min_dispatch",
+          "step": 107,
+          "value": 3
+        }
+      ],
+      "completed": 49,
+      "rejected": 1,
+      "unfulfilled": 0,
+      "vehicles": 9,
+      "sample_index": 402
+    },
+    {
+      "violations": [],
+      "completed": 44,
+      "rejected": 6,
+      "unfulfilled": 0,
+      "vehicles": 7,
+      "sample_index": 403
+    },
+    {
+      "violations": [],
+      "completed": 49,
+      "rejected": 1,
+      "unfulfilled": 0,
+      "vehicles": 8,
+      "sample_index": 404
+    },
+    {
+      "violations": [
+        {
+          "kind": "min_dispatch",
+          "step": 105,
+          "value": 3
+        }
+      ],
+      "completed": 48,
+      "rejected": 2,
+      "unfulfilled": 0,
+      "vehicles": 8,
+      "sample_index": 405
+    },
+    {
+      "violations": [],
+      "completed": 49,
+      "rejected": 1,
+      "unfulfilled": 0,
+      "vehicles": 9,
+      "sample_index": 406
+    },
+    {
+      "violations": [
+        {
+          "kind": "min_dispatch",
+          "step": 103,
+          "value": 1
+        }
+      ],
+      "completed": 45,
+      "rejected": 5,
+      "unfulfilled": 0,
+      "vehicles": 9,
+      "sample_index": 407
+    },
+    {
+      "violations": [],
+      "completed": 47,
+      "rejected": 3,
+      "unfulfilled": 0,
+      "vehicles": 8,
+      "sample_index": 408
+    },
+    {
+      "violations": [],
+      "completed": 47,
+      "rejected": 3,
+      "unfulfilled": 0,
+      "vehicles": 8,
+      "sample_index": 409
+    },
+    {
+      "violations": [],
+      "completed": 47,
+      "rejected": 3,
+      "unfulfilled": 0,
+      "vehicles": 8,
+      "sample_index": 410
+    },
+    {
+      "violations": [
+        {
+          "kind": "min_dispatch",
+          "step": 105,
+          "value": 2
+        }
+      ],
+      "completed": 47,
+      "rejected": 3,
+      "unfulfilled": 0,
+      "vehicles": 9,
+      "sample_index": 411
+    },
+    {
+      "violations": [
+        {
+          "kind": "min_dispatch",
+          "step": 103,
+          "value": 1
+        }
+      ],
+      "completed": 46,
+      "rejected": 4,
+      "unfulfilled": 0,
+      "vehicles": 8,
+      "sample_index": 412
+    },
+    {
+      "violations": [
+        {
+          "kind": "min_dispatch",
+          "step": 101,
+          "value": 3
+        }
+      ],
+      "completed": 44,
+      "rejected": 6,
+      "unfulfilled": 0,
+      "vehicles": 8,
+      "sample_index": 413
+    },
+    {
+      "violations": [
+        {
+          "kind": "min_dispatch",
+          "step": 105,
+          "value": 1
+        }
+      ],
+      "completed": 47,
+      "rejected": 3,
+      "unfulfilled": 0,
+      "vehicles": 9,
+      "sample_index": 414
+    },
+    {
+      "violations": [
+        {
+          "kind": "min_dispatch",
+          "step": 101,
+          "value": 3
+        }
+      ],
+      "completed": 44,
+      "rejected": 6,
+      "unfulfilled": 0,
+      "vehicles": 8,
+      "sample_index": 415
+    },
+    {
+      "violations": [],
+      "completed": 47,
+      "rejected": 3,
+      "unfulfilled": 0,
+      "vehicles": 8,
+      "sample_index": 416
+    },
+    {
+      "violations": [],
+      "completed": 49,
+      "rejected": 1,
+      "unfulfilled": 0,
+      "vehicles": 9,
+      "sample_index": 417
+    },
+    {
+      "violations": [],
+      "completed": 48,
+      "rejected": 2,
+      "unfulfilled": 0,
+      "vehicles": 8,
+      "sample_index": 418
+    },
+    {
+      "violations": [
+        {
+          "kind": "min_dispatch",
+          "step": 103,
+          "value": 2
+        }
+      ],
+      "completed": 46,
+      "rejected": 4,
+      "unfulfilled": 0,
+      "vehicles": 8,
+      "sample_index": 419
+    },
+    {
+      "violations": [
+        {
+          "kind": "min_dispatch",
+          "step": 97,
+          "value": 3
+        }
+      ],
+      "completed": 41,
+      "rejected": 9,
+      "unfulfilled": 0,
+      "vehicles": 7,
+      "sample_index": 420
+    },
+    {
+      "violations": [
+        {
+          "kind": "min_dispatch",
+          "step": 106,
+          "value": 3
+        }
+      ],
+      "completed": 48,
+      "rejected": 2,
+      "unfulfilled": 0,
+      "vehicles": 9,
+      "sample_index": 421
+    },
+    {
+      "violations": [
+        {
+          "kind": "min_dispatch",
+          "step": 104,
+          "value": 3
+        }
+      ],
+      "completed": 47,
+      "rejected": 3,
+      "unfulfilled": 0,
+      "vehicles": 8,
+      "sample_index": 422
+    },
+    {
+      "violations": [],
+      "completed": 48,
+      "rejected": 2,
+      "unfulfilled": 0,
+      "vehicles": 8,
+      "sample_index": 423
+    },
+    {
+      "violations": [
+        {
+          "kind": "min_dispatch",
+          "step": 105,
+          "value": 3
+        }
+      ],
+      "completed": 47,
+      "rejected": 3,
+      "unfulfilled": 0,
+      "vehicles": 9,
+      "sample_index": 424
+    },
+    {
+      "violations": [
+        {
+          "kind": "min_dispatch",
+          "step": 98,
+          "value": 3
+        }
+      ],
+      "completed": 41,
+      "rejected": 9,
+      "unfulfilled": 0,
+      "vehicles": 8,
+      "sample_index": 425
+    },
+    {
+      "violations": [
+        {
+          "kind": "min_dispatch",
+          "step": 105,
+          "value": 3
+        }
+      ],
+      "completed": 48,
+      "rejected": 2,
+      "unfulfilled": 0,
+      "vehicles": 8,
+      "sample_index": 426
+    },
+    {
+      "violations": [],
+      "completed": 49,
+      "rejected": 1,
+      "unfulfilled": 0,
+      "vehicles": 9,
+      "sample_index": 427
+    },
+    {
+      "violations": [
+        {
+          "kind": "min_dispatch",
+          "step": 106,
+          "value": 2
+        }
+      ],
+      "completed": 48,
+      "rejected": 2,
+      "unfulfilled": 0,
+      "vehicles": 9,
+      "sample_index": 428
+    },
+    {
+      "violations": [
+        {
+          "kind": "min_dispatch",
+          "step": 103,
+          "value": 3
+        }
+      ],
+      "completed": 46,
+      "rejected": 4,
+      "unfulfilled": 0,
+      "vehicles": 8,
+      "sample_index": 429
+    },
+    {
+      "violations": [
+        {
+          "kind": "min_dispatch",
+          "step": 100,
+          "value": 2
+        }
+      ],
+      "completed": 43,
+      "rejected": 7,
+      "unfulfilled": 0,
+      "vehicles": 8,
+      "sample_index": 430
+    },
+    {
+      "violations": [],
+      "completed": 47,
+      "rejected": 3,
+      "unfulfilled": 0,
+      "vehicles": 8,
+      "sample_index": 431
+    },
+    {
+      "violations": [],
+      "completed": 50,
+      "rejected": 0,
+      "unfulfilled": 0,
+      "vehicles": 9,
+      "sample_index": 432
+    },
+    {
+      "violations": [
+        {
+          "kind": "min_dispatch",
+          "step": 102,
+          "value": 2
+        }
+      ],
+      "completed": 45,
+      "rejected": 5,
+      "unfulfilled": 0,
+      "vehicles": 8,
+      "sample_index": 433
+    },
+    {
+      "violations": [
+        {
+          "kind": "min_dispatch",
+          "step": 99,
+          "value": 3
+        }
+      ],
+      "completed": 42,
+      "rejected": 8,
+      "unfulfilled": 0,
+      "vehicles": 8,
+      "sample_index": 434
+    },
+    {
+      "violations": [
+        {
+          "kind": "min_dispatch",
+          "step": 100,
+          "value": 3
+        }
+      ],
+      "completed": 43,
+      "rejected": 7,
+      "unfulfilled": 0,
+      "vehicles": 8,
+      "sample_index": 435
+    },
+    {
+      "violations": [
+        {
+          "kind": "min_dispatch",
+          "step": 96,
+          "value": 3
+        }
+      ],
+      "completed": 40,
+      "rejected": 10,
+      "unfulfilled": 0,
+      "vehicles": 7,
+      "sample_index": 436
+    },
+    {
+      "violations": [
+        {
+          "kind": "min_dispatch",
+          "step": 106,
+          "value": 2
+        }
+      ],
+      "completed": 48,
+      "rejected": 2,
+      "unfulfilled": 0,
+      "vehicles": 9,
+      "sample_index": 437
+    },
+    {
+      "violations": [
+        {
+          "kind": "min_dispatch",
+          "step": 98,
+          "value": 3
+        }
+      ],
+      "completed": 42,
+      "rejected": 8,
+      "unfulfilled": 0,
+      "vehicles": 7,
+      "sample_index": 438
+    },
+    {
+      "violations": [
+        {
+          "kind": "min_dispatch",
+          "step": 102,
+          "value": 2
+        }
+      ],
+      "completed": 45,
+      "rejected": 5,
+      "unfulfilled": 0,
+      "vehicles": 8,
+      "sample_index": 439
+    },
+    {
+      "violations": [],
+      "completed": 50,
+      "rejected": 0,
+      "unfulfilled": 0,
+      "vehicles": 9,
+      "sample_index": 440
+    },
+    {
+      "violations": [],
+      "completed": 44,
+      "rejected": 6,
+      "unfulfilled": 0,
+      "vehicles": 8,
+      "sample_index": 441
+    },
+    {
+      "violations": [],
+      "completed": 50,
+      "rejected": 0,
+      "unfulfilled": 0,
+      "vehicles": 9,
+      "sample_index": 442
+    },
+    {
+      "violations": [],
+      "completed": 47,
+      "rejected": 3,
+      "unfulfilled": 0,
+      "vehicles": 8,
+      "sample_index": 443
+    },
+    {
+      "violations": [
+        {
+          "kind": "min_dispatch",
+          "step": 105,
+          "value": 3
+        }
+      ],
+      "completed": 48,
+      "rejected": 2,
+      "unfulfilled": 0,
+      "vehicles": 8,
+      "sample_index": 444
+    },
+    {
+      "violations": [
+        {
+          "kind": "min_dispatch",
+          "step": 105,
+          "value": 3
+        }
+      ],
+      "completed": 48,
+      "rejected": 2,
+      "unfulfilled": 0,
+      "vehicles": 8,
+      "sample_index": 445
+    },
+    {
+      "violations": [
+        {
+          "kind": "min_dispatch",
+          "step": 104,
+          "value": 2
+        }
+      ],
+      "completed": 47,
+      "rejected": 3,
+      "unfulfilled": 0,
+      "vehicles": 8,
+      "sample_index": 446
+    },
+    {
+      "violations": [
+        {
+          "kind": "min_dispatch",
+          "step": 106,
+          "value": 2
+        }
+      ],
+      "completed": 48,
+      "rejected": 2,
+      "unfulfilled": 0,
+      "vehicles": 9,
+      "sample_index": 447
+    },
+    {
+      "violations": [
+        {
+          "kind": "min_dispatch",
+          "step": 103,
+          "value": 3
+        }
+      ],
+      "completed": 46,
+      "rejected": 4,
+      "unfulfilled": 0,
+      "vehicles": 8,
+      "sample_index": 448
+    },
+    {
+      "violations": [
+        {
+          "kind": "min_dispatch",
+          "step": 106,
+          "value": 3
+        }
+      ],
+      "completed": 48,
+      "rejected": 2,
+      "unfulfilled": 0,
+      "vehicles": 9,
+      "sample_index": 449
+    },
+    {
+      "violations": [
+        {
+          "kind": "min_dispatch",
+          "step": 107,
+          "value": 3
+        }
+      ],
+      "completed": 49,
+      "rejected": 1,
+      "unfulfilled": 0,
+      "vehicles": 9,
+      "sample_index": 450
+    },
+    {
+      "violations": [
+        {
+          "kind": "min_dispatch",
+          "step": 106,
+          "value": 3
+        }
+      ],
+      "completed": 48,
+      "rejected": 2,
+      "unfulfilled": 0,
+      "vehicles": 9,
+      "sample_index": 451
+    },
+    {
+      "violations": [],
+      "completed": 47,
+      "rejected": 3,
+      "unfulfilled": 0,
+      "vehicles": 8,
+      "sample_index": 452
+    },
+    {
+      "violations": [
+        {
+          "kind": "min_dispatch",
+          "step": 106,
+          "value": 2
+        }
+      ],
+      "completed": 48,
+      "rejected": 2,
+      "unfulfilled": 0,
+      "vehicles": 9,
+      "sample_index": 453
+    },
+    {
+      "violations": [],
+      "completed": 50,
+      "rejected": 0,
+      "unfulfilled": 0,
+      "vehicles": 9,
+      "sample_index": 454
+    },
+    {
+      "violations": [
+        {
+          "kind": "min_dispatch",
+          "step": 105,
+          "value": 3
+        }
+      ],
+      "completed": 47,
+      "rejected": 3,
+      "unfulfilled": 0,
+      "vehicles": 9,
+      "sample_index": 455
+    },
+    {
+      "violations": [],
+      "completed": 45,
+      "rejected": 5,
+      "unfulfilled": 0,
+      "vehicles": 9,
+      "sample_index": 456
+    },
+    {
+      "violations": [],
+      "completed": 49,
+      "rejected": 1,
+      "unfulfilled": 0,
+      "vehicles": 9,
+      "sample_index": 457
+    },
+    {
+      "violations": [],
+      "completed": 48,
+      "rejected": 2,
+      "unfulfilled": 0,
+      "vehicles": 9,
+      "sample_index": 458
+    },
+    {
+      "violations": [],
+      "completed": 48,
+      "rejected": 2,
+      "unfulfilled": 0,
+      "vehicles": 8,
+      "sample_index": 459
+    },
+    {
+      "violations": [],
+      "completed": 41,
+      "rejected": 9,
+      "unfulfilled": 0,
+      "vehicles": 7,
+      "sample_index": 460
+    },
+    {
+      "violations": [
+        {
+          "kind": "min_dispatch",
+          "step": 105,
+          "value": 3
+        }
+      ],
+      "completed": 47,
+      "rejected": 3,
+      "unfulfilled": 0,
+      "vehicles": 9,
+      "sample_index": 461
+    },
+    {
+      "violations": [
+        {
+          "kind": "min_dispatch",
+          "step": 103,
+          "value": 2
+        }
+      ],
+      "completed": 46,
+      "rejected": 4,
+      "unfulfilled": 0,
+      "vehicles": 8,
+      "sample_index": 462
+    },
+    {
+      "violations": [
+        {
+          "kind": "min_dispatch",
+          "step": 101,
+          "value": 3
+        }
+      ],
+      "completed": 44,
+      "rejected": 6,
+      "unfulfilled": 0,
+      "vehicles": 8,
+      "sample_index": 463
+    },
+    {
+      "violations": [],
+      "completed": 47,
+      "rejected": 3,
+      "unfulfilled": 0,
+      "vehicles": 8,
+      "sample_index": 464
+    },
+    {
+      "violations": [],
+      "completed": 48,
+      "rejected": 2,
+      "unfulfilled": 0,
+      "vehicles": 8,
+      "sample_index": 465
+    },
+    {
+      "violations": [],
+      "completed": 47,
+      "rejected": 3,
+      "unfulfilled": 0,
+      "vehicles": 7,
+      "sample_index": 466
+    },
+    {
+      "violations": [],
+      "completed": 49,
+      "rejected": 1,
+      "unfulfilled": 0,
+      "vehicles": 8,
+      "sample_index": 467
+    },
+    {
+      "violations": [
+        {
+          "kind": "min_dispatch",
+          "step": 94,
+          "value": 3
+        }
+      ],
+      "completed": 38,
+      "rejected": 12,
+      "unfulfilled": 0,
+      "vehicles": 7,
+      "sample_index": 468
+    },
+    {
+      "violations": [],
+      "completed": 43,
+      "rejected": 7,
+      "unfulfilled": 0,
+      "vehicles": 7,
+      "sample_index": 469
+    },
+    {
+      "violations": [],
+      "completed": 48,
+      "rejected": 2,
+      "unfulfilled": 0,
+      "vehicles": 8,
+      "sample_index": 470
+    },
+    {
+      "violations": [],
+      "completed": 45,
+      "rejected": 5,
+      "unfulfilled": 0,
+      "vehicles": 8,
+      "sample_index": 471
+    },
+    {
+      "violations": [],
+      "completed": 47,
+      "rejected": 3,
+      "unfulfilled": 0,
+      "vehicles": 8,
+      "sample_index": 472
+    },
+    {
+      "violations": [
+        {
+          "kind": "min_dispatch",
+          "step": 107,
+          "value": 3
+        }
+      ],
+      "completed": 49,
+      "rejected": 1,
+      "unfulfilled": 0,
+      "vehicles": 9,
+      "sample_index": 473
+    },
+    {
+      "violations": [
+        {
+          "kind": "min_dispatch",
+          "step": 94,
+          "value": 3
+        }
+      ],
+      "completed": 38,
+      "rejected": 12,
+      "unfulfilled": 0,
+      "vehicles": 7,
+      "sample_index": 474
+    },
+    {
+      "violations": [
+        {
+          "kind": "min_dispatch",
+          "step": 101,
+          "value": 3
+        }
+      ],
+      "completed": 44,
+      "rejected": 6,
+      "unfulfilled": 0,
+      "vehicles": 8,
+      "sample_index": 475
+    },
+    {
+      "violations": [
+        {
+          "kind": "min_dispatch",
+          "step": 96,
+          "value": 3
+        }
+      ],
+      "completed": 40,
+      "rejected": 10,
+      "unfulfilled": 0,
+      "vehicles": 7,
+      "sample_index": 476
+    },
+    {
+      "violations": [
+        {
+          "kind": "min_dispatch",
+          "step": 96,
+          "value": 3
+        }
+      ],
+      "completed": 40,
+      "rejected": 10,
+      "unfulfilled": 0,
+      "vehicles": 7,
+      "sample_index": 477
+    },
+    {
+      "violations": [
+        {
+          "kind": "min_dispatch",
+          "step": 106,
+          "value": 3
+        }
+      ],
+      "completed": 48,
+      "rejected": 2,
+      "unfulfilled": 0,
+      "vehicles": 9,
+      "sample_index": 478
+    },
+    {
+      "violations": [
+        {
+          "kind": "min_dispatch",
+          "step": 105,
+          "value": 3
+        }
+      ],
+      "completed": 47,
+      "rejected": 3,
+      "unfulfilled": 0,
+      "vehicles": 9,
+      "sample_index": 479
+    },
+    {
+      "violations": [
+        {
+          "kind": "min_dispatch",
+          "step": 99,
+          "value": 3
+        }
+      ],
+      "completed": 43,
+      "rejected": 7,
+      "unfulfilled": 0,
+      "vehicles": 7,
+      "sample_index": 480
+    },
+    {
+      "violations": [
+        {
+          "kind": "min_dispatch",
+          "step": 102,
+          "value": 3
+        }
+      ],
+      "completed": 45,
+      "rejected": 5,
+      "unfulfilled": 0,
+      "vehicles": 8,
+      "sample_index": 481
+    },
+    {
+      "violations": [
+        {
+          "kind": "min_dispatch",
+          "step": 106,
+          "value": 3
+        }
+      ],
+      "completed": 48,
+      "rejected": 2,
+      "unfulfilled": 0,
+      "vehicles": 9,
+      "sample_index": 482
+    },
+    {
+      "violations": [
+        {
+          "kind": "min_dispatch",
+          "step": 102,
+          "value": 3
+        }
+      ],
+      "completed": 45,
+      "rejected": 5,
+      "unfulfilled": 0,
+      "vehicles": 8,
+      "sample_index": 483
+    },
+    {
+      "violations": [
+        {
+          "kind": "min_dispatch",
+          "step": 104,
+          "value": 2
+        }
+      ],
+      "completed": 47,
+      "rejected": 3,
+      "unfulfilled": 0,
+      "vehicles": 8,
+      "sample_index": 484
+    },
+    {
+      "violations": [],
+      "completed": 48,
+      "rejected": 2,
+      "unfulfilled": 0,
+      "vehicles": 9,
+      "sample_index": 485
+    },
+    {
+      "violations": [
+        {
+          "kind": "min_dispatch",
+          "step": 101,
+          "value": 2
+        }
+      ],
+      "completed": 44,
+      "rejected": 6,
+      "unfulfilled": 0,
+      "vehicles": 8,
+      "sample_index": 486
+    },
+    {
+      "violations": [
+        {
+          "kind": "min_dispatch",
+          "step": 103,
+          "value": 3
+        }
+      ],
+      "completed": 46,
+      "rejected": 4,
+      "unfulfilled": 0,
+      "vehicles": 8,
+      "sample_index": 487
+    },
+    {
+      "violations": [
+        {
+          "kind": "min_dispatch",
+          "step": 105,
+          "value": 3
+        }
+      ],
+      "completed": 48,
+      "rejected": 2,
+      "unfulfilled": 0,
+      "vehicles": 8,
+      "sample_index": 488
+    },
+    {
+      "violations": [],
+      "completed": 47,
+      "rejected": 3,
+      "unfulfilled": 0,
+      "vehicles": 8,
+      "sample_index": 489
+    },
+    {
+      "violations": [
+        {
+          "kind": "min_dispatch",
+          "step": 107,
+          "value": 3
+        }
+      ],
+      "completed": 49,
+      "rejected": 1,
+      "unfulfilled": 0,
+      "vehicles": 9,
+      "sample_index": 490
+    },
+    {
+      "violations": [],
+      "completed": 49,
+      "rejected": 1,
+      "unfulfilled": 0,
+      "vehicles": 7,
+      "sample_index": 491
+    },
+    {
+      "violations": [
+        {
+          "kind": "min_dispatch",
+          "step": 107,
+          "value": 3
+        }
+      ],
+      "completed": 49,
+      "rejected": 1,
+      "unfulfilled": 0,
+      "vehicles": 9,
+      "sample_index": 492
+    },
+    {
+      "violations": [],
+      "completed": 49,
+      "rejected": 1,
+      "unfulfilled": 0,
+      "vehicles": 9,
+      "sample_index": 493
+    },
+    {
+      "violations": [],
+      "completed": 50,
+      "rejected": 0,
+      "unfulfilled": 0,
+      "vehicles": 9,
+      "sample_index": 494
+    },
+    {
+      "violations": [],
+      "completed": 49,
+      "rejected": 1,
+      "unfulfilled": 0,
+      "vehicles": 9,
+      "sample_index": 495
+    },
+    {
+      "violations": [
+        {
+          "kind": "min_dispatch",
+          "step": 97,
+          "value": 3
+        }
+      ],
+      "completed": 41,
+      "rejected": 9,
+      "unfulfilled": 0,
+      "vehicles": 7,
+      "sample_index": 496
+    },
+    {
+      "violations": [
+        {
+          "kind": "min_dispatch",
+          "step": 103,
+          "value": 3
+        }
+      ],
+      "completed": 46,
+      "rejected": 4,
+      "unfulfilled": 0,
+      "vehicles": 8,
+      "sample_index": 497
+    },
+    {
+      "violations": [
+        {
+          "kind": "min_dispatch",
+          "step": 104,
+          "value": 1
+        }
+      ],
+      "completed": 46,
+      "rejected": 4,
+      "unfulfilled": 0,
+      "vehicles": 9,
+      "sample_index": 498
+    },
+    {
+      "violations": [
+        {
+          "kind": "min_dispatch",
+          "step": 95,
+          "value": 3
+        }
+      ],
+      "completed": 39,
+      "rejected": 11,
+      "unfulfilled": 0,
+      "vehicles": 7,
+      "sample_index": 499
+    }
+  ],
+  "intervention_noop": false
+}
