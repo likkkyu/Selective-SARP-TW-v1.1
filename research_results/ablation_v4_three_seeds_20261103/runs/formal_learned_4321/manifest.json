@@ -1,0 +1,39 @@
+{
+  "policy": "learned",
+  "argv": [
+    "--graph_sizes",
+    "50",
+    "--epochs",
+    "20",
+    "--epoch-size",
+    "2048",
+    "--val-size",
+    "500",
+    "--batch-size",
+    "16",
+    "--pomo-size",
+    "1",
+    "--seed",
+    "4321",
+    "--num-workers",
+    "0",
+    "--reject-warmup-epochs",
+    "0",
+    "--baseline-mode",
+    "batch_mean",
+    "--output-root",
+    "formal_learned_4321/outputs"
+  ],
+  "status": "completed",
+  "start": 1793507690.6946712,
+  "sha256": {
+    "nets/attention_model.py": "c2556d6c4baf0aaaa0d847b6033cc5ccc8b0d28daed8a5ea6ecb2c1dacfaee25",
+    "state_mcvrptw_v2.py": "bb5668b2aa65c70558293b61fe9d596f942fd827207c023a15e8f57b00f90e96",
+    "problem_mcvrptw_v2.py": "d003d1bb87a89e414df4c5921f275f97ff5d586dbf5174140e1bc29a8033cc43",
+    "run_training_optimized.py": "4d5f65cd8afd7dfd3f9d06215b2f94d9b80debbce19555692297b0433bdd523d",
+    "experiments/reject_ablation_20261029/run_v3.py": "c7b93a1de34da9b433b83a826586bcd1363ca910c8d84f42bd878d4add32c47b",
+    "experiments/reject_ablation_20261029/depot_noop.py": "1c14b205a31d37a351eeaaa59e7d810fb74c8d4eae68a4ccf13f2292e7067ba5"
+  },
+  "scope": "diagnostic; formal release requires reviewed gate",
+  "elapsed_seconds": 37382.987596035004
+}

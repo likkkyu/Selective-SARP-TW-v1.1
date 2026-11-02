@@ -1,0 +1,11 @@
+{
+  "reason": "User authorized extending this experiment; replace outer timeout only, training unchanged",
+  "previous_timeout_pid": 2105,
+  "remaining_shell_pid": 2106,
+  "training_pid_at_change": 43900,
+  "extended_at_utc": "2026-11-02T11:41:16.428379+00:00",
+  "new_deadline_utc": "2026-11-02T23:41:16.428372+00:00",
+  "max_additional_seconds": 43200,
+  "status": 0,
+  "ended_utc": "2026-11-02T17:44:16.829217+00:00"
+}

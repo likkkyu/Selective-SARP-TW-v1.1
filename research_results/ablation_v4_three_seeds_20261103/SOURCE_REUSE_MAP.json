@@ -1,0 +1,247 @@
+[
+  {
+    "archive_path": "remaining/evaluate_model.py",
+    "sha256": "151277b33128a094061fb953657612a41f35518607910eabacc4b42d56bebdb1",
+    "existing_github_source": "research_snapshot_20261102/evaluate_model.py"
+  },
+  {
+    "archive_path": "remaining/review_tolerance.py",
+    "sha256": "72d2fb478a15b004ffb73ce5ca7d011cb1a4f11ede9cc7dd9c98f077da3c7d43",
+    "existing_github_source": "research_snapshot_20261102/review_tolerance.py"
+  },
+  {
+    "archive_path": "remaining/run_training_optimized.py",
+    "sha256": "4d5f65cd8afd7dfd3f9d06215b2f94d9b80debbce19555692297b0433bdd523d",
+    "existing_github_source": "research_snapshot_20261102/run_training_optimized.py"
+  },
+  {
+    "archive_path": "remaining/state_mcvrptw_v2.py",
+    "sha256": "bb5668b2aa65c70558293b61fe9d596f942fd827207c023a15e8f57b00f90e96",
+    "existing_github_source": "research_snapshot_20261102/state_mcvrptw_v2.py"
+  },
+  {
+    "archive_path": "remaining/problem_mcvrptw_v2.py",
+    "sha256": "d003d1bb87a89e414df4c5921f275f97ff5d586dbf5174140e1bc29a8033cc43",
+    "existing_github_source": "research_snapshot_20261102/problem_mcvrptw_v2.py"
+  },
+  {
+    "archive_path": "remaining/extend_supervisor.py",
+    "sha256": "8a4d473876e58879bd009711c194b8c41f5276bc32e1850011a862799008d87a",
+    "existing_github_source": null
+  },
+  {
+    "archive_path": "pair1234/evaluate_model.py",
+    "sha256": "151277b33128a094061fb953657612a41f35518607910eabacc4b42d56bebdb1",
+    "existing_github_source": "research_snapshot_20261102/evaluate_model.py"
+  },
+  {
+    "archive_path": "pair1234/review_tolerance.py",
+    "sha256": "72d2fb478a15b004ffb73ce5ca7d011cb1a4f11ede9cc7dd9c98f077da3c7d43",
+    "existing_github_source": "research_snapshot_20261102/review_tolerance.py"
+  },
+  {
+    "archive_path": "pair1234/run_training_optimized.py",
+    "sha256": "4d5f65cd8afd7dfd3f9d06215b2f94d9b80debbce19555692297b0433bdd523d",
+    "existing_github_source": "research_snapshot_20261102/run_training_optimized.py"
+  },
+  {
+    "archive_path": "pair1234/state_mcvrptw_v2.py",
+    "sha256": "bb5668b2aa65c70558293b61fe9d596f942fd827207c023a15e8f57b00f90e96",
+    "existing_github_source": "research_snapshot_20261102/state_mcvrptw_v2.py"
+  },
+  {
+    "archive_path": "pair1234/problem_mcvrptw_v2.py",
+    "sha256": "d003d1bb87a89e414df4c5921f275f97ff5d586dbf5174140e1bc29a8033cc43",
+    "existing_github_source": "research_snapshot_20261102/problem_mcvrptw_v2.py"
+  },
+  {
+    "archive_path": "remaining/utils/functions.py",
+    "sha256": "7b63ad1837783c013dd6eb7c069e1a53352d364cfa219af618ad4d97a7813a14",
+    "existing_github_source": "research_snapshot_20261102/utils/functions.py"
+  },
+  {
+    "archive_path": "remaining/utils/__init__.py",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "existing_github_source": "research_snapshot_20261102/utils/__init__.py"
+  },
+  {
+    "archive_path": "remaining/utils/beam_search.py",
+    "sha256": "5c5f0191335089e33b27c4f3bb0c58ebf992c40060fe361e1ba4080e2b4d8302",
+    "existing_github_source": "research_snapshot_20261102/utils/beam_search.py"
+  },
+  {
+    "archive_path": "remaining/utils/tensor_functions.py",
+    "sha256": "ccb654ea1c80949bfc7fbec304a39e345b8b8cf2e8dafecaa72c579ea20fc960",
+    "existing_github_source": "research_snapshot_20261102/utils/tensor_functions.py"
+  },
+  {
+    "archive_path": "remaining/utils/lexsort.py",
+    "sha256": "c0d84f5b8a6d2a8c97a75b63c7796699dd3fec7440a43f7c191028c2ec064bcc",
+    "existing_github_source": "research_snapshot_20261102/utils/lexsort.py"
+  },
+  {
+    "archive_path": "remaining/nets/graph_encoder.py",
+    "sha256": "8336742f3dba41c3f0695a16e56c35a5b42542a43f2110f41f0952a8e5505785",
+    "existing_github_source": "research_snapshot_20261102/nets/graph_encoder.py"
+  },
+  {
+    "archive_path": "remaining/nets/__init__.py",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "existing_github_source": "research_snapshot_20261102/nets/__init__.py"
+  },
+  {
+    "archive_path": "remaining/nets/attention_model.py",
+    "sha256": "c2556d6c4baf0aaaa0d847b6033cc5ccc8b0d28daed8a5ea6ecb2c1dacfaee25",
+    "existing_github_source": "research_snapshot_20261102/nets/attention_model.py"
+  },
+  {
+    "archive_path": "remaining/experiments/reject_ablation_20261029/run_v3.py",
+    "sha256": "c7b93a1de34da9b433b83a826586bcd1363ca910c8d84f42bd878d4add32c47b",
+    "existing_github_source": "research_snapshot_20261102/experiments/reject_ablation_20261029/run_v3.py"
+  },
+  {
+    "archive_path": "remaining/experiments/reject_ablation_20261029/audit_eval_v3.py",
+    "sha256": "8b24adcd7fee7fcfd8a27642083722f57c60093cca8017794194484e31eb477a",
+    "existing_github_source": "research_snapshot_20261102/experiments/reject_ablation_20261029/audit_eval_v3.py"
+  },
+  {
+    "archive_path": "remaining/experiments/reject_ablation_20261029/depot_noop.py",
+    "sha256": "1c14b205a31d37a351eeaaa59e7d810fb74c8d4eae68a4ccf13f2292e7067ba5",
+    "existing_github_source": "research_snapshot_20261102/experiments/reject_ablation_20261029/depot_noop.py"
+  },
+  {
+    "archive_path": "remaining/experiments/reject_ablation_20261029/evaluate_v3.py",
+    "sha256": "9ab0d81da0fbbe46c63eb13ad63987ba77f3434c30d45f71b185345492b8e28f",
+    "existing_github_source": "research_snapshot_20261102/experiments/reject_ablation_20261029/evaluate_v3.py"
+  },
+  {
+    "archive_path": "remaining/experiments/reject_ablation_20261029/route_audit.py",
+    "sha256": "8aee9732d151bd0f170788bff0ef8dc2bb150f22a95e04b5472e25758fb205ef",
+    "existing_github_source": "research_snapshot_20261102/experiments/reject_ablation_20261029/route_audit.py"
+  },
+  {
+    "archive_path": "remaining/experiments/sensitivity_20261030/scenarios.py",
+    "sha256": "7b3021d0e2fe6af58fc7256e76f31df7105b768ba8f9c72d8acad2549b16259a",
+    "existing_github_source": "research_snapshot_20261102/experiments/sensitivity_20261030/scenarios.py"
+  },
+  {
+    "archive_path": "remaining/experiments/sensitivity_20261030/batch.py",
+    "sha256": "5ad9fe3a55ce7e597fc6b6f25582ce141bbb0e3390d459ac022b5c916896c9dc",
+    "existing_github_source": "research_snapshot_20261102/experiments/sensitivity_20261030/batch.py"
+  },
+  {
+    "archive_path": "remaining/experiments/sensitivity_20261030/timing_candidate.py",
+    "sha256": "fe43b6c1896f4d3eb5e2318c9f2f33c9acfc3508625b22ecf7799bb5b708e6b6",
+    "existing_github_source": "research_snapshot_20261102/experiments/sensitivity_20261030/timing_candidate.py"
+  },
+  {
+    "archive_path": "remaining/experiments/sensitivity_20261030/test_scenarios.py",
+    "sha256": "f004c27afbaac191ba13ce4eae5bfe27a3018436a9a13bdbd307850e2a78f36e",
+    "existing_github_source": "research_snapshot_20261102/experiments/sensitivity_20261030/test_scenarios.py"
+  },
+  {
+    "archive_path": "remaining/experiments/sensitivity_20261030/corrected_entry.py",
+    "sha256": "579638e83e255f9361c3555ce4b1a7e2204ad0662c27880fcdb82e0961dce09c",
+    "existing_github_source": "research_snapshot_20261102/experiments/sensitivity_20261030/corrected_entry.py"
+  },
+  {
+    "archive_path": "remaining/experiments/sensitivity_20261030/evaluate.py",
+    "sha256": "3d277abd3afc4383167e9f74b9ac0b95889f9ae8d129ff9b611be5821dc06e3c",
+    "existing_github_source": "research_snapshot_20261102/experiments/sensitivity_20261030/evaluate.py"
+  },
+  {
+    "archive_path": "pair1234/utils/functions.py",
+    "sha256": "7b63ad1837783c013dd6eb7c069e1a53352d364cfa219af618ad4d97a7813a14",
+    "existing_github_source": "research_snapshot_20261102/utils/functions.py"
+  },
+  {
+    "archive_path": "pair1234/utils/__init__.py",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "existing_github_source": "research_snapshot_20261102/utils/__init__.py"
+  },
+  {
+    "archive_path": "pair1234/utils/beam_search.py",
+    "sha256": "5c5f0191335089e33b27c4f3bb0c58ebf992c40060fe361e1ba4080e2b4d8302",
+    "existing_github_source": "research_snapshot_20261102/utils/beam_search.py"
+  },
+  {
+    "archive_path": "pair1234/utils/tensor_functions.py",
+    "sha256": "ccb654ea1c80949bfc7fbec304a39e345b8b8cf2e8dafecaa72c579ea20fc960",
+    "existing_github_source": "research_snapshot_20261102/utils/tensor_functions.py"
+  },
+  {
+    "archive_path": "pair1234/utils/lexsort.py",
+    "sha256": "c0d84f5b8a6d2a8c97a75b63c7796699dd3fec7440a43f7c191028c2ec064bcc",
+    "existing_github_source": "research_snapshot_20261102/utils/lexsort.py"
+  },
+  {
+    "archive_path": "pair1234/nets/graph_encoder.py",
+    "sha256": "8336742f3dba41c3f0695a16e56c35a5b42542a43f2110f41f0952a8e5505785",
+    "existing_github_source": "research_snapshot_20261102/nets/graph_encoder.py"
+  },
+  {
+    "archive_path": "pair1234/nets/__init__.py",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "existing_github_source": "research_snapshot_20261102/nets/__init__.py"
+  },
+  {
+    "archive_path": "pair1234/nets/attention_model.py",
+    "sha256": "c2556d6c4baf0aaaa0d847b6033cc5ccc8b0d28daed8a5ea6ecb2c1dacfaee25",
+    "existing_github_source": "research_snapshot_20261102/nets/attention_model.py"
+  },
+  {
+    "archive_path": "pair1234/experiments/reject_ablation_20261029/run_v3.py",
+    "sha256": "c7b93a1de34da9b433b83a826586bcd1363ca910c8d84f42bd878d4add32c47b",
+    "existing_github_source": "research_snapshot_20261102/experiments/reject_ablation_20261029/run_v3.py"
+  },
+  {
+    "archive_path": "pair1234/experiments/reject_ablation_20261029/audit_eval_v3.py",
+    "sha256": "8b24adcd7fee7fcfd8a27642083722f57c60093cca8017794194484e31eb477a",
+    "existing_github_source": "research_snapshot_20261102/experiments/reject_ablation_20261029/audit_eval_v3.py"
+  },
+  {
+    "archive_path": "pair1234/experiments/reject_ablation_20261029/depot_noop.py",
+    "sha256": "1c14b205a31d37a351eeaaa59e7d810fb74c8d4eae68a4ccf13f2292e7067ba5",
+    "existing_github_source": "research_snapshot_20261102/experiments/reject_ablation_20261029/depot_noop.py"
+  },
+  {
+    "archive_path": "pair1234/experiments/reject_ablation_20261029/evaluate_v3.py",
+    "sha256": "9ab0d81da0fbbe46c63eb13ad63987ba77f3434c30d45f71b185345492b8e28f",
+    "existing_github_source": "research_snapshot_20261102/experiments/reject_ablation_20261029/evaluate_v3.py"
+  },
+  {
+    "archive_path": "pair1234/experiments/reject_ablation_20261029/route_audit.py",
+    "sha256": "8aee9732d151bd0f170788bff0ef8dc2bb150f22a95e04b5472e25758fb205ef",
+    "existing_github_source": "research_snapshot_20261102/experiments/reject_ablation_20261029/route_audit.py"
+  },
+  {
+    "archive_path": "pair1234/experiments/sensitivity_20261030/scenarios.py",
+    "sha256": "7b3021d0e2fe6af58fc7256e76f31df7105b768ba8f9c72d8acad2549b16259a",
+    "existing_github_source": "research_snapshot_20261102/experiments/sensitivity_20261030/scenarios.py"
+  },
+  {
+    "archive_path": "pair1234/experiments/sensitivity_20261030/batch.py",
+    "sha256": "5ad9fe3a55ce7e597fc6b6f25582ce141bbb0e3390d459ac022b5c916896c9dc",
+    "existing_github_source": "research_snapshot_20261102/experiments/sensitivity_20261030/batch.py"
+  },
+  {
+    "archive_path": "pair1234/experiments/sensitivity_20261030/timing_candidate.py",
+    "sha256": "fe43b6c1896f4d3eb5e2318c9f2f33c9acfc3508625b22ecf7799bb5b708e6b6",
+    "existing_github_source": "research_snapshot_20261102/experiments/sensitivity_20261030/timing_candidate.py"
+  },
+  {
+    "archive_path": "pair1234/experiments/sensitivity_20261030/test_scenarios.py",
+    "sha256": "f004c27afbaac191ba13ce4eae5bfe27a3018436a9a13bdbd307850e2a78f36e",
+    "existing_github_source": "research_snapshot_20261102/experiments/sensitivity_20261030/test_scenarios.py"
+  },
+  {
+    "archive_path": "pair1234/experiments/sensitivity_20261030/corrected_entry.py",
+    "sha256": "579638e83e255f9361c3555ce4b1a7e2204ad0662c27880fcdb82e0961dce09c",
+    "existing_github_source": "research_snapshot_20261102/experiments/sensitivity_20261030/corrected_entry.py"
+  },
+  {
+    "archive_path": "pair1234/experiments/sensitivity_20261030/evaluate.py",
+    "sha256": "3d277abd3afc4383167e9f74b9ac0b95889f9ae8d129ff9b611be5821dc06e3c",
+    "existing_github_source": "research_snapshot_20261102/experiments/sensitivity_20261030/evaluate.py"
+  }
+]

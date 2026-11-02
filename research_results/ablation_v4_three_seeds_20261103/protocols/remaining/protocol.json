@@ -1,0 +1,39 @@
+{
+  "scope": "cost-v4 formal remaining paired training seeds",
+  "epochs": 20,
+  "train": 2048,
+  "validation": 500,
+  "test_seed": 917531,
+  "test_samples": 500,
+  "timeout_seconds": 129600,
+  "source_sha256": {
+    "evaluate_model.py": "151277b33128a094061fb953657612a41f35518607910eabacc4b42d56bebdb1",
+    "problem_mcvrptw_v2.py": "d003d1bb87a89e414df4c5921f275f97ff5d586dbf5174140e1bc29a8033cc43",
+    "state_mcvrptw_v2.py": "bb5668b2aa65c70558293b61fe9d596f942fd827207c023a15e8f57b00f90e96",
+    "run_training_optimized.py": "4d5f65cd8afd7dfd3f9d06215b2f94d9b80debbce19555692297b0433bdd523d",
+    "nets/graph_encoder.py": "8336742f3dba41c3f0695a16e56c35a5b42542a43f2110f41f0952a8e5505785",
+    "nets/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "nets/attention_model.py": "c2556d6c4baf0aaaa0d847b6033cc5ccc8b0d28daed8a5ea6ecb2c1dacfaee25",
+    "utils/functions.py": "7b63ad1837783c013dd6eb7c069e1a53352d364cfa219af618ad4d97a7813a14",
+    "utils/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "utils/beam_search.py": "5c5f0191335089e33b27c4f3bb0c58ebf992c40060fe361e1ba4080e2b4d8302",
+    "utils/tensor_functions.py": "ccb654ea1c80949bfc7fbec304a39e345b8b8cf2e8dafecaa72c579ea20fc960",
+    "utils/lexsort.py": "c0d84f5b8a6d2a8c97a75b63c7796699dd3fec7440a43f7c191028c2ec064bcc",
+    "experiments/reject_ablation_20261029/run_v3.py": "c7b93a1de34da9b433b83a826586bcd1363ca910c8d84f42bd878d4add32c47b",
+    "experiments/reject_ablation_20261029/evaluate_v3.py": "9ab0d81da0fbbe46c63eb13ad63987ba77f3434c30d45f71b185345492b8e28f",
+    "experiments/reject_ablation_20261029/audit_eval_v3.py": "8b24adcd7fee7fcfd8a27642083722f57c60093cca8017794194484e31eb477a",
+    "experiments/reject_ablation_20261029/route_audit.py": "8aee9732d151bd0f170788bff0ef8dc2bb150f22a95e04b5472e25758fb205ef",
+    "experiments/reject_ablation_20261029/depot_noop.py": "1c14b205a31d37a351eeaaa59e7d810fb74c8d4eae68a4ccf13f2292e7067ba5",
+    "experiments/sensitivity_20261030/scenarios.py": "7b3021d0e2fe6af58fc7256e76f31df7105b768ba8f9c72d8acad2549b16259a",
+    "experiments/sensitivity_20261030/batch.py": "5ad9fe3a55ce7e597fc6b6f25582ce141bbb0e3390d459ac022b5c916896c9dc",
+    "experiments/sensitivity_20261030/test_scenarios.py": "f004c27afbaac191ba13ce4eae5bfe27a3018436a9a13bdbd307850e2a78f36e",
+    "experiments/sensitivity_20261030/evaluate.py": "3d277abd3afc4383167e9f74b9ac0b95889f9ae8d129ff9b611be5821dc06e3c",
+    "experiments/sensitivity_20261030/timing_candidate.py": "fe43b6c1896f4d3eb5e2318c9f2f33c9acfc3508625b22ecf7799bb5b708e6b6",
+    "experiments/sensitivity_20261030/corrected_entry.py": "579638e83e255f9361c3555ce4b1a7e2204ad0662c27880fcdb82e0961dce09c"
+  },
+  "seeds": [
+    4321,
+    8765
+  ],
+  "progress": "unbuffered stdout and stderr streamed with tee; per-batch training and per-epoch validation"
+}

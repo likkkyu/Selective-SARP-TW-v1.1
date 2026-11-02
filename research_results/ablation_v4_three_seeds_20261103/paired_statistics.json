@@ -1,0 +1,67 @@
+{
+  "training_seeds": 3,
+  "test_instances_per_model": 500,
+  "cost_version": 4,
+  "completion_guard": "not applied in these evaluations",
+  "per_seed": [
+    {
+      "seed": 1234,
+      "service_difference_pp": 2.2399999999999975,
+      "cost_difference": -650.7320003356936,
+      "cost_reduction_pct": 21.24100318488875,
+      "distance_difference_km": 19.879323120117192
+    },
+    {
+      "seed": 4321,
+      "service_difference_pp": -1.5159999999999951,
+      "cost_difference": 437.97235632324237,
+      "cost_reduction_pct": -18.262203376334686,
+      "distance_difference_km": -1.6823168334960883
+    },
+    {
+      "seed": 8765,
+      "service_difference_pp": 0.6480000000000041,
+      "cost_difference": -192.81393054199225,
+      "cost_reduction_pct": 6.764149045397206,
+      "distance_difference_km": 0.3553627929687764
+    }
+  ],
+  "summary": {
+    "service_rate_mean": {
+      "learned_mean": 91.69066666666666,
+      "learned_sd": 0.7345892276186259,
+      "rule_mean": 91.23333333333332,
+      "rule_sd": 1.1742935464922437,
+      "paired_mean_difference": 0.45733333333333553,
+      "paired_sd": 1.8852451653122784,
+      "normal_model_paired_t95_interval_exploratory_only": [
+        -4.2258752778777335,
+        5.140541944544404
+      ]
+    },
+    "total_cost_raw_mean": {
+      "learned_mean": 2635.58803817749,
+      "learned_sd": 212.55739463799256,
+      "rule_mean": 2770.779229695638,
+      "rule_sd": 339.75381754499057,
+      "paired_mean_difference": -135.1911915181478,
+      "paired_sd": 546.6347766941785,
+      "normal_model_paired_t95_interval_exploratory_only": [
+        -1493.107254905887,
+        1222.7248718695912
+      ]
+    },
+    "distance_mean": {
+      "learned_mean": 425.3497877197265,
+      "learned_sd": 6.731404887358253,
+      "rule_mean": 419.16566469319656,
+      "rule_sd": 7.508481297561004,
+      "paired_mean_difference": 6.18412302652996,
+      "paired_sd": 11.904071310588295,
+      "normal_model_paired_t95_interval_exploratory_only": [
+        -23.38722944050222,
+        35.755475493562145
+      ]
+    }
+  }
+}

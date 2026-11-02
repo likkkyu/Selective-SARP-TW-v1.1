@@ -1,0 +1,64 @@
+{
+  "status": "passed",
+  "new_files_downloaded": 49,
+  "existing_files_reused": 87,
+  "total_relevant_files_verified": 136,
+  "main_checkpoints": 12,
+  "models_tested": 6,
+  "model_instance_evaluations": 3000,
+  "unique_common_test_instances": 500,
+  "archive_bytes": 337538815,
+  "archive_sha256": "1512ad3d1ed01d437b0b9de6691cd73ed5e3f844b41177d01d98d5c3400bc3a7",
+  "models": [
+    {
+      "seed": 1234,
+      "policy": "learned",
+      "service_rate": 0.92468,
+      "hard_valid": 500,
+      "samples": 500,
+      "unfulfilled": 0
+    },
+    {
+      "seed": 1234,
+      "policy": "service_first",
+      "service_rate": 0.90228,
+      "hard_valid": 500,
+      "samples": 500,
+      "unfulfilled": 0
+    },
+    {
+      "seed": 4321,
+      "policy": "learned",
+      "service_rate": 0.91008,
+      "hard_valid": 500,
+      "samples": 500,
+      "unfulfilled": 0
+    },
+    {
+      "seed": 4321,
+      "policy": "service_first",
+      "service_rate": 0.92524,
+      "hard_valid": 500,
+      "samples": 500,
+      "unfulfilled": 0
+    },
+    {
+      "seed": 8765,
+      "policy": "learned",
+      "service_rate": 0.91596,
+      "hard_valid": 500,
+      "samples": 500,
+      "unfulfilled": 0
+    },
+    {
+      "seed": 8765,
+      "policy": "service_first",
+      "service_rate": 0.90948,
+      "hard_valid": 500,
+      "samples": 500,
+      "unfulfilled": 0
+    }
+  ],
+  "other_selection_role_checkpoints_omitted": 12,
+  "pending": "common guard1 reevaluation, not performed"
+}

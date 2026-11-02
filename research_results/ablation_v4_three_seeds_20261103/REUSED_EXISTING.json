@@ -1,0 +1,524 @@
+[
+  {
+    "path": "pair1234/evaluate_model.py",
+    "bytes": 69079,
+    "sha256": "151277b33128a094061fb953657612a41f35518607910eabacc4b42d56bebdb1",
+    "local_path": "evaluate_model.py"
+  },
+  {
+    "path": "pair1234/formal_exit.txt",
+    "bytes": 2,
+    "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+    "local_path": "artifacts/sensitivity_v4_final_20261102/raw/guarded_v2_exit.txt"
+  },
+  {
+    "path": "pair1234/formal_learned_1234.log",
+    "bytes": 383992,
+    "sha256": "4ab220827b6f0521a5f3e100abd8a6a319b4af9cb4d2b32d74f58ca6e28d239c",
+    "local_path": "experiments/sensitivity_20261030/v4_pair1234_review/formal_learned_1234.log"
+  },
+  {
+    "path": "pair1234/formal_learned_1234_eval.log",
+    "bytes": 5036,
+    "sha256": "b89bf9066034925cb37f6818f4b76232c7914f94a3c3f51a3c2bcf8097df2e43",
+    "local_path": "experiments/sensitivity_20261030/v4_pair1234_review/formal_learned_1234_eval.log"
+  },
+  {
+    "path": "pair1234/formal_pair.sh",
+    "bytes": 943,
+    "sha256": "0fd545c5ba0d2abe42554b08eb9e6591a5809e63c8ac6abd4ce6a4dd9fb3d974",
+    "local_path": "experiments/sensitivity_20261030/v4_pair1234_review/formal_pair.sh"
+  },
+  {
+    "path": "pair1234/formal_service_first_1234.log",
+    "bytes": 384238,
+    "sha256": "074640627beb18626c369702004ee38c9c3316e343add73a39117a24cb510efc",
+    "local_path": "experiments/sensitivity_20261030/v4_pair1234_review/formal_service_first_1234.log"
+  },
+  {
+    "path": "pair1234/formal_service_first_1234_eval.log",
+    "bytes": 5057,
+    "sha256": "e26daa92973bf6262e76e37c547dca48110a372c2db4f1c4b4802d2bd96c491b",
+    "local_path": "experiments/sensitivity_20261030/v4_pair1234_review/formal_service_first_1234_eval.log"
+  },
+  {
+    "path": "pair1234/formal_start.txt",
+    "bytes": 21,
+    "sha256": "9278863a9e3034dfa57c95421f05b1bf4ee8b04f41b53cdedf548626f280a23a",
+    "local_path": "experiments/sensitivity_20261030/v4_pair1234_review/formal_start.txt"
+  },
+  {
+    "path": "pair1234/launcher.log",
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "local_path": "utils/__init__.py"
+  },
+  {
+    "path": "pair1234/problem_mcvrptw_v2.py",
+    "bytes": 62797,
+    "sha256": "d003d1bb87a89e414df4c5921f275f97ff5d586dbf5174140e1bc29a8033cc43",
+    "local_path": "problem_mcvrptw_v2.py"
+  },
+  {
+    "path": "pair1234/protocol.json",
+    "bytes": 2747,
+    "sha256": "51c782e4dedad1fb81fb618c46a2c40e88672f12193ddf0b05e4dd2a4bf79db8",
+    "local_path": "experiments/sensitivity_20261030/v4_pair1234_review/protocol.json"
+  },
+  {
+    "path": "pair1234/run_training_optimized.py",
+    "bytes": 123761,
+    "sha256": "4d5f65cd8afd7dfd3f9d06215b2f94d9b80debbce19555692297b0433bdd523d",
+    "local_path": "run_training_optimized.py"
+  },
+  {
+    "path": "pair1234/state_mcvrptw_v2.py",
+    "bytes": 140770,
+    "sha256": "bb5668b2aa65c70558293b61fe9d596f942fd827207c023a15e8f57b00f90e96",
+    "local_path": "state_mcvrptw_v2.py"
+  },
+  {
+    "path": "pair1234/review_tolerance.py",
+    "bytes": 1407,
+    "sha256": "72d2fb478a15b004ffb73ce5ca7d011cb1a4f11ede9cc7dd9c98f077da3c7d43",
+    "local_path": "artifacts/sensitivity_v4_final_20261102/raw/review_tolerance.py"
+  },
+  {
+    "path": "pair1234/tolerance_eval.json",
+    "bytes": 7333,
+    "sha256": "6a153b3f2f1634056b9c401652d3676cc453587e5e8f9155065a084b259a7410",
+    "local_path": "experiments/sensitivity_20261030/v4_pair1234_review/formal_learned_1234/eval.json"
+  },
+  {
+    "path": "pair1234/tolerance_audit.json",
+    "bytes": 103576,
+    "sha256": "7ebe4c0755d05992ee46b96706b0ded680f670865c21eb05b5900208021bd626",
+    "local_path": "experiments/sensitivity_20261030/v4_pair1234_review/formal_learned_1234/audit.json"
+  },
+  {
+    "path": "pair1234/formal_learned_1234/audit.json",
+    "bytes": 103576,
+    "sha256": "7ebe4c0755d05992ee46b96706b0ded680f670865c21eb05b5900208021bd626",
+    "local_path": "experiments/sensitivity_20261030/v4_pair1234_review/formal_learned_1234/audit.json"
+  },
+  {
+    "path": "pair1234/formal_learned_1234/eval.json",
+    "bytes": 7333,
+    "sha256": "6a153b3f2f1634056b9c401652d3676cc453587e5e8f9155065a084b259a7410",
+    "local_path": "experiments/sensitivity_20261030/v4_pair1234_review/formal_learned_1234/eval.json"
+  },
+  {
+    "path": "pair1234/formal_learned_1234/manifest.json",
+    "bytes": 1227,
+    "sha256": "3ebdc646b7b3869581cfaae7430b12aa0fa5e46c8063d93bea7f083a22e9f38e",
+    "local_path": "experiments/sensitivity_20261030/v4_pair1234_review/formal_learned_1234/manifest.json"
+  },
+  {
+    "path": "pair1234/formal_service_first_1234/audit.json",
+    "bytes": 109950,
+    "sha256": "c241de839b2b78db87eb2351b2d55d253a1ce2bba8fd89090f042cfabf11a190",
+    "local_path": "experiments/sensitivity_20261030/v4_pair1234_review/formal_service_first_1234/audit.json"
+  },
+  {
+    "path": "pair1234/formal_service_first_1234/eval.json",
+    "bytes": 7326,
+    "sha256": "b233690cb11471c9025b5a8cccf619cfd91c9f39281adf584dd181777c99dff7",
+    "local_path": "experiments/sensitivity_20261030/v4_pair1234_review/formal_service_first_1234/eval.json"
+  },
+  {
+    "path": "pair1234/formal_service_first_1234/manifest.json",
+    "bytes": 1238,
+    "sha256": "b5f7f8564067387432e4ecc657253d04ccff63508426a7ccf012122b4f1f6f96",
+    "local_path": "experiments/sensitivity_20261030/v4_pair1234_review/formal_service_first_1234/manifest.json"
+  },
+  {
+    "path": "pair1234/nets/__init__.py",
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "local_path": "utils/__init__.py"
+  },
+  {
+    "path": "pair1234/nets/attention_model.py",
+    "bytes": 46781,
+    "sha256": "c2556d6c4baf0aaaa0d847b6033cc5ccc8b0d28daed8a5ea6ecb2c1dacfaee25",
+    "local_path": "nets/attention_model.py"
+  },
+  {
+    "path": "pair1234/nets/graph_encoder.py",
+    "bytes": 7825,
+    "sha256": "8336742f3dba41c3f0695a16e56c35a5b42542a43f2110f41f0952a8e5505785",
+    "local_path": "nets/graph_encoder.py"
+  },
+  {
+    "path": "pair1234/utils/__init__.py",
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "local_path": "utils/__init__.py"
+  },
+  {
+    "path": "pair1234/utils/beam_search.py",
+    "bytes": 8193,
+    "sha256": "5c5f0191335089e33b27c4f3bb0c58ebf992c40060fe361e1ba4080e2b4d8302",
+    "local_path": "utils/beam_search.py"
+  },
+  {
+    "path": "pair1234/utils/functions.py",
+    "bytes": 3172,
+    "sha256": "7b63ad1837783c013dd6eb7c069e1a53352d364cfa219af618ad4d97a7813a14",
+    "local_path": "utils/functions.py"
+  },
+  {
+    "path": "pair1234/utils/lexsort.py",
+    "bytes": 2382,
+    "sha256": "c0d84f5b8a6d2a8c97a75b63c7796699dd3fec7440a43f7c191028c2ec064bcc",
+    "local_path": "utils/lexsort.py"
+  },
+  {
+    "path": "pair1234/utils/tensor_functions.py",
+    "bytes": 1608,
+    "sha256": "ccb654ea1c80949bfc7fbec304a39e345b8b8cf2e8dafecaa72c579ea20fc960",
+    "local_path": "utils/tensor_functions.py"
+  },
+  {
+    "path": "pair1234/experiments/reject_ablation_20261029/audit_eval_v3.py",
+    "bytes": 1973,
+    "sha256": "8b24adcd7fee7fcfd8a27642083722f57c60093cca8017794194484e31eb477a",
+    "local_path": "artifacts/sensitivity_v4_final_20261102/raw/experiments/reject_ablation_20261029/audit_eval_v3.py"
+  },
+  {
+    "path": "pair1234/experiments/reject_ablation_20261029/depot_noop.py",
+    "bytes": 1129,
+    "sha256": "1c14b205a31d37a351eeaaa59e7d810fb74c8d4eae68a4ccf13f2292e7067ba5",
+    "local_path": "artifacts/sensitivity_v4_final_20261102/raw/experiments/reject_ablation_20261029/depot_noop.py"
+  },
+  {
+    "path": "pair1234/experiments/reject_ablation_20261029/evaluate_v3.py",
+    "bytes": 974,
+    "sha256": "9ab0d81da0fbbe46c63eb13ad63987ba77f3434c30d45f71b185345492b8e28f",
+    "local_path": "artifacts/sensitivity_v4_final_20261102/raw/experiments/reject_ablation_20261029/evaluate_v3.py"
+  },
+  {
+    "path": "pair1234/experiments/reject_ablation_20261029/route_audit.py",
+    "bytes": 3200,
+    "sha256": "8aee9732d151bd0f170788bff0ef8dc2bb150f22a95e04b5472e25758fb205ef",
+    "local_path": "artifacts/sensitivity_v4_final_20261102/raw/experiments/reject_ablation_20261029/route_audit.py"
+  },
+  {
+    "path": "pair1234/experiments/reject_ablation_20261029/run_v3.py",
+    "bytes": 3744,
+    "sha256": "c7b93a1de34da9b433b83a826586bcd1363ca910c8d84f42bd878d4add32c47b",
+    "local_path": "artifacts/sensitivity_v4_final_20261102/raw/experiments/reject_ablation_20261029/run_v3.py"
+  },
+  {
+    "path": "pair1234/experiments/sensitivity_20261030/batch.py",
+    "bytes": 2242,
+    "sha256": "5ad9fe3a55ce7e597fc6b6f25582ce141bbb0e3390d459ac022b5c916896c9dc",
+    "local_path": "artifacts/sensitivity_v4_final_20261102/raw/experiments/sensitivity_20261030/batch.py"
+  },
+  {
+    "path": "pair1234/experiments/sensitivity_20261030/corrected_diagnostic.sh",
+    "bytes": 1418,
+    "sha256": "ab0438d2deac3c062f4f9f1c002a81dffc9296b704756f0624c12055ea4f6ed7",
+    "local_path": "experiments/sensitivity_20261030/corrected_diagnostic.sh"
+  },
+  {
+    "path": "pair1234/experiments/sensitivity_20261030/corrected_entry.py",
+    "bytes": 1177,
+    "sha256": "579638e83e255f9361c3555ce4b1a7e2204ad0662c27880fcdb82e0961dce09c",
+    "local_path": "artifacts/sensitivity_v4_final_20261102/raw/experiments/sensitivity_20261030/corrected_entry.py"
+  },
+  {
+    "path": "pair1234/experiments/sensitivity_20261030/corrected_smoke.sh",
+    "bytes": 790,
+    "sha256": "cafa05a776580b187a9553ee26bcfc5f629186d43f22fdd33897de12c0ed8b17",
+    "local_path": "experiments/sensitivity_20261030/corrected_smoke.sh"
+  },
+  {
+    "path": "pair1234/experiments/sensitivity_20261030/evaluate.py",
+    "bytes": 2638,
+    "sha256": "3d277abd3afc4383167e9f74b9ac0b95889f9ae8d129ff9b611be5821dc06e3c",
+    "local_path": "artifacts/sensitivity_v4_final_20261102/raw/experiments/sensitivity_20261030/evaluate.py"
+  },
+  {
+    "path": "pair1234/experiments/sensitivity_20261030/scenarios.py",
+    "bytes": 2242,
+    "sha256": "7b3021d0e2fe6af58fc7256e76f31df7105b768ba8f9c72d8acad2549b16259a",
+    "local_path": "artifacts/sensitivity_v4_final_20261102/raw/experiments/sensitivity_20261030/scenarios.py"
+  },
+  {
+    "path": "pair1234/experiments/sensitivity_20261030/test_scenarios.py",
+    "bytes": 3040,
+    "sha256": "f004c27afbaac191ba13ce4eae5bfe27a3018436a9a13bdbd307850e2a78f36e",
+    "local_path": "artifacts/sensitivity_v4_final_20261102/raw/experiments/sensitivity_20261030/test_scenarios.py"
+  },
+  {
+    "path": "pair1234/experiments/sensitivity_20261030/timing_candidate.py",
+    "bytes": 934,
+    "sha256": "fe43b6c1896f4d3eb5e2318c9f2f33c9acfc3508625b22ecf7799bb5b708e6b6",
+    "local_path": "artifacts/sensitivity_v4_final_20261102/raw/experiments/sensitivity_20261030/timing_candidate.py"
+  },
+  {
+    "path": "pair1234/experiments/sensitivity_20261030/smoke_evidence/baseline.json",
+    "bytes": 471,
+    "sha256": "2a7a6901d10792cfbfc670e6e1ec6ab5993731b152e3dcb2e213b999b41cc72d",
+    "local_path": "experiments/sensitivity_20261030/smoke_evidence/baseline.json"
+  },
+  {
+    "path": "pair1234/experiments/sensitivity_20261030/smoke_evidence/checks.json",
+    "bytes": 513,
+    "sha256": "56c6d2db4b477b4a984646cfd3a767435a564f9d2d379aa58312b00f1bde8365",
+    "local_path": "experiments/sensitivity_20261030/smoke_evidence/checks.json"
+  },
+  {
+    "path": "pair1234/experiments/sensitivity_20261030/smoke_evidence/tw_tight.json",
+    "bytes": 471,
+    "sha256": "5f35ac1401ca42069c9556253097c571067854ca664c5f31608fe2a13d29a19a",
+    "local_path": "experiments/sensitivity_20261030/smoke_evidence/tw_tight.json"
+  },
+  {
+    "path": "pair1234/experiments/sensitivity_20261030/smoke_evidence/tw_wide.json",
+    "bytes": 471,
+    "sha256": "bd26f0172bad67604d3d9dfb9263bcc0ff1130436663d8411998faa1e8459617",
+    "local_path": "experiments/sensitivity_20261030/smoke_evidence/tw_wide.json"
+  },
+  {
+    "path": "pair1234/formal_learned_1234/outputs/pomo_n50_optimized/model_best.pt",
+    "bytes": 33364827,
+    "sha256": "116e9b67cdd8cc5c1464d54b466693ddbfe7f4475625ca4350744201be8125f1",
+    "local_path": "artifacts/sensitivity_v4_final_20261102/raw/formal_learned_1234/outputs/pomo_n50_optimized/model_best.pt"
+  },
+  {
+    "path": "pair1234/outputs/normalization_profiles/normalization_n100.json",
+    "bytes": 258,
+    "sha256": "51313f12ca85cb402419ff3c15454457fc0884b96fde50b338dad54d66163316",
+    "local_path": "artifacts/sensitivity_v4_final_20261102/raw/outputs/normalization_profiles/normalization_n100.json"
+  },
+  {
+    "path": "pair1234/outputs/normalization_profiles/normalization_n200.json",
+    "bytes": 255,
+    "sha256": "8b828550ae7c9e1fe57db2c98d4bf932711784ac8eeab5e6d38ebc4fcbae3cf7",
+    "local_path": "artifacts/sensitivity_v4_final_20261102/raw/outputs/normalization_profiles/normalization_n200.json"
+  },
+  {
+    "path": "pair1234/outputs/normalization_profiles/normalization_n25.json",
+    "bytes": 253,
+    "sha256": "f8d81a309c28209dcdff9054fbdb2ff8be1b0f6412cc90834de2aecbaa847a91",
+    "local_path": "artifacts/sensitivity_v4_final_20261102/raw/outputs/normalization_profiles/normalization_n25.json"
+  },
+  {
+    "path": "pair1234/outputs/normalization_profiles/normalization_n50.json",
+    "bytes": 254,
+    "sha256": "38a2525333c605c885077c7ccb915b4afffa54bd6c148e6d89738e8346d251d3",
+    "local_path": "artifacts/sensitivity_v4_final_20261102/raw/outputs/normalization_profiles/normalization_n50.json"
+  },
+  {
+    "path": "remaining/evaluate_model.py",
+    "bytes": 69079,
+    "sha256": "151277b33128a094061fb953657612a41f35518607910eabacc4b42d56bebdb1",
+    "local_path": "evaluate_model.py"
+  },
+  {
+    "path": "remaining/problem_mcvrptw_v2.py",
+    "bytes": 62797,
+    "sha256": "d003d1bb87a89e414df4c5921f275f97ff5d586dbf5174140e1bc29a8033cc43",
+    "local_path": "problem_mcvrptw_v2.py"
+  },
+  {
+    "path": "remaining/run_training_optimized.py",
+    "bytes": 123761,
+    "sha256": "4d5f65cd8afd7dfd3f9d06215b2f94d9b80debbce19555692297b0433bdd523d",
+    "local_path": "run_training_optimized.py"
+  },
+  {
+    "path": "remaining/state_mcvrptw_v2.py",
+    "bytes": 140770,
+    "sha256": "bb5668b2aa65c70558293b61fe9d596f942fd827207c023a15e8f57b00f90e96",
+    "local_path": "state_mcvrptw_v2.py"
+  },
+  {
+    "path": "remaining/review_tolerance.py",
+    "bytes": 1407,
+    "sha256": "72d2fb478a15b004ffb73ce5ca7d011cb1a4f11ede9cc7dd9c98f077da3c7d43",
+    "local_path": "artifacts/sensitivity_v4_final_20261102/raw/review_tolerance.py"
+  },
+  {
+    "path": "remaining/exit_status.txt",
+    "bytes": 2,
+    "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+    "local_path": "artifacts/sensitivity_v4_final_20261102/raw/guarded_v2_exit.txt"
+  },
+  {
+    "path": "remaining/nets/__init__.py",
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "local_path": "utils/__init__.py"
+  },
+  {
+    "path": "remaining/nets/attention_model.py",
+    "bytes": 46781,
+    "sha256": "c2556d6c4baf0aaaa0d847b6033cc5ccc8b0d28daed8a5ea6ecb2c1dacfaee25",
+    "local_path": "nets/attention_model.py"
+  },
+  {
+    "path": "remaining/nets/graph_encoder.py",
+    "bytes": 7825,
+    "sha256": "8336742f3dba41c3f0695a16e56c35a5b42542a43f2110f41f0952a8e5505785",
+    "local_path": "nets/graph_encoder.py"
+  },
+  {
+    "path": "remaining/utils/__init__.py",
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "local_path": "utils/__init__.py"
+  },
+  {
+    "path": "remaining/utils/beam_search.py",
+    "bytes": 8193,
+    "sha256": "5c5f0191335089e33b27c4f3bb0c58ebf992c40060fe361e1ba4080e2b4d8302",
+    "local_path": "utils/beam_search.py"
+  },
+  {
+    "path": "remaining/utils/functions.py",
+    "bytes": 3172,
+    "sha256": "7b63ad1837783c013dd6eb7c069e1a53352d364cfa219af618ad4d97a7813a14",
+    "local_path": "utils/functions.py"
+  },
+  {
+    "path": "remaining/utils/lexsort.py",
+    "bytes": 2382,
+    "sha256": "c0d84f5b8a6d2a8c97a75b63c7796699dd3fec7440a43f7c191028c2ec064bcc",
+    "local_path": "utils/lexsort.py"
+  },
+  {
+    "path": "remaining/utils/tensor_functions.py",
+    "bytes": 1608,
+    "sha256": "ccb654ea1c80949bfc7fbec304a39e345b8b8cf2e8dafecaa72c579ea20fc960",
+    "local_path": "utils/tensor_functions.py"
+  },
+  {
+    "path": "remaining/experiments/reject_ablation_20261029/audit_eval_v3.py",
+    "bytes": 1973,
+    "sha256": "8b24adcd7fee7fcfd8a27642083722f57c60093cca8017794194484e31eb477a",
+    "local_path": "artifacts/sensitivity_v4_final_20261102/raw/experiments/reject_ablation_20261029/audit_eval_v3.py"
+  },
+  {
+    "path": "remaining/experiments/reject_ablation_20261029/depot_noop.py",
+    "bytes": 1129,
+    "sha256": "1c14b205a31d37a351eeaaa59e7d810fb74c8d4eae68a4ccf13f2292e7067ba5",
+    "local_path": "artifacts/sensitivity_v4_final_20261102/raw/experiments/reject_ablation_20261029/depot_noop.py"
+  },
+  {
+    "path": "remaining/experiments/reject_ablation_20261029/evaluate_v3.py",
+    "bytes": 974,
+    "sha256": "9ab0d81da0fbbe46c63eb13ad63987ba77f3434c30d45f71b185345492b8e28f",
+    "local_path": "artifacts/sensitivity_v4_final_20261102/raw/experiments/reject_ablation_20261029/evaluate_v3.py"
+  },
+  {
+    "path": "remaining/experiments/reject_ablation_20261029/route_audit.py",
+    "bytes": 3200,
+    "sha256": "8aee9732d151bd0f170788bff0ef8dc2bb150f22a95e04b5472e25758fb205ef",
+    "local_path": "artifacts/sensitivity_v4_final_20261102/raw/experiments/reject_ablation_20261029/route_audit.py"
+  },
+  {
+    "path": "remaining/experiments/reject_ablation_20261029/run_v3.py",
+    "bytes": 3744,
+    "sha256": "c7b93a1de34da9b433b83a826586bcd1363ca910c8d84f42bd878d4add32c47b",
+    "local_path": "artifacts/sensitivity_v4_final_20261102/raw/experiments/reject_ablation_20261029/run_v3.py"
+  },
+  {
+    "path": "remaining/experiments/sensitivity_20261030/batch.py",
+    "bytes": 2242,
+    "sha256": "5ad9fe3a55ce7e597fc6b6f25582ce141bbb0e3390d459ac022b5c916896c9dc",
+    "local_path": "artifacts/sensitivity_v4_final_20261102/raw/experiments/sensitivity_20261030/batch.py"
+  },
+  {
+    "path": "remaining/experiments/sensitivity_20261030/corrected_diagnostic.sh",
+    "bytes": 1418,
+    "sha256": "ab0438d2deac3c062f4f9f1c002a81dffc9296b704756f0624c12055ea4f6ed7",
+    "local_path": "experiments/sensitivity_20261030/corrected_diagnostic.sh"
+  },
+  {
+    "path": "remaining/experiments/sensitivity_20261030/corrected_entry.py",
+    "bytes": 1177,
+    "sha256": "579638e83e255f9361c3555ce4b1a7e2204ad0662c27880fcdb82e0961dce09c",
+    "local_path": "artifacts/sensitivity_v4_final_20261102/raw/experiments/sensitivity_20261030/corrected_entry.py"
+  },
+  {
+    "path": "remaining/experiments/sensitivity_20261030/corrected_smoke.sh",
+    "bytes": 790,
+    "sha256": "cafa05a776580b187a9553ee26bcfc5f629186d43f22fdd33897de12c0ed8b17",
+    "local_path": "experiments/sensitivity_20261030/corrected_smoke.sh"
+  },
+  {
+    "path": "remaining/experiments/sensitivity_20261030/evaluate.py",
+    "bytes": 2638,
+    "sha256": "3d277abd3afc4383167e9f74b9ac0b95889f9ae8d129ff9b611be5821dc06e3c",
+    "local_path": "artifacts/sensitivity_v4_final_20261102/raw/experiments/sensitivity_20261030/evaluate.py"
+  },
+  {
+    "path": "remaining/experiments/sensitivity_20261030/scenarios.py",
+    "bytes": 2242,
+    "sha256": "7b3021d0e2fe6af58fc7256e76f31df7105b768ba8f9c72d8acad2549b16259a",
+    "local_path": "artifacts/sensitivity_v4_final_20261102/raw/experiments/sensitivity_20261030/scenarios.py"
+  },
+  {
+    "path": "remaining/experiments/sensitivity_20261030/test_scenarios.py",
+    "bytes": 3040,
+    "sha256": "f004c27afbaac191ba13ce4eae5bfe27a3018436a9a13bdbd307850e2a78f36e",
+    "local_path": "artifacts/sensitivity_v4_final_20261102/raw/experiments/sensitivity_20261030/test_scenarios.py"
+  },
+  {
+    "path": "remaining/experiments/sensitivity_20261030/timing_candidate.py",
+    "bytes": 934,
+    "sha256": "fe43b6c1896f4d3eb5e2318c9f2f33c9acfc3508625b22ecf7799bb5b708e6b6",
+    "local_path": "artifacts/sensitivity_v4_final_20261102/raw/experiments/sensitivity_20261030/timing_candidate.py"
+  },
+  {
+    "path": "remaining/experiments/sensitivity_20261030/smoke_evidence/baseline.json",
+    "bytes": 471,
+    "sha256": "2a7a6901d10792cfbfc670e6e1ec6ab5993731b152e3dcb2e213b999b41cc72d",
+    "local_path": "experiments/sensitivity_20261030/smoke_evidence/baseline.json"
+  },
+  {
+    "path": "remaining/experiments/sensitivity_20261030/smoke_evidence/checks.json",
+    "bytes": 513,
+    "sha256": "56c6d2db4b477b4a984646cfd3a767435a564f9d2d379aa58312b00f1bde8365",
+    "local_path": "experiments/sensitivity_20261030/smoke_evidence/checks.json"
+  },
+  {
+    "path": "remaining/experiments/sensitivity_20261030/smoke_evidence/tw_tight.json",
+    "bytes": 471,
+    "sha256": "5f35ac1401ca42069c9556253097c571067854ca664c5f31608fe2a13d29a19a",
+    "local_path": "experiments/sensitivity_20261030/smoke_evidence/tw_tight.json"
+  },
+  {
+    "path": "remaining/experiments/sensitivity_20261030/smoke_evidence/tw_wide.json",
+    "bytes": 471,
+    "sha256": "bd26f0172bad67604d3d9dfb9263bcc0ff1130436663d8411998faa1e8459617",
+    "local_path": "experiments/sensitivity_20261030/smoke_evidence/tw_wide.json"
+  },
+  {
+    "path": "remaining/outputs/normalization_profiles/normalization_n100.json",
+    "bytes": 258,
+    "sha256": "51313f12ca85cb402419ff3c15454457fc0884b96fde50b338dad54d66163316",
+    "local_path": "artifacts/sensitivity_v4_final_20261102/raw/outputs/normalization_profiles/normalization_n100.json"
+  },
+  {
+    "path": "remaining/outputs/normalization_profiles/normalization_n200.json",
+    "bytes": 255,
+    "sha256": "8b828550ae7c9e1fe57db2c98d4bf932711784ac8eeab5e6d38ebc4fcbae3cf7",
+    "local_path": "artifacts/sensitivity_v4_final_20261102/raw/outputs/normalization_profiles/normalization_n200.json"
+  },
+  {
+    "path": "remaining/outputs/normalization_profiles/normalization_n25.json",
+    "bytes": 253,
+    "sha256": "f8d81a309c28209dcdff9054fbdb2ff8be1b0f6412cc90834de2aecbaa847a91",
+    "local_path": "artifacts/sensitivity_v4_final_20261102/raw/outputs/normalization_profiles/normalization_n25.json"
+  },
+  {
+    "path": "remaining/outputs/normalization_profiles/normalization_n50.json",
+    "bytes": 254,
+    "sha256": "38a2525333c605c885077c7ccb915b4afffa54bd6c148e6d89738e8346d251d3",
+    "local_path": "artifacts/sensitivity_v4_final_20261102/raw/outputs/normalization_profiles/normalization_n50.json"
+  }
+]

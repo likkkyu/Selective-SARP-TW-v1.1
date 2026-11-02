@@ -1,0 +1,74 @@
+[
+  {
+    "path": "pair1234/formal_learned_1234/outputs/pomo_n50_optimized/model_best_objective.pt",
+    "bytes": 33368827,
+    "sha256": "e2d5168b40c3f5b1794858a3b05f99b1a6e4761818a08efe13422d1cc06c88ff",
+    "reason": "alternative selection checkpoint not used for reported experiment"
+  },
+  {
+    "path": "pair1234/formal_learned_1234/outputs/pomo_n50_optimized/model_best_service.pt",
+    "bytes": 33368027,
+    "sha256": "7d470735abca6f4fea24e39127b3420d5de7d9aa326763b1c9fbddaf3062c199",
+    "reason": "alternative selection checkpoint not used for reported experiment"
+  },
+  {
+    "path": "pair1234/formal_service_first_1234/outputs/pomo_n50_optimized/model_best_objective.pt",
+    "bytes": 33368827,
+    "sha256": "86a98f365a9b3293c34eef74dfa125a137c0c2d089afe48cfa421abfcbd414ed",
+    "reason": "alternative selection checkpoint not used for reported experiment"
+  },
+  {
+    "path": "pair1234/formal_service_first_1234/outputs/pomo_n50_optimized/model_best_service.pt",
+    "bytes": 33368027,
+    "sha256": "b0a8228a1ab184900b8321cd0c2c8e10e60b1867e844e32f562a1604e3a5d733",
+    "reason": "alternative selection checkpoint not used for reported experiment"
+  },
+  {
+    "path": "remaining/formal_learned_4321/outputs/pomo_n50_optimized/model_best_service.pt",
+    "bytes": 33368027,
+    "sha256": "a709128ad65cd43932712428831bb55b55dc653c0745928404b5d867ffcee049",
+    "reason": "alternative selection checkpoint not used for reported experiment"
+  },
+  {
+    "path": "remaining/formal_learned_4321/outputs/pomo_n50_optimized/model_best_objective.pt",
+    "bytes": 33368827,
+    "sha256": "3f8c65a85caa69bf3e7309f0c76bc4f76c1a8fb8fe690c43847dede095b56fce",
+    "reason": "alternative selection checkpoint not used for reported experiment"
+  },
+  {
+    "path": "remaining/formal_service_first_4321/outputs/pomo_n50_optimized/model_best_service.pt",
+    "bytes": 33368027,
+    "sha256": "abb7e6af2d10ddae314dabc83dfe5eaa11bff78523996746858111cbcf39aa87",
+    "reason": "alternative selection checkpoint not used for reported experiment"
+  },
+  {
+    "path": "remaining/formal_service_first_4321/outputs/pomo_n50_optimized/model_best_objective.pt",
+    "bytes": 33368827,
+    "sha256": "22e0f6a307a5b0b9e03f27bf97de160035c42008eb6661023f373b0f109a32a4",
+    "reason": "alternative selection checkpoint not used for reported experiment"
+  },
+  {
+    "path": "remaining/formal_learned_8765/outputs/pomo_n50_optimized/model_best_service.pt",
+    "bytes": 33368027,
+    "sha256": "67b63567c6e7398d93833cea2fde06252d6397574a45bf649e9acd144de38e58",
+    "reason": "alternative selection checkpoint not used for reported experiment"
+  },
+  {
+    "path": "remaining/formal_learned_8765/outputs/pomo_n50_optimized/model_best_objective.pt",
+    "bytes": 33368827,
+    "sha256": "1b6be6b331ab68768324fe8ff58445dc93de0dfb72055ff3adf682162cea613a",
+    "reason": "alternative selection checkpoint not used for reported experiment"
+  },
+  {
+    "path": "remaining/formal_service_first_8765/outputs/pomo_n50_optimized/model_best_service.pt",
+    "bytes": 33368027,
+    "sha256": "7b242c2c3fb724585b62c93961b7736af4b7f7da1cf38b1454c2384ccd1887dd",
+    "reason": "alternative selection checkpoint not used for reported experiment"
+  },
+  {
+    "path": "remaining/formal_service_first_8765/outputs/pomo_n50_optimized/model_best_objective.pt",
+    "bytes": 33368827,
+    "sha256": "59835a2f72bfa6a5d9b1bd77a694c12e85f95d740a5336f5a30202f90a97dac2",
+    "reason": "alternative selection checkpoint not used for reported experiment"
+  }
+]

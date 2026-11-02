@@ -1,0 +1,10 @@
+{
+  "strict_excess_events": [
+    {
+      "seconds_over": 0.020803120283208187,
+      "step": 71
+    }
+  ],
+  "max_seconds_over": 0.020803120283208187,
+  "declared_audit_tolerance_seconds": 0.36
+}

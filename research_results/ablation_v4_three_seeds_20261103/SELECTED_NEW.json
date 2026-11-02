@@ -1,0 +1,247 @@
+[
+  {
+    "path": "pair1234/tolerance_review.log",
+    "bytes": 5206,
+    "sha256": "a0f50167ffac56203dc0e1f3aa8e57e3db0c91e68064873250c9f7e8817e0f72"
+  },
+  {
+    "path": "pair1234/tolerance_review.json",
+    "bytes": 196,
+    "sha256": "d7d8febfff9b0d357f630695cacc198d4a8dc4b0bf21c913f93672a272bd5847"
+  },
+  {
+    "path": "pair1234/formal_learned_1234/outputs/pomo_n50_optimized/model_final.pt",
+    "bytes": 33365227,
+    "sha256": "3d5b25fab906cb17ff6aa5728347f02447e0b681eb7ee7f23f30ef2f409ceb68"
+  },
+  {
+    "path": "pair1234/formal_learned_1234/outputs/pomo_n50_optimized/training_log.json",
+    "bytes": 35376,
+    "sha256": "862fb7de4c07df9f8c5865b0f0212f0b6e3ad1e55c46b37fb0c4352f1fc80dfa"
+  },
+  {
+    "path": "pair1234/formal_service_first_1234/outputs/pomo_n50_optimized/model_best.pt",
+    "bytes": 33364827,
+    "sha256": "39e5f97dc9038b75eab258d5a92a3c75082e2a6dbf869205250e5d5f5b588701"
+  },
+  {
+    "path": "pair1234/formal_service_first_1234/outputs/pomo_n50_optimized/model_final.pt",
+    "bytes": 33365227,
+    "sha256": "3aed53e3b1fe7c4fa4ddf784c28b6b0ea178ee6a45d80e494032db5366061e96"
+  },
+  {
+    "path": "pair1234/formal_service_first_1234/outputs/pomo_n50_optimized/training_log.json",
+    "bytes": 35279,
+    "sha256": "387922f2dface679311f1f96bbdd2d297bfc235e37a0c21b1f2af922ff71f971"
+  },
+  {
+    "path": "remaining/protocol.json",
+    "bytes": 2883,
+    "sha256": "446eea5b35eaf5049982551162fc6437ddee46bf8619a379c92e59a3c04dc761"
+  },
+  {
+    "path": "remaining/remaining.sh",
+    "bytes": 1185,
+    "sha256": "698ed32a39d14ecf7d35409f1600a92cf13665fbc16f100dcb236f85f79d533d"
+  },
+  {
+    "path": "remaining/launch_guarded.sh",
+    "bytes": 860,
+    "sha256": "45d510e9f96e09636f07487973e3dc9d2307090ca3427615e4e38e27dd26427d"
+  },
+  {
+    "path": "remaining/live_progress.log",
+    "bytes": 1556062,
+    "sha256": "1da352ded21c66a22537a2f1d154a20a70b76d7a03f261bf3782ff69c33bbde0"
+  },
+  {
+    "path": "remaining/start_utc.txt",
+    "bytes": 26,
+    "sha256": "6ed06b21647e4020a0085b57d51dba4fa6909d68bef1184c2ef03163de5e13d1"
+  },
+  {
+    "path": "remaining/formal_learned_4321.log",
+    "bytes": 383381,
+    "sha256": "a80f8f20460207521a1a3644ac12552388ec42ea1d3a2abaa4a36d035125639a"
+  },
+  {
+    "path": "remaining/formal_learned_4321_eval.log",
+    "bytes": 5038,
+    "sha256": "4ec9a4454cccb3cdc94e616dc9ee3a1ed9be433b8223bfe39d203c1efacd7e39"
+  },
+  {
+    "path": "remaining/formal_service_first_4321.log",
+    "bytes": 383961,
+    "sha256": "e057b144a6e1eefb20b34ce33958ac5fa43bf71494ed2603a846e0c3bb599051"
+  },
+  {
+    "path": "remaining/formal_service_first_4321_eval.log",
+    "bytes": 5055,
+    "sha256": "2889e373dae6cf6b0ae6f597d1e189837cb9662c1008d9693c9a5240d116cf5c"
+  },
+  {
+    "path": "remaining/formal_learned_8765.log",
+    "bytes": 383570,
+    "sha256": "0bfb7e481ef077dfc277ab838c5d408e6cd70da7eb8d28891d31d5d37d6f0cd2"
+  },
+  {
+    "path": "remaining/formal_learned_8765_eval.log",
+    "bytes": 5036,
+    "sha256": "53d1ab56dd0c18fe44caf68710b79320e397c47547ccbfa9b35f05f35ee4ed4c"
+  },
+  {
+    "path": "remaining/formal_service_first_8765.log",
+    "bytes": 383951,
+    "sha256": "ff69cdd0a1e7d35202b8314ab1e29d611789cd4b351ea9d5c56a262ea79a7026"
+  },
+  {
+    "path": "remaining/extend_supervisor.py",
+    "bytes": 2557,
+    "sha256": "8a4d473876e58879bd009711c194b8c41f5276bc32e1850011a862799008d87a"
+  },
+  {
+    "path": "remaining/time_extension.log",
+    "bytes": 377,
+    "sha256": "fadc5db81639d6ce14f78523e1fbc91096484aa6113b23828336af88377ca3b5"
+  },
+  {
+    "path": "remaining/TIME_LIMIT_EXTENSION.json",
+    "bytes": 355,
+    "sha256": "c0f6aed43f6163794924aea7e3ac8bb643af78cda44b4f998e007f438028a735"
+  },
+  {
+    "path": "remaining/replaced_timeout_wrapper_exit.txt",
+    "bytes": 4,
+    "sha256": "e3b9c2844b5a5c2677b3a2279db2ec8487491dd9a23d6b22fac153391b3bb63c"
+  },
+  {
+    "path": "remaining/formal_service_first_8765_eval.log",
+    "bytes": 5056,
+    "sha256": "a344e8bd41cb16b6697715e1b2d18577d186ef216349f124ebe8802b9f05f5c9"
+  },
+  {
+    "path": "remaining/EXTENDED_RUN_RESULT.json",
+    "bytes": 421,
+    "sha256": "9732f9cf6ec85b3d7df3acbb02a1bc0567c5cf0c9abd9aeca3a96bf012ad34d7"
+  },
+  {
+    "path": "remaining/formal_learned_4321/manifest.json",
+    "bytes": 1228,
+    "sha256": "7cb1187ffe948ebf52b6b69d9aa8427d343b89063aef6be25300dfa247f1af58"
+  },
+  {
+    "path": "remaining/formal_learned_4321/eval.json",
+    "bytes": 7350,
+    "sha256": "17a4146be26405d944f73be33cbad8ba03c0ef56a0638c8bdd66c783b16b7f16"
+  },
+  {
+    "path": "remaining/formal_learned_4321/audit.json",
+    "bytes": 100858,
+    "sha256": "2afc5ffb3d0b3ed04446cad3955eb61bcf39d499dea6d41f8dea1e724de1b49a"
+  },
+  {
+    "path": "remaining/formal_service_first_4321/manifest.json",
+    "bytes": 1239,
+    "sha256": "09c652a0d3c012392e63aec71aba7952b14c6402ca632f927a5c7a2f2fd28c52"
+  },
+  {
+    "path": "remaining/formal_service_first_4321/eval.json",
+    "bytes": 7361,
+    "sha256": "07e74d19ff4814593a1b98aa25883adbd9dbaf51c0cc35c7624bbd3f06982f26"
+  },
+  {
+    "path": "remaining/formal_service_first_4321/audit.json",
+    "bytes": 108403,
+    "sha256": "06cac6d10ff06e4919837f8e296883ad2cbd5b5518f738d86a9c2d97e18838d2"
+  },
+  {
+    "path": "remaining/formal_learned_8765/manifest.json",
+    "bytes": 1228,
+    "sha256": "dc43e1108060d1d26737063488a295d1b553f0a9dca5c3c761593c62c611f2a2"
+  },
+  {
+    "path": "remaining/formal_learned_8765/eval.json",
+    "bytes": 7349,
+    "sha256": "3c7f0e14cad0c83d0fdcdc5e5a598df20aeedd0e516356199607d04afdd38423"
+  },
+  {
+    "path": "remaining/formal_learned_8765/audit.json",
+    "bytes": 106286,
+    "sha256": "ce9faaf97a97783b95f38329ad74c5c806f1771f913e791274ce3bae41cc614a"
+  },
+  {
+    "path": "remaining/formal_service_first_8765/manifest.json",
+    "bytes": 1239,
+    "sha256": "b3d5499e30dc887b517e3d92aab486412d5e88122739dca9c4641ff43e870f46"
+  },
+  {
+    "path": "remaining/formal_service_first_8765/eval.json",
+    "bytes": 7333,
+    "sha256": "2cc20ca38889ec204cef1f2403579ad673bfb9ea5acfb2e5681303f77b27a6a0"
+  },
+  {
+    "path": "remaining/formal_service_first_8765/audit.json",
+    "bytes": 109544,
+    "sha256": "325ded981ab4fe766327e8329e98cdbaef427a2776df5bc4a9540a479434eb32"
+  },
+  {
+    "path": "remaining/formal_learned_4321/outputs/pomo_n50_optimized/model_best.pt",
+    "bytes": 33364827,
+    "sha256": "a87c248c4fd4b9933c690da4c3edbd1bd9208822e5ca101da04091b99e075a01"
+  },
+  {
+    "path": "remaining/formal_learned_4321/outputs/pomo_n50_optimized/model_final.pt",
+    "bytes": 33365227,
+    "sha256": "1e1964b713e470ed32870b22d6224d0c79f51413a134aefddc9b47dacbb24b2a"
+  },
+  {
+    "path": "remaining/formal_learned_4321/outputs/pomo_n50_optimized/training_log.json",
+    "bytes": 35444,
+    "sha256": "f35e569b76bed962839afcf3bb130c98cf4fe16ed4322004b5da7d4f70147dde"
+  },
+  {
+    "path": "remaining/formal_service_first_4321/outputs/pomo_n50_optimized/model_best.pt",
+    "bytes": 33364827,
+    "sha256": "347c8fea88d1e7f2be62e084f1ff62253c3a7b259a82cf3b110eaeb0380be227"
+  },
+  {
+    "path": "remaining/formal_service_first_4321/outputs/pomo_n50_optimized/model_final.pt",
+    "bytes": 33365227,
+    "sha256": "65d4bea94f0e5ac69a482f89ad262817ca0d5e57bf0a9f7f94a6b0e14db3323b"
+  },
+  {
+    "path": "remaining/formal_service_first_4321/outputs/pomo_n50_optimized/training_log.json",
+    "bytes": 35356,
+    "sha256": "d365ca8314698a1c0ba43db90b99661b9123b78a09fe41845ab35fdf9f7518ee"
+  },
+  {
+    "path": "remaining/formal_learned_8765/outputs/pomo_n50_optimized/model_best.pt",
+    "bytes": 33364827,
+    "sha256": "99f83d2410aa6c305796cc3b712bbc8c60050a24c3a39ea8eb9464948e1b1472"
+  },
+  {
+    "path": "remaining/formal_learned_8765/outputs/pomo_n50_optimized/model_final.pt",
+    "bytes": 33365227,
+    "sha256": "edd82c5d2da599c107c92155df16271b312ae06e23e854173904409fb15b4420"
+  },
+  {
+    "path": "remaining/formal_learned_8765/outputs/pomo_n50_optimized/training_log.json",
+    "bytes": 35321,
+    "sha256": "f5fd0d828bfcdbe862d299b6d7752d61d4e31626bbf3f27cd668f9c4f82be7f0"
+  },
+  {
+    "path": "remaining/formal_service_first_8765/outputs/pomo_n50_optimized/model_best.pt",
+    "bytes": 33364827,
+    "sha256": "36d5dcb15c3f500322986b437f9263f9af5f95715e4f881b5a1fa609bf911f1c"
+  },
+  {
+    "path": "remaining/formal_service_first_8765/outputs/pomo_n50_optimized/model_final.pt",
+    "bytes": 33365227,
+    "sha256": "412b83c62e121defbd1f229e6fcfbdf3c836e7ed1fe9c85b82ca519e137f9c63"
+  },
+  {
+    "path": "remaining/formal_service_first_8765/outputs/pomo_n50_optimized/training_log.json",
+    "bytes": 35315,
+    "sha256": "557ae6fd10a71400085ea2ceda0962d8562f2cc3fcd042b3486272b5b3d5d516"
+  }
+]
