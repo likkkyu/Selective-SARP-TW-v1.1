@@ -1,0 +1,1005 @@
+{
+  "status": "passed",
+  "scope": "Paired fixed-policy passenger pickup-window response: same old trained learned checkpoints, CPU float32 certificate v5/native, raw and 0.5s hand-LNS plans. Not retraining or real-world causal inference.",
+  "independent_paired_instances": 32,
+  "neural_raw_plans": 288,
+  "neural_hybrid_plans": 288,
+  "LNS_plans": 96,
+  "all_final_plans": 672,
+  "all_hard_valid": true,
+  "unfulfilled": 0,
+  "summary": {
+    "learned_raw": {
+      "0.5": {
+        "service_pct": {
+          "mean": 95.14583333333334,
+          "conditional_instance_CI95": [
+            94.58333333333334,
+            95.6875
+          ]
+        },
+        "objective": {
+          "mean": 1399.525114020553,
+          "conditional_instance_CI95": [
+            1243.7496899147643,
+            1561.240071096369
+          ]
+        },
+        "non_rejection_objective": {
+          "mean": 3.9521973538864543,
+          "conditional_instance_CI95": [
+            3.8871132686928354,
+            4.02155501536536
+          ]
+        },
+        "raw_cost": {
+          "mean": 1657.244887522953,
+          "conditional_instance_CI95": [
+            1499.1625590405497,
+            1819.0410521338076
+          ]
+        },
+        "energy_fee": {
+          "mean": 81.74521673240147,
+          "conditional_instance_CI95": [
+            80.60660409924161,
+            82.83009530581762
+          ]
+        },
+        "distance_km": {
+          "mean": 450.57405251830176,
+          "conditional_instance_CI95": [
+            444.23166633701345,
+            456.59281531146183
+          ]
+        },
+        "passenger_delay_fee": {
+          "mean": 0.0,
+          "conditional_instance_CI95": [
+            0.0,
+            0.0
+          ]
+        },
+        "cargo_delay_fee": {
+          "mean": 3.0517541238847583,
+          "conditional_instance_CI95": [
+            2.0918679693601896,
+            4.132177893439424
+          ]
+        },
+        "rejection_penalty": {
+          "mean": 1395.5729166666667,
+          "conditional_instance_CI95": [
+            1239.84375,
+            1557.2916666666665
+          ]
+        },
+        "vehicles": {
+          "mean": 8.84375,
+          "conditional_instance_CI95": [
+            8.75,
+            8.927083333333332
+          ]
+        }
+      },
+      "1.0": {
+        "service_pct": {
+          "mean": 96.5625,
+          "conditional_instance_CI95": [
+            96.0625,
+            97.0625
+          ]
+        },
+        "objective": {
+          "mean": 992.2837512440049,
+          "conditional_instance_CI95": [
+            848.4899846669244,
+            1136.0155202356052
+          ]
+        },
+        "non_rejection_objective": {
+          "mean": 4.002501244004925,
+          "conditional_instance_CI95": [
+            3.912578279108465,
+            4.104084181671323
+          ]
+        },
+        "raw_cost": {
+          "mean": 1248.7323856923563,
+          "conditional_instance_CI95": [
+            1103.7890848152686,
+            1391.6465550757098
+          ]
+        },
+        "energy_fee": {
+          "mean": 82.4650297714204,
+          "conditional_instance_CI95": [
+            81.33976210427387,
+            83.66424079302897
+          ]
+        },
+        "distance_km": {
+          "mean": 454.64633048132225,
+          "conditional_instance_CI95": [
+            448.3741325436063,
+            461.2952147916285
+          ]
+        },
+        "passenger_delay_fee": {
+          "mean": 0.0,
+          "conditional_instance_CI95": [
+            0.0,
+            0.0
+          ]
+        },
+        "cargo_delay_fee": {
+          "mean": 4.861105920936064,
+          "conditional_instance_CI95": [
+            3.518445764788362,
+            6.462027795290031
+          ]
+        },
+        "rejection_penalty": {
+          "mean": 988.28125,
+          "conditional_instance_CI95": [
+            844.53125,
+            1132.03125
+          ]
+        },
+        "vehicles": {
+          "mean": 8.65625,
+          "conditional_instance_CI95": [
+            8.53125,
+            8.770833333333334
+          ]
+        }
+      },
+      "1.5": {
+        "service_pct": {
+          "mean": 96.5,
+          "conditional_instance_CI95": [
+            95.97916666666666,
+            97.04166666666666
+          ]
+        },
+        "objective": {
+          "mean": 1010.3075524125143,
+          "conditional_instance_CI95": [
+            854.6393775829503,
+            1160.0408662338184
+          ]
+        },
+        "non_rejection_objective": {
+          "mean": 4.057552412514259,
+          "conditional_instance_CI95": [
+            3.945073464033337,
+            4.185258150469686
+          ]
+        },
+        "raw_cost": {
+          "mean": 1265.4204457532528,
+          "conditional_instance_CI95": [
+            1111.8055600094272,
+            1415.0234683721287
+          ]
+        },
+        "energy_fee": {
+          "mean": 82.29400141557319,
+          "conditional_instance_CI95": [
+            81.27324264894185,
+            83.34782882854901
+          ]
+        },
+        "distance_km": {
+          "mean": 453.8503419510442,
+          "conditional_instance_CI95": [
+            448.1481904250708,
+            459.74658639142353
+          ]
+        },
+        "passenger_delay_fee": {
+          "mean": 0.0,
+          "conditional_instance_CI95": [
+            0.0,
+            0.0
+          ]
+        },
+        "cargo_delay_fee": {
+          "mean": 6.668111004346201,
+          "conditional_instance_CI95": [
+            4.830074794762664,
+            8.761549908448364
+          ]
+        },
+        "rejection_penalty": {
+          "mean": 1006.25,
+          "conditional_instance_CI95": [
+            850.5208333333334,
+            1155.9895833333335
+          ]
+        },
+        "vehicles": {
+          "mean": 8.510416666666668,
+          "conditional_instance_CI95": [
+            8.40625,
+            8.614583333333332
+          ]
+        }
+      }
+    },
+    "learned_hybrid": {
+      "0.5": {
+        "service_pct": {
+          "mean": 99.14583333333333,
+          "conditional_instance_CI95": [
+            98.77083333333333,
+            99.47916666666666
+          ]
+        },
+        "objective": {
+          "mean": 249.11161709787348,
+          "conditional_instance_CI95": [
+            153.31220731915022,
+            356.962326668968
+          ]
+        },
+        "non_rejection_objective": {
+          "mean": 3.5387004312068093,
+          "conditional_instance_CI95": [
+            3.4809978187863644,
+            3.5920961578901984
+          ]
+        },
+        "raw_cost": {
+          "mean": 484.7251316939252,
+          "conditional_instance_CI95": [
+            390.9720064471384,
+            594.518369036796
+          ]
+        },
+        "energy_fee": {
+          "mean": 70.46011041060616,
+          "conditional_instance_CI95": [
+            69.23586643897467,
+            71.58595742730401
+          ]
+        },
+        "distance_km": {
+          "mean": 388.45487905816367,
+          "conditional_instance_CI95": [
+            381.64178871804484,
+            394.7017726692903
+          ]
+        },
+        "passenger_delay_fee": {
+          "mean": 0.0,
+          "conditional_instance_CI95": [
+            0.0,
+            0.0
+          ]
+        },
+        "cargo_delay_fee": {
+          "mean": 0.3587712833190547,
+          "conditional_instance_CI95": [
+            0.1497581163032028,
+            0.631489101362701
+          ]
+        },
+        "rejection_penalty": {
+          "mean": 245.57291666666666,
+          "conditional_instance_CI95": [
+            149.73958333333331,
+            353.3854166666667
+          ]
+        },
+        "vehicles": {
+          "mean": 8.416666666666668,
+          "conditional_instance_CI95": [
+            8.270833333333334,
+            8.552083333333332
+          ]
+        }
+      },
+      "1.0": {
+        "service_pct": {
+          "mean": 99.47916666666666,
+          "conditional_instance_CI95": [
+            99.22916666666667,
+            99.6875
+          ]
+        },
+        "objective": {
+          "mean": 153.12679892803126,
+          "conditional_instance_CI95": [
+            93.22518555076637,
+            224.92743485218443
+          ]
+        },
+        "non_rejection_objective": {
+          "mean": 3.3872155946979055,
+          "conditional_instance_CI95": [
+            3.338693348219996,
+            3.4343754908901487
+          ]
+        },
+        "raw_cost": {
+          "mean": 379.04361343256505,
+          "conditional_instance_CI95": [
+            318.96509568387125,
+            447.0041479179902
+          ]
+        },
+        "energy_fee": {
+          "mean": 68.7089259778588,
+          "conditional_instance_CI95": [
+            67.56399558720867,
+            69.94835936120846
+          ]
+        },
+        "distance_km": {
+          "mean": 378.76663013028076,
+          "conditional_instance_CI95": [
+            372.4129749847535,
+            385.61797020475944
+          ]
+        },
+        "passenger_delay_fee": {
+          "mean": 0.0,
+          "conditional_instance_CI95": [
+            0.0,
+            0.0
+          ]
+        },
+        "cargo_delay_fee": {
+          "mean": 0.38677078803960685,
+          "conditional_instance_CI95": [
+            0.2049560540342221,
+            0.6304380302014426
+          ]
+        },
+        "rejection_penalty": {
+          "mean": 149.73958333333331,
+          "conditional_instance_CI95": [
+            89.84375,
+            221.61458333333331
+          ]
+        },
+        "vehicles": {
+          "mean": 8.010416666666668,
+          "conditional_instance_CI95": [
+            7.895833333333334,
+            8.114583333333334
+          ]
+        }
+      },
+      "1.5": {
+        "service_pct": {
+          "mean": 99.625,
+          "conditional_instance_CI95": [
+            99.45833333333333,
+            99.79166666666666
+          ]
+        },
+        "objective": {
+          "mean": 111.10795332524809,
+          "conditional_instance_CI95": [
+            63.18492441875984,
+            159.0728155030597
+          ]
+        },
+        "non_rejection_objective": {
+          "mean": 3.295453325248098,
+          "conditional_instance_CI95": [
+            3.2459092413800295,
+            3.346873318351238
+          ]
+        },
+        "raw_cost": {
+          "mean": 330.97789353146385,
+          "conditional_instance_CI95": [
+            282.5319686863439,
+            381.6751939527557
+          ]
+        },
+        "energy_fee": {
+          "mean": 67.68639274768661,
+          "conditional_instance_CI95": [
+            66.49966837471855,
+            68.93911196240884
+          ]
+        },
+        "distance_km": {
+          "mean": 373.13864192125345,
+          "conditional_instance_CI95": [
+            366.5766241962786,
+            380.04480515054667
+          ]
+        },
+        "passenger_delay_fee": {
+          "mean": 0.0,
+          "conditional_instance_CI95": [
+            0.0,
+            0.0
+          ]
+        },
+        "cargo_delay_fee": {
+          "mean": 0.47900078377726274,
+          "conditional_instance_CI95": [
+            0.32554931880265275,
+            0.6500071189400427
+          ]
+        },
+        "rejection_penalty": {
+          "mean": 107.8125,
+          "conditional_instance_CI95": [
+            59.89583333333333,
+            155.72916666666669
+          ]
+        },
+        "vehicles": {
+          "mean": 7.75,
+          "conditional_instance_CI95": [
+            7.635416666666666,
+            7.875
+          ]
+        }
+      }
+    },
+    "LNS": {
+      "0.5": {
+        "service_pct": {
+          "mean": 100.0,
+          "conditional_instance_CI95": [
+            100.0,
+            100.0
+          ]
+        },
+        "objective": {
+          "mean": 2.98288854893236,
+          "conditional_instance_CI95": [
+            2.9306536549457505,
+            3.0408711538229993
+          ]
+        },
+        "non_rejection_objective": {
+          "mean": 2.98288854893236,
+          "conditional_instance_CI95": [
+            2.9306536549457505,
+            3.0408711538229993
+          ]
+        },
+        "raw_cost": {
+          "mean": 201.01505879435075,
+          "conditional_instance_CI95": [
+            197.64080987835754,
+            204.72456074002605
+          ]
+        },
+        "energy_fee": {
+          "mean": 56.014761810288874,
+          "conditional_instance_CI95": [
+            54.81847747318184,
+            57.28687254178363
+          ]
+        },
+        "distance_km": {
+          "mean": 308.5019094549912,
+          "conditional_instance_CI95": [
+            301.91997720561454,
+            315.48982767582214
+          ]
+        },
+        "passenger_delay_fee": {
+          "mean": 0.0,
+          "conditional_instance_CI95": [
+            0.0,
+            0.0
+          ]
+        },
+        "cargo_delay_fee": {
+          "mean": 0.000296984061873129,
+          "conditional_instance_CI95": [
+            0.0,
+            0.000890952185619387
+          ]
+        },
+        "rejection_penalty": {
+          "mean": 0.0,
+          "conditional_instance_CI95": [
+            0.0,
+            0.0
+          ]
+        },
+        "vehicles": {
+          "mean": 7.25,
+          "conditional_instance_CI95": [
+            7.125,
+            7.40625
+          ]
+        }
+      },
+      "1.0": {
+        "service_pct": {
+          "mean": 100.0,
+          "conditional_instance_CI95": [
+            100.0,
+            100.0
+          ]
+        },
+        "objective": {
+          "mean": 2.794557468673246,
+          "conditional_instance_CI95": [
+            2.7358792744301845,
+            2.8473798367779
+          ]
+        },
+        "non_rejection_objective": {
+          "mean": 2.794557468673246,
+          "conditional_instance_CI95": [
+            2.7358792744301845,
+            2.8473798367779
+          ]
+        },
+        "raw_cost": {
+          "mean": 188.41689082422738,
+          "conditional_instance_CI95": [
+            184.53154294039118,
+            191.94772058348627
+          ]
+        },
+        "energy_fee": {
+          "mean": 52.781241885406345,
+          "conditional_instance_CI95": [
+            51.64971338258445,
+            53.91623090347419
+          ]
+        },
+        "distance_km": {
+          "mean": 290.56056398831697,
+          "conditional_instance_CI95": [
+            284.28618417289067,
+            296.83770821516896
+          ]
+        },
+        "passenger_delay_fee": {
+          "mean": 0.0,
+          "conditional_instance_CI95": [
+            0.0,
+            0.0
+          ]
+        },
+        "cargo_delay_fee": {
+          "mean": 0.010648938821021334,
+          "conditional_instance_CI95": [
+            0.00033576295381252395,
+            0.027497213541433217
+          ]
+        },
+        "rejection_penalty": {
+          "mean": 0.0,
+          "conditional_instance_CI95": [
+            0.0,
+            0.0
+          ]
+        },
+        "vehicles": {
+          "mean": 6.78125,
+          "conditional_instance_CI95": [
+            6.625,
+            6.90625
+          ]
+        }
+      },
+      "1.5": {
+        "service_pct": {
+          "mean": 100.0,
+          "conditional_instance_CI95": [
+            100.0,
+            100.0
+          ]
+        },
+        "objective": {
+          "mean": 2.7177267554235724,
+          "conditional_instance_CI95": [
+            2.6551525219727674,
+            2.7784806458039752
+          ]
+        },
+        "non_rejection_objective": {
+          "mean": 2.7177267554235724,
+          "conditional_instance_CI95": [
+            2.6551525219727674,
+            2.7784806458039752
+          ]
+        },
+        "raw_cost": {
+          "mean": 183.22418670847867,
+          "conditional_instance_CI95": [
+            179.19228932472305,
+            187.16436720867284
+          ]
+        },
+        "energy_fee": {
+          "mean": 51.333304403960156,
+          "conditional_instance_CI95": [
+            50.477262716040805,
+            52.2003185621244
+          ]
+        },
+        "distance_km": {
+          "mean": 282.5246561628871,
+          "conditional_instance_CI95": [
+            277.8040960560938,
+            287.30381748281076
+          ]
+        },
+        "passenger_delay_fee": {
+          "mean": 0.0,
+          "conditional_instance_CI95": [
+            0.0,
+            0.0
+          ]
+        },
+        "cargo_delay_fee": {
+          "mean": 0.015882304518523925,
+          "conditional_instance_CI95": [
+            0.0015844660429112478,
+            0.035675267966376586
+          ]
+        },
+        "rejection_penalty": {
+          "mean": 0.0,
+          "conditional_instance_CI95": [
+            0.0,
+            0.0
+          ]
+        },
+        "vehicles": {
+          "mean": 6.59375,
+          "conditional_instance_CI95": [
+            6.4375,
+            6.75
+          ]
+        }
+      }
+    }
+  },
+  "wide_minus_narrow": {
+    "learned_raw": {
+      "service_pct": {
+        "mean": 1.3541666666666665,
+        "conditional_instance_CI95": [
+          0.7083333333333326,
+          1.9791666666666679
+        ]
+      },
+      "objective": {
+        "mean": -389.21756160803886,
+        "conditional_instance_CI95": [
+          -568.9274526491788,
+          -203.55071526122762
+        ]
+      },
+      "non_rejection_objective": {
+        "mean": 0.10535505862780457,
+        "conditional_instance_CI95": [
+          0.012758921630178477,
+          0.20593222872088024
+        ]
+      },
+      "raw_cost": {
+        "mean": -391.8244417697002,
+        "conditional_instance_CI95": [
+          -572.3641109194187,
+          -206.6781712688349
+        ]
+      },
+      "energy_fee": {
+        "mean": 0.5487846831717218,
+        "conditional_instance_CI95": [
+          -0.4157493174155104,
+          1.5174911453126232
+        ]
+      },
+      "distance_km": {
+        "mean": 3.276289432742482,
+        "conditional_instance_CI95": [
+          -2.054737050214752,
+          8.667802014389398
+        ]
+      },
+      "passenger_delay_fee": {
+        "mean": 0.0,
+        "conditional_instance_CI95": [
+          0.0,
+          0.0
+        ]
+      },
+      "cargo_delay_fee": {
+        "mean": 3.616356880461444,
+        "conditional_instance_CI95": [
+          2.0340719220331467,
+          5.387429659364065
+        ]
+      },
+      "rejection_penalty": {
+        "mean": -389.32291666666663,
+        "conditional_instance_CI95": [
+          -569.0104166666667,
+          -203.64583333333331
+        ]
+      },
+      "vehicles": {
+        "mean": -0.33333333333333326,
+        "conditional_instance_CI95": [
+          -0.42708333333333315,
+          -0.2395833333333332
+        ]
+      }
+    },
+    "learned_hybrid": {
+      "service_pct": {
+        "mean": 0.47916666666666563,
+        "conditional_instance_CI95": [
+          0.12499999999999956,
+          0.875
+        ]
+      },
+      "objective": {
+        "mean": -138.0036637726254,
+        "conditional_instance_CI95": [
+          -251.82232964042723,
+          -36.21825961456214
+        ]
+      },
+      "non_rejection_objective": {
+        "mean": -0.24324710595871102,
+        "conditional_instance_CI95": [
+          -0.30607703200732467,
+          -0.17674589977603303
+        ]
+      },
+      "raw_cost": {
+        "mean": -153.74723816246131,
+        "conditional_instance_CI95": [
+          -268.32296221759265,
+          -54.423574987225365
+        ]
+      },
+      "energy_fee": {
+        "mean": -2.7737176629195552,
+        "conditional_instance_CI95": [
+          -4.172547772012732,
+          -1.2291962177378872
+        ]
+      },
+      "distance_km": {
+        "mean": -15.31623713691016,
+        "conditional_instance_CI95": [
+          -23.093270817549516,
+          -6.749231355236413
+        ]
+      },
+      "passenger_delay_fee": {
+        "mean": 0.0,
+        "conditional_instance_CI95": [
+          0.0,
+          0.0
+        ]
+      },
+      "cargo_delay_fee": {
+        "mean": 0.12022950045820802,
+        "conditional_instance_CI95": [
+          -0.19431883898559058,
+          0.3914968866260428
+        ]
+      },
+      "rejection_penalty": {
+        "mean": -137.76041666666666,
+        "conditional_instance_CI95": [
+          -251.5625,
+          -35.93750000000001
+        ]
+      },
+      "vehicles": {
+        "mean": -0.6666666666666665,
+        "conditional_instance_CI95": [
+          -0.8124999999999998,
+          -0.5208333333333329
+        ]
+      }
+    },
+    "LNS": {
+      "service_pct": {
+        "mean": 0.0,
+        "conditional_instance_CI95": [
+          0.0,
+          0.0
+        ]
+      },
+      "objective": {
+        "mean": -0.26516179350878855,
+        "conditional_instance_CI95": [
+          -0.34352188989466764,
+          -0.19200101437895217
+        ]
+      },
+      "non_rejection_objective": {
+        "mean": -0.26516179350878855,
+        "conditional_instance_CI95": [
+          -0.34352188989466764,
+          -0.19200101437895217
+        ]
+      },
+      "raw_cost": {
+        "mean": -17.79087208587206,
+        "conditional_instance_CI95": [
+          -22.618090945210753,
+          -13.280313436886836
+        ]
+      },
+      "energy_fee": {
+        "mean": -4.68145740632871,
+        "conditional_instance_CI95": [
+          -5.770984747639965,
+          -3.6101982464452633
+        ]
+      },
+      "distance_km": {
+        "mean": -25.977253292104166,
+        "conditional_instance_CI95": [
+          -32.01413039321533,
+          -20.035785430094364
+        ]
+      },
+      "passenger_delay_fee": {
+        "mean": 0.0,
+        "conditional_instance_CI95": [
+          0.0,
+          0.0
+        ]
+      },
+      "cargo_delay_fee": {
+        "mean": 0.015585320456650797,
+        "conditional_instance_CI95": [
+          0.0015844660429112478,
+          0.0353731200642771
+        ]
+      },
+      "rejection_penalty": {
+        "mean": 0.0,
+        "conditional_instance_CI95": [
+          0.0,
+          0.0
+        ]
+      },
+      "vehicles": {
+        "mean": -0.65625,
+        "conditional_instance_CI95": [
+          -0.875,
+          -0.4375
+        ]
+      }
+    }
+  },
+  "per_training_seed": [
+    {
+      "method": "learned_raw",
+      "training_seed": 1234,
+      "service_percent_by_factor": {
+        "0.5": 95.9375,
+        "1.0": 96.5625,
+        "1.5": 96.5625
+      },
+      "wide_minus_narrow_pp": 0.625
+    },
+    {
+      "method": "learned_raw",
+      "training_seed": 4321,
+      "service_percent_by_factor": {
+        "0.5": 93.0625,
+        "1.0": 95.3125,
+        "1.5": 95.9375
+      },
+      "wide_minus_narrow_pp": 2.875
+    },
+    {
+      "method": "learned_raw",
+      "training_seed": 8765,
+      "service_percent_by_factor": {
+        "0.5": 96.4375,
+        "1.0": 97.8125,
+        "1.5": 97
+      },
+      "wide_minus_narrow_pp": 0.5625
+    },
+    {
+      "method": "learned_hybrid",
+      "training_seed": 1234,
+      "service_percent_by_factor": {
+        "0.5": 99.3125,
+        "1.0": 99.25,
+        "1.5": 99.5625
+      },
+      "wide_minus_narrow_pp": 0.25
+    },
+    {
+      "method": "learned_hybrid",
+      "training_seed": 4321,
+      "service_percent_by_factor": {
+        "0.5": 98.875,
+        "1.0": 99.4375,
+        "1.5": 99.625
+      },
+      "wide_minus_narrow_pp": 0.75
+    },
+    {
+      "method": "learned_hybrid",
+      "training_seed": 8765,
+      "service_percent_by_factor": {
+        "0.5": 99.25,
+        "1.0": 99.75,
+        "1.5": 99.6875
+      },
+      "wide_minus_narrow_pp": 0.4375
+    }
+  ],
+  "class_coverage": [
+    {
+      "method": "learned_raw",
+      "window_multiplier": 0.5,
+      "passenger_service_percent": 97.07724425887265,
+      "cargo_service_percent": 92.263759086189
+    },
+    {
+      "method": "learned_raw",
+      "window_multiplier": 1.0,
+      "passenger_service_percent": 97.98190675017398,
+      "cargo_service_percent": 94.44444444444444
+    },
+    {
+      "method": "learned_raw",
+      "window_multiplier": 1.5,
+      "passenger_service_percent": 97.7035490605428,
+      "cargo_service_percent": 94.70404984423676
+    },
+    {
+      "method": "learned_hybrid",
+      "window_multiplier": 0.5,
+      "passenger_service_percent": 98.8517745302714,
+      "cargo_service_percent": 99.5846313603323
+    },
+    {
+      "method": "learned_hybrid",
+      "window_multiplier": 1.0,
+      "passenger_service_percent": 99.51287404314544,
+      "cargo_service_percent": 99.42886812045691
+    },
+    {
+      "method": "learned_hybrid",
+      "window_multiplier": 1.5,
+      "passenger_service_percent": 99.51287404314544,
+      "cargo_service_percent": 99.79231568016614
+    },
+    {
+      "method": "LNS",
+      "window_multiplier": 0.5,
+      "passenger_service_percent": 100.0,
+      "cargo_service_percent": 100.0
+    },
+    {
+      "method": "LNS",
+      "window_multiplier": 1.0,
+      "passenger_service_percent": 100.0,
+      "cargo_service_percent": 100.0
+    },
+    {
+      "method": "LNS",
+      "window_multiplier": 1.5,
+      "passenger_service_percent": 100.0,
+      "cargo_service_percent": 100.0
+    }
+  ],
+  "statistics": "Same 32 base-instance IDs across all conditions and checkpoints. Three training seeds separately; fixed-checkpoint instance bootstrap 10000/seed8162049. No p-values or independent-request replication. Raw and hybrid responses both retained.",
+  "interpretation": "Same request identities and only passenger pickup latest changes. Wider windows cannot worsen the mathematical optimum, but finite raw/hybrid/LNS algorithms may respond nonmonotonically. No real-world causal or optimality claims."
+}

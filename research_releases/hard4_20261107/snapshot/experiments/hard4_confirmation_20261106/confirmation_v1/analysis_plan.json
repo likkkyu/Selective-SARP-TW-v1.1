@@ -1,0 +1,21 @@
+{
+  "scope": "analysis specified before six neural and traditional runs complete; no significance-driven changes",
+  "source_sha256": "3f0a3c7f6399fef1e6e3894ee29c3862877b88191a5155ffb9e3eadc55d4b9fe",
+  "independent_unit": "32 paired common instances",
+  "primary_endpoints": [
+    "objective J",
+    "service rate"
+  ],
+  "conditional_bootstrap_resamples": 10000,
+  "bootstrap_seed": 8162037,
+  "controls": [
+    "service_first",
+    "insertion",
+    "LNS",
+    "SCIP"
+  ],
+  "all_contrasts_retained": true,
+  "hypothesis_tests": "none",
+  "no_optional_stopping": true,
+  "three_training_seed_effects": "mean, sample SD and each seed, separately from conditional instance intervals"
+}

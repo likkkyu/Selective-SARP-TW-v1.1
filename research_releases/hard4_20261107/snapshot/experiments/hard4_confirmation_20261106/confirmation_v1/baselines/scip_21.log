@@ -1,0 +1,49 @@
+2/2 feasible solutions given by solution candidate storage, new primal bound 2.979607e+00
+
+presolving:
+(round 1, fast)       100 del vars, 446 del conss, 0 add conss, 265 chg bounds, 113955 chg sides, 114055 chg coeffs, 0 upgd conss, 201 impls, 200 clqs
+(round 2, fast)       6840 del vars, 45200 del conss, 0 add conss, 7087 chg bounds, 119909 chg sides, 120091 chg coeffs, 0 upgd conss, 201 impls, 200 clqs
+(round 3, fast)       6872 del vars, 45398 del conss, 0 add conss, 7087 chg bounds, 120107 chg sides, 120289 chg coeffs, 0 upgd conss, 201 impls, 200 clqs
+(round 4, exhaustive) 6872 del vars, 45434 del conss, 0 add conss, 7198 chg bounds, 127759 chg sides, 128041 chg coeffs, 0 upgd conss, 201 impls, 200 clqs
+(round 5, exhaustive) 6872 del vars, 45434 del conss, 0 add conss, 7198 chg bounds, 127759 chg sides, 128041 chg coeffs, 16424 upgd conss, 201 impls, 200 clqs
+(round 6, exhaustive) 6898 del vars, 45434 del conss, 0 add conss, 7198 chg bounds, 127759 chg sides, 128041 chg coeffs, 16424 upgd conss, 18537 impls, 200 clqs
+(round 7, exhaustive) 6924 del vars, 45486 del conss, 0 add conss, 7198 chg bounds, 127759 chg sides, 128041 chg coeffs, 16450 upgd conss, 20282 impls, 200 clqs
+(round 8, exhaustive) 6950 del vars, 45564 del conss, 0 add conss, 7198 chg bounds, 127759 chg sides, 128041 chg coeffs, 16476 upgd conss, 21872 impls, 200 clqs
+   (3.5s) probing: 1000/7804 (12.8%) - 101 fixings, 0 aggregations, 359589 implications, 328 bound changes
+   (3.6s) probing: 1065/7804 (13.6%) - 101 fixings, 0 aggregations, 384844 implications, 352 bound changes
+   (3.6s) probing aborted: 1000/1000 successive useless probings
+(round 9, exhaustive) 6973 del vars, 45642 del conss, 0 add conss, 7550 chg bounds, 127759 chg sides, 128041 chg coeffs, 16502 upgd conss, 375183 impls, 27694 clqs
+(round 10, fast)       6973 del vars, 45689 del conss, 0 add conss, 7550 chg bounds, 127960 chg sides, 128591 chg coeffs, 16502 upgd conss, 375183 impls, 27694 clqs
+   (4.1s) probing: 1165/7804 (14.9%) - 101 fixings, 0 aggregations, 425210 implications, 395 bound changes
+   (4.1s) probing aborted: 1000/1000 successive useless probings
+   (4.6s) symmetry computation started: requiring (bin +, int +, cont +), (fixed: bin -, int -, cont -)
+   (4.8s) no symmetry present (symcode time: 0.04)
+presolving (11 rounds: 11 fast, 7 medium, 7 exhaustive):
+ 6973 deleted vars, 45716 deleted constraints, 0 added constraints, 7593 tightened bounds, 0 added holes, 127960 changed sides, 128591 changed coefficients
+ 413456 implications, 30209 cliques
+presolved problem has 23778 variables (7803 bin, 0 int, 0 impl, 15975 cont) and 153423 constraints
+  16142 constraints of type <varbound>
+      1 constraints of type <knapsack>
+    200 constraints of type <setppc>
+ 137080 constraints of type <linear>
+Presolving Time: 4.66
+transformed 1/2 original solutions to the transformed problem space
+
+ time | node  | left  |LP iter|LP it/n|mem/heur|mdpt |vars |cons |rows |cuts |sepa|confs|strbr|  dualbound   | primalbound  |  gap   | compl. 
+  5.7s|     1 |     0 |   808 |     - |   766M |   0 |  23k| 153k| 153k|   0 |  0 | 100 |   0 | 1.334130e-01 | 2.979607e+00 |2133.37%| unknown
+  6.3s|     1 |     0 |  1396 |     - |   787M |   0 |  23k| 153k| 153k| 188 |  1 | 100 |   0 | 1.448904e-01 | 2.979607e+00 |1956.46%| unknown
+  6.8s|     1 |     0 |  2063 |     - |   805M |   0 |  23k| 153k| 153k| 382 |  2 | 100 |   0 | 1.512971e-01 | 2.979607e+00 |1869.37%| unknown
+  7.3s|     1 |     0 |  2650 |     - |   825M |   0 |  23k| 153k| 153k| 551 |  3 | 100 |   0 | 1.567235e-01 | 2.979607e+00 |1801.19%| unknown
+  7.7s|     1 |     0 |  3217 |     - |   842M |   0 |  23k| 153k| 154k| 711 |  4 | 100 |   0 | 1.583417e-01 | 2.979607e+00 |1781.76%| unknown
+  8.3s|     1 |     0 |  3744 |     - |   859M |   0 |  23k| 153k| 154k| 861 |  5 | 100 |   0 | 1.600249e-01 | 2.979607e+00 |1761.96%| unknown
+  8.8s|     1 |     0 |  4308 |     - |   880M |   0 |  23k| 153k| 154k| 974 |  6 | 100 |   0 | 1.619156e-01 | 2.979607e+00 |1740.22%| unknown
+  9.5s|     1 |     0 |  4883 |     - |   900M |   0 |  23k| 153k| 154k|1120 |  7 | 100 |   0 | 1.646963e-01 | 2.979607e+00 |1709.15%| unknown
+ 10.0s|     1 |     0 |  5383 |     - |   916M |   0 |  23k| 153k| 154k|1297 |  8 | 100 |   0 | 1.646963e-01 | 2.979607e+00 |1709.15%| unknown
+(node 1) LP solver hit time limit in LP 11 -- using pseudo solution instead
+
+SCIP Status        : solving was interrupted [time limit reached]
+Solving Time (sec) : 10.00
+Solving Nodes      : 1
+Primal Bound       : +2.97960660182798e+00 (2 solutions)
+Dual Bound         : +1.64696257095784e-01
+Gap                : 1709.15 %

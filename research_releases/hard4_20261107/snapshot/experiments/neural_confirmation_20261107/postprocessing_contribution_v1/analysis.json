@@ -1,0 +1,160 @@
+{
+  "status": "passed",
+  "analysis_type": "Post hoc descriptive contrasts of already frozen complete results",
+  "independent_instances": 32,
+  "neural_training_seeds": [
+    1234,
+    4321,
+    8765
+  ],
+  "search_seed": 1234,
+  "search_budget_seconds": 0.5,
+  "columns": [
+    "service_gain_percentage_points",
+    "objective_after_minus_before"
+  ],
+  "intervals": "Pointwise paired-instance percentile bootstrap, 10000 resamples; fixed checkpoints/search seed; not multiplicity-adjusted or a new training replication",
+  "summaries": [
+    {
+      "initializer": "learned",
+      "estimate": [
+        2.9166666666666665,
+        -839.1569594887407
+      ],
+      "conditional_instance_CI95": [
+        [
+          2.416666666666667,
+          3.4374999999999996
+        ],
+        [
+          -988.8580153335004,
+          -695.456140029903
+        ]
+      ],
+      "instances_improved_service": 31,
+      "instances_unchanged_service": 1
+    },
+    {
+      "initializer": "service_first",
+      "estimate": [
+        2.6458333333333335,
+        -761.286293294265
+      ],
+      "conditional_instance_CI95": [
+        [
+          2.2916666666666665,
+          3.0000000000000004
+        ],
+        [
+          -863.1739121635095,
+          -659.415751993454
+        ]
+      ],
+      "instances_improved_service": 32,
+      "instances_unchanged_service": 0
+    },
+    {
+      "initializer": "insertion",
+      "estimate": [
+        1.0,
+        -287.46465052884474
+      ],
+      "conditional_instance_CI95": [
+        [
+          0.4375,
+          1.6875
+        ],
+        [
+          -485.0718594092406,
+          -125.7626539345473
+        ]
+      ],
+      "instances_improved_service": 9,
+      "instances_unchanged_service": 23
+    }
+  ],
+  "seed_specific": [
+    {
+      "initializer": "learned",
+      "training_seed": 1234,
+      "service_gain_pp": 2.6875,
+      "objective_delta": -773.1826898172802
+    },
+    {
+      "initializer": "service_first",
+      "training_seed": 1234,
+      "service_gain_pp": 3.0,
+      "objective_delta": -863.4043506264295
+    },
+    {
+      "initializer": "learned",
+      "training_seed": 4321,
+      "service_gain_pp": 4.125,
+      "objective_delta": -1186.6139192013484
+    },
+    {
+      "initializer": "service_first",
+      "training_seed": 4321,
+      "service_gain_pp": 2.625,
+      "objective_delta": -755.1011882209773
+    },
+    {
+      "initializer": "learned",
+      "training_seed": 8765,
+      "service_gain_pp": 1.9375,
+      "objective_delta": -557.6742694475932
+    },
+    {
+      "initializer": "service_first",
+      "training_seed": 8765,
+      "service_gain_pp": 2.3125,
+      "objective_delta": -665.353341035388
+    }
+  ],
+  "no_plan_lost_service_or_increased_J": true,
+  "interpretation": "All three initializers retained; improvement is attributable to adding the implemented manual search pipeline, not evidence of learning-rejection superiority or a learned repair operator",
+  "timing": "Use integrated times in original analysis; do not infer causal runtime differences from separately timed initializers",
+  "input_sha256": {
+    "experiments/neural_confirmation_20261107/confirmation_v1/plan.json": "ee70373a68ff840c40d952fdda88dfa4f078213aa5585cfa7a6bf36b72d1c688",
+    "experiments/neural_confirmation_20261107/confirmation_v1/analysis.json": "f8b95bd2459b067d7ebef1f39cf4d36893e7bd7e540d995b26034c4f221c9a39",
+    "experiments/neural_confirmation_20261107/confirmation_v1/neural/learned_1234.json": "9fc8ff72e4c9f8d0bbae389c0e5386cfad41fad0ffe242f114eb924d3c5bf794",
+    "experiments/neural_confirmation_20261107/confirmation_v1/neural/service_first_1234.json": "604fce2f83a3b82fb4ca6b437c48b3590d420de6451a790759814b809fa891b9",
+    "experiments/neural_confirmation_20261107/confirmation_v1/neural/learned_4321.json": "fc4183843eb85dbcc83e6d1ac70af83f76599ac3ff3d977478df7161fdc964f9",
+    "experiments/neural_confirmation_20261107/confirmation_v1/neural/service_first_4321.json": "b3aa6cc4d5a40a80e9e08399f8e0d8e307e3c2b24ac14b287be79a291635f7ad",
+    "experiments/neural_confirmation_20261107/confirmation_v1/neural/learned_8765.json": "7e456d230cc9b4e433eca33789d9f678d70ec57c550e9072d2ab9f274bc3cf58",
+    "experiments/neural_confirmation_20261107/confirmation_v1/neural/service_first_8765.json": "3b619fa7a73dd15f752ceae9dec258fbf98d271cf6949aafba9864d8406503d6",
+    "experiments/neural_confirmation_20261107/confirmation_v1/controls/instance_0.json": "2a58c526ffa0f6223859d9cbf4adae334b0f572dad950942aed6019758246f73",
+    "experiments/neural_confirmation_20261107/confirmation_v1/controls/instance_1.json": "c7693fd65c034f74593e31c9fb53193725915bb8a0583f427afb56f7f5e7da89",
+    "experiments/neural_confirmation_20261107/confirmation_v1/controls/instance_2.json": "c247f7583b93de693435fff21e5d20a2f60b19d5e7383547aed9e8c89fef9191",
+    "experiments/neural_confirmation_20261107/confirmation_v1/controls/instance_3.json": "3da87fc07e7d0bd2d8e3072532ef8cf9e35cff6eb419cf327baced8e983b5e47",
+    "experiments/neural_confirmation_20261107/confirmation_v1/controls/instance_4.json": "b1d7181587e58cf319adf571ed5267df7315371cd1866dd344f07e5be65e67d5",
+    "experiments/neural_confirmation_20261107/confirmation_v1/controls/instance_5.json": "cd040761d696273afad1acaf4ab45c1c3d80cac218ca582e8081fe1dec748a87",
+    "experiments/neural_confirmation_20261107/confirmation_v1/controls/instance_6.json": "8947452beb8218c3fdb6394df63278d0070026dfce69e974baa94d2a66c63124",
+    "experiments/neural_confirmation_20261107/confirmation_v1/controls/instance_7.json": "5fd958d7ad285d84133219aa9bcc99ea00509ef404d35350d5cf906820062563",
+    "experiments/neural_confirmation_20261107/confirmation_v1/controls/instance_8.json": "9b2cad9c4c05c5042aadef1baf5c02825438dc888fd165ecb327e61cef0befbf",
+    "experiments/neural_confirmation_20261107/confirmation_v1/controls/instance_9.json": "1113ea0ed9bfca6d7084b2d3a925f95115b2ba662a22d0cbfa1a683238ccaedb",
+    "experiments/neural_confirmation_20261107/confirmation_v1/controls/instance_10.json": "465e653b8d5470229b37ae29290a9e7b59a9aa3b838189a19d9fadec3d7e7664",
+    "experiments/neural_confirmation_20261107/confirmation_v1/controls/instance_11.json": "eaebdb874768be23f3cdf63ae4724dc6c49d3eb01e7271b094179556ef09aa8d",
+    "experiments/neural_confirmation_20261107/confirmation_v1/controls/instance_12.json": "34e9e4a3ac67984739fd943534e8f92f5c40d10650d994b20a2032d63f97f707",
+    "experiments/neural_confirmation_20261107/confirmation_v1/controls/instance_13.json": "0213ab64af8a600218387b6d0829cd8ad021301397bd8930954a252456673aec",
+    "experiments/neural_confirmation_20261107/confirmation_v1/controls/instance_14.json": "b4640fbda564eaeabac00e147f1e12da94d81d03e6c70aea360d3ac707ac9316",
+    "experiments/neural_confirmation_20261107/confirmation_v1/controls/instance_15.json": "b2e8625a4a8b5d20f09612c85a6756e5b72f908ebf3c397e21180f6b0be56b32",
+    "experiments/neural_confirmation_20261107/confirmation_v1/controls/instance_16.json": "7ac25dbf1882b18f589a558a3296a0144c0bcac64d4acfe11d1cf5949acab12d",
+    "experiments/neural_confirmation_20261107/confirmation_v1/controls/instance_17.json": "b702d88fbd6526a5d986479a7c83b99210b84931f057abf4315d7961d9c91833",
+    "experiments/neural_confirmation_20261107/confirmation_v1/controls/instance_18.json": "a785e9bd988ac5fe7ef75f7da2b0bfd6235efb1e83532d86db473547cee2f3b3",
+    "experiments/neural_confirmation_20261107/confirmation_v1/controls/instance_19.json": "04cbb294c79ea0a76b126baf3cee20036c8d5a1efabdc45e7f014844f2c1559d",
+    "experiments/neural_confirmation_20261107/confirmation_v1/controls/instance_20.json": "595ead42e3248faff2b9728f54bb662e6715ac732789edca7e80a42bf270493e",
+    "experiments/neural_confirmation_20261107/confirmation_v1/controls/instance_21.json": "34e78e8b318a274d0e318cf7e51ec3028a01f2431bb985263c913bae1bbab61c",
+    "experiments/neural_confirmation_20261107/confirmation_v1/controls/instance_22.json": "21d58f4acd188b4c035d90cae257a43b5f5ab8372c2aa93164aaa022609f03a4",
+    "experiments/neural_confirmation_20261107/confirmation_v1/controls/instance_23.json": "4eaa07ffec33863896728f92250ccd51bf91103c9f64028d169ef50a07307772",
+    "experiments/neural_confirmation_20261107/confirmation_v1/controls/instance_24.json": "59ddc62b88ac83994512da332ba6571c3ee499c4bc1a54ab7e76424c14b11c31",
+    "experiments/neural_confirmation_20261107/confirmation_v1/controls/instance_25.json": "bae25543538bf9dc31b341696c6811cb24940076210e99d1c6dc507cd45736d2",
+    "experiments/neural_confirmation_20261107/confirmation_v1/controls/instance_26.json": "8f9d15872eb20da249f2ff1b1059d1df536fa34b6158caa0d7784d947ec34a77",
+    "experiments/neural_confirmation_20261107/confirmation_v1/controls/instance_27.json": "a9fba89cd79805782d0d80e1f2efae5e74b9842b593fe530be2175903c99febd",
+    "experiments/neural_confirmation_20261107/confirmation_v1/controls/instance_28.json": "0e953a29b7031025c2a8c9cd31006f9f2fce55362224db23242c672aa355ed2b",
+    "experiments/neural_confirmation_20261107/confirmation_v1/controls/instance_29.json": "edd4e28c0a32dd22f00655c4ff99738937d830d1744e920df103d62649c6cdac",
+    "experiments/neural_confirmation_20261107/confirmation_v1/controls/instance_30.json": "a1f44e4d8d107f2f2982a873374d8764ec052c9975d3fce00007a85e67fc6539",
+    "experiments/neural_confirmation_20261107/confirmation_v1/controls/instance_31.json": "1d3bb91dde131ce3cef95936133d9fe9f85e7ee25e643c441100f8972a478c55"
+  },
+  "analysis_source_sha256": "7dd6cddf7848ec4d0b690ec5ead6bbaf010c4f5dedbd6d110abb3ef938458768"
+}

@@ -1,0 +1,25 @@
+{
+  "status": "smoke_executed_passed",
+  "mode": "smoke_not_confirmation",
+  "frozen_code_files": 129,
+  "checkpoint_bytes_identical": true,
+  "scenario_bytes_identical": false,
+  "metadata_changes": "Absolute JSON paths relocated; smoke additionally changes data to one case, sample count, SHA, scope and timeout",
+  "original_evidence_untouched": true,
+  "source_plan_sha256": "ee70373a68ff840c40d952fdda88dfa4f078213aa5585cfa7a6bf36b72d1c688",
+  "output_plan_sha256": "d3208a930d64371a02f6274977e23522b60120970e6066166079c0b638dfe1e2",
+  "notes": "New standalone directory contains copied files, no hardlinks or symlinks. It does not modify or upload the source project. Same timed stochastic LNS protocol does not imply byte-identical routes on a different host. Full mode reproduces second confirmation only, not the entire paper.",
+  "scope": "Fresh copied workspace, relocated JSON paths, one fixed scenario case, 12 raw/hybrid neural plans plus 3 traditional plans. Not full confirmation reproduction or a new performance result.",
+  "neural_report_sha256": "ff47547fd4b9fc5aa75a2adfa79f3404de551ead299db7aadeeefda387557cd1",
+  "controls_report_sha256": "a80dbc3a1f5a0f9a53097a3f6facdcd2b54612cfcea44b4c4137e103afa377a0",
+  "audited_plans": 15,
+  "raw_full_action_and_J_equal_to_original_case0": [
+    "learned_1234",
+    "learned_4321",
+    "learned_8765",
+    "service_first_1234",
+    "service_first_4321",
+    "service_first_8765"
+  ],
+  "temporary_workspace_removed_after_archive": true
+}

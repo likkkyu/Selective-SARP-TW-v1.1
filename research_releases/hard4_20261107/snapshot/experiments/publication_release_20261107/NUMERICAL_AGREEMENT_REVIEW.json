@@ -1,0 +1,19 @@
+{
+  "status": "passed_with_reporting_correction",
+  "small_cases": {
+    "cases": 6,
+    "enumerated_candidates": 506526,
+    "max_warm_solver_vs_scalar_enumeration_J_error": 2.2737367544323206e-13,
+    "max_float32_tensor_vs_scalar_J_error": 1.3781425877823494e-05,
+    "max_float32_tensor_vs_scalar_raw_cost_error": 0.00012063580513199668
+  },
+  "two_trip_case": {
+    "warm_solver_vs_analytic_J_error": 7.72715225139109e-14,
+    "tensor_vs_analytic_J_error": 6.912658059299304e-06
+  },
+  "interpretation": "SCIP/scalar double-precision agreement must not be presented as float32 tensor precision; neither representation check proves time-limited solver optimality",
+  "inputs": {
+    "experiments/hard4_exact_20261106/reference_v1/report.json": "6855be874be13f573def6d9d05a15060c05c3cc3d798ef9d58f3edc016b6cd14",
+    "experiments/hard4_exact_20261106/multitrip_v1/evidence/report.json": "cc5797a246f4b30dd14cec98ab2c27ed725671f4c0ae0b183f89065372f58fbf"
+  }
+}

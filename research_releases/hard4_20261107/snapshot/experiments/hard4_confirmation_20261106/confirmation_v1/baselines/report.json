@@ -1,0 +1,395 @@
+{
+  "status": "completed",
+  "scope": "new common 32-instance confirmation; user-approved main comparison: pretrained learned/rule deployments, strict insertion, LNS and SCIP; no retraining or pure training-component ablation",
+  "rows": [
+    {
+      "instance": 0,
+      "initial_completed": 48,
+      "LNS_completed": [
+        50,
+        50,
+        50
+      ],
+      "SCIP_completed": 48,
+      "hard_invalid": 0,
+      "unfulfilled": 0
+    },
+    {
+      "instance": 1,
+      "initial_completed": 49,
+      "LNS_completed": [
+        50,
+        50,
+        50
+      ],
+      "SCIP_completed": 49,
+      "hard_invalid": 0,
+      "unfulfilled": 0
+    },
+    {
+      "instance": 2,
+      "initial_completed": 49,
+      "LNS_completed": [
+        50,
+        50,
+        50
+      ],
+      "SCIP_completed": 49,
+      "hard_invalid": 0,
+      "unfulfilled": 0
+    },
+    {
+      "instance": 3,
+      "initial_completed": 50,
+      "LNS_completed": [
+        50,
+        50,
+        50
+      ],
+      "SCIP_completed": 50,
+      "hard_invalid": 0,
+      "unfulfilled": 0
+    },
+    {
+      "instance": 4,
+      "initial_completed": 48,
+      "LNS_completed": [
+        50,
+        50,
+        50
+      ],
+      "SCIP_completed": 48,
+      "hard_invalid": 0,
+      "unfulfilled": 0
+    },
+    {
+      "instance": 5,
+      "initial_completed": 50,
+      "LNS_completed": [
+        50,
+        50,
+        50
+      ],
+      "SCIP_completed": 50,
+      "hard_invalid": 0,
+      "unfulfilled": 0
+    },
+    {
+      "instance": 6,
+      "initial_completed": 49,
+      "LNS_completed": [
+        50,
+        50,
+        50
+      ],
+      "SCIP_completed": 49,
+      "hard_invalid": 0,
+      "unfulfilled": 0
+    },
+    {
+      "instance": 7,
+      "initial_completed": 50,
+      "LNS_completed": [
+        50,
+        50,
+        50
+      ],
+      "SCIP_completed": 50,
+      "hard_invalid": 0,
+      "unfulfilled": 0
+    },
+    {
+      "instance": 8,
+      "initial_completed": 49,
+      "LNS_completed": [
+        50,
+        50,
+        50
+      ],
+      "SCIP_completed": 49,
+      "hard_invalid": 0,
+      "unfulfilled": 0
+    },
+    {
+      "instance": 9,
+      "initial_completed": 49,
+      "LNS_completed": [
+        50,
+        50,
+        50
+      ],
+      "SCIP_completed": 49,
+      "hard_invalid": 0,
+      "unfulfilled": 0
+    },
+    {
+      "instance": 10,
+      "initial_completed": 50,
+      "LNS_completed": [
+        50,
+        50,
+        50
+      ],
+      "SCIP_completed": 50,
+      "hard_invalid": 0,
+      "unfulfilled": 0
+    },
+    {
+      "instance": 11,
+      "initial_completed": 49,
+      "LNS_completed": [
+        50,
+        50,
+        50
+      ],
+      "SCIP_completed": 49,
+      "hard_invalid": 0,
+      "unfulfilled": 0
+    },
+    {
+      "instance": 12,
+      "initial_completed": 50,
+      "LNS_completed": [
+        50,
+        50,
+        50
+      ],
+      "SCIP_completed": 50,
+      "hard_invalid": 0,
+      "unfulfilled": 0
+    },
+    {
+      "instance": 13,
+      "initial_completed": 50,
+      "LNS_completed": [
+        50,
+        50,
+        50
+      ],
+      "SCIP_completed": 50,
+      "hard_invalid": 0,
+      "unfulfilled": 0
+    },
+    {
+      "instance": 14,
+      "initial_completed": 48,
+      "LNS_completed": [
+        50,
+        50,
+        50
+      ],
+      "SCIP_completed": 48,
+      "hard_invalid": 0,
+      "unfulfilled": 0
+    },
+    {
+      "instance": 15,
+      "initial_completed": 48,
+      "LNS_completed": [
+        50,
+        50,
+        50
+      ],
+      "SCIP_completed": 48,
+      "hard_invalid": 0,
+      "unfulfilled": 0
+    },
+    {
+      "instance": 16,
+      "initial_completed": 47,
+      "LNS_completed": [
+        50,
+        50,
+        50
+      ],
+      "SCIP_completed": 47,
+      "hard_invalid": 0,
+      "unfulfilled": 0
+    },
+    {
+      "instance": 17,
+      "initial_completed": 50,
+      "LNS_completed": [
+        50,
+        50,
+        50
+      ],
+      "SCIP_completed": 50,
+      "hard_invalid": 0,
+      "unfulfilled": 0
+    },
+    {
+      "instance": 18,
+      "initial_completed": 49,
+      "LNS_completed": [
+        50,
+        50,
+        50
+      ],
+      "SCIP_completed": 49,
+      "hard_invalid": 0,
+      "unfulfilled": 0
+    },
+    {
+      "instance": 19,
+      "initial_completed": 50,
+      "LNS_completed": [
+        50,
+        50,
+        50
+      ],
+      "SCIP_completed": 50,
+      "hard_invalid": 0,
+      "unfulfilled": 0
+    },
+    {
+      "instance": 20,
+      "initial_completed": 50,
+      "LNS_completed": [
+        50,
+        50,
+        50
+      ],
+      "SCIP_completed": 50,
+      "hard_invalid": 0,
+      "unfulfilled": 0
+    },
+    {
+      "instance": 21,
+      "initial_completed": 50,
+      "LNS_completed": [
+        50,
+        50,
+        50
+      ],
+      "SCIP_completed": 50,
+      "hard_invalid": 0,
+      "unfulfilled": 0
+    },
+    {
+      "instance": 22,
+      "initial_completed": 47,
+      "LNS_completed": [
+        50,
+        50,
+        50
+      ],
+      "SCIP_completed": 47,
+      "hard_invalid": 0,
+      "unfulfilled": 0
+    },
+    {
+      "instance": 23,
+      "initial_completed": 48,
+      "LNS_completed": [
+        50,
+        50,
+        50
+      ],
+      "SCIP_completed": 48,
+      "hard_invalid": 0,
+      "unfulfilled": 0
+    },
+    {
+      "instance": 24,
+      "initial_completed": 47,
+      "LNS_completed": [
+        50,
+        50,
+        50
+      ],
+      "SCIP_completed": 47,
+      "hard_invalid": 0,
+      "unfulfilled": 0
+    },
+    {
+      "instance": 25,
+      "initial_completed": 48,
+      "LNS_completed": [
+        50,
+        50,
+        50
+      ],
+      "SCIP_completed": 48,
+      "hard_invalid": 0,
+      "unfulfilled": 0
+    },
+    {
+      "instance": 26,
+      "initial_completed": 50,
+      "LNS_completed": [
+        50,
+        50,
+        50
+      ],
+      "SCIP_completed": 50,
+      "hard_invalid": 0,
+      "unfulfilled": 0
+    },
+    {
+      "instance": 27,
+      "initial_completed": 50,
+      "LNS_completed": [
+        50,
+        50,
+        50
+      ],
+      "SCIP_completed": 50,
+      "hard_invalid": 0,
+      "unfulfilled": 0
+    },
+    {
+      "instance": 28,
+      "initial_completed": 49,
+      "LNS_completed": [
+        50,
+        50,
+        50
+      ],
+      "SCIP_completed": 49,
+      "hard_invalid": 0,
+      "unfulfilled": 0
+    },
+    {
+      "instance": 29,
+      "initial_completed": 47,
+      "LNS_completed": [
+        50,
+        50,
+        50
+      ],
+      "SCIP_completed": 47,
+      "hard_invalid": 0,
+      "unfulfilled": 0
+    },
+    {
+      "instance": 30,
+      "initial_completed": 49,
+      "LNS_completed": [
+        50,
+        50,
+        50
+      ],
+      "SCIP_completed": 49,
+      "hard_invalid": 0,
+      "unfulfilled": 0
+    },
+    {
+      "instance": 31,
+      "initial_completed": 49,
+      "LNS_completed": [
+        50,
+        50,
+        50
+      ],
+      "SCIP_completed": 49,
+      "hard_invalid": 0,
+      "unfulfilled": 0
+    }
+  ],
+  "cost_version": 4,
+  "hard_minimum": 4,
+  "torch_threads": 1,
+  "scenario_sha256": "8796310dcbb67483a5ba7f1015fd171c8bee1b0ff70388c73f824ea092beb611",
+  "seconds": 1470.3133204579353
+}

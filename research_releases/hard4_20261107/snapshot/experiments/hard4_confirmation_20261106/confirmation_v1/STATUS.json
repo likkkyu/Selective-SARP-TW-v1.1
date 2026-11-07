@@ -1,0 +1,12 @@
+{
+  "status": "main_confirmation_completed_verified",
+  "neural": "completed_verified",
+  "baselines": "completed_verified",
+  "neural_exec_session": 92494,
+  "next_action": "finish exact-reference; user question pending on neural optimization versus manuscript framing; do not claim neural superiority or restart main",
+  "completed_neural_models": 6,
+  "neural_final_plans_verified": 192,
+  "baseline_exec_session": 4697,
+  "completed_baseline_instances": 32,
+  "analysis": "passed"
+}

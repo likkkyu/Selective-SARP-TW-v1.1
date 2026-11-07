@@ -1,0 +1,254 @@
+{
+  "status": "passed",
+  "samples": 32,
+  "fully_audited_plans": 480,
+  "columns": [
+    "service_percentage_points",
+    "objective_J",
+    "algorithm_seconds"
+  ],
+  "summary": [
+    {
+      "method": "learned_raw",
+      "service_percent": 96.5625,
+      "mean_J": 992.2837584167719,
+      "mean_algorithm_seconds": 1.861419223087675
+    },
+    {
+      "method": "learned_hybrid",
+      "service_percent": 99.47916666666666,
+      "mean_J": 153.12679892803123,
+      "mean_algorithm_seconds": 2.365269062516745
+    },
+    {
+      "method": "service_first_raw",
+      "service_percent": 96.95833333333334,
+      "mean_J": 878.5241032217939,
+      "mean_algorithm_seconds": 1.6670388876045763
+    },
+    {
+      "method": "service_first_hybrid",
+      "service_percent": 99.60416666666667,
+      "mean_J": 117.23780992752906,
+      "mean_algorithm_seconds": 2.170918701388776
+    },
+    {
+      "method": "insertion_initial",
+      "service_percent": 98.0625,
+      "mean_J": 560.0016457327981,
+      "mean_algorithm_seconds": 2.586330861926399
+    },
+    {
+      "method": "insertion_short",
+      "service_percent": 99.0625,
+      "mean_J": 272.5369952039534,
+      "mean_algorithm_seconds": 3.0938086224050494
+    },
+    {
+      "method": "insertion_strong",
+      "service_percent": 100.0,
+      "mean_J": 2.794557468673246,
+      "mean_algorithm_seconds": 12.57453624862319
+    }
+  ],
+  "seed_specific": [
+    {
+      "method": "learned_raw",
+      "training_seed": 1234,
+      "service_percent": 96.5625,
+      "mean_J": 992.1467717587948
+    },
+    {
+      "method": "learned_hybrid",
+      "training_seed": 1234,
+      "service_percent": 99.25,
+      "mean_J": 218.96408194151465
+    },
+    {
+      "method": "service_first_raw",
+      "training_seed": 1234,
+      "service_percent": 96.625,
+      "mean_J": 974.6688163429499
+    },
+    {
+      "method": "service_first_hybrid",
+      "training_seed": 1234,
+      "service_percent": 99.625,
+      "mean_J": 111.26446571652049
+    },
+    {
+      "method": "learned_raw",
+      "training_seed": 4321,
+      "service_percent": 95.3125,
+      "mean_J": 1351.8052930906415
+    },
+    {
+      "method": "learned_hybrid",
+      "training_seed": 4321,
+      "service_percent": 99.4375,
+      "mean_J": 165.191373889293
+    },
+    {
+      "method": "service_first_raw",
+      "training_seed": 4321,
+      "service_percent": 96.9375,
+      "mean_J": 884.3070746511221
+    },
+    {
+      "method": "service_first_hybrid",
+      "training_seed": 4321,
+      "service_percent": 99.5625,
+      "mean_J": 129.2058864301447
+    },
+    {
+      "method": "learned_raw",
+      "training_seed": 8765,
+      "service_percent": 97.8125,
+      "mean_J": 632.8992104008794
+    },
+    {
+      "method": "learned_hybrid",
+      "training_seed": 8765,
+      "service_percent": 99.75,
+      "mean_J": 75.22494095328605
+    },
+    {
+      "method": "service_first_raw",
+      "training_seed": 8765,
+      "service_percent": 97.3125,
+      "mean_J": 776.59641867131
+    },
+    {
+      "method": "service_first_hybrid",
+      "training_seed": 8765,
+      "service_percent": 99.625,
+      "mean_J": 111.24307763592196
+    }
+  ],
+  "comparisons": [
+    {
+      "A": "learned_raw",
+      "B": "service_first_raw",
+      "interpretation": "A minus B; positive service favors A, negative J/time favors A",
+      "estimate": [
+        -0.39583333333333215,
+        113.75965519497794,
+        0.1943803354830985
+      ],
+      "conditional_instance_bootstrap_CI95": [
+        [
+          -0.9999999999999987,
+          0.22916666666666785
+        ],
+        [
+          -65.87412333302196,
+          287.4075636788582
+        ],
+        [
+          0.14915066636106838,
+          0.24022562175150589
+        ]
+      ]
+    },
+    {
+      "A": "learned_hybrid",
+      "B": "service_first_hybrid",
+      "interpretation": "A minus B; positive service favors A, negative J/time favors A",
+      "estimate": [
+        -0.12500000000000133,
+        35.88898900050217,
+        0.19435036112796905
+      ],
+      "conditional_instance_bootstrap_CI95": [
+        [
+          -0.39583333333333526,
+          0.1458333333333317
+        ],
+        [
+          -41.9433440889589,
+          113.76140802626551
+        ],
+        [
+          0.14911819900507917,
+          0.24017501386709528
+        ]
+      ]
+    },
+    {
+      "A": "learned_hybrid",
+      "B": "insertion_short",
+      "interpretation": "A minus B; positive service favors A, negative J/time favors A",
+      "estimate": [
+        0.41666666666666563,
+        -119.41019627592215,
+        -0.7285395598883044
+      ],
+      "conditional_instance_bootstrap_CI95": [
+        [
+          -0.14583333333333348,
+          1.020833333333333
+        ],
+        [
+          -293.12095974556723,
+          42.22293657104333
+        ],
+        [
+          -0.8313122380170473,
+          -0.6199743721175767
+        ]
+      ]
+    },
+    {
+      "A": "learned_hybrid",
+      "B": "insertion_strong",
+      "interpretation": "A minus B; positive service favors A, negative J/time favors A",
+      "estimate": [
+        -0.5208333333333344,
+        150.33224145935796,
+        -10.209267186106446
+      ],
+      "conditional_instance_bootstrap_CI95": [
+        [
+          -0.770833333333333,
+          -0.31250000000000044
+        ],
+        [
+          90.42228587686769,
+          222.10338206141847
+        ],
+        [
+          -10.312129382062661,
+          -10.100990131933454
+        ]
+      ]
+    },
+    {
+      "A": "learned_raw",
+      "B": "insertion_initial",
+      "interpretation": "A minus B; positive service favors A, negative J/time favors A",
+      "estimate": [
+        -1.4999999999999991,
+        432.2821126839738,
+        -0.7249116388387241
+      ],
+      "conditional_instance_bootstrap_CI95": [
+        [
+          -2.354166666666665,
+          -0.6458333333333317
+        ],
+        [
+          186.6804497884934,
+          677.7946776332533
+        ],
+        [
+          -0.8278055233809332,
+          -0.6162016016040374
+        ]
+      ]
+    }
+  ],
+  "protocol": "Fresh common N50 confirmation of frozen CPU-v5/native neural starts with and without matched short LNS; strict insertion and matched short/strong LNS controls. No retraining. First-round 32-case results remain archived; this is a distinct protocol, not selective replacement.",
+  "replication": "32 paired instances; average fixed checkpoints within each instance, bootstrap common instance indices 10000 times, seed8162049. Conditional intervals, not inference over training populations. Seed-specific results separately; no p-values or optional stopping.",
+  "search_replication": "One fixed search seed for every matched postprocessor and strong control, not three independent algorithm runs. Three pretrained checkpoint seeds per neural arm. Do not infer search-seed stability.",
+  "not_pure_training_ablation": true
+}

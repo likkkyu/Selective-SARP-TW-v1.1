@@ -1,0 +1,80 @@
+{
+  "scope": "small-instance exact model verification, not main benchmark, not untouched test or cold-solve speed claim",
+  "cases": [
+    {
+      "label": "three_requests_no_dispatch",
+      "orders": 3
+    },
+    {
+      "label": "four_late_dispatch",
+      "orders": 4
+    },
+    {
+      "label": "five_cargo_piecewise_delay",
+      "orders": 5
+    },
+    {
+      "label": "five_mixed_capacity_ride",
+      "orders": 5
+    },
+    {
+      "label": "development0_first_five",
+      "orders": 5
+    },
+    {
+      "label": "development1_first_five",
+      "orders": 5
+    }
+  ],
+  "enumeration": "all accepted subsets of size>=4 plus all-reject; all pickup-before-delivery permutations, one trip",
+  "cold_solver_seconds": 5,
+  "oracle_warm_solver_seconds": 2,
+  "total_timeout_seconds": 300,
+  "physical_config": {
+    "OPERATION_START": 10.0,
+    "OPERATION_END": 16.0,
+    "AREA_SIZE": 10.0,
+    "VEHICLE_SPEED": 25.0,
+    "MAX_TRIP_TIME": 3.0,
+    "SERVICE_TIME": 0.05,
+    "PASSENGER_MAX_RIDE_TIME_MINUTES": 70.0,
+    "PASSENGER_MAX_EXCESS_RIDE_TIME_MINUTES": 30.0,
+    "HARD_CARGO_PICKUP_TIMEWINDOW": true,
+    "PASSENGER_CAPACITY": 15,
+    "CARGO_CAPACITY": 20,
+    "PASSENGER_WEIGHT_KG": 65.0,
+    "CARGO_UNIT_WEIGHT_KG": 1.0,
+    "ENERGY_BASE": 0.18,
+    "ENERGY_WEIGHT_REF": 10000.0,
+    "ELECTRICITY_PRICE": 1.0,
+    "PASSENGER_DELAY_COST": 0.6,
+    "CARGO_DELAY_COST": 0.06,
+    "CARGO_DELAY_TIER1_MIN": 30.0,
+    "CARGO_DELAY_TIER2_MIN": 60.0,
+    "CARGO_DELAY_COST_30_60": 0.18,
+    "CARGO_DELAY_COST_60_PLUS": 0.36,
+    "VEHICLE_COST": 20.0,
+    "ALPHA_ENERGY": 1.0,
+    "ALPHA_DELAY": 2.5,
+    "ALPHA_VEHICLE": 3.0,
+    "ALPHA_REJECT": 575.0,
+    "ALPHA_UNFULFILLED": 750.0,
+    "ALPHA_TRIP_OVERTIME": 200.0
+  },
+  "normalization_profile": {
+    "graph_size": 50,
+    "energy_cost_raw": 98.93025535345078,
+    "passenger_delivery_delay_cost_raw": 576.4865581989288,
+    "cargo_delay_cost_raw": 42.86428897175938,
+    "vehicle_cost_norm": 180.0,
+    "num_samples": 256,
+    "seed": 1234,
+    "num_vehicles": 9
+  },
+  "source_sha256": {
+    "experiments/hard4_exact_20261106/run.py": "7378e79ca4f6c6773d168f7c64cd5a4992ff77741fd4181e47242e8716675f81",
+    "experiments/hard4_confirmation_20261106/scip_boundary_v2.py": "6dc85f712a3161f2ab59d5f14431c6344bc5e00d74cb83c2877693c41029aa0c",
+    "experiments/min_dispatch_hard_20261106/strict_scip.py": "87d033c9974c459656e4d1eb9da51e11f3c2d36c8de24c8ffe3f21a25be1f232",
+    "experiments/mip_scip_20261106/scip_selective.py": "9cb731b5acd21a2aa0e1fbed9088222e89eba5cf8b22bfae83555c9d16307fa0"
+  }
+}

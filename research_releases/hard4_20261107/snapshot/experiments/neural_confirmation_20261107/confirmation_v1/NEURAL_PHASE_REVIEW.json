@@ -1,0 +1,40 @@
+{
+  "status": "passed",
+  "scope": "Complete neural phase only; traditional comparison still running; no superiority conclusion",
+  "plans": {
+    "raw": 192,
+    "hybrid": 192
+  },
+  "physical_config_match": true,
+  "normalization_match": true,
+  "all_trips_at_least_four": true,
+  "raw_hybrid_full_audits": true,
+  "finite_and_monotone_objective": true,
+  "actual_integrated_time_checked": true,
+  "evidence": [
+    {
+      "model": "learned_1234",
+      "file_sha256": "9fc8ff72e4c9f8d0bbae389c0e5386cfad41fad0ffe242f114eb924d3c5bf794"
+    },
+    {
+      "model": "service_first_1234",
+      "file_sha256": "604fce2f83a3b82fb4ca6b437c48b3590d420de6451a790759814b809fa891b9"
+    },
+    {
+      "model": "learned_4321",
+      "file_sha256": "fc4183843eb85dbcc83e6d1ac70af83f76599ac3ff3d977478df7161fdc964f9"
+    },
+    {
+      "model": "service_first_4321",
+      "file_sha256": "b3aa6cc4d5a40a80e9e08399f8e0d8e307e3c2b24ac14b287be79a291635f7ad"
+    },
+    {
+      "model": "learned_8765",
+      "file_sha256": "7e456d230cc9b4e433eca33789d9f678d70ec57c550e9072d2ab9f274bc3cf58"
+    },
+    {
+      "model": "service_first_8765",
+      "file_sha256": "3b619fa7a73dd15f752ceae9dec258fbf98d271cf6949aafba9864d8406503d6"
+    }
+  ]
+}

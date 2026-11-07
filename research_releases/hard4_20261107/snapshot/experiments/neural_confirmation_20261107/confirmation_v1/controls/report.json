@@ -1,0 +1,201 @@
+{
+  "status": "completed",
+  "scope": "Fresh common N50 confirmation of frozen CPU-v5/native neural starts with and without matched short LNS; strict insertion and matched short/strong LNS controls. No retraining. First-round 32-case results remain archived; this is a distinct protocol, not selective replacement.",
+  "scenario_sha256": "837a278a776741a089374443cbb772f81addf48bdd183bc6318d44bcfa5975ba",
+  "rows": [
+    {
+      "instance": 0,
+      "initial_completed": 49,
+      "short_completed": 50,
+      "strong_completed": 50
+    },
+    {
+      "instance": 1,
+      "initial_completed": 48,
+      "short_completed": 49,
+      "strong_completed": 50
+    },
+    {
+      "instance": 2,
+      "initial_completed": 49,
+      "short_completed": 49,
+      "strong_completed": 50
+    },
+    {
+      "instance": 3,
+      "initial_completed": 50,
+      "short_completed": 50,
+      "strong_completed": 50
+    },
+    {
+      "instance": 4,
+      "initial_completed": 50,
+      "short_completed": 50,
+      "strong_completed": 50
+    },
+    {
+      "instance": 5,
+      "initial_completed": 50,
+      "short_completed": 50,
+      "strong_completed": 50
+    },
+    {
+      "instance": 6,
+      "initial_completed": 50,
+      "short_completed": 50,
+      "strong_completed": 50
+    },
+    {
+      "instance": 7,
+      "initial_completed": 47,
+      "short_completed": 50,
+      "strong_completed": 50
+    },
+    {
+      "instance": 8,
+      "initial_completed": 47,
+      "short_completed": 47,
+      "strong_completed": 50
+    },
+    {
+      "instance": 9,
+      "initial_completed": 49,
+      "short_completed": 49,
+      "strong_completed": 50
+    },
+    {
+      "instance": 10,
+      "initial_completed": 50,
+      "short_completed": 50,
+      "strong_completed": 50
+    },
+    {
+      "instance": 11,
+      "initial_completed": 50,
+      "short_completed": 50,
+      "strong_completed": 50
+    },
+    {
+      "instance": 12,
+      "initial_completed": 50,
+      "short_completed": 50,
+      "strong_completed": 50
+    },
+    {
+      "instance": 13,
+      "initial_completed": 50,
+      "short_completed": 50,
+      "strong_completed": 50
+    },
+    {
+      "instance": 14,
+      "initial_completed": 49,
+      "short_completed": 50,
+      "strong_completed": 50
+    },
+    {
+      "instance": 15,
+      "initial_completed": 49,
+      "short_completed": 49,
+      "strong_completed": 50
+    },
+    {
+      "instance": 16,
+      "initial_completed": 49,
+      "short_completed": 50,
+      "strong_completed": 50
+    },
+    {
+      "instance": 17,
+      "initial_completed": 50,
+      "short_completed": 50,
+      "strong_completed": 50
+    },
+    {
+      "instance": 18,
+      "initial_completed": 50,
+      "short_completed": 50,
+      "strong_completed": 50
+    },
+    {
+      "instance": 19,
+      "initial_completed": 50,
+      "short_completed": 50,
+      "strong_completed": 50
+    },
+    {
+      "instance": 20,
+      "initial_completed": 50,
+      "short_completed": 50,
+      "strong_completed": 50
+    },
+    {
+      "instance": 21,
+      "initial_completed": 49,
+      "short_completed": 50,
+      "strong_completed": 50
+    },
+    {
+      "instance": 22,
+      "initial_completed": 50,
+      "short_completed": 50,
+      "strong_completed": 50
+    },
+    {
+      "instance": 23,
+      "initial_completed": 48,
+      "short_completed": 48,
+      "strong_completed": 50
+    },
+    {
+      "instance": 24,
+      "initial_completed": 50,
+      "short_completed": 50,
+      "strong_completed": 50
+    },
+    {
+      "instance": 25,
+      "initial_completed": 46,
+      "short_completed": 49,
+      "strong_completed": 50
+    },
+    {
+      "instance": 26,
+      "initial_completed": 50,
+      "short_completed": 50,
+      "strong_completed": 50
+    },
+    {
+      "instance": 27,
+      "initial_completed": 48,
+      "short_completed": 50,
+      "strong_completed": 50
+    },
+    {
+      "instance": 28,
+      "initial_completed": 49,
+      "short_completed": 49,
+      "strong_completed": 50
+    },
+    {
+      "instance": 29,
+      "initial_completed": 48,
+      "short_completed": 48,
+      "strong_completed": 50
+    },
+    {
+      "instance": 30,
+      "initial_completed": 47,
+      "short_completed": 50,
+      "strong_completed": 50
+    },
+    {
+      "instance": 31,
+      "initial_completed": 48,
+      "short_completed": 48,
+      "strong_completed": 50
+    }
+  ],
+  "timing": "Actual pipeline includes fresh insertion initialization, fresh RouteEngine and complete search. Audits/replay separately; no summed historical timings.",
+  "seconds": 505.3018260410754
+}

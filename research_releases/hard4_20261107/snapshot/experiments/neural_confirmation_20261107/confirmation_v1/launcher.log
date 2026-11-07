@@ -1,0 +1,282 @@
+  embedding_dim=256, hidden_dim=256, n_encode_layers=6, n_heads=8, tanh_clipping=10.0, normalization=batch, shrink_size=16
+  decode_pickup_urgency_bias=0.000000, decode_pickup_urgency_horizon_hours=1.000000
+MODEL learned_1234 batch1 samples 32 load_seconds 0.06
+PROGRESS learned_1234 1 / 32 served 48 J 1154.2654 algorithm_s 1.658 hybrid_served 50 hybrid_total_s 2.159 hard_valid True
+PROGRESS learned_1234 2 / 32 served 49 J 578.864 algorithm_s 1.643 hybrid_served 49 hybrid_total_s 2.147 hard_valid True
+PROGRESS learned_1234 3 / 32 served 47 J 1728.7334 algorithm_s 1.782 hybrid_served 50 hybrid_total_s 2.285 hard_valid True
+PROGRESS learned_1234 4 / 32 served 48 J 1153.9207 algorithm_s 2.425 hybrid_served 49 hybrid_total_s 2.929 hard_valid True
+PROGRESS learned_1234 5 / 32 served 48 J 1153.458 algorithm_s 1.883 hybrid_served 50 hybrid_total_s 2.386 hard_valid True
+PROGRESS learned_1234 6 / 32 served 50 J 4.647 algorithm_s 1.901 hybrid_served 50 hybrid_total_s 2.404 hard_valid True
+PROGRESS learned_1234 7 / 32 served 48 J 1153.458 algorithm_s 2.227 hybrid_served 50 hybrid_total_s 2.73 hard_valid True
+PROGRESS learned_1234 8 / 32 served 48 J 1153.5735 algorithm_s 1.855 hybrid_served 48 hybrid_total_s 2.358 hard_valid True
+PROGRESS learned_1234 9 / 32 served 47 J 1728.4524 algorithm_s 2.185 hybrid_served 50 hybrid_total_s 2.688 hard_valid True
+PROGRESS learned_1234 10 / 32 served 50 J 3.9657 algorithm_s 1.81 hybrid_served 50 hybrid_total_s 2.314 hard_valid True
+PROGRESS learned_1234 11 / 32 served 48 J 1154.403 algorithm_s 1.684 hybrid_served 50 hybrid_total_s 2.189 hard_valid True
+PROGRESS learned_1234 12 / 32 served 50 J 3.9004 algorithm_s 2.021 hybrid_served 50 hybrid_total_s 2.524 hard_valid True
+PROGRESS learned_1234 13 / 32 served 50 J 3.9016 algorithm_s 2.168 hybrid_served 50 hybrid_total_s 2.672 hard_valid True
+PROGRESS learned_1234 14 / 32 served 45 J 2878.8284 algorithm_s 2.354 hybrid_served 50 hybrid_total_s 2.857 hard_valid True
+PROGRESS learned_1234 15 / 32 served 48 J 1153.8881 algorithm_s 1.739 hybrid_served 50 hybrid_total_s 2.243 hard_valid True
+PROGRESS learned_1234 16 / 32 served 48 J 1153.4299 algorithm_s 1.88 hybrid_served 49 hybrid_total_s 2.384 hard_valid True
+PROGRESS learned_1234 17 / 32 served 47 J 1728.4518 algorithm_s 1.73 hybrid_served 49 hybrid_total_s 2.234 hard_valid True
+PROGRESS learned_1234 18 / 32 served 49 J 578.5643 algorithm_s 2.034 hybrid_served 49 hybrid_total_s 2.538 hard_valid True
+PROGRESS learned_1234 19 / 32 served 49 J 578.9007 algorithm_s 2.334 hybrid_served 50 hybrid_total_s 2.838 hard_valid True
+PROGRESS learned_1234 20 / 32 served 48 J 1153.8599 algorithm_s 2.257 hybrid_served 50 hybrid_total_s 2.761 hard_valid True
+PROGRESS learned_1234 21 / 32 served 49 J 579.1631 algorithm_s 2.029 hybrid_served 50 hybrid_total_s 2.533 hard_valid True
+PROGRESS learned_1234 22 / 32 served 49 J 578.9687 algorithm_s 1.979 hybrid_served 50 hybrid_total_s 2.483 hard_valid True
+PROGRESS learned_1234 23 / 32 served 49 J 579.2531 algorithm_s 1.919 hybrid_served 50 hybrid_total_s 2.423 hard_valid True
+PROGRESS learned_1234 24 / 32 served 48 J 1153.543 algorithm_s 1.463 hybrid_served 50 hybrid_total_s 1.967 hard_valid True
+PROGRESS learned_1234 25 / 32 served 50 J 4.1712 algorithm_s 1.737 hybrid_served 50 hybrid_total_s 2.24 hard_valid True
+PROGRESS learned_1234 26 / 32 served 48 J 1153.8073 algorithm_s 1.658 hybrid_served 49 hybrid_total_s 2.162 hard_valid True
+PROGRESS learned_1234 27 / 32 served 48 J 1153.9058 algorithm_s 1.561 hybrid_served 50 hybrid_total_s 2.066 hard_valid True
+PROGRESS learned_1234 28 / 32 served 46 J 2303.8723 algorithm_s 2.107 hybrid_served 49 hybrid_total_s 2.612 hard_valid True
+PROGRESS learned_1234 29 / 32 served 47 J 1728.4926 algorithm_s 2.012 hybrid_served 50 hybrid_total_s 2.515 hard_valid True
+PROGRESS learned_1234 30 / 32 served 49 J 579.2091 algorithm_s 2.055 hybrid_served 50 hybrid_total_s 2.558 hard_valid True
+PROGRESS learned_1234 31 / 32 served 50 J 3.8497 algorithm_s 1.684 hybrid_served 50 hybrid_total_s 2.188 hard_valid True
+PROGRESS learned_1234 32 / 32 served 47 J 1728.9951 algorithm_s 1.687 hybrid_served 47 hybrid_total_s 2.191 hard_valid True
+  embedding_dim=256, hidden_dim=256, n_encode_layers=6, n_heads=8, tanh_clipping=10.0, normalization=batch, shrink_size=16
+  decode_pickup_urgency_bias=0.000000, decode_pickup_urgency_horizon_hours=1.000000
+MODEL service_first_1234 batch1 samples 32 load_seconds 0.05
+PROGRESS service_first_1234 1 / 32 served 50 J 5.4497 algorithm_s 1.309 hybrid_served 50 hybrid_total_s 1.813 hard_valid True
+PROGRESS service_first_1234 2 / 32 served 50 J 3.9148 algorithm_s 1.594 hybrid_served 50 hybrid_total_s 2.098 hard_valid True
+PROGRESS service_first_1234 3 / 32 served 49 J 579.5986 algorithm_s 2.272 hybrid_served 49 hybrid_total_s 2.776 hard_valid True
+PROGRESS service_first_1234 4 / 32 served 50 J 4.2526 algorithm_s 2.401 hybrid_served 50 hybrid_total_s 2.904 hard_valid True
+PROGRESS service_first_1234 5 / 32 served 48 J 1153.5682 algorithm_s 1.626 hybrid_served 50 hybrid_total_s 2.13 hard_valid True
+PROGRESS service_first_1234 6 / 32 served 47 J 1728.7975 algorithm_s 1.746 hybrid_served 50 hybrid_total_s 2.25 hard_valid True
+PROGRESS service_first_1234 7 / 32 served 48 J 1153.4204 algorithm_s 2.26 hybrid_served 50 hybrid_total_s 2.763 hard_valid True
+PROGRESS service_first_1234 8 / 32 served 50 J 4.1404 algorithm_s 1.832 hybrid_served 50 hybrid_total_s 2.335 hard_valid True
+PROGRESS service_first_1234 9 / 32 served 49 J 579.0114 algorithm_s 2.018 hybrid_served 50 hybrid_total_s 2.522 hard_valid True
+PROGRESS service_first_1234 10 / 32 served 50 J 4.4408 algorithm_s 1.438 hybrid_served 50 hybrid_total_s 1.942 hard_valid True
+PROGRESS service_first_1234 11 / 32 served 48 J 1158.2535 algorithm_s 1.885 hybrid_served 50 hybrid_total_s 2.389 hard_valid True
+PROGRESS service_first_1234 12 / 32 served 47 J 1728.4489 algorithm_s 2.037 hybrid_served 48 hybrid_total_s 2.541 hard_valid True
+PROGRESS service_first_1234 13 / 32 served 47 J 1728.4354 algorithm_s 2.245 hybrid_served 49 hybrid_total_s 2.748 hard_valid True
+PROGRESS service_first_1234 14 / 32 served 47 J 1731.7209 algorithm_s 1.912 hybrid_served 50 hybrid_total_s 2.416 hard_valid True
+PROGRESS service_first_1234 15 / 32 served 47 J 1728.5431 algorithm_s 1.594 hybrid_served 50 hybrid_total_s 2.098 hard_valid True
+PROGRESS service_first_1234 16 / 32 served 47 J 1728.4927 algorithm_s 1.786 hybrid_served 50 hybrid_total_s 2.29 hard_valid True
+PROGRESS service_first_1234 17 / 32 served 49 J 580.3459 algorithm_s 1.61 hybrid_served 50 hybrid_total_s 2.113 hard_valid True
+PROGRESS service_first_1234 18 / 32 served 49 J 580.5445 algorithm_s 1.801 hybrid_served 50 hybrid_total_s 2.305 hard_valid True
+PROGRESS service_first_1234 19 / 32 served 47 J 1728.7487 algorithm_s 2.117 hybrid_served 50 hybrid_total_s 2.62 hard_valid True
+PROGRESS service_first_1234 20 / 32 served 48 J 1154.874 algorithm_s 2.136 hybrid_served 50 hybrid_total_s 2.64 hard_valid True
+PROGRESS service_first_1234 21 / 32 served 49 J 578.4716 algorithm_s 1.521 hybrid_served 50 hybrid_total_s 2.025 hard_valid True
+PROGRESS service_first_1234 22 / 32 served 48 J 1153.5507 algorithm_s 1.781 hybrid_served 50 hybrid_total_s 2.285 hard_valid True
+PROGRESS service_first_1234 23 / 32 served 49 J 578.4326 algorithm_s 1.815 hybrid_served 50 hybrid_total_s 2.319 hard_valid True
+PROGRESS service_first_1234 24 / 32 served 48 J 1154.1752 algorithm_s 1.548 hybrid_served 50 hybrid_total_s 2.052 hard_valid True
+PROGRESS service_first_1234 25 / 32 served 48 J 1153.8123 algorithm_s 1.871 hybrid_served 50 hybrid_total_s 2.375 hard_valid True
+PROGRESS service_first_1234 26 / 32 served 49 J 579.0012 algorithm_s 1.722 hybrid_served 50 hybrid_total_s 2.226 hard_valid True
+PROGRESS service_first_1234 27 / 32 served 49 J 579.9033 algorithm_s 1.462 hybrid_served 50 hybrid_total_s 1.966 hard_valid True
+PROGRESS service_first_1234 28 / 32 served 46 J 2303.4976 algorithm_s 1.664 hybrid_served 48 hybrid_total_s 2.168 hard_valid True
+PROGRESS service_first_1234 29 / 32 served 48 J 1154.4873 algorithm_s 2.115 hybrid_served 50 hybrid_total_s 2.619 hard_valid True
+PROGRESS service_first_1234 30 / 32 served 49 J 581.7906 algorithm_s 1.653 hybrid_served 50 hybrid_total_s 2.157 hard_valid True
+PROGRESS service_first_1234 31 / 32 served 47 J 1728.4381 algorithm_s 1.749 hybrid_served 50 hybrid_total_s 2.253 hard_valid True
+PROGRESS service_first_1234 32 / 32 served 49 J 578.8398 algorithm_s 1.821 hybrid_served 50 hybrid_total_s 2.325 hard_valid True
+  embedding_dim=256, hidden_dim=256, n_encode_layers=6, n_heads=8, tanh_clipping=10.0, normalization=batch, shrink_size=16
+  decode_pickup_urgency_bias=0.000000, decode_pickup_urgency_horizon_hours=1.000000
+MODEL learned_4321 batch1 samples 32 load_seconds 0.05
+PROGRESS learned_4321 1 / 32 served 48 J 1154.2147 algorithm_s 1.313 hybrid_served 48 hybrid_total_s 1.816 hard_valid True
+PROGRESS learned_4321 2 / 32 served 46 J 2304.1479 algorithm_s 1.662 hybrid_served 49 hybrid_total_s 2.166 hard_valid True
+PROGRESS learned_4321 3 / 32 served 44 J 3453.9343 algorithm_s 1.795 hybrid_served 50 hybrid_total_s 2.298 hard_valid True
+PROGRESS learned_4321 4 / 32 served 48 J 1153.6637 algorithm_s 2.314 hybrid_served 49 hybrid_total_s 2.818 hard_valid True
+PROGRESS learned_4321 5 / 32 served 45 J 2880.3018 algorithm_s 1.716 hybrid_served 50 hybrid_total_s 2.22 hard_valid True
+PROGRESS learned_4321 6 / 32 served 48 J 1154.1091 algorithm_s 1.734 hybrid_served 50 hybrid_total_s 2.238 hard_valid True
+PROGRESS learned_4321 7 / 32 served 50 J 5.3053 algorithm_s 2.342 hybrid_served 50 hybrid_total_s 2.846 hard_valid True
+PROGRESS learned_4321 8 / 32 served 47 J 1728.5067 algorithm_s 1.645 hybrid_served 50 hybrid_total_s 2.149 hard_valid True
+PROGRESS learned_4321 9 / 32 served 47 J 1729.024 algorithm_s 2.233 hybrid_served 50 hybrid_total_s 2.737 hard_valid True
+PROGRESS learned_4321 10 / 32 served 47 J 1728.4611 algorithm_s 1.973 hybrid_served 49 hybrid_total_s 2.477 hard_valid True
+PROGRESS learned_4321 11 / 32 served 47 J 1728.5293 algorithm_s 1.51 hybrid_served 48 hybrid_total_s 2.014 hard_valid True
+PROGRESS learned_4321 12 / 32 served 50 J 3.9026 algorithm_s 1.733 hybrid_served 50 hybrid_total_s 2.236 hard_valid True
+PROGRESS learned_4321 13 / 32 served 44 J 3454.0171 algorithm_s 2.375 hybrid_served 50 hybrid_total_s 2.879 hard_valid True
+PROGRESS learned_4321 14 / 32 served 49 J 579.5915 algorithm_s 2.304 hybrid_served 50 hybrid_total_s 2.807 hard_valid True
+PROGRESS learned_4321 15 / 32 served 49 J 578.9277 algorithm_s 1.614 hybrid_served 49 hybrid_total_s 2.118 hard_valid True
+PROGRESS learned_4321 16 / 32 served 50 J 4.9211 algorithm_s 2.025 hybrid_served 50 hybrid_total_s 2.529 hard_valid True
+PROGRESS learned_4321 17 / 32 served 47 J 1728.6958 algorithm_s 1.906 hybrid_served 50 hybrid_total_s 2.41 hard_valid True
+PROGRESS learned_4321 18 / 32 served 48 J 1153.9001 algorithm_s 1.864 hybrid_served 50 hybrid_total_s 2.368 hard_valid True
+PROGRESS learned_4321 19 / 32 served 48 J 1154.2019 algorithm_s 2.301 hybrid_served 49 hybrid_total_s 2.805 hard_valid True
+PROGRESS learned_4321 20 / 32 served 46 J 2303.2505 algorithm_s 1.892 hybrid_served 50 hybrid_total_s 2.396 hard_valid True
+PROGRESS learned_4321 21 / 32 served 49 J 579.0785 algorithm_s 1.465 hybrid_served 50 hybrid_total_s 1.969 hard_valid True
+PROGRESS learned_4321 22 / 32 served 48 J 1154.5146 algorithm_s 1.944 hybrid_served 50 hybrid_total_s 2.448 hard_valid True
+PROGRESS learned_4321 23 / 32 served 47 J 1728.8762 algorithm_s 1.752 hybrid_served 50 hybrid_total_s 2.256 hard_valid True
+PROGRESS learned_4321 24 / 32 served 45 J 2879.1008 algorithm_s 1.318 hybrid_served 50 hybrid_total_s 1.822 hard_valid True
+PROGRESS learned_4321 25 / 32 served 49 J 578.9117 algorithm_s 1.502 hybrid_served 50 hybrid_total_s 2.006 hard_valid True
+PROGRESS learned_4321 26 / 32 served 48 J 1155.0095 algorithm_s 1.814 hybrid_served 50 hybrid_total_s 2.318 hard_valid True
+PROGRESS learned_4321 27 / 32 served 48 J 1154.3467 algorithm_s 1.174 hybrid_served 50 hybrid_total_s 1.678 hard_valid True
+PROGRESS learned_4321 28 / 32 served 49 J 579.6474 algorithm_s 1.735 hybrid_served 50 hybrid_total_s 2.239 hard_valid True
+PROGRESS learned_4321 29 / 32 served 49 J 578.8953 algorithm_s 1.75 hybrid_served 50 hybrid_total_s 2.254 hard_valid True
+PROGRESS learned_4321 30 / 32 served 49 J 579.9485 algorithm_s 1.346 hybrid_served 50 hybrid_total_s 1.85 hard_valid True
+PROGRESS learned_4321 31 / 32 served 49 J 578.9199 algorithm_s 1.338 hybrid_served 50 hybrid_total_s 1.842 hard_valid True
+PROGRESS learned_4321 32 / 32 served 47 J 1728.9139 algorithm_s 1.482 hybrid_served 50 hybrid_total_s 1.986 hard_valid True
+  embedding_dim=256, hidden_dim=256, n_encode_layers=6, n_heads=8, tanh_clipping=10.0, normalization=batch, shrink_size=16
+  decode_pickup_urgency_bias=0.000000, decode_pickup_urgency_horizon_hours=1.000000
+MODEL service_first_4321 batch1 samples 32 load_seconds 0.05
+PROGRESS service_first_4321 1 / 32 served 47 J 1728.7239 algorithm_s 1.155 hybrid_served 50 hybrid_total_s 1.659 hard_valid True
+PROGRESS service_first_4321 2 / 32 served 49 J 578.8343 algorithm_s 1.265 hybrid_served 50 hybrid_total_s 1.769 hard_valid True
+PROGRESS service_first_4321 3 / 32 served 47 J 1728.547 algorithm_s 1.455 hybrid_served 50 hybrid_total_s 1.96 hard_valid True
+PROGRESS service_first_4321 4 / 32 served 49 J 578.7493 algorithm_s 2.138 hybrid_served 49 hybrid_total_s 2.642 hard_valid True
+PROGRESS service_first_4321 5 / 32 served 47 J 1728.6393 algorithm_s 1.293 hybrid_served 49 hybrid_total_s 1.796 hard_valid True
+PROGRESS service_first_4321 6 / 32 served 49 J 579.0806 algorithm_s 1.439 hybrid_served 50 hybrid_total_s 1.943 hard_valid True
+PROGRESS service_first_4321 7 / 32 served 48 J 1153.3972 algorithm_s 1.858 hybrid_served 50 hybrid_total_s 2.362 hard_valid True
+PROGRESS service_first_4321 8 / 32 served 50 J 3.8446 algorithm_s 1.511 hybrid_served 50 hybrid_total_s 2.015 hard_valid True
+PROGRESS service_first_4321 9 / 32 served 50 J 3.9057 algorithm_s 1.764 hybrid_served 50 hybrid_total_s 2.268 hard_valid True
+PROGRESS service_first_4321 10 / 32 served 47 J 1728.4681 algorithm_s 0.988 hybrid_served 49 hybrid_total_s 1.492 hard_valid True
+PROGRESS service_first_4321 11 / 32 served 48 J 1153.8107 algorithm_s 1.123 hybrid_served 50 hybrid_total_s 1.627 hard_valid True
+PROGRESS service_first_4321 12 / 32 served 47 J 1728.4572 algorithm_s 1.567 hybrid_served 50 hybrid_total_s 2.071 hard_valid True
+PROGRESS service_first_4321 13 / 32 served 49 J 578.8779 algorithm_s 1.8 hybrid_served 50 hybrid_total_s 2.304 hard_valid True
+PROGRESS service_first_4321 14 / 32 served 48 J 1153.5358 algorithm_s 1.756 hybrid_served 50 hybrid_total_s 2.26 hard_valid True
+PROGRESS service_first_4321 15 / 32 served 48 J 1153.5022 algorithm_s 1.416 hybrid_served 49 hybrid_total_s 1.92 hard_valid True
+PROGRESS service_first_4321 16 / 32 served 50 J 3.7888 algorithm_s 1.499 hybrid_served 50 hybrid_total_s 2.002 hard_valid True
+PROGRESS service_first_4321 17 / 32 served 50 J 3.8425 algorithm_s 1.336 hybrid_served 50 hybrid_total_s 1.84 hard_valid True
+PROGRESS service_first_4321 18 / 32 served 48 J 1153.5378 algorithm_s 2.088 hybrid_served 49 hybrid_total_s 2.592 hard_valid True
+PROGRESS service_first_4321 19 / 32 served 50 J 3.8527 algorithm_s 1.974 hybrid_served 50 hybrid_total_s 2.478 hard_valid True
+PROGRESS service_first_4321 20 / 32 served 49 J 578.8585 algorithm_s 1.922 hybrid_served 50 hybrid_total_s 2.426 hard_valid True
+PROGRESS service_first_4321 21 / 32 served 50 J 4.0028 algorithm_s 1.284 hybrid_served 50 hybrid_total_s 1.787 hard_valid True
+PROGRESS service_first_4321 22 / 32 served 50 J 3.9847 algorithm_s 1.403 hybrid_served 50 hybrid_total_s 1.907 hard_valid True
+PROGRESS service_first_4321 23 / 32 served 48 J 1153.875 algorithm_s 1.15 hybrid_served 50 hybrid_total_s 1.654 hard_valid True
+PROGRESS service_first_4321 24 / 32 served 48 J 1153.8966 algorithm_s 1.068 hybrid_served 50 hybrid_total_s 1.572 hard_valid True
+PROGRESS service_first_4321 25 / 32 served 50 J 3.8775 algorithm_s 1.327 hybrid_served 50 hybrid_total_s 1.831 hard_valid True
+PROGRESS service_first_4321 26 / 32 served 48 J 1153.9795 algorithm_s 1.41 hybrid_served 50 hybrid_total_s 1.914 hard_valid True
+PROGRESS service_first_4321 27 / 32 served 47 J 1729.5125 algorithm_s 1.256 hybrid_served 50 hybrid_total_s 1.76 hard_valid True
+PROGRESS service_first_4321 28 / 32 served 47 J 1728.6638 algorithm_s 1.375 hybrid_served 50 hybrid_total_s 1.879 hard_valid True
+PROGRESS service_first_4321 29 / 32 served 49 J 579.0167 algorithm_s 1.713 hybrid_served 50 hybrid_total_s 2.217 hard_valid True
+PROGRESS service_first_4321 30 / 32 served 50 J 5.3918 algorithm_s 1.413 hybrid_served 50 hybrid_total_s 1.917 hard_valid True
+PROGRESS service_first_4321 31 / 32 served 47 J 1728.7836 algorithm_s 1.274 hybrid_served 48 hybrid_total_s 1.778 hard_valid True
+PROGRESS service_first_4321 32 / 32 served 47 J 1728.588 algorithm_s 1.428 hybrid_served 50 hybrid_total_s 1.931 hard_valid True
+  embedding_dim=256, hidden_dim=256, n_encode_layers=6, n_heads=8, tanh_clipping=10.0, normalization=batch, shrink_size=16
+  decode_pickup_urgency_bias=0.000000, decode_pickup_urgency_horizon_hours=1.000000
+MODEL learned_8765 batch1 samples 32 load_seconds 0.05
+PROGRESS learned_8765 1 / 32 served 49 J 580.0818 algorithm_s 1.398 hybrid_served 50 hybrid_total_s 1.902 hard_valid True
+PROGRESS learned_8765 2 / 32 served 48 J 1153.5393 algorithm_s 1.694 hybrid_served 50 hybrid_total_s 2.198 hard_valid True
+PROGRESS learned_8765 3 / 32 served 50 J 3.986 algorithm_s 1.916 hybrid_served 50 hybrid_total_s 2.42 hard_valid True
+PROGRESS learned_8765 4 / 32 served 46 J 2303.3337 algorithm_s 2.413 hybrid_served 48 hybrid_total_s 2.918 hard_valid True
+PROGRESS learned_8765 5 / 32 served 48 J 1153.5144 algorithm_s 1.803 hybrid_served 50 hybrid_total_s 2.306 hard_valid True
+PROGRESS learned_8765 6 / 32 served 49 J 578.4737 algorithm_s 1.665 hybrid_served 50 hybrid_total_s 2.169 hard_valid True
+PROGRESS learned_8765 7 / 32 served 50 J 3.9347 algorithm_s 2.359 hybrid_served 50 hybrid_total_s 2.864 hard_valid True
+PROGRESS learned_8765 8 / 32 served 49 J 578.9857 algorithm_s 1.886 hybrid_served 50 hybrid_total_s 2.39 hard_valid True
+PROGRESS learned_8765 9 / 32 served 48 J 1153.4879 algorithm_s 1.9 hybrid_served 50 hybrid_total_s 2.404 hard_valid True
+PROGRESS learned_8765 10 / 32 served 50 J 4.0578 algorithm_s 1.817 hybrid_served 50 hybrid_total_s 2.321 hard_valid True
+PROGRESS learned_8765 11 / 32 served 50 J 5.7419 algorithm_s 1.802 hybrid_served 50 hybrid_total_s 2.306 hard_valid True
+PROGRESS learned_8765 12 / 32 served 50 J 3.896 algorithm_s 2.038 hybrid_served 50 hybrid_total_s 2.542 hard_valid True
+PROGRESS learned_8765 13 / 32 served 50 J 3.9346 algorithm_s 2.269 hybrid_served 50 hybrid_total_s 2.773 hard_valid True
+PROGRESS learned_8765 14 / 32 served 50 J 4.2851 algorithm_s 1.808 hybrid_served 50 hybrid_total_s 2.312 hard_valid True
+PROGRESS learned_8765 15 / 32 served 48 J 1153.8856 algorithm_s 1.874 hybrid_served 50 hybrid_total_s 2.378 hard_valid True
+PROGRESS learned_8765 16 / 32 served 49 J 578.5111 algorithm_s 1.919 hybrid_served 50 hybrid_total_s 2.423 hard_valid True
+PROGRESS learned_8765 17 / 32 served 50 J 4.1025 algorithm_s 1.665 hybrid_served 50 hybrid_total_s 2.169 hard_valid True
+PROGRESS learned_8765 18 / 32 served 47 J 1728.7731 algorithm_s 2.001 hybrid_served 50 hybrid_total_s 2.505 hard_valid True
+PROGRESS learned_8765 19 / 32 served 50 J 3.4474 algorithm_s 1.91 hybrid_served 50 hybrid_total_s 2.414 hard_valid True
+PROGRESS learned_8765 20 / 32 served 48 J 1154.1913 algorithm_s 2.409 hybrid_served 50 hybrid_total_s 2.913 hard_valid True
+PROGRESS learned_8765 21 / 32 served 50 J 3.9471 algorithm_s 1.709 hybrid_served 50 hybrid_total_s 2.214 hard_valid True
+PROGRESS learned_8765 22 / 32 served 50 J 3.9943 algorithm_s 1.942 hybrid_served 50 hybrid_total_s 2.446 hard_valid True
+PROGRESS learned_8765 23 / 32 served 50 J 3.8308 algorithm_s 1.806 hybrid_served 50 hybrid_total_s 2.31 hard_valid True
+PROGRESS learned_8765 24 / 32 served 49 J 578.886 algorithm_s 1.681 hybrid_served 50 hybrid_total_s 2.185 hard_valid True
+PROGRESS learned_8765 25 / 32 served 47 J 1728.9878 algorithm_s 1.774 hybrid_served 50 hybrid_total_s 2.279 hard_valid True
+PROGRESS learned_8765 26 / 32 served 48 J 1153.8762 algorithm_s 1.92 hybrid_served 50 hybrid_total_s 2.424 hard_valid True
+PROGRESS learned_8765 27 / 32 served 48 J 1154.4141 algorithm_s 1.538 hybrid_served 49 hybrid_total_s 2.043 hard_valid True
+PROGRESS learned_8765 28 / 32 served 49 J 578.8749 algorithm_s 1.865 hybrid_served 50 hybrid_total_s 2.369 hard_valid True
+PROGRESS learned_8765 29 / 32 served 49 J 578.8013 algorithm_s 2.102 hybrid_served 50 hybrid_total_s 2.606 hard_valid True
+PROGRESS learned_8765 30 / 32 served 49 J 580.5267 algorithm_s 1.616 hybrid_served 49 hybrid_total_s 2.12 hard_valid True
+PROGRESS learned_8765 31 / 32 served 48 J 1153.5245 algorithm_s 1.804 hybrid_served 50 hybrid_total_s 2.309 hard_valid True
+PROGRESS learned_8765 32 / 32 served 49 J 578.9474 algorithm_s 2.056 hybrid_served 50 hybrid_total_s 2.56 hard_valid True
+  embedding_dim=256, hidden_dim=256, n_encode_layers=6, n_heads=8, tanh_clipping=10.0, normalization=batch, shrink_size=16
+  decode_pickup_urgency_bias=0.000000, decode_pickup_urgency_horizon_hours=1.000000
+MODEL service_first_8765 batch1 samples 32 load_seconds 0.06
+PROGRESS service_first_8765 1 / 32 served 50 J 4.5824 algorithm_s 1.351 hybrid_served 50 hybrid_total_s 1.854 hard_valid True
+PROGRESS service_first_8765 2 / 32 served 47 J 1728.5023 algorithm_s 1.384 hybrid_served 48 hybrid_total_s 1.888 hard_valid True
+PROGRESS service_first_8765 3 / 32 served 48 J 1153.683 algorithm_s 1.604 hybrid_served 50 hybrid_total_s 2.108 hard_valid True
+PROGRESS service_first_8765 4 / 32 served 46 J 2303.4607 algorithm_s 1.758 hybrid_served 49 hybrid_total_s 2.262 hard_valid True
+PROGRESS service_first_8765 5 / 32 served 50 J 3.9418 algorithm_s 1.587 hybrid_served 50 hybrid_total_s 2.09 hard_valid True
+PROGRESS service_first_8765 6 / 32 served 49 J 578.7095 algorithm_s 1.725 hybrid_served 50 hybrid_total_s 2.229 hard_valid True
+PROGRESS service_first_8765 7 / 32 served 48 J 1153.4497 algorithm_s 2.129 hybrid_served 49 hybrid_total_s 2.633 hard_valid True
+PROGRESS service_first_8765 8 / 32 served 48 J 1155.4055 algorithm_s 1.601 hybrid_served 50 hybrid_total_s 2.105 hard_valid True
+PROGRESS service_first_8765 9 / 32 served 47 J 1728.495 algorithm_s 1.78 hybrid_served 50 hybrid_total_s 2.284 hard_valid True
+PROGRESS service_first_8765 10 / 32 served 49 J 579.1154 algorithm_s 1.468 hybrid_served 50 hybrid_total_s 1.972 hard_valid True
+PROGRESS service_first_8765 11 / 32 served 47 J 1728.577 algorithm_s 1.379 hybrid_served 50 hybrid_total_s 1.883 hard_valid True
+PROGRESS service_first_8765 12 / 32 served 50 J 3.8459 algorithm_s 1.965 hybrid_served 50 hybrid_total_s 2.469 hard_valid True
+PROGRESS service_first_8765 13 / 32 served 50 J 3.8849 algorithm_s 2.781 hybrid_served 50 hybrid_total_s 3.285 hard_valid True
+PROGRESS service_first_8765 14 / 32 served 49 J 578.9424 algorithm_s 1.693 hybrid_served 50 hybrid_total_s 2.198 hard_valid True
+PROGRESS service_first_8765 15 / 32 served 48 J 1153.4816 algorithm_s 1.957 hybrid_served 49 hybrid_total_s 2.461 hard_valid True
+PROGRESS service_first_8765 16 / 32 served 49 J 578.5683 algorithm_s 1.912 hybrid_served 50 hybrid_total_s 2.416 hard_valid True
+PROGRESS service_first_8765 17 / 32 served 50 J 4.1926 algorithm_s 1.267 hybrid_served 50 hybrid_total_s 1.771 hard_valid True
+PROGRESS service_first_8765 18 / 32 served 48 J 1153.521 algorithm_s 1.881 hybrid_served 49 hybrid_total_s 2.385 hard_valid True
+PROGRESS service_first_8765 19 / 32 served 50 J 3.4979 algorithm_s 1.973 hybrid_served 50 hybrid_total_s 2.477 hard_valid True
+PROGRESS service_first_8765 20 / 32 served 48 J 1153.5704 algorithm_s 1.841 hybrid_served 50 hybrid_total_s 2.345 hard_valid True
+PROGRESS service_first_8765 21 / 32 served 49 J 578.5161 algorithm_s 1.253 hybrid_served 50 hybrid_total_s 1.757 hard_valid True
+PROGRESS service_first_8765 22 / 32 served 48 J 1153.4875 algorithm_s 1.772 hybrid_served 50 hybrid_total_s 2.276 hard_valid True
+PROGRESS service_first_8765 23 / 32 served 50 J 3.8974 algorithm_s 1.808 hybrid_served 50 hybrid_total_s 2.312 hard_valid True
+PROGRESS service_first_8765 24 / 32 served 50 J 3.9613 algorithm_s 1.316 hybrid_served 50 hybrid_total_s 1.82 hard_valid True
+PROGRESS service_first_8765 25 / 32 served 49 J 579.1204 algorithm_s 1.68 hybrid_served 50 hybrid_total_s 2.185 hard_valid True
+PROGRESS service_first_8765 26 / 32 served 48 J 1154.0563 algorithm_s 1.756 hybrid_served 50 hybrid_total_s 2.259 hard_valid True
+PROGRESS service_first_8765 27 / 32 served 50 J 6.1458 algorithm_s 1.224 hybrid_served 50 hybrid_total_s 1.728 hard_valid True
+PROGRESS service_first_8765 28 / 32 served 49 J 579.4255 algorithm_s 1.523 hybrid_served 50 hybrid_total_s 2.027 hard_valid True
+PROGRESS service_first_8765 29 / 32 served 48 J 1154.0798 algorithm_s 2.268 hybrid_served 50 hybrid_total_s 2.772 hard_valid True
+PROGRESS service_first_8765 30 / 32 served 50 J 4.7898 algorithm_s 1.439 hybrid_served 50 hybrid_total_s 1.943 hard_valid True
+PROGRESS service_first_8765 31 / 32 served 48 J 1153.6318 algorithm_s 1.666 hybrid_served 50 hybrid_total_s 2.17 hard_valid True
+PROGRESS service_first_8765 32 / 32 served 47 J 1728.5463 algorithm_s 1.505 hybrid_served 50 hybrid_total_s 2.009 hard_valid True
+CONTROL 1 / 32 short served 50 J 2.9516 integrated_s 3.103
+CONTROL 1 / 32 strong served 50 J 2.9025 integrated_s 12.587
+CONTROL 2 / 32 short served 49 J 577.9611 integrated_s 3.294
+CONTROL 2 / 32 strong served 50 J 2.9325 integrated_s 12.557
+CONTROL 3 / 32 short served 49 J 577.9907 integrated_s 3.283
+CONTROL 3 / 32 strong served 50 J 2.8893 integrated_s 12.78
+CONTROL 4 / 32 short served 50 J 2.9048 integrated_s 2.806
+CONTROL 4 / 32 strong served 50 J 2.4972 integrated_s 12.31
+CONTROL 5 / 32 short served 50 J 2.9867 integrated_s 3.103
+CONTROL 5 / 32 strong served 50 J 2.9376 integrated_s 12.6
+CONTROL 6 / 32 short served 50 J 2.9478 integrated_s 3.072
+CONTROL 6 / 32 strong served 50 J 2.5366 integrated_s 12.552
+CONTROL 7 / 32 short served 50 J 2.9879 integrated_s 3.268
+CONTROL 7 / 32 strong served 50 J 2.8786 integrated_s 12.719
+CONTROL 8 / 32 short served 50 J 3.2971 integrated_s 3.36
+CONTROL 8 / 32 strong served 50 J 2.8732 integrated_s 12.953
+CONTROL 9 / 32 short served 47 J 1727.5532 integrated_s 3.35
+CONTROL 9 / 32 strong served 50 J 2.5163 integrated_s 12.903
+CONTROL 10 / 32 short served 49 J 578.0174 integrated_s 2.963
+CONTROL 10 / 32 strong served 50 J 2.4843 integrated_s 12.311
+CONTROL 11 / 32 short served 50 J 2.9499 integrated_s 3.152
+CONTROL 11 / 32 strong served 50 J 2.8603 integrated_s 12.512
+CONTROL 12 / 32 short served 50 J 2.9554 integrated_s 2.963
+CONTROL 12 / 32 strong served 50 J 2.8331 integrated_s 12.45
+CONTROL 13 / 32 short served 50 J 3.0599 integrated_s 3.154
+CONTROL 13 / 32 strong served 50 J 2.8784 integrated_s 12.627
+CONTROL 14 / 32 short served 50 J 3.0001 integrated_s 2.863
+CONTROL 14 / 32 strong served 50 J 2.918 integrated_s 12.381
+CONTROL 15 / 32 short served 50 J 3.2722 integrated_s 2.981
+CONTROL 15 / 32 strong served 50 J 2.8388 integrated_s 12.442
+CONTROL 16 / 32 short served 49 J 577.5549 integrated_s 3.507
+CONTROL 16 / 32 strong served 50 J 2.4957 integrated_s 13.011
+CONTROL 17 / 32 short served 50 J 2.9578 integrated_s 2.992
+CONTROL 17 / 32 strong served 50 J 2.8542 integrated_s 12.509
+CONTROL 18 / 32 short served 50 J 3.057 integrated_s 2.967
+CONTROL 18 / 32 strong served 50 J 2.8314 integrated_s 12.479
+CONTROL 19 / 32 short served 50 J 2.9209 integrated_s 2.96
+CONTROL 19 / 32 strong served 50 J 2.862 integrated_s 12.485
+CONTROL 20 / 32 short served 50 J 2.9249 integrated_s 3.03
+CONTROL 20 / 32 strong served 50 J 2.4723 integrated_s 12.491
+CONTROL 21 / 32 short served 50 J 2.99 integrated_s 2.937
+CONTROL 21 / 32 strong served 50 J 2.8885 integrated_s 12.421
+CONTROL 22 / 32 short served 50 J 2.9493 integrated_s 3.04
+CONTROL 22 / 32 strong served 50 J 2.8833 integrated_s 12.529
+CONTROL 23 / 32 short served 50 J 2.9582 integrated_s 3.123
+CONTROL 23 / 32 strong served 50 J 2.854 integrated_s 12.584
+CONTROL 24 / 32 short served 48 J 1152.9612 integrated_s 3.153
+CONTROL 24 / 32 strong served 50 J 2.8854 integrated_s 12.679
+CONTROL 25 / 32 short served 50 J 2.964 integrated_s 2.805
+CONTROL 25 / 32 strong served 50 J 2.8915 integrated_s 12.397
+CONTROL 26 / 32 short served 49 J 578.475 integrated_s 3.123
+CONTROL 26 / 32 strong served 50 J 2.8573 integrated_s 12.62
+CONTROL 27 / 32 short served 50 J 2.9629 integrated_s 3.132
+CONTROL 27 / 32 strong served 50 J 2.8563 integrated_s 12.64
+CONTROL 28 / 32 short served 50 J 3.3138 integrated_s 3.133
+CONTROL 28 / 32 strong served 50 J 2.8979 integrated_s 12.679
+CONTROL 29 / 32 short served 49 J 577.9599 integrated_s 2.989
+CONTROL 29 / 32 strong served 50 J 2.8692 integrated_s 12.317
+CONTROL 30 / 32 short served 48 J 1153.0206 integrated_s 3.35
+CONTROL 30 / 32 strong served 50 J 2.4838 integrated_s 12.727
+CONTROL 31 / 32 short served 50 J 3.4306 integrated_s 3.041
+CONTROL 31 / 32 strong served 50 J 2.8617 integrated_s 12.57
+CONTROL 32 / 32 short served 48 J 1152.947 integrated_s 3.005
+CONTROL 32 / 32 strong served 50 J 2.9045 integrated_s 12.559
+{'method': 'learned_raw', 'service_percent': 96.5625, 'mean_J': 992.2837584167719, 'mean_algorithm_seconds': 1.861419223087675}
+{'method': 'learned_hybrid', 'service_percent': 99.47916666666666, 'mean_J': 153.12679892803123, 'mean_algorithm_seconds': 2.365269062516745}
+{'method': 'service_first_raw', 'service_percent': 96.95833333333334, 'mean_J': 878.5241032217939, 'mean_algorithm_seconds': 1.6670388876045763}
+{'method': 'service_first_hybrid', 'service_percent': 99.60416666666667, 'mean_J': 117.23780992752906, 'mean_algorithm_seconds': 2.170918701388776}
+{'method': 'insertion_initial', 'service_percent': 98.0625, 'mean_J': 560.0016457327981, 'mean_algorithm_seconds': 2.586330861926399}
+{'method': 'insertion_short', 'service_percent': 99.0625, 'mean_J': 272.5369952039534, 'mean_algorithm_seconds': 3.0938086224050494}
+{'method': 'insertion_strong', 'service_percent': 100.0, 'mean_J': 2.794557468673246, 'mean_algorithm_seconds': 12.57453624862319}
+ALL 480 plans complete, audited and retained

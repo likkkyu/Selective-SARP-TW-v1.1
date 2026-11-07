@@ -1,0 +1,24 @@
+{
+  "status": "passed",
+  "scope": "Fixed-policy sensitivity complete; not manuscript publication readiness",
+  "workflow_exit": 0,
+  "fully_audited_plans": 672,
+  "all_frozen_sources_match": true,
+  "parameter_effect_check": "PARAMETER_EFFECT_CHECK.json",
+  "nested_feasibility_check": "NESTED_FEASIBILITY_CHECK.json",
+  "training_seed_effects": {
+    "learned_raw": {
+      "mean": 1.3541666666666667,
+      "sample_sd": 1.317450979480198,
+      "all_three_positive": true
+    },
+    "learned_hybrid": {
+      "mean": 0.4791666666666667,
+      "sample_sd": 0.2525907427704613,
+      "all_three_positive": true
+    }
+  },
+  "analysis_sha256": "b4917519f268665dd869f6886a06d8c07b7ab5611e897c6efd3d61e405c6e094",
+  "figure_review": "wtc2027_zh/figures/neural_sensitivity_20261107_v2/visual_QA.json",
+  "interpretation": "Strong LNS finds all-service plans even in narrow windows; neural changes are algorithm response, not evidence of physical impossibility."
+}

@@ -1,0 +1,1578 @@
+{
+  "status": "passed",
+  "scope": "224 fixed baseline plans under changed windows; not new policy output, not optimality or causal proof.",
+  "wide_hard_valid": 224,
+  "narrow_original_routes_valid": 0,
+  "wide_same_cost": true,
+  "canonicalization": "Identical accepted IDs and pickup/delivery tours, followed by all unaccepted requests rejected before physical execution.",
+  "rows": [
+    {
+      "method": "learned_raw_1234",
+      "instance": 0,
+      "wide_same_acceptance_and_routes_valid": true,
+      "wide_objective_difference": 0.0,
+      "narrow_original_routes_valid": false
+    },
+    {
+      "method": "learned_hybrid_1234",
+      "instance": 0,
+      "wide_same_acceptance_and_routes_valid": true,
+      "wide_objective_difference": 0.0,
+      "narrow_original_routes_valid": false
+    },
+    {
+      "method": "learned_raw_1234",
+      "instance": 1,
+      "wide_same_acceptance_and_routes_valid": true,
+      "wide_objective_difference": 0.0,
+      "narrow_original_routes_valid": false
+    },
+    {
+      "method": "learned_hybrid_1234",
+      "instance": 1,
+      "wide_same_acceptance_and_routes_valid": true,
+      "wide_objective_difference": 0.0,
+      "narrow_original_routes_valid": false
+    },
+    {
+      "method": "learned_raw_1234",
+      "instance": 2,
+      "wide_same_acceptance_and_routes_valid": true,
+      "wide_objective_difference": 0.0,
+      "narrow_original_routes_valid": false
+    },
+    {
+      "method": "learned_hybrid_1234",
+      "instance": 2,
+      "wide_same_acceptance_and_routes_valid": true,
+      "wide_objective_difference": 0.0,
+      "narrow_original_routes_valid": false
+    },
+    {
+      "method": "learned_raw_1234",
+      "instance": 3,
+      "wide_same_acceptance_and_routes_valid": true,
+      "wide_objective_difference": 0.0,
+      "narrow_original_routes_valid": false
+    },
+    {
+      "method": "learned_hybrid_1234",
+      "instance": 3,
+      "wide_same_acceptance_and_routes_valid": true,
+      "wide_objective_difference": 0.0,
+      "narrow_original_routes_valid": false
+    },
+    {
+      "method": "learned_raw_1234",
+      "instance": 4,
+      "wide_same_acceptance_and_routes_valid": true,
+      "wide_objective_difference": 0.0,
+      "narrow_original_routes_valid": false
+    },
+    {
+      "method": "learned_hybrid_1234",
+      "instance": 4,
+      "wide_same_acceptance_and_routes_valid": true,
+      "wide_objective_difference": 0.0,
+      "narrow_original_routes_valid": false
+    },
+    {
+      "method": "learned_raw_1234",
+      "instance": 5,
+      "wide_same_acceptance_and_routes_valid": true,
+      "wide_objective_difference": 0.0,
+      "narrow_original_routes_valid": false
+    },
+    {
+      "method": "learned_hybrid_1234",
+      "instance": 5,
+      "wide_same_acceptance_and_routes_valid": true,
+      "wide_objective_difference": 0.0,
+      "narrow_original_routes_valid": false
+    },
+    {
+      "method": "learned_raw_1234",
+      "instance": 6,
+      "wide_same_acceptance_and_routes_valid": true,
+      "wide_objective_difference": 0.0,
+      "narrow_original_routes_valid": false
+    },
+    {
+      "method": "learned_hybrid_1234",
+      "instance": 6,
+      "wide_same_acceptance_and_routes_valid": true,
+      "wide_objective_difference": 0.0,
+      "narrow_original_routes_valid": false
+    },
+    {
+      "method": "learned_raw_1234",
+      "instance": 7,
+      "wide_same_acceptance_and_routes_valid": true,
+      "wide_objective_difference": 0.0,
+      "narrow_original_routes_valid": false
+    },
+    {
+      "method": "learned_hybrid_1234",
+      "instance": 7,
+      "wide_same_acceptance_and_routes_valid": true,
+      "wide_objective_difference": 0.0,
+      "narrow_original_routes_valid": false
+    },
+    {
+      "method": "learned_raw_1234",
+      "instance": 8,
+      "wide_same_acceptance_and_routes_valid": true,
+      "wide_objective_difference": 0.0,
+      "narrow_original_routes_valid": false
+    },
+    {
+      "method": "learned_hybrid_1234",
+      "instance": 8,
+      "wide_same_acceptance_and_routes_valid": true,
+      "wide_objective_difference": 0.0,
+      "narrow_original_routes_valid": false
+    },
+    {
+      "method": "learned_raw_1234",
+      "instance": 9,
+      "wide_same_acceptance_and_routes_valid": true,
+      "wide_objective_difference": 0.0,
+      "narrow_original_routes_valid": false
+    },
+    {
+      "method": "learned_hybrid_1234",
+      "instance": 9,
+      "wide_same_acceptance_and_routes_valid": true,
+      "wide_objective_difference": 0.0,
+      "narrow_original_routes_valid": false
+    },
+    {
+      "method": "learned_raw_1234",
+      "instance": 10,
+      "wide_same_acceptance_and_routes_valid": true,
+      "wide_objective_difference": 0.0,
+      "narrow_original_routes_valid": false
+    },
+    {
+      "method": "learned_hybrid_1234",
+      "instance": 10,
+      "wide_same_acceptance_and_routes_valid": true,
+      "wide_objective_difference": 0.0,
+      "narrow_original_routes_valid": false
+    },
+    {
+      "method": "learned_raw_1234",
+      "instance": 11,
+      "wide_same_acceptance_and_routes_valid": true,
+      "wide_objective_difference": 0.0,
+      "narrow_original_routes_valid": false
+    },
+    {
+      "method": "learned_hybrid_1234",
+      "instance": 11,
+      "wide_same_acceptance_and_routes_valid": true,
+      "wide_objective_difference": 0.0,
+      "narrow_original_routes_valid": false
+    },
+    {
+      "method": "learned_raw_1234",
+      "instance": 12,
+      "wide_same_acceptance_and_routes_valid": true,
+      "wide_objective_difference": 0.0,
+      "narrow_original_routes_valid": false
+    },
+    {
+      "method": "learned_hybrid_1234",
+      "instance": 12,
+      "wide_same_acceptance_and_routes_valid": true,
+      "wide_objective_difference": 0.0,
+      "narrow_original_routes_valid": false
+    },
+    {
+      "method": "learned_raw_1234",
+      "instance": 13,
+      "wide_same_acceptance_and_routes_valid": true,
+      "wide_objective_difference": 0.0,
+      "narrow_original_routes_valid": false
+    },
+    {
+      "method": "learned_hybrid_1234",
+      "instance": 13,
+      "wide_same_acceptance_and_routes_valid": true,
+      "wide_objective_difference": 0.0,
+      "narrow_original_routes_valid": false
+    },
+    {
+      "method": "learned_raw_1234",
+      "instance": 14,
+      "wide_same_acceptance_and_routes_valid": true,
+      "wide_objective_difference": 0.0,
+      "narrow_original_routes_valid": false
+    },
+    {
+      "method": "learned_hybrid_1234",
+      "instance": 14,
+      "wide_same_acceptance_and_routes_valid": true,
+      "wide_objective_difference": 0.0,
+      "narrow_original_routes_valid": false
+    },
+    {
+      "method": "learned_raw_1234",
+      "instance": 15,
+      "wide_same_acceptance_and_routes_valid": true,
+      "wide_objective_difference": 0.0,
+      "narrow_original_routes_valid": false
+    },
+    {
+      "method": "learned_hybrid_1234",
+      "instance": 15,
+      "wide_same_acceptance_and_routes_valid": true,
+      "wide_objective_difference": 0.0,
+      "narrow_original_routes_valid": false
+    },
+    {
+      "method": "learned_raw_1234",
+      "instance": 16,
+      "wide_same_acceptance_and_routes_valid": true,
+      "wide_objective_difference": 0.0,
+      "narrow_original_routes_valid": false
+    },
+    {
+      "method": "learned_hybrid_1234",
+      "instance": 16,
+      "wide_same_acceptance_and_routes_valid": true,
+      "wide_objective_difference": 0.0,
+      "narrow_original_routes_valid": false
+    },
+    {
+      "method": "learned_raw_1234",
+      "instance": 17,
+      "wide_same_acceptance_and_routes_valid": true,
+      "wide_objective_difference": 0.0,
+      "narrow_original_routes_valid": false
+    },
+    {
+      "method": "learned_hybrid_1234",
+      "instance": 17,
+      "wide_same_acceptance_and_routes_valid": true,
+      "wide_objective_difference": 0.0,
+      "narrow_original_routes_valid": false
+    },
+    {
+      "method": "learned_raw_1234",
+      "instance": 18,
+      "wide_same_acceptance_and_routes_valid": true,
+      "wide_objective_difference": 0.0,
+      "narrow_original_routes_valid": false
+    },
+    {
+      "method": "learned_hybrid_1234",
+      "instance": 18,
+      "wide_same_acceptance_and_routes_valid": true,
+      "wide_objective_difference": 0.0,
+      "narrow_original_routes_valid": false
+    },
+    {
+      "method": "learned_raw_1234",
+      "instance": 19,
+      "wide_same_acceptance_and_routes_valid": true,
+      "wide_objective_difference": 0.0,
+      "narrow_original_routes_valid": false
+    },
+    {
+      "method": "learned_hybrid_1234",
+      "instance": 19,
+      "wide_same_acceptance_and_routes_valid": true,
+      "wide_objective_difference": 0.0,
+      "narrow_original_routes_valid": false
+    },
+    {
+      "method": "learned_raw_1234",
+      "instance": 20,
+      "wide_same_acceptance_and_routes_valid": true,
+      "wide_objective_difference": 0.0,
+      "narrow_original_routes_valid": false
+    },
+    {
+      "method": "learned_hybrid_1234",
+      "instance": 20,
+      "wide_same_acceptance_and_routes_valid": true,
+      "wide_objective_difference": 0.0,
+      "narrow_original_routes_valid": false
+    },
+    {
+      "method": "learned_raw_1234",
+      "instance": 21,
+      "wide_same_acceptance_and_routes_valid": true,
+      "wide_objective_difference": 0.0,
+      "narrow_original_routes_valid": false
+    },
+    {
+      "method": "learned_hybrid_1234",
+      "instance": 21,
+      "wide_same_acceptance_and_routes_valid": true,
+      "wide_objective_difference": 0.0,
+      "narrow_original_routes_valid": false
+    },
+    {
+      "method": "learned_raw_1234",
+      "instance": 22,
+      "wide_same_acceptance_and_routes_valid": true,
+      "wide_objective_difference": 0.0,
+      "narrow_original_routes_valid": false
+    },
+    {
+      "method": "learned_hybrid_1234",
+      "instance": 22,
+      "wide_same_acceptance_and_routes_valid": true,
+      "wide_objective_difference": 0.0,
+      "narrow_original_routes_valid": false
+    },
+    {
+      "method": "learned_raw_1234",
+      "instance": 23,
+      "wide_same_acceptance_and_routes_valid": true,
+      "wide_objective_difference": 0.0,
+      "narrow_original_routes_valid": false
+    },
+    {
+      "method": "learned_hybrid_1234",
+      "instance": 23,
+      "wide_same_acceptance_and_routes_valid": true,
+      "wide_objective_difference": 0.0,
+      "narrow_original_routes_valid": false
+    },
+    {
+      "method": "learned_raw_1234",
+      "instance": 24,
+      "wide_same_acceptance_and_routes_valid": true,
+      "wide_objective_difference": 0.0,
+      "narrow_original_routes_valid": false
+    },
+    {
+      "method": "learned_hybrid_1234",
+      "instance": 24,
+      "wide_same_acceptance_and_routes_valid": true,
+      "wide_objective_difference": 0.0,
+      "narrow_original_routes_valid": false
+    },
+    {
+      "method": "learned_raw_1234",
+      "instance": 25,
+      "wide_same_acceptance_and_routes_valid": true,
+      "wide_objective_difference": 0.0,
+      "narrow_original_routes_valid": false
+    },
+    {
+      "method": "learned_hybrid_1234",
+      "instance": 25,
+      "wide_same_acceptance_and_routes_valid": true,
+      "wide_objective_difference": 0.0,
+      "narrow_original_routes_valid": false
+    },
+    {
+      "method": "learned_raw_1234",
+      "instance": 26,
+      "wide_same_acceptance_and_routes_valid": true,
+      "wide_objective_difference": 0.0,
+      "narrow_original_routes_valid": false
+    },
+    {
+      "method": "learned_hybrid_1234",
+      "instance": 26,
+      "wide_same_acceptance_and_routes_valid": true,
+      "wide_objective_difference": 0.0,
+      "narrow_original_routes_valid": false
+    },
+    {
+      "method": "learned_raw_1234",
+      "instance": 27,
+      "wide_same_acceptance_and_routes_valid": true,
+      "wide_objective_difference": 0.0,
+      "narrow_original_routes_valid": false
+    },
+    {
+      "method": "learned_hybrid_1234",
+      "instance": 27,
+      "wide_same_acceptance_and_routes_valid": true,
+      "wide_objective_difference": 0.0,
+      "narrow_original_routes_valid": false
+    },
+    {
+      "method": "learned_raw_1234",
+      "instance": 28,
+      "wide_same_acceptance_and_routes_valid": true,
+      "wide_objective_difference": 0.0,
+      "narrow_original_routes_valid": false
+    },
+    {
+      "method": "learned_hybrid_1234",
+      "instance": 28,
+      "wide_same_acceptance_and_routes_valid": true,
+      "wide_objective_difference": 0.0,
+      "narrow_original_routes_valid": false
+    },
+    {
+      "method": "learned_raw_1234",
+      "instance": 29,
+      "wide_same_acceptance_and_routes_valid": true,
+      "wide_objective_difference": 0.0,
+      "narrow_original_routes_valid": false
+    },
+    {
+      "method": "learned_hybrid_1234",
+      "instance": 29,
+      "wide_same_acceptance_and_routes_valid": true,
+      "wide_objective_difference": 0.0,
+      "narrow_original_routes_valid": false
+    },
+    {
+      "method": "learned_raw_1234",
+      "instance": 30,
+      "wide_same_acceptance_and_routes_valid": true,
+      "wide_objective_difference": 0.0,
+      "narrow_original_routes_valid": false
+    },
+    {
+      "method": "learned_hybrid_1234",
+      "instance": 30,
+      "wide_same_acceptance_and_routes_valid": true,
+      "wide_objective_difference": 0.0,
+      "narrow_original_routes_valid": false
+    },
+    {
+      "method": "learned_raw_1234",
+      "instance": 31,
+      "wide_same_acceptance_and_routes_valid": true,
+      "wide_objective_difference": 0.0,
+      "narrow_original_routes_valid": false
+    },
+    {
+      "method": "learned_hybrid_1234",
+      "instance": 31,
+      "wide_same_acceptance_and_routes_valid": true,
+      "wide_objective_difference": 0.0,
+      "narrow_original_routes_valid": false
+    },
+    {
+      "method": "learned_raw_4321",
+      "instance": 0,
+      "wide_same_acceptance_and_routes_valid": true,
+      "wide_objective_difference": 0.0,
+      "narrow_original_routes_valid": false
+    },
+    {
+      "method": "learned_hybrid_4321",
+      "instance": 0,
+      "wide_same_acceptance_and_routes_valid": true,
+      "wide_objective_difference": 0.0,
+      "narrow_original_routes_valid": false
+    },
+    {
+      "method": "learned_raw_4321",
+      "instance": 1,
+      "wide_same_acceptance_and_routes_valid": true,
+      "wide_objective_difference": 0.0,
+      "narrow_original_routes_valid": false
+    },
+    {
+      "method": "learned_hybrid_4321",
+      "instance": 1,
+      "wide_same_acceptance_and_routes_valid": true,
+      "wide_objective_difference": 0.0,
+      "narrow_original_routes_valid": false
+    },
+    {
+      "method": "learned_raw_4321",
+      "instance": 2,
+      "wide_same_acceptance_and_routes_valid": true,
+      "wide_objective_difference": 0.0,
+      "narrow_original_routes_valid": false
+    },
+    {
+      "method": "learned_hybrid_4321",
+      "instance": 2,
+      "wide_same_acceptance_and_routes_valid": true,
+      "wide_objective_difference": 0.0,
+      "narrow_original_routes_valid": false
+    },
+    {
+      "method": "learned_raw_4321",
+      "instance": 3,
+      "wide_same_acceptance_and_routes_valid": true,
+      "wide_objective_difference": 0.0,
+      "narrow_original_routes_valid": false
+    },
+    {
+      "method": "learned_hybrid_4321",
+      "instance": 3,
+      "wide_same_acceptance_and_routes_valid": true,
+      "wide_objective_difference": 0.0,
+      "narrow_original_routes_valid": false
+    },
+    {
+      "method": "learned_raw_4321",
+      "instance": 4,
+      "wide_same_acceptance_and_routes_valid": true,
+      "wide_objective_difference": 0.0,
+      "narrow_original_routes_valid": false
+    },
+    {
+      "method": "learned_hybrid_4321",
+      "instance": 4,
+      "wide_same_acceptance_and_routes_valid": true,
+      "wide_objective_difference": 0.0,
+      "narrow_original_routes_valid": false
+    },
+    {
+      "method": "learned_raw_4321",
+      "instance": 5,
+      "wide_same_acceptance_and_routes_valid": true,
+      "wide_objective_difference": 0.0,
+      "narrow_original_routes_valid": false
+    },
+    {
+      "method": "learned_hybrid_4321",
+      "instance": 5,
+      "wide_same_acceptance_and_routes_valid": true,
+      "wide_objective_difference": 0.0,
+      "narrow_original_routes_valid": false
+    },
+    {
+      "method": "learned_raw_4321",
+      "instance": 6,
+      "wide_same_acceptance_and_routes_valid": true,
+      "wide_objective_difference": 0.0,
+      "narrow_original_routes_valid": false
+    },
+    {
+      "method": "learned_hybrid_4321",
+      "instance": 6,
+      "wide_same_acceptance_and_routes_valid": true,
+      "wide_objective_difference": 0.0,
+      "narrow_original_routes_valid": false
+    },
+    {
+      "method": "learned_raw_4321",
+      "instance": 7,
+      "wide_same_acceptance_and_routes_valid": true,
+      "wide_objective_difference": 0.0,
+      "narrow_original_routes_valid": false
+    },
+    {
+      "method": "learned_hybrid_4321",
+      "instance": 7,
+      "wide_same_acceptance_and_routes_valid": true,
+      "wide_objective_difference": 0.0,
+      "narrow_original_routes_valid": false
+    },
+    {
+      "method": "learned_raw_4321",
+      "instance": 8,
+      "wide_same_acceptance_and_routes_valid": true,
+      "wide_objective_difference": 0.0,
+      "narrow_original_routes_valid": false
+    },
+    {
+      "method": "learned_hybrid_4321",
+      "instance": 8,
+      "wide_same_acceptance_and_routes_valid": true,
+      "wide_objective_difference": 0.0,
+      "narrow_original_routes_valid": false
+    },
+    {
+      "method": "learned_raw_4321",
+      "instance": 9,
+      "wide_same_acceptance_and_routes_valid": true,
+      "wide_objective_difference": 0.0,
+      "narrow_original_routes_valid": false
+    },
+    {
+      "method": "learned_hybrid_4321",
+      "instance": 9,
+      "wide_same_acceptance_and_routes_valid": true,
+      "wide_objective_difference": 0.0,
+      "narrow_original_routes_valid": false
+    },
+    {
+      "method": "learned_raw_4321",
+      "instance": 10,
+      "wide_same_acceptance_and_routes_valid": true,
+      "wide_objective_difference": 0.0,
+      "narrow_original_routes_valid": false
+    },
+    {
+      "method": "learned_hybrid_4321",
+      "instance": 10,
+      "wide_same_acceptance_and_routes_valid": true,
+      "wide_objective_difference": 0.0,
+      "narrow_original_routes_valid": false
+    },
+    {
+      "method": "learned_raw_4321",
+      "instance": 11,
+      "wide_same_acceptance_and_routes_valid": true,
+      "wide_objective_difference": 0.0,
+      "narrow_original_routes_valid": false
+    },
+    {
+      "method": "learned_hybrid_4321",
+      "instance": 11,
+      "wide_same_acceptance_and_routes_valid": true,
+      "wide_objective_difference": 0.0,
+      "narrow_original_routes_valid": false
+    },
+    {
+      "method": "learned_raw_4321",
+      "instance": 12,
+      "wide_same_acceptance_and_routes_valid": true,
+      "wide_objective_difference": 0.0,
+      "narrow_original_routes_valid": false
+    },
+    {
+      "method": "learned_hybrid_4321",
+      "instance": 12,
+      "wide_same_acceptance_and_routes_valid": true,
+      "wide_objective_difference": 0.0,
+      "narrow_original_routes_valid": false
+    },
+    {
+      "method": "learned_raw_4321",
+      "instance": 13,
+      "wide_same_acceptance_and_routes_valid": true,
+      "wide_objective_difference": 0.0,
+      "narrow_original_routes_valid": false
+    },
+    {
+      "method": "learned_hybrid_4321",
+      "instance": 13,
+      "wide_same_acceptance_and_routes_valid": true,
+      "wide_objective_difference": 0.0,
+      "narrow_original_routes_valid": false
+    },
+    {
+      "method": "learned_raw_4321",
+      "instance": 14,
+      "wide_same_acceptance_and_routes_valid": true,
+      "wide_objective_difference": 0.0,
+      "narrow_original_routes_valid": false
+    },
+    {
+      "method": "learned_hybrid_4321",
+      "instance": 14,
+      "wide_same_acceptance_and_routes_valid": true,
+      "wide_objective_difference": 0.0,
+      "narrow_original_routes_valid": false
+    },
+    {
+      "method": "learned_raw_4321",
+      "instance": 15,
+      "wide_same_acceptance_and_routes_valid": true,
+      "wide_objective_difference": 0.0,
+      "narrow_original_routes_valid": false
+    },
+    {
+      "method": "learned_hybrid_4321",
+      "instance": 15,
+      "wide_same_acceptance_and_routes_valid": true,
+      "wide_objective_difference": 0.0,
+      "narrow_original_routes_valid": false
+    },
+    {
+      "method": "learned_raw_4321",
+      "instance": 16,
+      "wide_same_acceptance_and_routes_valid": true,
+      "wide_objective_difference": 0.0,
+      "narrow_original_routes_valid": false
+    },
+    {
+      "method": "learned_hybrid_4321",
+      "instance": 16,
+      "wide_same_acceptance_and_routes_valid": true,
+      "wide_objective_difference": 0.0,
+      "narrow_original_routes_valid": false
+    },
+    {
+      "method": "learned_raw_4321",
+      "instance": 17,
+      "wide_same_acceptance_and_routes_valid": true,
+      "wide_objective_difference": 0.0,
+      "narrow_original_routes_valid": false
+    },
+    {
+      "method": "learned_hybrid_4321",
+      "instance": 17,
+      "wide_same_acceptance_and_routes_valid": true,
+      "wide_objective_difference": 0.0,
+      "narrow_original_routes_valid": false
+    },
+    {
+      "method": "learned_raw_4321",
+      "instance": 18,
+      "wide_same_acceptance_and_routes_valid": true,
+      "wide_objective_difference": 0.0,
+      "narrow_original_routes_valid": false
+    },
+    {
+      "method": "learned_hybrid_4321",
+      "instance": 18,
+      "wide_same_acceptance_and_routes_valid": true,
+      "wide_objective_difference": 0.0,
+      "narrow_original_routes_valid": false
+    },
+    {
+      "method": "learned_raw_4321",
+      "instance": 19,
+      "wide_same_acceptance_and_routes_valid": true,
+      "wide_objective_difference": 0.0,
+      "narrow_original_routes_valid": false
+    },
+    {
+      "method": "learned_hybrid_4321",
+      "instance": 19,
+      "wide_same_acceptance_and_routes_valid": true,
+      "wide_objective_difference": 0.0,
+      "narrow_original_routes_valid": false
+    },
+    {
+      "method": "learned_raw_4321",
+      "instance": 20,
+      "wide_same_acceptance_and_routes_valid": true,
+      "wide_objective_difference": 0.0,
+      "narrow_original_routes_valid": false
+    },
+    {
+      "method": "learned_hybrid_4321",
+      "instance": 20,
+      "wide_same_acceptance_and_routes_valid": true,
+      "wide_objective_difference": 0.0,
+      "narrow_original_routes_valid": false
+    },
+    {
+      "method": "learned_raw_4321",
+      "instance": 21,
+      "wide_same_acceptance_and_routes_valid": true,
+      "wide_objective_difference": 0.0,
+      "narrow_original_routes_valid": false
+    },
+    {
+      "method": "learned_hybrid_4321",
+      "instance": 21,
+      "wide_same_acceptance_and_routes_valid": true,
+      "wide_objective_difference": 0.0,
+      "narrow_original_routes_valid": false
+    },
+    {
+      "method": "learned_raw_4321",
+      "instance": 22,
+      "wide_same_acceptance_and_routes_valid": true,
+      "wide_objective_difference": 0.0,
+      "narrow_original_routes_valid": false
+    },
+    {
+      "method": "learned_hybrid_4321",
+      "instance": 22,
+      "wide_same_acceptance_and_routes_valid": true,
+      "wide_objective_difference": 0.0,
+      "narrow_original_routes_valid": false
+    },
+    {
+      "method": "learned_raw_4321",
+      "instance": 23,
+      "wide_same_acceptance_and_routes_valid": true,
+      "wide_objective_difference": 0.0,
+      "narrow_original_routes_valid": false
+    },
+    {
+      "method": "learned_hybrid_4321",
+      "instance": 23,
+      "wide_same_acceptance_and_routes_valid": true,
+      "wide_objective_difference": 0.0,
+      "narrow_original_routes_valid": false
+    },
+    {
+      "method": "learned_raw_4321",
+      "instance": 24,
+      "wide_same_acceptance_and_routes_valid": true,
+      "wide_objective_difference": 0.0,
+      "narrow_original_routes_valid": false
+    },
+    {
+      "method": "learned_hybrid_4321",
+      "instance": 24,
+      "wide_same_acceptance_and_routes_valid": true,
+      "wide_objective_difference": 0.0,
+      "narrow_original_routes_valid": false
+    },
+    {
+      "method": "learned_raw_4321",
+      "instance": 25,
+      "wide_same_acceptance_and_routes_valid": true,
+      "wide_objective_difference": 0.0,
+      "narrow_original_routes_valid": false
+    },
+    {
+      "method": "learned_hybrid_4321",
+      "instance": 25,
+      "wide_same_acceptance_and_routes_valid": true,
+      "wide_objective_difference": 0.0,
+      "narrow_original_routes_valid": false
+    },
+    {
+      "method": "learned_raw_4321",
+      "instance": 26,
+      "wide_same_acceptance_and_routes_valid": true,
+      "wide_objective_difference": 0.0,
+      "narrow_original_routes_valid": false
+    },
+    {
+      "method": "learned_hybrid_4321",
+      "instance": 26,
+      "wide_same_acceptance_and_routes_valid": true,
+      "wide_objective_difference": 0.0,
+      "narrow_original_routes_valid": false
+    },
+    {
+      "method": "learned_raw_4321",
+      "instance": 27,
+      "wide_same_acceptance_and_routes_valid": true,
+      "wide_objective_difference": 0.0,
+      "narrow_original_routes_valid": false
+    },
+    {
+      "method": "learned_hybrid_4321",
+      "instance": 27,
+      "wide_same_acceptance_and_routes_valid": true,
+      "wide_objective_difference": 0.0,
+      "narrow_original_routes_valid": false
+    },
+    {
+      "method": "learned_raw_4321",
+      "instance": 28,
+      "wide_same_acceptance_and_routes_valid": true,
+      "wide_objective_difference": 0.0,
+      "narrow_original_routes_valid": false
+    },
+    {
+      "method": "learned_hybrid_4321",
+      "instance": 28,
+      "wide_same_acceptance_and_routes_valid": true,
+      "wide_objective_difference": 0.0,
+      "narrow_original_routes_valid": false
+    },
+    {
+      "method": "learned_raw_4321",
+      "instance": 29,
+      "wide_same_acceptance_and_routes_valid": true,
+      "wide_objective_difference": 0.0,
+      "narrow_original_routes_valid": false
+    },
+    {
+      "method": "learned_hybrid_4321",
+      "instance": 29,
+      "wide_same_acceptance_and_routes_valid": true,
+      "wide_objective_difference": 0.0,
+      "narrow_original_routes_valid": false
+    },
+    {
+      "method": "learned_raw_4321",
+      "instance": 30,
+      "wide_same_acceptance_and_routes_valid": true,
+      "wide_objective_difference": 0.0,
+      "narrow_original_routes_valid": false
+    },
+    {
+      "method": "learned_hybrid_4321",
+      "instance": 30,
+      "wide_same_acceptance_and_routes_valid": true,
+      "wide_objective_difference": 0.0,
+      "narrow_original_routes_valid": false
+    },
+    {
+      "method": "learned_raw_4321",
+      "instance": 31,
+      "wide_same_acceptance_and_routes_valid": true,
+      "wide_objective_difference": 0.0,
+      "narrow_original_routes_valid": false
+    },
+    {
+      "method": "learned_hybrid_4321",
+      "instance": 31,
+      "wide_same_acceptance_and_routes_valid": true,
+      "wide_objective_difference": 0.0,
+      "narrow_original_routes_valid": false
+    },
+    {
+      "method": "learned_raw_8765",
+      "instance": 0,
+      "wide_same_acceptance_and_routes_valid": true,
+      "wide_objective_difference": 0.0,
+      "narrow_original_routes_valid": false
+    },
+    {
+      "method": "learned_hybrid_8765",
+      "instance": 0,
+      "wide_same_acceptance_and_routes_valid": true,
+      "wide_objective_difference": 0.0,
+      "narrow_original_routes_valid": false
+    },
+    {
+      "method": "learned_raw_8765",
+      "instance": 1,
+      "wide_same_acceptance_and_routes_valid": true,
+      "wide_objective_difference": 0.0,
+      "narrow_original_routes_valid": false
+    },
+    {
+      "method": "learned_hybrid_8765",
+      "instance": 1,
+      "wide_same_acceptance_and_routes_valid": true,
+      "wide_objective_difference": 0.0,
+      "narrow_original_routes_valid": false
+    },
+    {
+      "method": "learned_raw_8765",
+      "instance": 2,
+      "wide_same_acceptance_and_routes_valid": true,
+      "wide_objective_difference": 0.0,
+      "narrow_original_routes_valid": false
+    },
+    {
+      "method": "learned_hybrid_8765",
+      "instance": 2,
+      "wide_same_acceptance_and_routes_valid": true,
+      "wide_objective_difference": 0.0,
+      "narrow_original_routes_valid": false
+    },
+    {
+      "method": "learned_raw_8765",
+      "instance": 3,
+      "wide_same_acceptance_and_routes_valid": true,
+      "wide_objective_difference": 0.0,
+      "narrow_original_routes_valid": false
+    },
+    {
+      "method": "learned_hybrid_8765",
+      "instance": 3,
+      "wide_same_acceptance_and_routes_valid": true,
+      "wide_objective_difference": 0.0,
+      "narrow_original_routes_valid": false
+    },
+    {
+      "method": "learned_raw_8765",
+      "instance": 4,
+      "wide_same_acceptance_and_routes_valid": true,
+      "wide_objective_difference": 0.0,
+      "narrow_original_routes_valid": false
+    },
+    {
+      "method": "learned_hybrid_8765",
+      "instance": 4,
+      "wide_same_acceptance_and_routes_valid": true,
+      "wide_objective_difference": 0.0,
+      "narrow_original_routes_valid": false
+    },
+    {
+      "method": "learned_raw_8765",
+      "instance": 5,
+      "wide_same_acceptance_and_routes_valid": true,
+      "wide_objective_difference": 0.0,
+      "narrow_original_routes_valid": false
+    },
+    {
+      "method": "learned_hybrid_8765",
+      "instance": 5,
+      "wide_same_acceptance_and_routes_valid": true,
+      "wide_objective_difference": 0.0,
+      "narrow_original_routes_valid": false
+    },
+    {
+      "method": "learned_raw_8765",
+      "instance": 6,
+      "wide_same_acceptance_and_routes_valid": true,
+      "wide_objective_difference": 0.0,
+      "narrow_original_routes_valid": false
+    },
+    {
+      "method": "learned_hybrid_8765",
+      "instance": 6,
+      "wide_same_acceptance_and_routes_valid": true,
+      "wide_objective_difference": 0.0,
+      "narrow_original_routes_valid": false
+    },
+    {
+      "method": "learned_raw_8765",
+      "instance": 7,
+      "wide_same_acceptance_and_routes_valid": true,
+      "wide_objective_difference": 0.0,
+      "narrow_original_routes_valid": false
+    },
+    {
+      "method": "learned_hybrid_8765",
+      "instance": 7,
+      "wide_same_acceptance_and_routes_valid": true,
+      "wide_objective_difference": 0.0,
+      "narrow_original_routes_valid": false
+    },
+    {
+      "method": "learned_raw_8765",
+      "instance": 8,
+      "wide_same_acceptance_and_routes_valid": true,
+      "wide_objective_difference": 0.0,
+      "narrow_original_routes_valid": false
+    },
+    {
+      "method": "learned_hybrid_8765",
+      "instance": 8,
+      "wide_same_acceptance_and_routes_valid": true,
+      "wide_objective_difference": 0.0,
+      "narrow_original_routes_valid": false
+    },
+    {
+      "method": "learned_raw_8765",
+      "instance": 9,
+      "wide_same_acceptance_and_routes_valid": true,
+      "wide_objective_difference": 0.0,
+      "narrow_original_routes_valid": false
+    },
+    {
+      "method": "learned_hybrid_8765",
+      "instance": 9,
+      "wide_same_acceptance_and_routes_valid": true,
+      "wide_objective_difference": 0.0,
+      "narrow_original_routes_valid": false
+    },
+    {
+      "method": "learned_raw_8765",
+      "instance": 10,
+      "wide_same_acceptance_and_routes_valid": true,
+      "wide_objective_difference": 0.0,
+      "narrow_original_routes_valid": false
+    },
+    {
+      "method": "learned_hybrid_8765",
+      "instance": 10,
+      "wide_same_acceptance_and_routes_valid": true,
+      "wide_objective_difference": 0.0,
+      "narrow_original_routes_valid": false
+    },
+    {
+      "method": "learned_raw_8765",
+      "instance": 11,
+      "wide_same_acceptance_and_routes_valid": true,
+      "wide_objective_difference": 0.0,
+      "narrow_original_routes_valid": false
+    },
+    {
+      "method": "learned_hybrid_8765",
+      "instance": 11,
+      "wide_same_acceptance_and_routes_valid": true,
+      "wide_objective_difference": 0.0,
+      "narrow_original_routes_valid": false
+    },
+    {
+      "method": "learned_raw_8765",
+      "instance": 12,
+      "wide_same_acceptance_and_routes_valid": true,
+      "wide_objective_difference": 0.0,
+      "narrow_original_routes_valid": false
+    },
+    {
+      "method": "learned_hybrid_8765",
+      "instance": 12,
+      "wide_same_acceptance_and_routes_valid": true,
+      "wide_objective_difference": 0.0,
+      "narrow_original_routes_valid": false
+    },
+    {
+      "method": "learned_raw_8765",
+      "instance": 13,
+      "wide_same_acceptance_and_routes_valid": true,
+      "wide_objective_difference": 0.0,
+      "narrow_original_routes_valid": false
+    },
+    {
+      "method": "learned_hybrid_8765",
+      "instance": 13,
+      "wide_same_acceptance_and_routes_valid": true,
+      "wide_objective_difference": 0.0,
+      "narrow_original_routes_valid": false
+    },
+    {
+      "method": "learned_raw_8765",
+      "instance": 14,
+      "wide_same_acceptance_and_routes_valid": true,
+      "wide_objective_difference": 0.0,
+      "narrow_original_routes_valid": false
+    },
+    {
+      "method": "learned_hybrid_8765",
+      "instance": 14,
+      "wide_same_acceptance_and_routes_valid": true,
+      "wide_objective_difference": 0.0,
+      "narrow_original_routes_valid": false
+    },
+    {
+      "method": "learned_raw_8765",
+      "instance": 15,
+      "wide_same_acceptance_and_routes_valid": true,
+      "wide_objective_difference": 0.0,
+      "narrow_original_routes_valid": false
+    },
+    {
+      "method": "learned_hybrid_8765",
+      "instance": 15,
+      "wide_same_acceptance_and_routes_valid": true,
+      "wide_objective_difference": 0.0,
+      "narrow_original_routes_valid": false
+    },
+    {
+      "method": "learned_raw_8765",
+      "instance": 16,
+      "wide_same_acceptance_and_routes_valid": true,
+      "wide_objective_difference": 0.0,
+      "narrow_original_routes_valid": false
+    },
+    {
+      "method": "learned_hybrid_8765",
+      "instance": 16,
+      "wide_same_acceptance_and_routes_valid": true,
+      "wide_objective_difference": 0.0,
+      "narrow_original_routes_valid": false
+    },
+    {
+      "method": "learned_raw_8765",
+      "instance": 17,
+      "wide_same_acceptance_and_routes_valid": true,
+      "wide_objective_difference": 0.0,
+      "narrow_original_routes_valid": false
+    },
+    {
+      "method": "learned_hybrid_8765",
+      "instance": 17,
+      "wide_same_acceptance_and_routes_valid": true,
+      "wide_objective_difference": 0.0,
+      "narrow_original_routes_valid": false
+    },
+    {
+      "method": "learned_raw_8765",
+      "instance": 18,
+      "wide_same_acceptance_and_routes_valid": true,
+      "wide_objective_difference": 0.0,
+      "narrow_original_routes_valid": false
+    },
+    {
+      "method": "learned_hybrid_8765",
+      "instance": 18,
+      "wide_same_acceptance_and_routes_valid": true,
+      "wide_objective_difference": 0.0,
+      "narrow_original_routes_valid": false
+    },
+    {
+      "method": "learned_raw_8765",
+      "instance": 19,
+      "wide_same_acceptance_and_routes_valid": true,
+      "wide_objective_difference": 0.0,
+      "narrow_original_routes_valid": false
+    },
+    {
+      "method": "learned_hybrid_8765",
+      "instance": 19,
+      "wide_same_acceptance_and_routes_valid": true,
+      "wide_objective_difference": 0.0,
+      "narrow_original_routes_valid": false
+    },
+    {
+      "method": "learned_raw_8765",
+      "instance": 20,
+      "wide_same_acceptance_and_routes_valid": true,
+      "wide_objective_difference": 0.0,
+      "narrow_original_routes_valid": false
+    },
+    {
+      "method": "learned_hybrid_8765",
+      "instance": 20,
+      "wide_same_acceptance_and_routes_valid": true,
+      "wide_objective_difference": 0.0,
+      "narrow_original_routes_valid": false
+    },
+    {
+      "method": "learned_raw_8765",
+      "instance": 21,
+      "wide_same_acceptance_and_routes_valid": true,
+      "wide_objective_difference": 0.0,
+      "narrow_original_routes_valid": false
+    },
+    {
+      "method": "learned_hybrid_8765",
+      "instance": 21,
+      "wide_same_acceptance_and_routes_valid": true,
+      "wide_objective_difference": 0.0,
+      "narrow_original_routes_valid": false
+    },
+    {
+      "method": "learned_raw_8765",
+      "instance": 22,
+      "wide_same_acceptance_and_routes_valid": true,
+      "wide_objective_difference": 0.0,
+      "narrow_original_routes_valid": false
+    },
+    {
+      "method": "learned_hybrid_8765",
+      "instance": 22,
+      "wide_same_acceptance_and_routes_valid": true,
+      "wide_objective_difference": 0.0,
+      "narrow_original_routes_valid": false
+    },
+    {
+      "method": "learned_raw_8765",
+      "instance": 23,
+      "wide_same_acceptance_and_routes_valid": true,
+      "wide_objective_difference": 0.0,
+      "narrow_original_routes_valid": false
+    },
+    {
+      "method": "learned_hybrid_8765",
+      "instance": 23,
+      "wide_same_acceptance_and_routes_valid": true,
+      "wide_objective_difference": 0.0,
+      "narrow_original_routes_valid": false
+    },
+    {
+      "method": "learned_raw_8765",
+      "instance": 24,
+      "wide_same_acceptance_and_routes_valid": true,
+      "wide_objective_difference": 0.0,
+      "narrow_original_routes_valid": false
+    },
+    {
+      "method": "learned_hybrid_8765",
+      "instance": 24,
+      "wide_same_acceptance_and_routes_valid": true,
+      "wide_objective_difference": 0.0,
+      "narrow_original_routes_valid": false
+    },
+    {
+      "method": "learned_raw_8765",
+      "instance": 25,
+      "wide_same_acceptance_and_routes_valid": true,
+      "wide_objective_difference": 0.0,
+      "narrow_original_routes_valid": false
+    },
+    {
+      "method": "learned_hybrid_8765",
+      "instance": 25,
+      "wide_same_acceptance_and_routes_valid": true,
+      "wide_objective_difference": 0.0,
+      "narrow_original_routes_valid": false
+    },
+    {
+      "method": "learned_raw_8765",
+      "instance": 26,
+      "wide_same_acceptance_and_routes_valid": true,
+      "wide_objective_difference": 0.0,
+      "narrow_original_routes_valid": false
+    },
+    {
+      "method": "learned_hybrid_8765",
+      "instance": 26,
+      "wide_same_acceptance_and_routes_valid": true,
+      "wide_objective_difference": 0.0,
+      "narrow_original_routes_valid": false
+    },
+    {
+      "method": "learned_raw_8765",
+      "instance": 27,
+      "wide_same_acceptance_and_routes_valid": true,
+      "wide_objective_difference": 0.0,
+      "narrow_original_routes_valid": false
+    },
+    {
+      "method": "learned_hybrid_8765",
+      "instance": 27,
+      "wide_same_acceptance_and_routes_valid": true,
+      "wide_objective_difference": 0.0,
+      "narrow_original_routes_valid": false
+    },
+    {
+      "method": "learned_raw_8765",
+      "instance": 28,
+      "wide_same_acceptance_and_routes_valid": true,
+      "wide_objective_difference": 0.0,
+      "narrow_original_routes_valid": false
+    },
+    {
+      "method": "learned_hybrid_8765",
+      "instance": 28,
+      "wide_same_acceptance_and_routes_valid": true,
+      "wide_objective_difference": 0.0,
+      "narrow_original_routes_valid": false
+    },
+    {
+      "method": "learned_raw_8765",
+      "instance": 29,
+      "wide_same_acceptance_and_routes_valid": true,
+      "wide_objective_difference": 0.0,
+      "narrow_original_routes_valid": false
+    },
+    {
+      "method": "learned_hybrid_8765",
+      "instance": 29,
+      "wide_same_acceptance_and_routes_valid": true,
+      "wide_objective_difference": 0.0,
+      "narrow_original_routes_valid": false
+    },
+    {
+      "method": "learned_raw_8765",
+      "instance": 30,
+      "wide_same_acceptance_and_routes_valid": true,
+      "wide_objective_difference": 0.0,
+      "narrow_original_routes_valid": false
+    },
+    {
+      "method": "learned_hybrid_8765",
+      "instance": 30,
+      "wide_same_acceptance_and_routes_valid": true,
+      "wide_objective_difference": 0.0,
+      "narrow_original_routes_valid": false
+    },
+    {
+      "method": "learned_raw_8765",
+      "instance": 31,
+      "wide_same_acceptance_and_routes_valid": true,
+      "wide_objective_difference": 0.0,
+      "narrow_original_routes_valid": false
+    },
+    {
+      "method": "learned_hybrid_8765",
+      "instance": 31,
+      "wide_same_acceptance_and_routes_valid": true,
+      "wide_objective_difference": 0.0,
+      "narrow_original_routes_valid": false
+    },
+    {
+      "method": "LNS",
+      "instance": 0,
+      "wide_same_acceptance_and_routes_valid": true,
+      "wide_objective_difference": 0.0,
+      "narrow_original_routes_valid": false
+    },
+    {
+      "method": "LNS",
+      "instance": 1,
+      "wide_same_acceptance_and_routes_valid": true,
+      "wide_objective_difference": 0.0,
+      "narrow_original_routes_valid": false
+    },
+    {
+      "method": "LNS",
+      "instance": 2,
+      "wide_same_acceptance_and_routes_valid": true,
+      "wide_objective_difference": 0.0,
+      "narrow_original_routes_valid": false
+    },
+    {
+      "method": "LNS",
+      "instance": 3,
+      "wide_same_acceptance_and_routes_valid": true,
+      "wide_objective_difference": 0.0,
+      "narrow_original_routes_valid": false
+    },
+    {
+      "method": "LNS",
+      "instance": 4,
+      "wide_same_acceptance_and_routes_valid": true,
+      "wide_objective_difference": 0.0,
+      "narrow_original_routes_valid": false
+    },
+    {
+      "method": "LNS",
+      "instance": 5,
+      "wide_same_acceptance_and_routes_valid": true,
+      "wide_objective_difference": 0.0,
+      "narrow_original_routes_valid": false
+    },
+    {
+      "method": "LNS",
+      "instance": 6,
+      "wide_same_acceptance_and_routes_valid": true,
+      "wide_objective_difference": 0.0,
+      "narrow_original_routes_valid": false
+    },
+    {
+      "method": "LNS",
+      "instance": 7,
+      "wide_same_acceptance_and_routes_valid": true,
+      "wide_objective_difference": 0.0,
+      "narrow_original_routes_valid": false
+    },
+    {
+      "method": "LNS",
+      "instance": 8,
+      "wide_same_acceptance_and_routes_valid": true,
+      "wide_objective_difference": 0.0,
+      "narrow_original_routes_valid": false
+    },
+    {
+      "method": "LNS",
+      "instance": 9,
+      "wide_same_acceptance_and_routes_valid": true,
+      "wide_objective_difference": 0.0,
+      "narrow_original_routes_valid": false
+    },
+    {
+      "method": "LNS",
+      "instance": 10,
+      "wide_same_acceptance_and_routes_valid": true,
+      "wide_objective_difference": 0.0,
+      "narrow_original_routes_valid": false
+    },
+    {
+      "method": "LNS",
+      "instance": 11,
+      "wide_same_acceptance_and_routes_valid": true,
+      "wide_objective_difference": 0.0,
+      "narrow_original_routes_valid": false
+    },
+    {
+      "method": "LNS",
+      "instance": 12,
+      "wide_same_acceptance_and_routes_valid": true,
+      "wide_objective_difference": 0.0,
+      "narrow_original_routes_valid": false
+    },
+    {
+      "method": "LNS",
+      "instance": 13,
+      "wide_same_acceptance_and_routes_valid": true,
+      "wide_objective_difference": 0.0,
+      "narrow_original_routes_valid": false
+    },
+    {
+      "method": "LNS",
+      "instance": 14,
+      "wide_same_acceptance_and_routes_valid": true,
+      "wide_objective_difference": 0.0,
+      "narrow_original_routes_valid": false
+    },
+    {
+      "method": "LNS",
+      "instance": 15,
+      "wide_same_acceptance_and_routes_valid": true,
+      "wide_objective_difference": 0.0,
+      "narrow_original_routes_valid": false
+    },
+    {
+      "method": "LNS",
+      "instance": 16,
+      "wide_same_acceptance_and_routes_valid": true,
+      "wide_objective_difference": 0.0,
+      "narrow_original_routes_valid": false
+    },
+    {
+      "method": "LNS",
+      "instance": 17,
+      "wide_same_acceptance_and_routes_valid": true,
+      "wide_objective_difference": 0.0,
+      "narrow_original_routes_valid": false
+    },
+    {
+      "method": "LNS",
+      "instance": 18,
+      "wide_same_acceptance_and_routes_valid": true,
+      "wide_objective_difference": 0.0,
+      "narrow_original_routes_valid": false
+    },
+    {
+      "method": "LNS",
+      "instance": 19,
+      "wide_same_acceptance_and_routes_valid": true,
+      "wide_objective_difference": 0.0,
+      "narrow_original_routes_valid": false
+    },
+    {
+      "method": "LNS",
+      "instance": 20,
+      "wide_same_acceptance_and_routes_valid": true,
+      "wide_objective_difference": 0.0,
+      "narrow_original_routes_valid": false
+    },
+    {
+      "method": "LNS",
+      "instance": 21,
+      "wide_same_acceptance_and_routes_valid": true,
+      "wide_objective_difference": 0.0,
+      "narrow_original_routes_valid": false
+    },
+    {
+      "method": "LNS",
+      "instance": 22,
+      "wide_same_acceptance_and_routes_valid": true,
+      "wide_objective_difference": 0.0,
+      "narrow_original_routes_valid": false
+    },
+    {
+      "method": "LNS",
+      "instance": 23,
+      "wide_same_acceptance_and_routes_valid": true,
+      "wide_objective_difference": 0.0,
+      "narrow_original_routes_valid": false
+    },
+    {
+      "method": "LNS",
+      "instance": 24,
+      "wide_same_acceptance_and_routes_valid": true,
+      "wide_objective_difference": 0.0,
+      "narrow_original_routes_valid": false
+    },
+    {
+      "method": "LNS",
+      "instance": 25,
+      "wide_same_acceptance_and_routes_valid": true,
+      "wide_objective_difference": 0.0,
+      "narrow_original_routes_valid": false
+    },
+    {
+      "method": "LNS",
+      "instance": 26,
+      "wide_same_acceptance_and_routes_valid": true,
+      "wide_objective_difference": 0.0,
+      "narrow_original_routes_valid": false
+    },
+    {
+      "method": "LNS",
+      "instance": 27,
+      "wide_same_acceptance_and_routes_valid": true,
+      "wide_objective_difference": 0.0,
+      "narrow_original_routes_valid": false
+    },
+    {
+      "method": "LNS",
+      "instance": 28,
+      "wide_same_acceptance_and_routes_valid": true,
+      "wide_objective_difference": 0.0,
+      "narrow_original_routes_valid": false
+    },
+    {
+      "method": "LNS",
+      "instance": 29,
+      "wide_same_acceptance_and_routes_valid": true,
+      "wide_objective_difference": 0.0,
+      "narrow_original_routes_valid": false
+    },
+    {
+      "method": "LNS",
+      "instance": 30,
+      "wide_same_acceptance_and_routes_valid": true,
+      "wide_objective_difference": 0.0,
+      "narrow_original_routes_valid": false
+    },
+    {
+      "method": "LNS",
+      "instance": 31,
+      "wide_same_acceptance_and_routes_valid": true,
+      "wide_objective_difference": 0.0,
+      "narrow_original_routes_valid": false
+    }
+  ]
+}

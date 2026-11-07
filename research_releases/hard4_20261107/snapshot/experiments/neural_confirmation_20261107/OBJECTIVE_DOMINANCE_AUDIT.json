@@ -1,0 +1,30 @@
+{
+  "status": "passed",
+  "scope": "Sufficient analytic bound for N50 instances in the declared domain; not observed maximum, not arbitrary N/parameters, not proof of greedy-policy optimality.",
+  "conditions": [
+    "Unit-square locations and depot",
+    "All delivery deadlines at or after operation start",
+    "Nonnegative objective weights",
+    "Each pickup/delivery node visited at most once",
+    "At most nine closed trips",
+    "Every accepted order completed; no unfulfilled requests",
+    "All audited physical limits; at most 1e-4h numeric end/trip tolerance"
+  ],
+  "checked_input_instances": 32,
+  "scenario_sha256": "837a278a776741a089374443cbb772f81addf48bdd183bc6318d44bcfa5975ba",
+  "n": 50,
+  "k": 9,
+  "conservative_components": {
+    "normalized_energy": 3.0837845955668555,
+    "normalized_passenger_delay": 46.836217802467694,
+    "normalized_cargo_delay": 377.94328072660556,
+    "normalized_dispatch": 3.0,
+    "numerical_overtime_allowance": 0.18000000000000002
+  },
+  "non_rejection_objective_upper_bound": 431.04328312464014,
+  "rejection_penalty": 575.0,
+  "margin": 143.95671687535986,
+  "proof": "Write J=575r+G, 0<=G<=U<575. If r_A<=r_B-1 then J_A-J_B<=-575+U<0. Thus every globally optimal feasible solution first minimizes rejection count and then minimizes G. Bounding all 50 orders as passengers AND as cargo double-counts alternatives intentionally, making the upper bound conservative.",
+  "implication": "Current objective is lexicographic service coverage then operational penalties within this domain, not an economic price-vs-acceptance tradeoff. Feasible route grouping and order decisions still matter; service-first greedy need not be optimal.",
+  "training_decision": "Do not lower rejection penalty based on new test outcomes or relabel old weights. A new economic-tradeoff study would need a separately motivated objective, conditioning/training design and independent protocol."
+}

@@ -1,0 +1,640 @@
+{
+  "status": "passed",
+  "scope": "new common 32-instance confirmation; user-approved main comparison: pretrained learned/rule deployments, strict insertion, LNS and SCIP; no retraining or pure training-component ablation",
+  "independent_common_instances": 32,
+  "observed_final_plans": 352,
+  "all_final_plans_hard_valid": true,
+  "unfulfilled": 0,
+  "bootstrap": {
+    "seed": 8162037,
+    "resamples": 10000,
+    "unit": "common instance ID",
+    "method": "paired percentile bootstrap, averaging repeated algorithms within instance first",
+    "interval_scope": "conditional on fixed models/search seeds; pointwise, not simultaneous or training-population intervals",
+    "hypothesis_tests": "none; report all predeclared contrasts without significance labels"
+  },
+  "aggregates": {
+    "learned": {
+      "service_pct": {
+        "mean": 95.85416666666666,
+        "conditional_instance_percentile_CI95": [
+          95.125,
+          96.58333333333333
+        ]
+      },
+      "objective": {
+        "mean": 1195.8678924575106,
+        "conditional_instance_percentile_CI95": [
+          986.3342369046858,
+          1405.4886581620274
+        ]
+      },
+      "raw_cost": {
+        "mean": 1449.679671802497,
+        "conditional_instance_percentile_CI95": [
+          1242.372040022812,
+          1659.92642131993
+        ]
+      },
+      "energy_fee": {
+        "mean": 82.10020654682063,
+        "conditional_instance_percentile_CI95": [
+          80.93595035754389,
+          83.24506616021733
+        ]
+      },
+      "distance_km": {
+        "mean": 452.52813177328255,
+        "conditional_instance_percentile_CI95": [
+          446.0691197176955,
+          458.87677887282194
+        ]
+      },
+      "passenger_delay_fee": {
+        "mean": 0.0,
+        "conditional_instance_percentile_CI95": [
+          0.0,
+          0.0
+        ]
+      },
+      "cargo_delay_fee": {
+        "mean": 4.402381922343113,
+        "conditional_instance_percentile_CI95": [
+          2.9121005403560316,
+          6.188027284563433
+        ]
+      },
+      "vehicle_fee": {
+        "mean": 171.25,
+        "conditional_instance_percentile_CI95": [
+          168.95833333333334,
+          173.33333333333334
+        ]
+      },
+      "rejection_penalty": {
+        "mean": 1191.9270833333335,
+        "conditional_instance_percentile_CI95": [
+          982.2916666666667,
+          1401.5625
+        ]
+      },
+      "vehicles": {
+        "mean": 8.5625,
+        "conditional_instance_percentile_CI95": [
+          8.447916666666668,
+          8.666666666666668
+        ]
+      },
+      "algorithm_seconds": {
+        "mean": 5.608994259985289,
+        "conditional_instance_percentile_CI95": [
+          5.437612315187076,
+          5.790296761315949
+        ]
+      },
+      "passenger_service_pct": 96.99074074074075,
+      "cargo_service_pct": 93.91891891891892
+    },
+    "service_first": {
+      "service_pct": {
+        "mean": 96.35416666666666,
+        "conditional_instance_percentile_CI95": [
+          95.75,
+          96.95833333333334
+        ]
+      },
+      "objective": {
+        "mean": 1052.2317314523907,
+        "conditional_instance_percentile_CI95": [
+          878.5044766018706,
+          1225.9135752430195
+        ]
+      },
+      "raw_cost": {
+        "mean": 1305.5067558951994,
+        "conditional_instance_percentile_CI95": [
+          1132.725756199388,
+          1477.2071460864693
+        ]
+      },
+      "energy_fee": {
+        "mean": 81.02752854720086,
+        "conditional_instance_percentile_CI95": [
+          79.70640731603326,
+          82.33943499994544
+        ]
+      },
+      "distance_km": {
+        "mean": 446.27399400184487,
+        "conditional_instance_percentile_CI95": [
+          438.9776768353377,
+          453.5178722786603
+        ]
+      },
+      "passenger_delay_fee": {
+        "mean": 0.0,
+        "conditional_instance_percentile_CI95": [
+          0.0,
+          0.0
+        ]
+      },
+      "cargo_delay_fee": {
+        "mean": 7.135477347998617,
+        "conditional_instance_percentile_CI95": [
+          5.031360135797855,
+          9.333200129162341
+        ]
+      },
+      "vehicle_fee": {
+        "mean": 169.16666666666669,
+        "conditional_instance_percentile_CI95": [
+          166.45833333333331,
+          171.875
+        ]
+      },
+      "rejection_penalty": {
+        "mean": 1048.1770833333335,
+        "conditional_instance_percentile_CI95": [
+          874.4791666666667,
+          1221.875
+        ]
+      },
+      "vehicles": {
+        "mean": 8.458333333333332,
+        "conditional_instance_percentile_CI95": [
+          8.322916666666666,
+          8.59375
+        ]
+      },
+      "algorithm_seconds": {
+        "mean": 5.202006163586095,
+        "conditional_instance_percentile_CI95": [
+          5.096499145867225,
+          5.308588859033959
+        ]
+      },
+      "passenger_service_pct": 96.56084656084657,
+      "cargo_service_pct": 96.00225225225226
+    },
+    "insertion": {
+      "service_pct": {
+        "mean": 97.875,
+        "conditional_instance_percentile_CI95": [
+          97.125,
+          98.5625
+        ]
+      },
+      "objective": {
+        "mean": 613.9612258344437,
+        "conditional_instance_percentile_CI95": [
+          416.3513165368916,
+          829.5106928866417
+        ]
+      },
+      "raw_cost": {
+        "mean": 816.4844371248946,
+        "conditional_instance_percentile_CI95": [
+          621.7767947799985,
+          1027.293478953219
+        ]
+      },
+      "energy_fee": {
+        "mean": 63.88965520559873,
+        "conditional_instance_percentile_CI95": [
+          62.24537771954263,
+          65.42146321702262
+        ]
+      },
+      "distance_km": {
+        "mean": 351.877691592092,
+        "conditional_instance_percentile_CI95": [
+          342.7899225327484,
+          360.2991354065709
+        ]
+      },
+      "passenger_delay_fee": {
+        "mean": 0.0,
+        "conditional_instance_percentile_CI95": [
+          0.0,
+          0.0
+        ]
+      },
+      "cargo_delay_fee": {
+        "mean": 0.40728191929594243,
+        "conditional_instance_percentile_CI95": [
+          0.10941362896027812,
+          0.8607367066999434
+        ]
+      },
+      "vehicle_fee": {
+        "mean": 141.25,
+        "conditional_instance_percentile_CI95": [
+          138.125,
+          144.375
+        ]
+      },
+      "rejection_penalty": {
+        "mean": 610.9375,
+        "conditional_instance_percentile_CI95": [
+          413.28125,
+          826.5625
+        ]
+      },
+      "vehicles": {
+        "mean": 7.0625,
+        "conditional_instance_percentile_CI95": [
+          6.90625,
+          7.21875
+        ]
+      },
+      "algorithm_seconds": {
+        "mean": 2.9665406874992186,
+        "conditional_instance_percentile_CI95": [
+          2.8566086053095203,
+          3.0863782715323396
+        ]
+      },
+      "passenger_service_pct": 98.01587301587301,
+      "cargo_service_pct": 97.63513513513513
+    },
+    "LNS": {
+      "service_pct": {
+        "mean": 100.0,
+        "conditional_instance_percentile_CI95": [
+          100.0,
+          100.0
+        ]
+      },
+      "objective": {
+        "mean": 2.838431524872793,
+        "conditional_instance_percentile_CI95": [
+          2.804985034051298,
+          2.8670915461214475
+        ]
+      },
+      "raw_cost": {
+        "mean": 191.28882412699426,
+        "conditional_instance_percentile_CI95": [
+          188.97578875975006,
+          193.29995929790536
+        ]
+      },
+      "energy_fee": {
+        "mean": 53.36536204614764,
+        "conditional_instance_percentile_CI95": [
+          52.437965747289056,
+          54.231448727363286
+        ]
+      },
+      "distance_km": {
+        "mean": 293.6800680631379,
+        "conditional_instance_percentile_CI95": [
+          288.5817515696887,
+          298.45913684103317
+        ]
+      },
+      "passenger_delay_fee": {
+        "mean": 0.0,
+        "conditional_instance_percentile_CI95": [
+          0.0,
+          0.0
+        ]
+      },
+      "cargo_delay_fee": {
+        "mean": 0.006795414179962676,
+        "conditional_instance_percentile_CI95": [
+          0.001407230972123785,
+          0.014280814395420225
+        ]
+      },
+      "vehicle_fee": {
+        "mean": 137.91666666666669,
+        "conditional_instance_percentile_CI95": [
+          136.25,
+          139.16666666666669
+        ]
+      },
+      "rejection_penalty": {
+        "mean": 0.0,
+        "conditional_instance_percentile_CI95": [
+          0.0,
+          0.0
+        ]
+      },
+      "vehicles": {
+        "mean": 6.895833333333334,
+        "conditional_instance_percentile_CI95": [
+          6.8125,
+          6.958333333333334
+        ]
+      },
+      "algorithm_seconds": {
+        "mean": 12.966600009152899,
+        "conditional_instance_percentile_CI95": [
+          12.856638274015342,
+          13.086435673549264
+        ]
+      },
+      "passenger_service_pct": 100.0,
+      "cargo_service_pct": 100.0
+    },
+    "SCIP": {
+      "service_pct": {
+        "mean": 97.875,
+        "conditional_instance_percentile_CI95": [
+          97.125,
+          98.5625
+        ]
+      },
+      "objective": {
+        "mean": 613.9612258344437,
+        "conditional_instance_percentile_CI95": [
+          416.3513165368916,
+          829.5106928866417
+        ]
+      },
+      "raw_cost": {
+        "mean": 816.4844371248946,
+        "conditional_instance_percentile_CI95": [
+          621.7767947799985,
+          1027.293478953219
+        ]
+      },
+      "energy_fee": {
+        "mean": 63.88965520559873,
+        "conditional_instance_percentile_CI95": [
+          62.24537771954263,
+          65.42146321702262
+        ]
+      },
+      "distance_km": {
+        "mean": 351.877691592092,
+        "conditional_instance_percentile_CI95": [
+          342.7899225327484,
+          360.2991354065709
+        ]
+      },
+      "passenger_delay_fee": {
+        "mean": 0.0,
+        "conditional_instance_percentile_CI95": [
+          0.0,
+          0.0
+        ]
+      },
+      "cargo_delay_fee": {
+        "mean": 0.40728191929594243,
+        "conditional_instance_percentile_CI95": [
+          0.10941362896027812,
+          0.8607367066999434
+        ]
+      },
+      "vehicle_fee": {
+        "mean": 141.25,
+        "conditional_instance_percentile_CI95": [
+          138.125,
+          144.375
+        ]
+      },
+      "rejection_penalty": {
+        "mean": 610.9375,
+        "conditional_instance_percentile_CI95": [
+          413.28125,
+          826.5625
+        ]
+      },
+      "vehicles": {
+        "mean": 7.0625,
+        "conditional_instance_percentile_CI95": [
+          6.90625,
+          7.21875
+        ]
+      },
+      "algorithm_seconds": {
+        "mean": 15.738922730590275,
+        "conditional_instance_percentile_CI95": [
+          15.597107014592257,
+          15.891947962174527
+        ]
+      },
+      "passenger_service_pct": 98.01587301587301,
+      "cargo_service_pct": 97.63513513513513
+    }
+  },
+  "learned_minus_control": {
+    "service_first": {
+      "service_pct": {
+        "mean": -0.5,
+        "conditional_instance_percentile_CI95": [
+          -1.3958333333333335,
+          0.39583333333333437
+        ]
+      },
+      "objective": {
+        "mean": 143.63616100512002,
+        "conditional_instance_percentile_CI95": [
+          -113.91052561395573,
+          401.15934980174535
+        ]
+      },
+      "algorithm_seconds": {
+        "mean": 0.406988096399194,
+        "conditional_instance_percentile_CI95": [
+          0.2710810714379781,
+          0.5471313094255187
+        ]
+      }
+    },
+    "insertion": {
+      "service_pct": {
+        "mean": -2.0208333333333335,
+        "conditional_instance_percentile_CI95": [
+          -2.9375,
+          -1.1041666666666656
+        ]
+      },
+      "objective": {
+        "mean": 581.9066666230672,
+        "conditional_instance_percentile_CI95": [
+          318.3219082705425,
+          845.3517679995226
+        ]
+      },
+      "algorithm_seconds": {
+        "mean": 2.6424535724860716,
+        "conditional_instance_percentile_CI95": [
+          2.4017623484727366,
+          2.882196039017254
+        ]
+      }
+    },
+    "LNS": {
+      "service_pct": {
+        "mean": -4.145833333333334,
+        "conditional_instance_percentile_CI95": [
+          -4.875,
+          -3.4166666666666674
+        ]
+      },
+      "objective": {
+        "mean": 1193.0294609326381,
+        "conditional_instance_percentile_CI95": [
+          983.5068197826887,
+          1402.6492406895434
+        ]
+      },
+      "algorithm_seconds": {
+        "mean": -7.357605749167609,
+        "conditional_instance_percentile_CI95": [
+          -7.598295300306836,
+          -7.1178606900194605
+        ]
+      }
+    },
+    "SCIP": {
+      "service_pct": {
+        "mean": -2.0208333333333335,
+        "conditional_instance_percentile_CI95": [
+          -2.9375,
+          -1.1041666666666656
+        ]
+      },
+      "objective": {
+        "mean": 581.9066666230672,
+        "conditional_instance_percentile_CI95": [
+          318.3219082705425,
+          845.3517679995226
+        ]
+      },
+      "algorithm_seconds": {
+        "mean": -10.129928470604984,
+        "conditional_instance_percentile_CI95": [
+          -10.381959269863758,
+          -9.885253541778699
+        ]
+      }
+    }
+  },
+  "three_training_seed_effects": [
+    {
+      "training_seed": 1234,
+      "learned_service_pct": 96.125,
+      "rule_service_pct": 96.4375,
+      "paired_service_difference_pp": -0.3125
+    },
+    {
+      "training_seed": 4321,
+      "learned_service_pct": 94.5625,
+      "rule_service_pct": 96,
+      "paired_service_difference_pp": -1.4375
+    },
+    {
+      "training_seed": 8765,
+      "learned_service_pct": 96.875,
+      "rule_service_pct": 96.625,
+      "paired_service_difference_pp": 0.25
+    }
+  ],
+  "training_seed_mean_difference_pp": -0.5,
+  "training_seed_difference_sample_sd_pp": 0.85923294280422,
+  "LNS_anytime": {
+    "1.0": {
+      "available_runs": 0,
+      "total_runs": 96,
+      "mean_service_pct_among_available": null,
+      "warning": "Unavailable early solutions are not backfilled from future results. Conditional available-case mean is not whole-benchmark quality."
+    },
+    "3.0": {
+      "available_runs": 57,
+      "total_runs": 96,
+      "mean_service_pct_among_available": 98.59649122807018,
+      "warning": "Unavailable early solutions are not backfilled from future results. Conditional available-case mean is not whole-benchmark quality."
+    },
+    "10.0": {
+      "available_runs": 96,
+      "total_runs": 96,
+      "mean_service_pct_among_available": 100,
+      "warning": "Unavailable early solutions are not backfilled from future results. Conditional available-case mean is not whole-benchmark quality."
+    }
+  },
+  "SCIP": {
+    "status_counts": {
+      "timelimit": 32
+    },
+    "proven_optimal_instances": 0,
+    "native_gap_values": [
+      1e+20,
+      1e+20,
+      1e+20,
+      14.359753480291285,
+      1e+20,
+      17.874960026377856,
+      1e+20,
+      16.212230238963112,
+      1e+20,
+      1e+20,
+      14.932101257952587,
+      1e+20,
+      15.893339815718306,
+      16.30974451157654,
+      1e+20,
+      1e+20,
+      1e+20,
+      19.552938353029162,
+      1e+20,
+      13.570618081829748,
+      17.81049955908299,
+      17.091525905747233,
+      1e+20,
+      1e+20,
+      1e+20,
+      1e+20,
+      15.972973487748266,
+      17.108267462791023,
+      1e+20,
+      1e+20,
+      1e+20,
+      1e+20
+    ],
+    "relative_gap_to_primal": [
+      8.67305321000019e+16,
+      1.730130275858205e+17,
+      1.7290632836681693e+17,
+      0.9348947884298312,
+      8.673272924605832e+16,
+      0.9470197553476938,
+      1.7300181451789085e+17,
+      0.9419017764626276,
+      1.7302341481720336e+17,
+      1.730056955038282e+17,
+      0.9372336401953982,
+      1.7301847629945942e+17,
+      0.940805074016829,
+      0.9422290722239596,
+      8.6731806161474e+16,
+      8.673497215731093e+16,
+      5.786895563756018e+16,
+      0.9513451564528915,
+      1.730169726417663e+17,
+      0.9313687316225077,
+      0.9468382008218845,
+      0.9447255026906092,
+      5.787199195392767e+16,
+      8.672957871017582e+16,
+      5.7886691613454104e+16,
+      8.676475828083531e+16,
+      0.9410828043346773,
+      0.9447766053790179,
+      1.7301370543056163e+17,
+      5.786991026790317e+16,
+      1.7300557838816458e+17,
+      1.7300921811511434e+17
+    ],
+    "warning": "Native SCIP gap uses a different denominator. Huge sentinel values or no useful lower bound do not establish tight optimality gaps; warm-start performance is not attributed to optimization."
+  },
+  "timing": "Algorithm time on same CPU1 thread, sequential methods; neural includes construction, baseline includes initialization. Imports/checkpoint loading and final audits separate. SCIP wrapper includes its own mandatory original-instance audit, plus separately recorded common final audit. No general hardware speedup claim.",
+  "selection_warning": "Existing weights were trained in the former environment. These results compare deployments in corrected hard4 evaluation, not newly trained pure-component causal ablation.",
+  "software": {
+    "numpy": "1.26.4"
+  },
+  "analysis_source_sha256": "3f0a3c7f6399fef1e6e3894ee29c3862877b88191a5155ffb9e3eadc55d4b9fe"
+}

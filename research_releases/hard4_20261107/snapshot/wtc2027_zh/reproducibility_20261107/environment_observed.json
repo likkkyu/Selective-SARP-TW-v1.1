@@ -1,0 +1,18 @@
+{
+  "scope": "Observed analysis interpreter; not a portable lockfile or performance-normalized hardware benchmark",
+  "python": "3.12.9 | packaged by Anaconda, Inc. | (main, Feb  6 2025, 12:55:12) [Clang 14.0.6 ]",
+  "executable": "/opt/anaconda3/bin/python",
+  "platform": "macOS-14.5-arm64-arm-64bit",
+  "machine": "arm64",
+  "device_used": "cpu",
+  "torch_threads_in_evaluation_reports": 1,
+  "packages": {
+    "torch": "2.6.0",
+    "numpy": "1.26.4",
+    "scipy": "1.15.2",
+    "pyscipopt": "5.4.1",
+    "matplotlib": "3.10.0",
+    "Pillow": "11.1.0"
+  },
+  "notes": "Word/PDF generation uses the separate bundled document runtime and must record that build environment independently. Wall-clock search can vary with host load; no CUDA equivalence has been validated."
+}
