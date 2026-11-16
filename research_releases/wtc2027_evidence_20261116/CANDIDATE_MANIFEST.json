@@ -1,5 +1,5 @@
 {
-  "status": "local_candidate_not_published",
+  "status": "published_git_snapshot",
   "created_utc": "2026-11-16T18:29:34.607735+00:00",
   "scope": "Code and result evidence for N100 and Shenzhen road-network validation; manuscript and all tensor/checkpoint files excluded",
   "source_git_head": "477897ca5fa1177930d4ca68a1acd81eda14ffeb",
@@ -4432,5 +4432,8 @@
     "osm_derived_data": "ODbL; see ODBL_ATTRIBUTION.md",
     "model_weights": "not distributed and no reuse licence asserted"
   },
-  "boundary": "A local hash-audited candidate is not a public GitHub release, archival DOI, independent reproduction, field trial, or solver-optimality certificate."
+  "boundary": "A public Git snapshot supplies code and result evidence, but is not an archival DOI, independent reproduction, field trial, model-weight release, or solver-optimality certificate.",
+  "public_candidate_commit_read_back": "0d2280682bea6ac6313331e3ff7b12639fd50b39",
+  "public_branch": "codex/wtc-n100-road-release-20261116",
+  "publication_verification": "The candidate commit was pushed and its branch ref was read back with an exact SHA match before this finalization commit."
 }
