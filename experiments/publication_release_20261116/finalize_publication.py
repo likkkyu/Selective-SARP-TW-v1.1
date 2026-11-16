@@ -22,6 +22,10 @@ def main():
     manifest["publication_verification"] = (
         "The candidate commit was pushed and its branch ref was read back with an exact SHA match before this finalization commit."
     )
+    manifest["boundary"] = (
+        "A public Git snapshot supplies code and result evidence, but is not an archival DOI, independent reproduction, "
+        "field trial, model-weight release, or solver-optimality certificate."
+    )
     manifest_path.write_text(json.dumps(manifest, ensure_ascii=False, indent=2), encoding="utf-8")
     readme = release / "README.md"
     text = readme.read_text(encoding="utf-8")
