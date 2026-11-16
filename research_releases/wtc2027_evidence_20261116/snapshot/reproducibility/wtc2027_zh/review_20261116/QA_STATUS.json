@@ -1,13 +1,13 @@
 {
   "status": "passed",
   "review_date": "2026-11-17",
-  "scope": "Current WTC Chinese working draft after fixed-commit synchronization and nine-checkpoint availability correction",
+  "scope": "Current WTC Chinese working draft after fixed-commit synchronization and twelve-checkpoint availability correction",
   "source_path": "wtc2027_zh/论文正文.md",
-  "source_sha256": "17aa8b822271419e8572e49e2ad9d040ca69bbe9c4c54ae636eb0435216f7496",
+  "source_sha256": "0d832f30b33fee0f0d3ba37a0f3f569b0dd7052eb831ca427beedc4259e05428",
   "docx_path": "wtc2027_zh/WTC2027_客货协同调度_中文工作稿.docx",
-  "docx_sha256": "088b1a09704a93303fd53fe04207b1bdcfa25209126c20d51455b3553821dabe",
+  "docx_sha256": "1e277d5ed0a6e63383f3edf40362778cfa280e6e693569dccb7048676bac1ace",
   "rendered_pdf_path": "wtc2027_zh/review_20261116/render/WTC2027_客货协同调度_中文工作稿.pdf",
-  "rendered_pdf_sha256": "93714d12e5d2695868aae704e7aa6e813f4508f58b4981ea43f09e05f81878a9",
+  "rendered_pdf_sha256": "5fdc9e3b1f40853cefc54d87161c60251a36b97398d36ba96afe0b4cb244833f",
   "pages": 8,
   "complete_visual_review": true,
   "pages_reviewed": [1, 2, 3, 4, 5, 6, 7, 8],
@@ -21,7 +21,7 @@
     "reference_19_and_osm_attribution": "passed",
     "reference_page_legibility": "passed",
     "fixed_public_release_commit": "passed",
-    "nine_checkpoint_availability_statement": "passed"
+    "twelve_checkpoint_availability_statement": "passed"
   },
   "known_non_defects": [
     "Author, affiliation, funding and corresponding-author fields remain intentionally blank pending author input.",

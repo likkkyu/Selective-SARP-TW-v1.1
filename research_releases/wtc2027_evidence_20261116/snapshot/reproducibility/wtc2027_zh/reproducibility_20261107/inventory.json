@@ -1,6 +1,6 @@
 {
   "status": "complete_local_inventory",
-  "created_utc": "2026-11-16T18:27:21Z",
+  "created_utc": "2026-11-16T18:34:49Z",
   "target": "WTC2027 Chinese conference manuscript; availability appendix prepared as reproducibility material, not a claim that Nature-specific policy is mandatory",
   "studies": [
     {
@@ -1899,6 +1899,42 @@
       "sha256": "085ec780623a092b4b1088e974eac66a50adda430e5daf8717a71716c0fdc9ea",
       "hash_validation": "fresh final inventory",
       "access_status": "local file; checkpoint bytes not publicly released"
+    },
+    {
+      "scale": "Shenzhen-road-N50",
+      "policy": "road_native_learned",
+      "initial_model_seed": 1234,
+      "training_seed": 20261115,
+      "path": "experiments/shenzhen_real_road_20261112/road_native_formal_n512_seed1234_v1/best.pt",
+      "bytes": 11144811,
+      "sha256": "559f588a9e6eca194d99780f871663ea4e2bf171c5b949e692d1a3f6de771d22",
+      "checkpoint_epoch": 14,
+      "hash_validation": "fresh final inventory",
+      "access_status": "local file; checkpoint bytes not publicly released"
+    },
+    {
+      "scale": "Shenzhen-road-N50",
+      "policy": "road_native_learned",
+      "initial_model_seed": 4321,
+      "training_seed": 20261116,
+      "path": "experiments/shenzhen_real_road_20261112/road_native_formal_n512_seed4321_v1/best.pt",
+      "bytes": 11144811,
+      "sha256": "be41623d998eba1afd5b3a0b521b4d25f3cbd584746c90ca93737c637ae1c79e",
+      "checkpoint_epoch": 11,
+      "hash_validation": "fresh final inventory",
+      "access_status": "local file; checkpoint bytes not publicly released"
+    },
+    {
+      "scale": "Shenzhen-road-N50",
+      "policy": "road_native_learned",
+      "initial_model_seed": 8765,
+      "training_seed": 20261117,
+      "path": "experiments/shenzhen_real_road_20261112/road_native_formal_n512_seed8765_v1/best.pt",
+      "bytes": 11144811,
+      "sha256": "ce2dcd779f25d4e1a5b3adc41f9f2f615040b22219d83925dfa1723eded17da1",
+      "checkpoint_epoch": 15,
+      "hash_validation": "fresh final inventory",
+      "access_status": "local file; checkpoint bytes not publicly released"
     }
   ],
   "supporting_validation": [
@@ -2019,12 +2055,12 @@
     },
     {
       "path": "wtc2027_zh/review_20261116/REFERENCE_VERIFICATION.md",
-      "sha256": "83da3c6f9079c1e1a7ec90dc06886177341cf2da188b1f6b08c60b58ffd8b4c7",
+      "sha256": "c67a4bc422282067848856272590d585cf8a9eb44fc0531253bdd99fde60f302",
       "role": "supporting validation, training metadata or analytic derivation; not an extra performance replicate"
     },
     {
       "path": "wtc2027_zh/review_20261116/REFERENCE_VERIFICATION.json",
-      "sha256": "7eb407f62f6f8bba68b72122e88b370326013a559e329d898a12f11912f45c1d",
+      "sha256": "c1793576338eaf9a0a34db6bef47f63eb24b959ea196884f5b1b4a8c7554dd88",
       "role": "supporting validation, training metadata or analytic derivation; not an extra performance replicate"
     }
   ],

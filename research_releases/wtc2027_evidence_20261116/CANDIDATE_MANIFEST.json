@@ -1,11 +1,11 @@
 {
-  "status": "published_git_snapshot",
-  "created_utc": "2026-11-16T18:29:34.607735+00:00",
+  "status": "local_candidate_not_published",
+  "created_utc": "2026-11-16T18:34:50.579899+00:00",
   "scope": "Code and result evidence for N100 and Shenzhen road-network validation; manuscript and all tensor/checkpoint files excluded",
   "source_git_head": "477897ca5fa1177930d4ca68a1acd81eda14ffeb",
   "source_worktree_note": "candidate includes explicitly hashed frozen source bytes and may be built from a dirty working tree",
   "previous_public_release_commit": "1505564a9fc06cf226d56eae30484adfc7b42574",
-  "manuscript_sha256": "17aa8b822271419e8572e49e2ad9d040ca69bbe9c4c54ae636eb0435216f7496",
+  "manuscript_sha256": "0d832f30b33fee0f0d3ba37a0f3f569b0dd7052eb831ca427beedc4259e05428",
   "files": [
     {
       "path": "snapshot/frozen_code/experiments/dispatch_clock_fix_20261106/baseline_smoke.py",
@@ -719,8 +719,8 @@
     },
     {
       "path": "snapshot/reproducibility/wtc2027_zh/reproducibility_20261107/inventory.json",
-      "bytes": 108900,
-      "sha256": "59bfda29d3375cca4ba0d352be356a2fa3397cbdc79a8c7c47ba216f9c15db76"
+      "bytes": 110463,
+      "sha256": "44f5445f1296fbdd8b3741bc60f5877b8894c8f0b4ea5dab822c5c1f5ddb58d6"
     },
     {
       "path": "snapshot/reproducibility/wtc2027_zh/reproducibility_20261107/n100_claim_audit.json",
@@ -734,18 +734,18 @@
     },
     {
       "path": "snapshot/reproducibility/wtc2027_zh/review_20261116/QA_STATUS.json",
-      "bytes": 1725,
-      "sha256": "487bcfa1000965a0d107c868da26c98b165ad1389db2e4b6aa446811002701bb"
+      "bytes": 1729,
+      "sha256": "6e3997e877e1e1f15f23ef70ab3c3621bb4422008e5c136f96eface1c62fabc1"
     },
     {
       "path": "snapshot/reproducibility/wtc2027_zh/review_20261116/REFERENCE_VERIFICATION.json",
       "bytes": 4368,
-      "sha256": "7eb407f62f6f8bba68b72122e88b370326013a559e329d898a12f11912f45c1d"
+      "sha256": "c1793576338eaf9a0a34db6bef47f63eb24b959ea196884f5b1b4a8c7554dd88"
     },
     {
       "path": "snapshot/reproducibility/wtc2027_zh/review_20261116/REFERENCE_VERIFICATION.md",
       "bytes": 5476,
-      "sha256": "83da3c6f9079c1e1a7ec90dc06886177341cf2da188b1f6b08c60b58ffd8b4c7"
+      "sha256": "c67a4bc422282067848856272590d585cf8a9eb44fc0531253bdd99fde60f302"
     },
     {
       "path": "snapshot/results/experiments/lazy_v4_hybrid_confirmation_20261116/PAIRED_ANALYSIS.json",
@@ -4300,100 +4300,88 @@
   ],
   "omitted_model_identifiers": [
     {
+      "scale": "N50",
       "policy": "learned",
       "training_seed": 1234,
       "sha256": "116e9b67cdd8cc5c1464d54b466693ddbfe7f4475625ca4350744201be8125f1",
       "bytes": 33364827
     },
     {
+      "scale": "N50",
       "policy": "service_first",
       "training_seed": 1234,
       "sha256": "39e5f97dc9038b75eab258d5a92a3c75082e2a6dbf869205250e5d5f5b588701",
       "bytes": 33364827
     },
     {
+      "scale": "N50",
       "policy": "learned",
       "training_seed": 4321,
       "sha256": "a87c248c4fd4b9933c690da4c3edbd1bd9208822e5ca101da04091b99e075a01",
       "bytes": 33364827
     },
     {
+      "scale": "N50",
       "policy": "service_first",
       "training_seed": 4321,
       "sha256": "347c8fea88d1e7f2be62e084f1ff62253c3a7b259a82cf3b110eaeb0380be227",
       "bytes": 33364827
     },
     {
+      "scale": "N50",
       "policy": "learned",
       "training_seed": 8765,
       "sha256": "99f83d2410aa6c305796cc3b712bbc8c60050a24c3a39ea8eb9464948e1b1472",
       "bytes": 33364827
     },
     {
+      "scale": "N50",
       "policy": "service_first",
       "training_seed": 8765,
       "sha256": "36d5dcb15c3f500322986b437f9263f9af5f95715e4f881b5a1fa609bf911f1c",
       "bytes": 33364827
     },
     {
+      "scale": "N100",
       "policy": "learned_transfer",
       "training_seed": 314159,
       "sha256": "55944fc4853f5d957a7bd47fe127cba2cf669675535fc4af8112b9c34a0fc188",
       "bytes": 33365723
     },
     {
+      "scale": "N100",
       "policy": "learned_transfer",
       "training_seed": 271828,
       "sha256": "170ca0f3268ce8915c1cdf0bb2a9061143078d627fbbeb9c1eb767d30368ffd1",
       "bytes": 33365723
     },
     {
+      "scale": "N100",
       "policy": "learned_transfer",
       "training_seed": 161803,
       "sha256": "085ec780623a092b4b1088e974eac66a50adda430e5daf8717a71716c0fdc9ea",
       "bytes": 33365723
     },
     {
-      "initial_model_seed": 1234,
+      "scale": "Shenzhen-road-N50",
+      "policy": "road_native_learned",
       "training_seed": 20261115,
-      "checkpoint": "experiments/shenzhen_real_road_20261112/road_native_formal_n512_seed1234_v1/best.pt",
-      "checkpoint_sha256": "559f588a9e6eca194d99780f871663ea4e2bf171c5b949e692d1a3f6de771d22",
-      "checkpoint_epoch": 14,
-      "validation_service_rate_percent": 91.8125,
-      "validation_mean_objective_cost": 2478.084185563028,
-      "validation_hard_invalid": 0,
-      "training_protocol": "experiments/shenzhen_real_road_20261112/road_native_formal_n512_seed1234_v1/protocol.json",
-      "training_protocol_sha256": "817e3f27c42a737d5a837afaa01be1f672b60c2ffbbfb3f9bdf78dacda394864",
-      "independent_validation": "experiments/shenzhen_real_road_20261112/road_native_formal_n512_seed1234_v1/independent_validation_best.json",
-      "independent_validation_sha256": "25128cd4c1920cc4ec840002f653aaf4f454969e8f7793e9a0d46dff3eb158bb"
+      "sha256": "559f588a9e6eca194d99780f871663ea4e2bf171c5b949e692d1a3f6de771d22",
+      "bytes": 11144811
     },
     {
-      "initial_model_seed": 4321,
+      "scale": "Shenzhen-road-N50",
+      "policy": "road_native_learned",
       "training_seed": 20261116,
-      "checkpoint": "experiments/shenzhen_real_road_20261112/road_native_formal_n512_seed4321_v1/best.pt",
-      "checkpoint_sha256": "be41623d998eba1afd5b3a0b521b4d25f3cbd584746c90ca93737c637ae1c79e",
-      "checkpoint_epoch": 11,
-      "validation_service_rate_percent": 90.5,
-      "validation_mean_objective_cost": 2795.6028438210487,
-      "validation_hard_invalid": 0,
-      "training_protocol": "experiments/shenzhen_real_road_20261112/road_native_formal_n512_seed4321_v1/protocol.json",
-      "training_protocol_sha256": "7924dd18435b4deafec7e3d8e014e16c1860befa86c95e906d3f31eadffdddd0",
-      "independent_validation": "experiments/shenzhen_real_road_20261112/road_native_formal_n512_seed4321_v1/independent_validation_best.json",
-      "independent_validation_sha256": "0db4d21b55fc72db2f3bf7f19aa91c86b461104e2c17bdeffd2b66643e87f66f"
+      "sha256": "be41623d998eba1afd5b3a0b521b4d25f3cbd584746c90ca93737c637ae1c79e",
+      "bytes": 11144811
     },
     {
-      "initial_model_seed": 8765,
+      "scale": "Shenzhen-road-N50",
+      "policy": "road_native_learned",
       "training_seed": 20261117,
-      "checkpoint": "experiments/shenzhen_real_road_20261112/road_native_formal_n512_seed8765_v1/best.pt",
-      "checkpoint_sha256": "ce2dcd779f25d4e1a5b3adc41f9f2f615040b22219d83925dfa1723eded17da1",
-      "checkpoint_epoch": 15,
-      "validation_service_rate_percent": 93.3125,
-      "validation_mean_objective_cost": 1926.6682860553265,
-      "validation_hard_invalid": 0,
-      "training_protocol": "experiments/shenzhen_real_road_20261112/road_native_formal_n512_seed8765_v1/protocol.json",
-      "training_protocol_sha256": "9edf5d6eb40878cd71fc9366f317eb773164cb5905851057dbf3ff46853d4906",
-      "independent_validation": "experiments/shenzhen_real_road_20261112/road_native_formal_n512_seed8765_v1/independent_validation_best.json",
-      "independent_validation_sha256": "a689e8e43d6b7330dfce34092656157a52723e0f4f1039ff09af9bdcc4dbbe6f"
+      "sha256": "ce2dcd779f25d4e1a5b3adc41f9f2f615040b22219d83925dfa1723eded17da1",
+      "bytes": 11144811
     }
   ],
   "secret_scan": {
@@ -4432,8 +4420,5 @@
     "osm_derived_data": "ODbL; see ODBL_ATTRIBUTION.md",
     "model_weights": "not distributed and no reuse licence asserted"
   },
-  "boundary": "A public Git snapshot supplies code and result evidence, but is not an archival DOI, independent reproduction, field trial, model-weight release, or solver-optimality certificate.",
-  "public_candidate_commit_read_back": "0d2280682bea6ac6313331e3ff7b12639fd50b39",
-  "public_branch": "codex/wtc-n100-road-release-20261116",
-  "publication_verification": "The candidate commit was pushed and its branch ref was read back with an exact SHA match before this finalization commit."
+  "boundary": "A local hash-audited candidate is not a public GitHub release, archival DOI, independent reproduction, field trial, or solver-optimality certificate."
 }

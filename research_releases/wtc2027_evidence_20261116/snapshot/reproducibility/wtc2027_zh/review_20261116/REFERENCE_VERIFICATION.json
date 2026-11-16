@@ -2,7 +2,7 @@
   "status": "passed_current_19_reference_metadata_and_semantic_placement",
   "audit_date": "2026-11-17",
   "manuscript": "wtc2027_zh/论文正文.md",
-  "manuscript_sha256": "17aa8b822271419e8572e49e2ad9d040ca69bbe9c4c54ae636eb0435216f7496",
+  "manuscript_sha256": "0d832f30b33fee0f0d3ba37a0f3f569b0dd7052eb831ca427beedc4259e05428",
   "scope": "Bibliographic metadata, continuous citation coverage, and local claim-to-source semantic support; not independent replication of cited studies",
   "reference_count": 19,
   "all_references_cited": true,
