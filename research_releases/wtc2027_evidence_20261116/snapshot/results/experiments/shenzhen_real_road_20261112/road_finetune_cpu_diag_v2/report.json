@@ -1,0 +1,244 @@
+{
+  "protocol": {
+    "status": "running",
+    "scope": "road-matrix fine-tuning diagnostic; no formal P1 test exposure",
+    "pool_sha256": "6ec5b69453a4f0091bbed0b49846b84fe16cf87623a516ec1bc8c624b69d8f96",
+    "pool_seed": 2026111301,
+    "formal_test_sha256_excluded": "fb062d7696da02dabf56f5d93f9efbe74db75dff61ec05aa6151dc558b708b98",
+    "initial_checkpoint_sha256": "116e9b67cdd8cc5c1464d54b466693ddbfe7f4475625ca4350744201be8125f1",
+    "training_indices": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15,
+      16,
+      18,
+      19,
+      20,
+      21,
+      22,
+      23,
+      25,
+      27,
+      28,
+      29,
+      30,
+      31,
+      32,
+      33,
+      34,
+      35,
+      36,
+      37,
+      38,
+      39,
+      40,
+      41,
+      42,
+      43,
+      44,
+      46,
+      48,
+      49,
+      50,
+      52,
+      53,
+      54,
+      56,
+      57,
+      58,
+      59,
+      60,
+      61,
+      62,
+      63
+    ],
+    "validation_indices": [
+      9,
+      17,
+      24,
+      26,
+      45,
+      47,
+      51,
+      55
+    ],
+    "epochs": 10,
+    "batch_size": 4,
+    "learning_rate": 1e-06,
+    "gradient_clip": 1.0,
+    "seed": 20261113,
+    "max_minutes": 10.0,
+    "state_kwargs": {
+      "max_concurrent_open_orders": 6,
+      "min_orders_per_dispatch": 4,
+      "enable_delivery_viability": true,
+      "enable_viability_fallback": false,
+      "relax_pickup_commitment_trip_time": false
+    }
+  },
+  "epochs": [
+    {
+      "epoch": 1,
+      "train_mean_cost": 13638.304408482143,
+      "train_mean_loss": 39688.30412946428,
+      "train_mean_gradient_norm_before_clip": 2110183.40625,
+      "validation": {
+        "instances": 8,
+        "mean_cost": 10496.72119140625,
+        "mean_completed": 31.75,
+        "service_rate_percent": 63.5,
+        "hard_invalid": 0,
+        "forced_underfilled_declines": 16,
+        "decode_seconds": 1.0787605419900501
+      }
+    },
+    {
+      "epoch": 2,
+      "train_mean_cost": 12714.282165527344,
+      "train_mean_loss": 39223.919189453125,
+      "train_mean_gradient_norm_before_clip": 2662976.7276785714,
+      "validation": {
+        "instances": 8,
+        "mean_cost": 10281.11865234375,
+        "mean_completed": 32.125,
+        "service_rate_percent": 64.25,
+        "hard_invalid": 0,
+        "forced_underfilled_declines": 18,
+        "decode_seconds": 1.1741485840029782
+      }
+    },
+    {
+      "epoch": 3,
+      "train_mean_cost": 11256.585566929409,
+      "train_mean_loss": 43502.4453125,
+      "train_mean_gradient_norm_before_clip": 2549192.6696428573,
+      "validation": {
+        "instances": 8,
+        "mean_cost": 8556.4072265625,
+        "mean_completed": 35.125,
+        "service_rate_percent": 70.25,
+        "hard_invalid": 0,
+        "forced_underfilled_declines": 16,
+        "decode_seconds": 1.190883916002349
+      }
+    },
+    {
+      "epoch": 4,
+      "train_mean_cost": 12355.03976876395,
+      "train_mean_loss": 66630.23374720982,
+      "train_mean_gradient_norm_before_clip": 2612042.3035714286,
+      "validation": {
+        "instances": 8,
+        "mean_cost": 9418.73681640625,
+        "mean_completed": 33.625,
+        "service_rate_percent": 67.25,
+        "hard_invalid": 0,
+        "forced_underfilled_declines": 19,
+        "decode_seconds": 1.2301345000159927
+      }
+    },
+    {
+      "epoch": 5,
+      "train_mean_cost": 10702.155085972377,
+      "train_mean_loss": 56132.84821428572,
+      "train_mean_gradient_norm_before_clip": 2744653.0535714286,
+      "validation": {
+        "instances": 8,
+        "mean_cost": 7262.869140625,
+        "mean_completed": 37.375,
+        "service_rate_percent": 74.75,
+        "hard_invalid": 0,
+        "forced_underfilled_declines": 14,
+        "decode_seconds": 1.1418545409978833
+      }
+    },
+    {
+      "epoch": 6,
+      "train_mean_cost": 8833.763318743024,
+      "train_mean_loss": 34467.211146763395,
+      "train_mean_gradient_norm_before_clip": 2315972.285714286,
+      "validation": {
+        "instances": 8,
+        "mean_cost": 9562.46826171875,
+        "mean_completed": 33.375,
+        "service_rate_percent": 66.75,
+        "hard_invalid": 0,
+        "forced_underfilled_declines": 21,
+        "decode_seconds": 1.0926185839925893
+      }
+    },
+    {
+      "epoch": 7,
+      "train_mean_cost": 10209.402587890625,
+      "train_mean_loss": 69004.99086216518,
+      "train_mean_gradient_norm_before_clip": 2743848.375,
+      "validation": {
+        "instances": 8,
+        "mean_cost": 9275.02685546875,
+        "mean_completed": 33.875,
+        "service_rate_percent": 67.75,
+        "hard_invalid": 0,
+        "forced_underfilled_declines": 18,
+        "decode_seconds": 1.1744024159997934
+      }
+    },
+    {
+      "epoch": 8,
+      "train_mean_cost": 9398.420013427734,
+      "train_mean_loss": 34923.39069475447,
+      "train_mean_gradient_norm_before_clip": 2080054.0,
+      "validation": {
+        "instances": 8,
+        "mean_cost": 8628.2822265625,
+        "mean_completed": 35.0,
+        "service_rate_percent": 70.0,
+        "hard_invalid": 0,
+        "forced_underfilled_declines": 15,
+        "decode_seconds": 1.334888500001398
+      }
+    },
+    {
+      "epoch": 9,
+      "train_mean_cost": 9059.624106270927,
+      "train_mean_loss": 46991.71491350447,
+      "train_mean_gradient_norm_before_clip": 2381049.25,
+      "validation": {
+        "instances": 8,
+        "mean_cost": 8053.427978515625,
+        "mean_completed": 36.0,
+        "service_rate_percent": 72.0,
+        "hard_invalid": 0,
+        "forced_underfilled_declines": 18,
+        "decode_seconds": 1.4013978330040118
+      }
+    },
+    {
+      "epoch": 10,
+      "train_mean_cost": 8987.724038260323,
+      "train_mean_loss": 44016.78109305246,
+      "train_mean_gradient_norm_before_clip": 2374282.5859375,
+      "validation": {
+        "instances": 8,
+        "mean_cost": 6903.669677734375,
+        "mean_completed": 38.0,
+        "service_rate_percent": 76.0,
+        "hard_invalid": 0,
+        "forced_underfilled_declines": 15,
+        "decode_seconds": 1.3690339579916326
+      }
+    }
+  ],
+  "status": "completed"
+}

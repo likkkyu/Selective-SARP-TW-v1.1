@@ -1,0 +1,43 @@
+{
+  "status": "frozen_before_short_lns_alignment",
+  "created_local": "2026-11-16T18:28:00+08:00",
+  "scope": "Apply the previously selected 0.5-second fixed-seed LNS to each of the three frozen current-model starts on the exact 30-instance N100 SCIP common set.",
+  "graph_size": 100,
+  "samples": 30,
+  "dataset_seed": 2026111600,
+  "training_seeds": [314159, 271828, 161803],
+  "short_lns": {
+    "search_seed": 1234,
+    "seconds_per_instance": 0.5,
+    "max_iterations": 1000,
+    "same_budget_and_seed_for_every_start": true
+  },
+  "hard_minimum_completed_orders_per_trip": 4,
+  "cost_semantics_version": 4,
+  "total_timeout_seconds": 900,
+  "stopping_rule": "Run all 30 instances and all three starts or fail closed; retain every outcome and do not retry automatically.",
+  "claim_boundary": "Post hoc same-instance alignment evaluation using a search budget selected before these alignment outcomes; it supports descriptive quality-time comparison, not blinded model selection.",
+  "input_reports": [
+    {
+      "label": "neural_314159",
+      "path": "experiments/lazy_v4_scip_alignment_20261116/results/seed_314159/report.json",
+      "sha256": "56ba6a6830e6c937da286b7c03643dd2b74c55ce086a1713fb45ffeef63db415"
+    },
+    {
+      "label": "neural_271828",
+      "path": "experiments/lazy_v4_scip_alignment_20261116/results/seed_271828_serial_retry1/report.json",
+      "sha256": "7bc648f1efc557a43d74fb462b338140ed98d28694ade792301b50e0992bdb2f"
+    },
+    {
+      "label": "neural_161803",
+      "path": "experiments/lazy_v4_scip_alignment_20261116/results/seed_161803/report.json",
+      "sha256": "c546502e5fcf59528c80c7f02a2df1b3335b503259a2971aa9ca066b74ddb20f"
+    }
+  ],
+  "source_sha256": {
+    "experiments/lazy_v4_scip_alignment_20261116/run_short_lns.py": "78c4bf4d932d84e45dc7d1c4b9e5e98345ac335bb1a70f61aecaf278f0a503bf",
+    "experiments/drl_canonical_audit_20261115/audit_common.py": "47b122896316c335c04e25e31a9515b1d64f499f019b35b10bdedd7d96d3a328",
+    "experiments/hard4_lns_20261106/route_engine.py": "0a9d1977f19dbc4bfad7c2a0eb83eba4a00e00ee01f066335c521dcc39bc034f",
+    "experiments/hard4_lns_20261106/search.py": "ae50a644aba55b0b9d78a790ec6cbd9cef5d9f0226171e62636c9c4b427a75a7"
+  }
+}

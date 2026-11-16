@@ -1,0 +1,291 @@
+{
+  "status": "passed",
+  "scope": "Apply the previously selected 0.5-second fixed-seed LNS to each of the three frozen current-model starts on the exact 30-instance N100 SCIP common set.",
+  "claim_boundary": "Post hoc same-instance alignment evaluation using a search budget selected before these alignment outcomes; it supports descriptive quality-time comparison, not blinded model selection.",
+  "experimental_unit": "paired N100 instance; training seeds averaged within each instance",
+  "samples": 30,
+  "training_seeds": [
+    314159,
+    271828,
+    161803
+  ],
+  "methods": {
+    "current_neural_seed_averaged": {
+      "service_rate": 0.956,
+      "objective": 2534.5784703917857,
+      "raw_cost": 3047.467488973844,
+      "distance": 844.7097290374107,
+      "vehicles": 16.666666666666668,
+      "mean_inference_seconds_local_cpu": 2.0542289296223317
+    },
+    "neural_plus_0_5s_lns_seed_averaged": {
+      "service_rate": 0.979,
+      "objective": 1211.7903463490954,
+      "raw_cost": 1707.9863054756934,
+      "distance": 824.8793777703128,
+      "vehicles": 16.4,
+      "mean_end_to_end_seconds_local_cpu": 2.5542577361658916
+    },
+    "strict_insertion": {
+      "service_rate": 0.9926666666666667,
+      "objective": 424.6336433971812,
+      "raw_cost": 806.4096184913461,
+      "distance": 659.7006249171053,
+      "vehicles": 13.2,
+      "mean_build_seconds_local_cpu": 36.05507299723443
+    },
+    "scip_300s_incumbent": {
+      "service_rate": 0.9926666666666667,
+      "objective": 424.6336433971812,
+      "raw_cost": 806.4096184913461,
+      "distance": 659.7006249171053,
+      "vehicles": 13.2,
+      "mean_pipeline_seconds_local_cpu": 344.75349820840296
+    }
+  },
+  "seed_metrics": {
+    "314159": {
+      "start": {
+        "service_rate": 0.967,
+        "objective": 1902.4745668866808,
+        "raw_cost": 2427.077896103608,
+        "distance": 848.159990119782,
+        "vehicles": 16.466666666666665
+      },
+      "short_lns": {
+        "service_rate": 0.9836666666666666,
+        "objective": 943.743695576924,
+        "raw_cost": 1447.1747361312327,
+        "distance": 824.0792451690872,
+        "vehicles": 16.2
+      }
+    },
+    "271828": {
+      "start": {
+        "service_rate": 0.952,
+        "objective": 2764.079500794903,
+        "raw_cost": 3261.7704295411345,
+        "distance": 848.2463146007691,
+        "vehicles": 16.8
+      },
+      "short_lns": {
+        "service_rate": 0.979,
+        "objective": 1211.394577840717,
+        "raw_cost": 1695.957456755517,
+        "distance": 827.9714326421799,
+        "vehicles": 16.533333333333335
+      }
+    },
+    "161803": {
+      "start": {
+        "service_rate": 0.949,
+        "objective": 2937.181343493773,
+        "raw_cost": 3453.554141276788,
+        "distance": 837.722882391681,
+        "vehicles": 16.733333333333334
+      },
+      "short_lns": {
+        "service_rate": 0.9743333333333334,
+        "objective": 1480.2327656296459,
+        "raw_cost": 1980.8267235403307,
+        "distance": 822.5874554996713,
+        "vehicles": 16.466666666666665
+      }
+    }
+  },
+  "paired": {
+    "hybrid_minus_raw": {
+      "service_rate": {
+        "mean_difference": 0.023,
+        "paired_instance_bootstrap_95pct_ci": [
+          0.018222222222222237,
+          0.028000000000000004
+        ],
+        "negative_instances": 0,
+        "ties": 1,
+        "positive_instances": 29,
+        "instances": 30
+      },
+      "objective": {
+        "mean_difference": -1322.78812404269,
+        "paired_instance_bootstrap_95pct_ci": [
+          -1616.728031152888,
+          -1048.0812763995684
+        ],
+        "negative_instances": 30,
+        "ties": 0,
+        "positive_instances": 0,
+        "instances": 30
+      },
+      "raw_cost": {
+        "mean_difference": -1339.4811834981504,
+        "paired_instance_bootstrap_95pct_ci": [
+          -1630.6168310270054,
+          -1066.3230301519015
+        ],
+        "negative_instances": 30,
+        "ties": 0,
+        "positive_instances": 0,
+        "instances": 30
+      },
+      "distance": {
+        "mean_difference": -19.83035126709785,
+        "paired_instance_bootstrap_95pct_ci": [
+          -25.337146206253784,
+          -14.522630231859361
+        ],
+        "negative_instances": 26,
+        "ties": 0,
+        "positive_instances": 4,
+        "instances": 30
+      },
+      "vehicles": {
+        "mean_difference": -0.2666666666666669,
+        "paired_instance_bootstrap_95pct_ci": [
+          -0.34444444444444505,
+          -0.1777777777777781
+        ],
+        "negative_instances": 21,
+        "ties": 8,
+        "positive_instances": 1,
+        "instances": 30
+      }
+    },
+    "hybrid_minus_insertion": {
+      "service_rate": {
+        "mean_difference": -0.01366666666666667,
+        "paired_instance_bootstrap_95pct_ci": [
+          -0.01944444444444447,
+          -0.007999999999999991
+        ],
+        "negative_instances": 21,
+        "ties": 6,
+        "positive_instances": 3,
+        "instances": 30
+      },
+      "objective": {
+        "mean_difference": 787.1567029519143,
+        "paired_instance_bootstrap_95pct_ci": [
+          461.1806093461916,
+          1125.8008845994548
+        ],
+        "negative_instances": 3,
+        "ties": 0,
+        "positive_instances": 27,
+        "instances": 30
+      },
+      "raw_cost": {
+        "mean_difference": 901.5766869843472,
+        "paired_instance_bootstrap_95pct_ci": [
+          575.014044533237,
+          1242.5565646938733
+        ],
+        "negative_instances": 3,
+        "ties": 0,
+        "positive_instances": 27,
+        "instances": 30
+      },
+      "distance": {
+        "mean_difference": 165.17875285320753,
+        "paired_instance_bootstrap_95pct_ci": [
+          151.32901564269355,
+          178.5648820817578
+        ],
+        "negative_instances": 0,
+        "ties": 0,
+        "positive_instances": 30,
+        "instances": 30
+      },
+      "vehicles": {
+        "mean_difference": 3.2,
+        "paired_instance_bootstrap_95pct_ci": [
+          2.9777777777777783,
+          3.4222222222222225
+        ],
+        "negative_instances": 0,
+        "ties": 0,
+        "positive_instances": 30,
+        "instances": 30
+      }
+    },
+    "hybrid_minus_scip_incumbent": {
+      "service_rate": {
+        "mean_difference": -0.01366666666666667,
+        "paired_instance_bootstrap_95pct_ci": [
+          -0.019666666666666686,
+          -0.008
+        ],
+        "negative_instances": 21,
+        "ties": 6,
+        "positive_instances": 3,
+        "instances": 30
+      },
+      "objective": {
+        "mean_difference": 787.1567029519143,
+        "paired_instance_bootstrap_95pct_ci": [
+          454.90235472253187,
+          1125.779622019336
+        ],
+        "negative_instances": 3,
+        "ties": 0,
+        "positive_instances": 27,
+        "instances": 30
+      },
+      "raw_cost": {
+        "mean_difference": 901.5766869843472,
+        "paired_instance_bootstrap_95pct_ci": [
+          569.7344895116559,
+          1238.961752501438
+        ],
+        "negative_instances": 3,
+        "ties": 0,
+        "positive_instances": 27,
+        "instances": 30
+      },
+      "distance": {
+        "mean_difference": 165.17875285320753,
+        "paired_instance_bootstrap_95pct_ci": [
+          151.33997669046252,
+          178.52561102247657
+        ],
+        "negative_instances": 0,
+        "ties": 0,
+        "positive_instances": 30,
+        "instances": 30
+      },
+      "vehicles": {
+        "mean_difference": 3.2,
+        "paired_instance_bootstrap_95pct_ci": [
+          2.9777777777777783,
+          3.422222222222222
+        ],
+        "negative_instances": 0,
+        "ties": 0,
+        "positive_instances": 30,
+        "instances": 30
+      }
+    }
+  },
+  "scip_solver": {
+    "time_limit_instances": 30,
+    "optimal_instances": 0,
+    "improved_warm_start_instances": 0,
+    "median_gap": 963.2052599667745
+  },
+  "audit": {
+    "instances": 30,
+    "hard_violations": 0,
+    "unfulfilled": 0,
+    "all_trips_at_least_four": true
+  },
+  "timing_ratios": {
+    "insertion_over_neural_hybrid": 14.115675363033436,
+    "scip_pipeline_over_neural_hybrid": 134.97208732189281
+  },
+  "timing_boundary": "Same Apple M2 host and one-thread evaluator, but runs occurred in separate sessions; ratios are hardware-specific deployment observations.",
+  "bootstrap": {
+    "replicates": 20000,
+    "seed": 20261117,
+    "method": "paired nonparametric percentile bootstrap over instances"
+  }
+}

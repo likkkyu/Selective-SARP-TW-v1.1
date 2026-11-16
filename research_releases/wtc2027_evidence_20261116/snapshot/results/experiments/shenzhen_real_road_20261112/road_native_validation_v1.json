@@ -1,0 +1,13 @@
+{
+  "scope": "frozen development validation split; never final paper testing",
+  "source_pool_sha256": "62b8692c767e35ece4a9a2aec4e87229402ad1d5ff9215a73657d157cbe7cb05",
+  "source_pool_seed": 2026111304,
+  "selection_seed": 20261114,
+  "instances": 32,
+  "validation_indices": [
+    4, 8, 12, 29, 42, 51, 53, 59,
+    63, 64, 68, 70, 75, 81, 88, 99,
+    105, 113, 118, 120, 130, 136, 137, 139,
+    152, 168, 169, 199, 218, 241, 251, 255
+  ]
+}

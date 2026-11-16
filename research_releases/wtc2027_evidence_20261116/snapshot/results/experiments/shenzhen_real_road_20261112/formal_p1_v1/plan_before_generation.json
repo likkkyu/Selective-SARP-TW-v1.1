@@ -1,0 +1,86 @@
+{
+  "status": "selection_frozen_before_generation",
+  "scope": "fresh 32-case P1 Shenzhen current-road semi-synthetic external validation; no tuning on these cases",
+  "created_utc": "2026-11-12T15:54:08Z",
+  "seed": 2026111201,
+  "samples": 32,
+  "graph_size": 50,
+  "primary_arm": "road_fixed25",
+  "geometry_control": "straight_fixed25_on_identical_snapped_terminals",
+  "uncalibrated_sensitivity": "road_osm_speed",
+  "models": [
+    {
+      "seed": 1234,
+      "policy": "learned",
+      "checkpoint": "/Users/likeyu/Downloads/project-vrp-v6-4-main/artifacts/ablation_final_20261103/raw/pair1234/formal_learned_1234/outputs/pomo_n50_optimized/model_best.pt",
+      "sha256": "116e9b67cdd8cc5c1464d54b466693ddbfe7f4475625ca4350744201be8125f1"
+    },
+    {
+      "seed": 4321,
+      "policy": "learned",
+      "checkpoint": "/Users/likeyu/Downloads/project-vrp-v6-4-main/artifacts/ablation_final_20261103/raw/remaining/formal_learned_4321/outputs/pomo_n50_optimized/model_best.pt",
+      "sha256": "a87c248c4fd4b9933c690da4c3edbd1bd9208822e5ca101da04091b99e075a01"
+    },
+    {
+      "seed": 8765,
+      "policy": "learned",
+      "checkpoint": "/Users/likeyu/Downloads/project-vrp-v6-4-main/artifacts/ablation_final_20261103/raw/remaining/formal_learned_8765/outputs/pomo_n50_optimized/model_best.pt",
+      "sha256": "99f83d2410aa6c305796cc3b712bbc8c60050a24c3a39ea8eb9464948e1b1472"
+    }
+  ],
+  "physical_config": {
+    "OPERATION_START": 10.0,
+    "OPERATION_END": 16.0,
+    "AREA_SIZE": 10.0,
+    "VEHICLE_SPEED": 25.0,
+    "MAX_TRIP_TIME": 3.0,
+    "SERVICE_TIME": 0.05,
+    "PASSENGER_MAX_RIDE_TIME_MINUTES": 70.0,
+    "PASSENGER_MAX_EXCESS_RIDE_TIME_MINUTES": 30.0,
+    "HARD_CARGO_PICKUP_TIMEWINDOW": true,
+    "PASSENGER_CAPACITY": 15,
+    "CARGO_CAPACITY": 20,
+    "PASSENGER_WEIGHT_KG": 65.0,
+    "CARGO_UNIT_WEIGHT_KG": 1.0,
+    "ENERGY_BASE": 0.18,
+    "ENERGY_WEIGHT_REF": 10000.0,
+    "ELECTRICITY_PRICE": 1.0,
+    "PASSENGER_DELAY_COST": 0.6,
+    "CARGO_DELAY_COST": 0.06,
+    "CARGO_DELAY_TIER1_MIN": 30.0,
+    "CARGO_DELAY_TIER2_MIN": 60.0,
+    "CARGO_DELAY_COST_30_60": 0.18,
+    "CARGO_DELAY_COST_60_PLUS": 0.36,
+    "VEHICLE_COST": 20.0,
+    "ALPHA_ENERGY": 1.0,
+    "ALPHA_DELAY": 2.5,
+    "ALPHA_VEHICLE": 3.0,
+    "ALPHA_REJECT": 575.0,
+    "ALPHA_UNFULFILLED": 750.0,
+    "ALPHA_TRIP_OVERTIME": 200.0
+  },
+  "normalization_profile": {
+    "graph_size": 50,
+    "energy_cost_raw": 98.93025535345078,
+    "passenger_delivery_delay_cost_raw": 576.4865581989288,
+    "cargo_delay_cost_raw": 42.86428897175938,
+    "vehicle_cost_norm": 180.0,
+    "num_samples": 256,
+    "seed": 1234,
+    "num_vehicles": 9
+  },
+  "hard_minimum_completed_orders_per_trip": 4,
+  "strong_lns_seconds": 10.0,
+  "neural_repair_lns_seconds": 0.5,
+  "search_seed": 1234,
+  "graph_sha256": "572f667e850d1c352768315e37da09d9f20f8a2bc7cff3f7e24187e16cf4331f",
+  "source_sha256": {
+    "experiments/shenzhen_real_road_20261112/prepare_formal_p1.py": "cf9762c9deb8fdd0b1778c2292580fb8dbc5f6b0b5b608b8b44f610991838297",
+    "experiments/shenzhen_real_road_20261112/road_network.py": "dec104a78750089bbe219bb10e9e7ecb36440045e6c6debe8ea80483a9702b4d",
+    "experiments/shenzhen_real_road_20261112/road_route_engine.py": "c2b56d41fa5c1a410d36102096ba6cef2f70e1a1a5b67a70e914bc5060511a05",
+    "experiments/shenzhen_real_road_20261112/greedy_hard4.py": "016c183c881d148907d748ed41228295002890a3644c5ed9cdc5e834efad3c1c",
+    "experiments/hard4_lns_20261106/search.py": "ae50a644aba55b0b9d78a790ec6cbd9cef5d9f0226171e62636c9c4b427a75a7"
+  },
+  "host": "macOS-14.5-arm64-arm-64bit",
+  "interpretation_guard": "P1 isolates road representation with synthetic requests. OSM class speeds are a proxy, not observed traffic speeds."
+}

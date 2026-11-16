@@ -1,0 +1,52 @@
+{
+  "test_index": 2,
+  "insertion": {
+    "cost": {
+      "objective": 3.429646312277379,
+      "raw_cost": 235.28508267217208,
+      "energy": 75.24384792231844,
+      "distance": 414.8996527791023,
+      "passenger_delay_cost": 0.0,
+      "cargo_delay_cost": 0.041234749853639126,
+      "vehicle_cost": 160.0,
+      "reject_penalty": 0.0,
+      "completed": 50,
+      "vehicles": 8
+    },
+    "audit": {
+      "valid": true,
+      "violations": [],
+      "completed": 50,
+      "vehicles": 8,
+      "minimum_completed_per_trip": 5
+    },
+    "seconds": 0.10312404200521996
+  },
+  "lns": {
+    "cost": {
+      "objective": 3.340740225429475,
+      "raw_cost": 226.68626929541392,
+      "energy": 66.68626929541394,
+      "distance": 367.5887651145458,
+      "passenger_delay_cost": 0.0,
+      "cargo_delay_cost": 0.0,
+      "vehicle_cost": 160.0,
+      "reject_penalty": 0.0,
+      "completed": 50,
+      "vehicles": 8
+    },
+    "audit": {
+      "valid": true,
+      "violations": [],
+      "completed": 50,
+      "vehicles": 8,
+      "minimum_completed_per_trip": 5
+    },
+    "search_seconds": 3.0000145829981193,
+    "search_wall_seconds": 3.000037749996409,
+    "integrated_seconds": 3.103161792001629,
+    "iterations": 60,
+    "partial_last_iteration_discarded": true,
+    "route_evaluations": 353448
+  }
+}

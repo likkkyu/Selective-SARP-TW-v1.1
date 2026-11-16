@@ -1,0 +1,42 @@
+{
+  "protocol_version": 2,
+  "created_date": "2026-11-12",
+  "status": "P1_complete_matrix_aware_training_preflight",
+  "city": "Shenzhen",
+  "area": "Futian-Luohu",
+  "bbox_wgs84": {
+    "south": 22.5,
+    "west": 114.02,
+    "north": 22.59,
+    "east": 114.117
+  },
+  "osm_filter": "driveable public roads; exclude walking/cycling/construction",
+  "road_costs": {
+    "distance": "shortest directed path by edge length_km",
+    "travel_time": "shortest directed path by edge travel_time_h",
+    "speed_source_priority": ["OSM maxspeed", "road-class default"]
+  },
+  "orders": {
+    "graph_size": 50,
+    "passenger_share_target": 0.6,
+    "cargo_share_target": 0.4,
+    "type_counts_rule": "record realized Bernoulli counts per instance; do not claim every instance is exactly 30/20",
+    "hard_minimum_completed_orders_per_trip": 4,
+    "decline_before_execution_allowed": true,
+    "cancel_after_pickup_allowed": false
+  },
+  "stages": {
+    "P0": "programmatic directed-network unit and route-engine checks",
+    "P1": "real Shenzhen road network plus existing synthetic orders",
+    "P2": "real passenger OD plus Shenzhen freight hotspots and LaDe-calibrated cargo",
+    "P3": "fresh common-instance formal comparison"
+  },
+  "matrix_aware_training_gate": {
+    "formal_test_instances_excluded": true,
+    "cpu_forward_backward_passed": true,
+    "independent_route_audit_required": true,
+    "first_gpu_stage": "finite 64-case diagnostic only"
+  },
+  "reporting_label": "real-road-network-driven semi-synthetic external validation"
+}
+

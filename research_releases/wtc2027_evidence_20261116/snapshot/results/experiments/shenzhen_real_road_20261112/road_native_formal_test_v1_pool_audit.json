@@ -1,0 +1,1043 @@
+{
+  "status": "passed",
+  "scope": "independent structural audit of frozen Shenzhen road-native formal-test pool",
+  "pool": "experiments/shenzhen_real_road_20261112/road_native_formal_test_v1_seed2026111401_n128.pt",
+  "pool_sha256": "600e11131f8de7c0c3d6a356c6ff5438e59075e1955dc23884a76ab188ca7711",
+  "manifest": "experiments/shenzhen_real_road_20261112/road_native_formal_test_v1_seed2026111401_n128.json",
+  "manifest_sha256": "27fa3c0339a9ac39decd1f3f96910e9a17c7dd052c937512d86060ed7d8debdf",
+  "model_lock_sha256": "32c815445a9de1697aa159d83c4190edd0cbb677bab4082097cc732736bac62e",
+  "cases": 128,
+  "all_cases_valid": true,
+  "band_fallbacks": 0,
+  "minimum_unique_road_nodes": 101,
+  "mean_direct_pair_distance_km": 5.65564376488328,
+  "mean_directed_terminal_distance_km": 6.014618806540966,
+  "cases_with_asymmetric_road_distances": 128,
+  "errors": [],
+  "per_case": [
+    {
+      "instance": 0,
+      "valid": true,
+      "unique_road_nodes": 101,
+      "mean_direct_pair_distance_km": 5.507229804992676,
+      "mean_directed_terminal_distance_km": 5.694928169250488,
+      "asymmetric_terminal_pairs": 10084
+    },
+    {
+      "instance": 1,
+      "valid": true,
+      "unique_road_nodes": 101,
+      "mean_direct_pair_distance_km": 5.767815589904785,
+      "mean_directed_terminal_distance_km": 5.987697124481201,
+      "asymmetric_terminal_pairs": 10064
+    },
+    {
+      "instance": 2,
+      "valid": true,
+      "unique_road_nodes": 101,
+      "mean_direct_pair_distance_km": 5.197677135467529,
+      "mean_directed_terminal_distance_km": 5.727489948272705,
+      "asymmetric_terminal_pairs": 10044
+    },
+    {
+      "instance": 3,
+      "valid": true,
+      "unique_road_nodes": 101,
+      "mean_direct_pair_distance_km": 5.452627182006836,
+      "mean_directed_terminal_distance_km": 6.032713890075684,
+      "asymmetric_terminal_pairs": 10072
+    },
+    {
+      "instance": 4,
+      "valid": true,
+      "unique_road_nodes": 101,
+      "mean_direct_pair_distance_km": 5.3464508056640625,
+      "mean_directed_terminal_distance_km": 6.163558006286621,
+      "asymmetric_terminal_pairs": 10068
+    },
+    {
+      "instance": 5,
+      "valid": true,
+      "unique_road_nodes": 101,
+      "mean_direct_pair_distance_km": 5.629130840301514,
+      "mean_directed_terminal_distance_km": 6.135885238647461,
+      "asymmetric_terminal_pairs": 10068
+    },
+    {
+      "instance": 6,
+      "valid": true,
+      "unique_road_nodes": 101,
+      "mean_direct_pair_distance_km": 5.739940166473389,
+      "mean_directed_terminal_distance_km": 6.199937343597412,
+      "asymmetric_terminal_pairs": 10060
+    },
+    {
+      "instance": 7,
+      "valid": true,
+      "unique_road_nodes": 101,
+      "mean_direct_pair_distance_km": 5.7214179039001465,
+      "mean_directed_terminal_distance_km": 6.624024868011475,
+      "asymmetric_terminal_pairs": 10062
+    },
+    {
+      "instance": 8,
+      "valid": true,
+      "unique_road_nodes": 101,
+      "mean_direct_pair_distance_km": 6.305739879608154,
+      "mean_directed_terminal_distance_km": 6.365102291107178,
+      "asymmetric_terminal_pairs": 10072
+    },
+    {
+      "instance": 9,
+      "valid": true,
+      "unique_road_nodes": 101,
+      "mean_direct_pair_distance_km": 5.6017303466796875,
+      "mean_directed_terminal_distance_km": 5.829988479614258,
+      "asymmetric_terminal_pairs": 10084
+    },
+    {
+      "instance": 10,
+      "valid": true,
+      "unique_road_nodes": 101,
+      "mean_direct_pair_distance_km": 5.830972194671631,
+      "mean_directed_terminal_distance_km": 6.012772083282471,
+      "asymmetric_terminal_pairs": 10068
+    },
+    {
+      "instance": 11,
+      "valid": true,
+      "unique_road_nodes": 101,
+      "mean_direct_pair_distance_km": 6.064842700958252,
+      "mean_directed_terminal_distance_km": 6.408300399780273,
+      "asymmetric_terminal_pairs": 10062
+    },
+    {
+      "instance": 12,
+      "valid": true,
+      "unique_road_nodes": 101,
+      "mean_direct_pair_distance_km": 5.856101036071777,
+      "mean_directed_terminal_distance_km": 5.663005828857422,
+      "asymmetric_terminal_pairs": 10050
+    },
+    {
+      "instance": 13,
+      "valid": true,
+      "unique_road_nodes": 101,
+      "mean_direct_pair_distance_km": 5.4551544189453125,
+      "mean_directed_terminal_distance_km": 5.774465560913086,
+      "asymmetric_terminal_pairs": 10054
+    },
+    {
+      "instance": 14,
+      "valid": true,
+      "unique_road_nodes": 101,
+      "mean_direct_pair_distance_km": 5.510540008544922,
+      "mean_directed_terminal_distance_km": 5.682135581970215,
+      "asymmetric_terminal_pairs": 10072
+    },
+    {
+      "instance": 15,
+      "valid": true,
+      "unique_road_nodes": 101,
+      "mean_direct_pair_distance_km": 5.455583572387695,
+      "mean_directed_terminal_distance_km": 5.5845513343811035,
+      "asymmetric_terminal_pairs": 10082
+    },
+    {
+      "instance": 16,
+      "valid": true,
+      "unique_road_nodes": 101,
+      "mean_direct_pair_distance_km": 5.916818141937256,
+      "mean_directed_terminal_distance_km": 6.191150665283203,
+      "asymmetric_terminal_pairs": 10070
+    },
+    {
+      "instance": 17,
+      "valid": true,
+      "unique_road_nodes": 101,
+      "mean_direct_pair_distance_km": 6.039724349975586,
+      "mean_directed_terminal_distance_km": 6.345017910003662,
+      "asymmetric_terminal_pairs": 10054
+    },
+    {
+      "instance": 18,
+      "valid": true,
+      "unique_road_nodes": 101,
+      "mean_direct_pair_distance_km": 5.426702976226807,
+      "mean_directed_terminal_distance_km": 6.029234409332275,
+      "asymmetric_terminal_pairs": 10068
+    },
+    {
+      "instance": 19,
+      "valid": true,
+      "unique_road_nodes": 101,
+      "mean_direct_pair_distance_km": 5.156625747680664,
+      "mean_directed_terminal_distance_km": 5.647038459777832,
+      "asymmetric_terminal_pairs": 10058
+    },
+    {
+      "instance": 20,
+      "valid": true,
+      "unique_road_nodes": 101,
+      "mean_direct_pair_distance_km": 5.5562052726745605,
+      "mean_directed_terminal_distance_km": 5.718916416168213,
+      "asymmetric_terminal_pairs": 10086
+    },
+    {
+      "instance": 21,
+      "valid": true,
+      "unique_road_nodes": 101,
+      "mean_direct_pair_distance_km": 5.649754524230957,
+      "mean_directed_terminal_distance_km": 6.183390140533447,
+      "asymmetric_terminal_pairs": 10056
+    },
+    {
+      "instance": 22,
+      "valid": true,
+      "unique_road_nodes": 101,
+      "mean_direct_pair_distance_km": 5.43565559387207,
+      "mean_directed_terminal_distance_km": 6.2592267990112305,
+      "asymmetric_terminal_pairs": 10026
+    },
+    {
+      "instance": 23,
+      "valid": true,
+      "unique_road_nodes": 101,
+      "mean_direct_pair_distance_km": 5.865231513977051,
+      "mean_directed_terminal_distance_km": 6.1739606857299805,
+      "asymmetric_terminal_pairs": 10044
+    },
+    {
+      "instance": 24,
+      "valid": true,
+      "unique_road_nodes": 101,
+      "mean_direct_pair_distance_km": 5.498816013336182,
+      "mean_directed_terminal_distance_km": 5.77664041519165,
+      "asymmetric_terminal_pairs": 10074
+    },
+    {
+      "instance": 25,
+      "valid": true,
+      "unique_road_nodes": 101,
+      "mean_direct_pair_distance_km": 5.818704605102539,
+      "mean_directed_terminal_distance_km": 6.206676959991455,
+      "asymmetric_terminal_pairs": 10048
+    },
+    {
+      "instance": 26,
+      "valid": true,
+      "unique_road_nodes": 101,
+      "mean_direct_pair_distance_km": 6.009675979614258,
+      "mean_directed_terminal_distance_km": 6.6925578117370605,
+      "asymmetric_terminal_pairs": 10084
+    },
+    {
+      "instance": 27,
+      "valid": true,
+      "unique_road_nodes": 101,
+      "mean_direct_pair_distance_km": 5.705923080444336,
+      "mean_directed_terminal_distance_km": 6.117557525634766,
+      "asymmetric_terminal_pairs": 10068
+    },
+    {
+      "instance": 28,
+      "valid": true,
+      "unique_road_nodes": 101,
+      "mean_direct_pair_distance_km": 5.3380656242370605,
+      "mean_directed_terminal_distance_km": 5.60468864440918,
+      "asymmetric_terminal_pairs": 10076
+    },
+    {
+      "instance": 29,
+      "valid": true,
+      "unique_road_nodes": 101,
+      "mean_direct_pair_distance_km": 5.754473686218262,
+      "mean_directed_terminal_distance_km": 6.03758430480957,
+      "asymmetric_terminal_pairs": 10056
+    },
+    {
+      "instance": 30,
+      "valid": true,
+      "unique_road_nodes": 101,
+      "mean_direct_pair_distance_km": 5.634533882141113,
+      "mean_directed_terminal_distance_km": 5.908029079437256,
+      "asymmetric_terminal_pairs": 10068
+    },
+    {
+      "instance": 31,
+      "valid": true,
+      "unique_road_nodes": 101,
+      "mean_direct_pair_distance_km": 5.565449237823486,
+      "mean_directed_terminal_distance_km": 6.448325157165527,
+      "asymmetric_terminal_pairs": 10076
+    },
+    {
+      "instance": 32,
+      "valid": true,
+      "unique_road_nodes": 101,
+      "mean_direct_pair_distance_km": 5.579164028167725,
+      "mean_directed_terminal_distance_km": 5.461092948913574,
+      "asymmetric_terminal_pairs": 10080
+    },
+    {
+      "instance": 33,
+      "valid": true,
+      "unique_road_nodes": 101,
+      "mean_direct_pair_distance_km": 5.79848575592041,
+      "mean_directed_terminal_distance_km": 6.589660167694092,
+      "asymmetric_terminal_pairs": 10000
+    },
+    {
+      "instance": 34,
+      "valid": true,
+      "unique_road_nodes": 101,
+      "mean_direct_pair_distance_km": 5.780829906463623,
+      "mean_directed_terminal_distance_km": 6.276188373565674,
+      "asymmetric_terminal_pairs": 10018
+    },
+    {
+      "instance": 35,
+      "valid": true,
+      "unique_road_nodes": 101,
+      "mean_direct_pair_distance_km": 5.456122398376465,
+      "mean_directed_terminal_distance_km": 6.6174235343933105,
+      "asymmetric_terminal_pairs": 10054
+    },
+    {
+      "instance": 36,
+      "valid": true,
+      "unique_road_nodes": 101,
+      "mean_direct_pair_distance_km": 5.734528064727783,
+      "mean_directed_terminal_distance_km": 5.745129108428955,
+      "asymmetric_terminal_pairs": 10078
+    },
+    {
+      "instance": 37,
+      "valid": true,
+      "unique_road_nodes": 101,
+      "mean_direct_pair_distance_km": 5.420287609100342,
+      "mean_directed_terminal_distance_km": 5.87287712097168,
+      "asymmetric_terminal_pairs": 10062
+    },
+    {
+      "instance": 38,
+      "valid": true,
+      "unique_road_nodes": 101,
+      "mean_direct_pair_distance_km": 5.405987739562988,
+      "mean_directed_terminal_distance_km": 5.651752948760986,
+      "asymmetric_terminal_pairs": 10082
+    },
+    {
+      "instance": 39,
+      "valid": true,
+      "unique_road_nodes": 101,
+      "mean_direct_pair_distance_km": 5.445518970489502,
+      "mean_directed_terminal_distance_km": 5.791197776794434,
+      "asymmetric_terminal_pairs": 10068
+    },
+    {
+      "instance": 40,
+      "valid": true,
+      "unique_road_nodes": 101,
+      "mean_direct_pair_distance_km": 5.763437271118164,
+      "mean_directed_terminal_distance_km": 6.063974857330322,
+      "asymmetric_terminal_pairs": 10068
+    },
+    {
+      "instance": 41,
+      "valid": true,
+      "unique_road_nodes": 101,
+      "mean_direct_pair_distance_km": 5.7222819328308105,
+      "mean_directed_terminal_distance_km": 6.009156703948975,
+      "asymmetric_terminal_pairs": 10064
+    },
+    {
+      "instance": 42,
+      "valid": true,
+      "unique_road_nodes": 101,
+      "mean_direct_pair_distance_km": 5.898502826690674,
+      "mean_directed_terminal_distance_km": 6.599486827850342,
+      "asymmetric_terminal_pairs": 10070
+    },
+    {
+      "instance": 43,
+      "valid": true,
+      "unique_road_nodes": 101,
+      "mean_direct_pair_distance_km": 5.686366081237793,
+      "mean_directed_terminal_distance_km": 6.08149528503418,
+      "asymmetric_terminal_pairs": 10056
+    },
+    {
+      "instance": 44,
+      "valid": true,
+      "unique_road_nodes": 101,
+      "mean_direct_pair_distance_km": 5.686132907867432,
+      "mean_directed_terminal_distance_km": 6.096278667449951,
+      "asymmetric_terminal_pairs": 10078
+    },
+    {
+      "instance": 45,
+      "valid": true,
+      "unique_road_nodes": 101,
+      "mean_direct_pair_distance_km": 5.494060516357422,
+      "mean_directed_terminal_distance_km": 6.196489334106445,
+      "asymmetric_terminal_pairs": 10080
+    },
+    {
+      "instance": 46,
+      "valid": true,
+      "unique_road_nodes": 101,
+      "mean_direct_pair_distance_km": 5.7935943603515625,
+      "mean_directed_terminal_distance_km": 6.337501049041748,
+      "asymmetric_terminal_pairs": 9988
+    },
+    {
+      "instance": 47,
+      "valid": true,
+      "unique_road_nodes": 101,
+      "mean_direct_pair_distance_km": 5.840341567993164,
+      "mean_directed_terminal_distance_km": 6.273520469665527,
+      "asymmetric_terminal_pairs": 10064
+    },
+    {
+      "instance": 48,
+      "valid": true,
+      "unique_road_nodes": 101,
+      "mean_direct_pair_distance_km": 5.634365081787109,
+      "mean_directed_terminal_distance_km": 5.924183368682861,
+      "asymmetric_terminal_pairs": 10060
+    },
+    {
+      "instance": 49,
+      "valid": true,
+      "unique_road_nodes": 101,
+      "mean_direct_pair_distance_km": 5.743253231048584,
+      "mean_directed_terminal_distance_km": 6.207951545715332,
+      "asymmetric_terminal_pairs": 9956
+    },
+    {
+      "instance": 50,
+      "valid": true,
+      "unique_road_nodes": 101,
+      "mean_direct_pair_distance_km": 5.254148960113525,
+      "mean_directed_terminal_distance_km": 5.952944755554199,
+      "asymmetric_terminal_pairs": 10076
+    },
+    {
+      "instance": 51,
+      "valid": true,
+      "unique_road_nodes": 101,
+      "mean_direct_pair_distance_km": 5.5206780433654785,
+      "mean_directed_terminal_distance_km": 5.530086517333984,
+      "asymmetric_terminal_pairs": 10088
+    },
+    {
+      "instance": 52,
+      "valid": true,
+      "unique_road_nodes": 101,
+      "mean_direct_pair_distance_km": 5.546813488006592,
+      "mean_directed_terminal_distance_km": 5.782099723815918,
+      "asymmetric_terminal_pairs": 10082
+    },
+    {
+      "instance": 53,
+      "valid": true,
+      "unique_road_nodes": 101,
+      "mean_direct_pair_distance_km": 5.3812947273254395,
+      "mean_directed_terminal_distance_km": 5.672184467315674,
+      "asymmetric_terminal_pairs": 10080
+    },
+    {
+      "instance": 54,
+      "valid": true,
+      "unique_road_nodes": 101,
+      "mean_direct_pair_distance_km": 5.639011383056641,
+      "mean_directed_terminal_distance_km": 5.741648197174072,
+      "asymmetric_terminal_pairs": 10072
+    },
+    {
+      "instance": 55,
+      "valid": true,
+      "unique_road_nodes": 101,
+      "mean_direct_pair_distance_km": 5.547828197479248,
+      "mean_directed_terminal_distance_km": 6.034527778625488,
+      "asymmetric_terminal_pairs": 10032
+    },
+    {
+      "instance": 56,
+      "valid": true,
+      "unique_road_nodes": 101,
+      "mean_direct_pair_distance_km": 6.284858226776123,
+      "mean_directed_terminal_distance_km": 6.276638031005859,
+      "asymmetric_terminal_pairs": 10056
+    },
+    {
+      "instance": 57,
+      "valid": true,
+      "unique_road_nodes": 101,
+      "mean_direct_pair_distance_km": 5.1808180809021,
+      "mean_directed_terminal_distance_km": 6.057407855987549,
+      "asymmetric_terminal_pairs": 9996
+    },
+    {
+      "instance": 58,
+      "valid": true,
+      "unique_road_nodes": 101,
+      "mean_direct_pair_distance_km": 5.34769344329834,
+      "mean_directed_terminal_distance_km": 6.227358341217041,
+      "asymmetric_terminal_pairs": 10064
+    },
+    {
+      "instance": 59,
+      "valid": true,
+      "unique_road_nodes": 101,
+      "mean_direct_pair_distance_km": 5.879656791687012,
+      "mean_directed_terminal_distance_km": 6.36544942855835,
+      "asymmetric_terminal_pairs": 10068
+    },
+    {
+      "instance": 60,
+      "valid": true,
+      "unique_road_nodes": 101,
+      "mean_direct_pair_distance_km": 5.655026435852051,
+      "mean_directed_terminal_distance_km": 5.740516185760498,
+      "asymmetric_terminal_pairs": 10066
+    },
+    {
+      "instance": 61,
+      "valid": true,
+      "unique_road_nodes": 101,
+      "mean_direct_pair_distance_km": 5.837606906890869,
+      "mean_directed_terminal_distance_km": 6.013649940490723,
+      "asymmetric_terminal_pairs": 10066
+    },
+    {
+      "instance": 62,
+      "valid": true,
+      "unique_road_nodes": 101,
+      "mean_direct_pair_distance_km": 5.593511581420898,
+      "mean_directed_terminal_distance_km": 6.304361820220947,
+      "asymmetric_terminal_pairs": 10044
+    },
+    {
+      "instance": 63,
+      "valid": true,
+      "unique_road_nodes": 101,
+      "mean_direct_pair_distance_km": 5.732133865356445,
+      "mean_directed_terminal_distance_km": 6.190937519073486,
+      "asymmetric_terminal_pairs": 10060
+    },
+    {
+      "instance": 64,
+      "valid": true,
+      "unique_road_nodes": 101,
+      "mean_direct_pair_distance_km": 5.854040145874023,
+      "mean_directed_terminal_distance_km": 5.853062629699707,
+      "asymmetric_terminal_pairs": 10092
+    },
+    {
+      "instance": 65,
+      "valid": true,
+      "unique_road_nodes": 101,
+      "mean_direct_pair_distance_km": 5.766840934753418,
+      "mean_directed_terminal_distance_km": 6.146010398864746,
+      "asymmetric_terminal_pairs": 10062
+    },
+    {
+      "instance": 66,
+      "valid": true,
+      "unique_road_nodes": 101,
+      "mean_direct_pair_distance_km": 5.31094217300415,
+      "mean_directed_terminal_distance_km": 5.756301403045654,
+      "asymmetric_terminal_pairs": 10088
+    },
+    {
+      "instance": 67,
+      "valid": true,
+      "unique_road_nodes": 101,
+      "mean_direct_pair_distance_km": 5.422420501708984,
+      "mean_directed_terminal_distance_km": 5.5138258934021,
+      "asymmetric_terminal_pairs": 10070
+    },
+    {
+      "instance": 68,
+      "valid": true,
+      "unique_road_nodes": 101,
+      "mean_direct_pair_distance_km": 5.683547496795654,
+      "mean_directed_terminal_distance_km": 5.899578094482422,
+      "asymmetric_terminal_pairs": 10064
+    },
+    {
+      "instance": 69,
+      "valid": true,
+      "unique_road_nodes": 101,
+      "mean_direct_pair_distance_km": 5.749944686889648,
+      "mean_directed_terminal_distance_km": 5.868589878082275,
+      "asymmetric_terminal_pairs": 10078
+    },
+    {
+      "instance": 70,
+      "valid": true,
+      "unique_road_nodes": 101,
+      "mean_direct_pair_distance_km": 5.235536098480225,
+      "mean_directed_terminal_distance_km": 5.341297626495361,
+      "asymmetric_terminal_pairs": 10088
+    },
+    {
+      "instance": 71,
+      "valid": true,
+      "unique_road_nodes": 101,
+      "mean_direct_pair_distance_km": 5.3082475662231445,
+      "mean_directed_terminal_distance_km": 5.357477188110352,
+      "asymmetric_terminal_pairs": 10080
+    },
+    {
+      "instance": 72,
+      "valid": true,
+      "unique_road_nodes": 101,
+      "mean_direct_pair_distance_km": 5.6550774574279785,
+      "mean_directed_terminal_distance_km": 5.617744445800781,
+      "asymmetric_terminal_pairs": 10070
+    },
+    {
+      "instance": 73,
+      "valid": true,
+      "unique_road_nodes": 101,
+      "mean_direct_pair_distance_km": 5.950104236602783,
+      "mean_directed_terminal_distance_km": 5.808041572570801,
+      "asymmetric_terminal_pairs": 10008
+    },
+    {
+      "instance": 74,
+      "valid": true,
+      "unique_road_nodes": 101,
+      "mean_direct_pair_distance_km": 5.467003345489502,
+      "mean_directed_terminal_distance_km": 5.811091423034668,
+      "asymmetric_terminal_pairs": 10090
+    },
+    {
+      "instance": 75,
+      "valid": true,
+      "unique_road_nodes": 101,
+      "mean_direct_pair_distance_km": 5.506166934967041,
+      "mean_directed_terminal_distance_km": 5.9467878341674805,
+      "asymmetric_terminal_pairs": 10056
+    },
+    {
+      "instance": 76,
+      "valid": true,
+      "unique_road_nodes": 101,
+      "mean_direct_pair_distance_km": 5.720689296722412,
+      "mean_directed_terminal_distance_km": 5.9280195236206055,
+      "asymmetric_terminal_pairs": 10070
+    },
+    {
+      "instance": 77,
+      "valid": true,
+      "unique_road_nodes": 101,
+      "mean_direct_pair_distance_km": 5.430227279663086,
+      "mean_directed_terminal_distance_km": 6.12600564956665,
+      "asymmetric_terminal_pairs": 10072
+    },
+    {
+      "instance": 78,
+      "valid": true,
+      "unique_road_nodes": 101,
+      "mean_direct_pair_distance_km": 5.858501434326172,
+      "mean_directed_terminal_distance_km": 6.548768043518066,
+      "asymmetric_terminal_pairs": 10062
+    },
+    {
+      "instance": 79,
+      "valid": true,
+      "unique_road_nodes": 101,
+      "mean_direct_pair_distance_km": 5.9646172523498535,
+      "mean_directed_terminal_distance_km": 6.097647666931152,
+      "asymmetric_terminal_pairs": 10068
+    },
+    {
+      "instance": 80,
+      "valid": true,
+      "unique_road_nodes": 101,
+      "mean_direct_pair_distance_km": 5.892633438110352,
+      "mean_directed_terminal_distance_km": 6.1617207527160645,
+      "asymmetric_terminal_pairs": 10060
+    },
+    {
+      "instance": 81,
+      "valid": true,
+      "unique_road_nodes": 101,
+      "mean_direct_pair_distance_km": 5.766727447509766,
+      "mean_directed_terminal_distance_km": 5.86752986907959,
+      "asymmetric_terminal_pairs": 10076
+    },
+    {
+      "instance": 82,
+      "valid": true,
+      "unique_road_nodes": 101,
+      "mean_direct_pair_distance_km": 5.7397780418396,
+      "mean_directed_terminal_distance_km": 6.354301929473877,
+      "asymmetric_terminal_pairs": 10072
+    },
+    {
+      "instance": 83,
+      "valid": true,
+      "unique_road_nodes": 101,
+      "mean_direct_pair_distance_km": 5.890407085418701,
+      "mean_directed_terminal_distance_km": 6.058253765106201,
+      "asymmetric_terminal_pairs": 10080
+    },
+    {
+      "instance": 84,
+      "valid": true,
+      "unique_road_nodes": 101,
+      "mean_direct_pair_distance_km": 5.384298324584961,
+      "mean_directed_terminal_distance_km": 6.197790622711182,
+      "asymmetric_terminal_pairs": 10050
+    },
+    {
+      "instance": 85,
+      "valid": true,
+      "unique_road_nodes": 101,
+      "mean_direct_pair_distance_km": 5.5451555252075195,
+      "mean_directed_terminal_distance_km": 6.485357761383057,
+      "asymmetric_terminal_pairs": 10080
+    },
+    {
+      "instance": 86,
+      "valid": true,
+      "unique_road_nodes": 101,
+      "mean_direct_pair_distance_km": 5.831625938415527,
+      "mean_directed_terminal_distance_km": 5.966925144195557,
+      "asymmetric_terminal_pairs": 10052
+    },
+    {
+      "instance": 87,
+      "valid": true,
+      "unique_road_nodes": 101,
+      "mean_direct_pair_distance_km": 5.919680118560791,
+      "mean_directed_terminal_distance_km": 6.060989856719971,
+      "asymmetric_terminal_pairs": 10048
+    },
+    {
+      "instance": 88,
+      "valid": true,
+      "unique_road_nodes": 101,
+      "mean_direct_pair_distance_km": 5.450328826904297,
+      "mean_directed_terminal_distance_km": 5.639901161193848,
+      "asymmetric_terminal_pairs": 10048
+    },
+    {
+      "instance": 89,
+      "valid": true,
+      "unique_road_nodes": 101,
+      "mean_direct_pair_distance_km": 6.213893890380859,
+      "mean_directed_terminal_distance_km": 6.515302658081055,
+      "asymmetric_terminal_pairs": 10082
+    },
+    {
+      "instance": 90,
+      "valid": true,
+      "unique_road_nodes": 101,
+      "mean_direct_pair_distance_km": 5.407069683074951,
+      "mean_directed_terminal_distance_km": 6.005237579345703,
+      "asymmetric_terminal_pairs": 10072
+    },
+    {
+      "instance": 91,
+      "valid": true,
+      "unique_road_nodes": 101,
+      "mean_direct_pair_distance_km": 5.58519172668457,
+      "mean_directed_terminal_distance_km": 5.8238606452941895,
+      "asymmetric_terminal_pairs": 10068
+    },
+    {
+      "instance": 92,
+      "valid": true,
+      "unique_road_nodes": 101,
+      "mean_direct_pair_distance_km": 5.63162899017334,
+      "mean_directed_terminal_distance_km": 5.898823261260986,
+      "asymmetric_terminal_pairs": 10084
+    },
+    {
+      "instance": 93,
+      "valid": true,
+      "unique_road_nodes": 101,
+      "mean_direct_pair_distance_km": 5.794334888458252,
+      "mean_directed_terminal_distance_km": 5.8413848876953125,
+      "asymmetric_terminal_pairs": 10078
+    },
+    {
+      "instance": 94,
+      "valid": true,
+      "unique_road_nodes": 101,
+      "mean_direct_pair_distance_km": 5.944690704345703,
+      "mean_directed_terminal_distance_km": 6.36668586730957,
+      "asymmetric_terminal_pairs": 10070
+    },
+    {
+      "instance": 95,
+      "valid": true,
+      "unique_road_nodes": 101,
+      "mean_direct_pair_distance_km": 5.449495315551758,
+      "mean_directed_terminal_distance_km": 5.67459774017334,
+      "asymmetric_terminal_pairs": 10078
+    },
+    {
+      "instance": 96,
+      "valid": true,
+      "unique_road_nodes": 101,
+      "mean_direct_pair_distance_km": 5.733277797698975,
+      "mean_directed_terminal_distance_km": 5.836263656616211,
+      "asymmetric_terminal_pairs": 10056
+    },
+    {
+      "instance": 97,
+      "valid": true,
+      "unique_road_nodes": 101,
+      "mean_direct_pair_distance_km": 5.709502696990967,
+      "mean_directed_terminal_distance_km": 5.874557971954346,
+      "asymmetric_terminal_pairs": 10082
+    },
+    {
+      "instance": 98,
+      "valid": true,
+      "unique_road_nodes": 101,
+      "mean_direct_pair_distance_km": 5.822033882141113,
+      "mean_directed_terminal_distance_km": 5.870856285095215,
+      "asymmetric_terminal_pairs": 10076
+    },
+    {
+      "instance": 99,
+      "valid": true,
+      "unique_road_nodes": 101,
+      "mean_direct_pair_distance_km": 5.558072090148926,
+      "mean_directed_terminal_distance_km": 6.057661533355713,
+      "asymmetric_terminal_pairs": 10068
+    },
+    {
+      "instance": 100,
+      "valid": true,
+      "unique_road_nodes": 101,
+      "mean_direct_pair_distance_km": 5.398589611053467,
+      "mean_directed_terminal_distance_km": 5.631651401519775,
+      "asymmetric_terminal_pairs": 10058
+    },
+    {
+      "instance": 101,
+      "valid": true,
+      "unique_road_nodes": 101,
+      "mean_direct_pair_distance_km": 5.418920516967773,
+      "mean_directed_terminal_distance_km": 5.7965898513793945,
+      "asymmetric_terminal_pairs": 10082
+    },
+    {
+      "instance": 102,
+      "valid": true,
+      "unique_road_nodes": 101,
+      "mean_direct_pair_distance_km": 5.193392276763916,
+      "mean_directed_terminal_distance_km": 5.463108539581299,
+      "asymmetric_terminal_pairs": 10062
+    },
+    {
+      "instance": 103,
+      "valid": true,
+      "unique_road_nodes": 101,
+      "mean_direct_pair_distance_km": 6.094237804412842,
+      "mean_directed_terminal_distance_km": 6.059654235839844,
+      "asymmetric_terminal_pairs": 10068
+    },
+    {
+      "instance": 104,
+      "valid": true,
+      "unique_road_nodes": 101,
+      "mean_direct_pair_distance_km": 5.913263320922852,
+      "mean_directed_terminal_distance_km": 6.244451522827148,
+      "asymmetric_terminal_pairs": 10066
+    },
+    {
+      "instance": 105,
+      "valid": true,
+      "unique_road_nodes": 101,
+      "mean_direct_pair_distance_km": 5.882357120513916,
+      "mean_directed_terminal_distance_km": 6.410481929779053,
+      "asymmetric_terminal_pairs": 10066
+    },
+    {
+      "instance": 106,
+      "valid": true,
+      "unique_road_nodes": 101,
+      "mean_direct_pair_distance_km": 5.393657207489014,
+      "mean_directed_terminal_distance_km": 5.948990345001221,
+      "asymmetric_terminal_pairs": 10062
+    },
+    {
+      "instance": 107,
+      "valid": true,
+      "unique_road_nodes": 101,
+      "mean_direct_pair_distance_km": 5.752305507659912,
+      "mean_directed_terminal_distance_km": 6.044774055480957,
+      "asymmetric_terminal_pairs": 10042
+    },
+    {
+      "instance": 108,
+      "valid": true,
+      "unique_road_nodes": 101,
+      "mean_direct_pair_distance_km": 5.863131523132324,
+      "mean_directed_terminal_distance_km": 5.827983856201172,
+      "asymmetric_terminal_pairs": 10088
+    },
+    {
+      "instance": 109,
+      "valid": true,
+      "unique_road_nodes": 101,
+      "mean_direct_pair_distance_km": 5.697366237640381,
+      "mean_directed_terminal_distance_km": 6.115582466125488,
+      "asymmetric_terminal_pairs": 10074
+    },
+    {
+      "instance": 110,
+      "valid": true,
+      "unique_road_nodes": 101,
+      "mean_direct_pair_distance_km": 5.537324905395508,
+      "mean_directed_terminal_distance_km": 6.280573844909668,
+      "asymmetric_terminal_pairs": 10046
+    },
+    {
+      "instance": 111,
+      "valid": true,
+      "unique_road_nodes": 101,
+      "mean_direct_pair_distance_km": 5.688662052154541,
+      "mean_directed_terminal_distance_km": 5.95965576171875,
+      "asymmetric_terminal_pairs": 10028
+    },
+    {
+      "instance": 112,
+      "valid": true,
+      "unique_road_nodes": 101,
+      "mean_direct_pair_distance_km": 5.424643516540527,
+      "mean_directed_terminal_distance_km": 5.652949810028076,
+      "asymmetric_terminal_pairs": 10058
+    },
+    {
+      "instance": 113,
+      "valid": true,
+      "unique_road_nodes": 101,
+      "mean_direct_pair_distance_km": 5.790402412414551,
+      "mean_directed_terminal_distance_km": 6.336806297302246,
+      "asymmetric_terminal_pairs": 10060
+    },
+    {
+      "instance": 114,
+      "valid": true,
+      "unique_road_nodes": 101,
+      "mean_direct_pair_distance_km": 5.45078182220459,
+      "mean_directed_terminal_distance_km": 6.205926418304443,
+      "asymmetric_terminal_pairs": 10074
+    },
+    {
+      "instance": 115,
+      "valid": true,
+      "unique_road_nodes": 101,
+      "mean_direct_pair_distance_km": 5.665597438812256,
+      "mean_directed_terminal_distance_km": 6.086585998535156,
+      "asymmetric_terminal_pairs": 10034
+    },
+    {
+      "instance": 116,
+      "valid": true,
+      "unique_road_nodes": 101,
+      "mean_direct_pair_distance_km": 6.0958967208862305,
+      "mean_directed_terminal_distance_km": 5.982562065124512,
+      "asymmetric_terminal_pairs": 10036
+    },
+    {
+      "instance": 117,
+      "valid": true,
+      "unique_road_nodes": 101,
+      "mean_direct_pair_distance_km": 5.500066757202148,
+      "mean_directed_terminal_distance_km": 6.2491888999938965,
+      "asymmetric_terminal_pairs": 10076
+    },
+    {
+      "instance": 118,
+      "valid": true,
+      "unique_road_nodes": 101,
+      "mean_direct_pair_distance_km": 6.101007461547852,
+      "mean_directed_terminal_distance_km": 6.192788124084473,
+      "asymmetric_terminal_pairs": 10084
+    },
+    {
+      "instance": 119,
+      "valid": true,
+      "unique_road_nodes": 101,
+      "mean_direct_pair_distance_km": 5.679678916931152,
+      "mean_directed_terminal_distance_km": 6.425909519195557,
+      "asymmetric_terminal_pairs": 10052
+    },
+    {
+      "instance": 120,
+      "valid": true,
+      "unique_road_nodes": 101,
+      "mean_direct_pair_distance_km": 5.768841743469238,
+      "mean_directed_terminal_distance_km": 6.249061584472656,
+      "asymmetric_terminal_pairs": 10074
+    },
+    {
+      "instance": 121,
+      "valid": true,
+      "unique_road_nodes": 101,
+      "mean_direct_pair_distance_km": 5.349305629730225,
+      "mean_directed_terminal_distance_km": 5.748627662658691,
+      "asymmetric_terminal_pairs": 10088
+    },
+    {
+      "instance": 122,
+      "valid": true,
+      "unique_road_nodes": 101,
+      "mean_direct_pair_distance_km": 5.693500518798828,
+      "mean_directed_terminal_distance_km": 6.144124984741211,
+      "asymmetric_terminal_pairs": 10078
+    },
+    {
+      "instance": 123,
+      "valid": true,
+      "unique_road_nodes": 101,
+      "mean_direct_pair_distance_km": 5.676494598388672,
+      "mean_directed_terminal_distance_km": 5.8413825035095215,
+      "asymmetric_terminal_pairs": 10066
+    },
+    {
+      "instance": 124,
+      "valid": true,
+      "unique_road_nodes": 101,
+      "mean_direct_pair_distance_km": 5.910322189331055,
+      "mean_directed_terminal_distance_km": 5.770360946655273,
+      "asymmetric_terminal_pairs": 10076
+    },
+    {
+      "instance": 125,
+      "valid": true,
+      "unique_road_nodes": 101,
+      "mean_direct_pair_distance_km": 5.197887420654297,
+      "mean_directed_terminal_distance_km": 5.845417499542236,
+      "asymmetric_terminal_pairs": 10086
+    },
+    {
+      "instance": 126,
+      "valid": true,
+      "unique_road_nodes": 101,
+      "mean_direct_pair_distance_km": 5.79848575592041,
+      "mean_directed_terminal_distance_km": 6.063124179840088,
+      "asymmetric_terminal_pairs": 10044
+    },
+    {
+      "instance": 127,
+      "valid": true,
+      "unique_road_nodes": 101,
+      "mean_direct_pair_distance_km": 5.732893466949463,
+      "mean_directed_terminal_distance_km": 6.202918529510498,
+      "asymmetric_terminal_pairs": 10062
+    }
+  ]
+}

@@ -1,0 +1,31 @@
+{
+  "status": "created",
+  "purpose": "provisional manuscript figure; WTC final-size requirements pending live verification",
+  "figure_width_mm": 180,
+  "figure_height_mm": 78,
+  "panel_a": "actual directed OSM graph and actual shortest-path route geometry for frozen test instance 0",
+  "panel_b": "method means and 95% paired-instance bootstrap confidence intervals; n=128 scenarios",
+  "transformations": [
+    "three neural training seeds averaged within each test instance",
+    "no smoothing",
+    "no exclusions"
+  ],
+  "sources": {
+    "experiments/shenzhen_real_road_20261112/road_native_formal_test_v1_analysis.json": "757f7a6eb97844fdbbd894498f6b152a5cbc566df7d8e040b118f5a96369289e",
+    "experiments/shenzhen_real_road_20261112/road_native_formal_test_v1_seed2026111401_n128.pt": "600e11131f8de7c0c3d6a356c6ff5438e59075e1955dc23884a76ab188ca7711",
+    "experiments/shenzhen_real_road_20261112/data/futian_luohu_current.json": "572f667e850d1c352768315e37da09d9f20f8a2bc7cff3f7e24187e16cf4331f",
+    "experiments/shenzhen_real_road_20261112/formal_p1_v1/plan.json": "5999809e7d54952fd5e2b40fa55f31d161c4f5e2a8c8161c56efc0a36208f06b"
+  },
+  "outputs": {
+    "real_road_validation_v1.pdf": "d584ac48bbc2c17d318bcc8420049c72bf74d7c6ee68237292c3b6c024adaa7f",
+    "real_road_validation_v1.png": "6906e50ae9dbfa0929431f4c779506f68f5ee0cb73e6e1a3df2328b6edfac4cd",
+    "real_road_validation_v1_source.csv": "9055c801974bab6cfd20b51bb4d1bcf966095f824529fb64e2d8253bbcafa8d6",
+    "real_road_validation_v1_alt_text.md": "b4041a6afc23820b1e369d9d45cd0925a9bee55e2c77a5935ffb5c9c0f624f6a"
+  },
+  "software": {
+    "python": "3.12.9",
+    "matplotlib": "3.10.0",
+    "networkx": "3.4.2"
+  },
+  "integrity": "road geometry and results were not smoothed, filtered, or selectively altered"
+}

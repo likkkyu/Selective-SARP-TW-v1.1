@@ -1,0 +1,9 @@
+{
+  "status": "pass",
+  "instances": 32,
+  "replayed_actions": 3477,
+  "masked_planned_actions": 0,
+  "max_distance_error_km": 0.000211336649954319,
+  "max_training_cost_distance_error_km": 3.036949783563614e-05,
+  "explicit_road_matrix_semantics": true
+}

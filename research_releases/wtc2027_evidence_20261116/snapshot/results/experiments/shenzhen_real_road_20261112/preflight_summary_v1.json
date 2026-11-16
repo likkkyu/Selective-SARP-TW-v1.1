@@ -1,0 +1,70 @@
+{
+  "status": "pass",
+  "classification": "CPU development preflight; not formal paper evidence",
+  "instances": 4,
+  "graph_sha256": "572f667e850d1c352768315e37da09d9f20f8a2bc7cff3f7e24187e16cf4331f",
+  "graph_nodes_largest_strong_component": 37719,
+  "graph_edges_largest_strong_component": 58944,
+  "all_unique_terminal_assignments": true,
+  "road_to_straight_median_mean": 1.3816803369087256,
+  "arms": {
+    "straight_fixed25": {
+      "instances": 4,
+      "mean_completed": 48,
+      "full_service_instances": 1,
+      "mean_vehicles": 6.25,
+      "mean_distance_km": 295.914979341086,
+      "mean_energy_cost": 53.69974586586867,
+      "mean_objective": 1152.6584602068594
+    },
+    "road_fixed25": {
+      "instances": 4,
+      "mean_completed": 47.75,
+      "full_service_instances": 1,
+      "mean_vehicles": 9,
+      "mean_distance_km": 485.46180382740715,
+      "mean_energy_cost": 87.97847991175729,
+      "mean_objective": 1297.6410403855948
+    },
+    "road_osm_speed": {
+      "instances": 4,
+      "mean_completed": 50,
+      "full_service_instances": 4,
+      "mean_vehicles": 7.25,
+      "mean_distance_km": 517.2415909349608,
+      "mean_energy_cost": 93.8570858689419,
+      "mean_objective": 3.371492223113319
+    }
+  },
+  "paired": [
+    {
+      "instance": 0,
+      "road_fixed25_minus_straight_completed": 0,
+      "road_osm_speed_minus_road_fixed25_completed": 2,
+      "road_fixed25_minus_straight_distance_km": 221.1229317794996,
+      "road_osm_speed_minus_road_fixed25_distance_km": 24.760203577887808
+    },
+    {
+      "instance": 1,
+      "road_fixed25_minus_straight_completed": 0,
+      "road_osm_speed_minus_road_fixed25_completed": 0,
+      "road_fixed25_minus_straight_distance_km": 128.55647898503787,
+      "road_osm_speed_minus_road_fixed25_distance_km": 17.510579163189902
+    },
+    {
+      "instance": 2,
+      "road_fixed25_minus_straight_completed": 0,
+      "road_osm_speed_minus_road_fixed25_completed": 3,
+      "road_fixed25_minus_straight_distance_km": 189.8985762656459,
+      "road_osm_speed_minus_road_fixed25_distance_km": 40.18962317435853
+    },
+    {
+      "instance": 3,
+      "road_fixed25_minus_straight_completed": -1,
+      "road_osm_speed_minus_road_fixed25_completed": 4,
+      "road_fixed25_minus_straight_distance_km": 218.60931091510128,
+      "road_osm_speed_minus_road_fixed25_distance_km": 44.658742514778
+    }
+  ],
+  "interpretation_guard": "OSM class speeds are free-flow/default proxies until calibrated with Shenzhen taxi observations; no causal or field-performance claim."
+}

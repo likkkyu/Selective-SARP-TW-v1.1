@@ -1,0 +1,52 @@
+{
+  "status": "locked",
+  "locked_at_utc": "2026-11-14T08:12:50.854331+00:00",
+  "scope": "neural model choices frozen before road-native formal-test generation",
+  "development_pool_sha256": "52b45488371b94c47e28a3a84378838dd6411c312ef0bbf0cfd812aaf7714641",
+  "validation_split_source_sha256": "31535aaa7556b5c5222b8c64677fe4cd7c0e762e608164bd04d664c8b67ad1a4",
+  "checkpoint_selection_rule": "zero hard invalid, then highest validation service rate, then lowest validation mean cost",
+  "models": [
+    {
+      "initial_model_seed": 1234,
+      "training_seed": 20261115,
+      "checkpoint": "experiments/shenzhen_real_road_20261112/road_native_formal_n512_seed1234_v1/best.pt",
+      "checkpoint_sha256": "559f588a9e6eca194d99780f871663ea4e2bf171c5b949e692d1a3f6de771d22",
+      "checkpoint_epoch": 14,
+      "validation_service_rate_percent": 91.8125,
+      "validation_mean_objective_cost": 2478.084185563028,
+      "validation_hard_invalid": 0,
+      "training_protocol": "experiments/shenzhen_real_road_20261112/road_native_formal_n512_seed1234_v1/protocol.json",
+      "training_protocol_sha256": "817e3f27c42a737d5a837afaa01be1f672b60c2ffbbfb3f9bdf78dacda394864",
+      "independent_validation": "experiments/shenzhen_real_road_20261112/road_native_formal_n512_seed1234_v1/independent_validation_best.json",
+      "independent_validation_sha256": "25128cd4c1920cc4ec840002f653aaf4f454969e8f7793e9a0d46dff3eb158bb"
+    },
+    {
+      "initial_model_seed": 4321,
+      "training_seed": 20261116,
+      "checkpoint": "experiments/shenzhen_real_road_20261112/road_native_formal_n512_seed4321_v1/best.pt",
+      "checkpoint_sha256": "be41623d998eba1afd5b3a0b521b4d25f3cbd584746c90ca93737c637ae1c79e",
+      "checkpoint_epoch": 11,
+      "validation_service_rate_percent": 90.5,
+      "validation_mean_objective_cost": 2795.6028438210487,
+      "validation_hard_invalid": 0,
+      "training_protocol": "experiments/shenzhen_real_road_20261112/road_native_formal_n512_seed4321_v1/protocol.json",
+      "training_protocol_sha256": "7924dd18435b4deafec7e3d8e014e16c1860befa86c95e906d3f31eadffdddd0",
+      "independent_validation": "experiments/shenzhen_real_road_20261112/road_native_formal_n512_seed4321_v1/independent_validation_best.json",
+      "independent_validation_sha256": "0db4d21b55fc72db2f3bf7f19aa91c86b461104e2c17bdeffd2b66643e87f66f"
+    },
+    {
+      "initial_model_seed": 8765,
+      "training_seed": 20261117,
+      "checkpoint": "experiments/shenzhen_real_road_20261112/road_native_formal_n512_seed8765_v1/best.pt",
+      "checkpoint_sha256": "ce2dcd779f25d4e1a5b3adc41f9f2f615040b22219d83925dfa1723eded17da1",
+      "checkpoint_epoch": 15,
+      "validation_service_rate_percent": 93.3125,
+      "validation_mean_objective_cost": 1926.6682860553265,
+      "validation_hard_invalid": 0,
+      "training_protocol": "experiments/shenzhen_real_road_20261112/road_native_formal_n512_seed8765_v1/protocol.json",
+      "training_protocol_sha256": "9edf5d6eb40878cd71fc9366f317eb773164cb5905851057dbf3ff46853d4906",
+      "independent_validation": "experiments/shenzhen_real_road_20261112/road_native_formal_n512_seed8765_v1/independent_validation_best.json",
+      "independent_validation_sha256": "a689e8e43d6b7330dfce34092656157a52723e0f4f1039ff09af9bdcc4dbbe6f"
+    }
+  ]
+}

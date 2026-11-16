@@ -1,0 +1,913 @@
+{
+  "status": "passed",
+  "scope": "Evaluate the three frozen cost-v4 lazy-certificate N100 checkpoints on the exact 30-instance common set previously used for strict insertion and 300-second SCIP incumbents.",
+  "claim_boundary": "This is a post hoc alignment evaluation on an existing SCIP test set. It supports direct same-instance descriptive comparison, but is not a new blinded model-selection test and does not make a SCIP incumbent optimal.",
+  "experimental_unit": "paired N100 instance; three training seeds averaged within each instance",
+  "samples": 30,
+  "training_seeds": [
+    314159,
+    271828,
+    161803
+  ],
+  "dataset_equivalence": {
+    "status": "passed",
+    "scenario_path": "experiments/scip_multiscale_20261114/formal_v1_20261114/common_n100_seed2026111600.pt",
+    "scenario_sha256": "d874cb88ebf8e035738d1b1666cff7897b14c1d937a2ab4b1812d1ba0f39ffba",
+    "dataset_seed": 2026111600,
+    "graph_size": 100,
+    "instances": 30,
+    "tensor_fields_compared": 240,
+    "non_tensor_fields_compared": 30,
+    "comparison": "exact key equality and torch.equal for every tensor"
+  },
+  "seed_metrics": {
+    "314159": {
+      "service_rate": 0.967,
+      "objective": 1902.4745668866808,
+      "raw_cost": 2427.077896103608,
+      "distance": 848.159990119782,
+      "vehicles": 16.466666666666665,
+      "mean_inference_seconds": 2.1549031695001757,
+      "report": "experiments/lazy_v4_scip_alignment_20261116/results/seed_314159/report.json"
+    },
+    "271828": {
+      "service_rate": 0.952,
+      "objective": 2764.079500794903,
+      "raw_cost": 3261.7704295411345,
+      "distance": 848.2463146007691,
+      "vehicles": 16.8,
+      "mean_inference_seconds": 1.8849392041680404,
+      "report": "experiments/lazy_v4_scip_alignment_20261116/results/seed_271828_serial_retry1/report.json"
+    },
+    "161803": {
+      "service_rate": 0.949,
+      "objective": 2937.181343493773,
+      "raw_cost": 3453.554141276788,
+      "distance": 837.722882391681,
+      "vehicles": 16.733333333333334,
+      "mean_inference_seconds": 2.1228444151987786,
+      "report": "experiments/lazy_v4_scip_alignment_20261116/results/seed_161803/report.json"
+    }
+  },
+  "methods": {
+    "current_neural_seed_averaged": {
+      "service_rate": 0.956,
+      "objective": 2534.5784703917857,
+      "raw_cost": 3047.467488973844,
+      "distance": 844.7097290374107,
+      "vehicles": 16.666666666666668
+    },
+    "strict_insertion": {
+      "service_rate": 0.9926666666666667,
+      "objective": 424.6336433971812,
+      "raw_cost": 806.4096184913461,
+      "distance": 659.7006249171053,
+      "vehicles": 13.2
+    },
+    "scip_incumbent": {
+      "service_rate": 0.9926666666666667,
+      "objective": 424.6336433971812,
+      "raw_cost": 806.4096184913461,
+      "distance": 659.7006249171053,
+      "vehicles": 13.2
+    }
+  },
+  "paired_neural_minus_insertion": {
+    "service_rate_difference": -0.03666666666666667,
+    "service_rate_difference_95pct_ci": [
+      -0.043000000000000003,
+      -0.030555555555555565
+    ],
+    "objective_difference": 2109.9448269946047,
+    "objective_difference_95pct_ci": [
+      1758.631478685538,
+      2467.7043562912086
+    ],
+    "neural_better_objective_instances": 0,
+    "ties": 0,
+    "insertion_better_objective_instances": 30
+  },
+  "scip_solver": {
+    "time_limit_instances": 30,
+    "optimal_instances": 0,
+    "improved_warm_start_instances": 0,
+    "median_gap": 963.2052599667745
+  },
+  "bootstrap": {
+    "replicates": 20000,
+    "seed": 20261116,
+    "method": "paired nonparametric percentile bootstrap over instances"
+  },
+  "per_instance": [
+    {
+      "instance": 0,
+      "neural_seed_mean": {
+        "completed": 94.66666666666667,
+        "objective": 3071.9505601995697,
+        "raw_cost": 3610.432855476099,
+        "distance": 851.2651291122343,
+        "vehicles": 16.666666666666668
+      },
+      "insertion": {
+        "completed": 99,
+        "objective": 577.9834113037613,
+        "raw_cost": 962.2747488349116,
+        "distance": 691.8806794441606,
+        "vehicles": 13
+      },
+      "scip_incumbent": {
+        "completed": 99,
+        "objective": 577.9834113037613,
+        "raw_cost": 962.2747488349116,
+        "distance": 691.8806794441606,
+        "vehicles": 13
+      },
+      "scip_status": "timelimit",
+      "scip_gap": 2171.7942147850354,
+      "scip_improvement": 0.0
+    },
+    {
+      "instance": 1,
+      "neural_seed_mean": {
+        "completed": 98.33333333333333,
+        "objective": 962.7857821854749,
+        "raw_cost": 1475.8817836843073,
+        "distance": 875.6168595105573,
+        "vehicles": 16.666666666666668
+      },
+      "insertion": {
+        "completed": 100,
+        "objective": 3.1623169000564557,
+        "raw_cost": 411.37925832168247,
+        "distance": 717.957726541857,
+        "vehicles": 14
+      },
+      "scip_incumbent": {
+        "completed": 100,
+        "objective": 3.1623169000564557,
+        "raw_cost": 411.37925832168247,
+        "distance": 717.957726541857,
+        "vehicles": 14
+      },
+      "scip_status": "timelimit",
+      "scip_gap": 9.725410780948561,
+      "scip_improvement": 0.0
+    },
+    {
+      "instance": 2,
+      "neural_seed_mean": {
+        "completed": 98.0,
+        "objective": 1155.012408651289,
+        "raw_cost": 1685.8912999715187,
+        "distance": 865.5856285000391,
+        "vehicles": 16.666666666666668
+      },
+      "insertion": {
+        "completed": 100,
+        "objective": 2.8967515942124074,
+        "raw_cost": 377.6561434911977,
+        "distance": 648.7855846106803,
+        "vehicles": 13
+      },
+      "scip_incumbent": {
+        "completed": 100,
+        "objective": 2.8967515942124074,
+        "raw_cost": 377.6561434911977,
+        "distance": 648.7855846106803,
+        "vehicles": 13
+      },
+      "scip_status": "timelimit",
+      "scip_gap": 8.605299149896714,
+      "scip_improvement": 0.0
+    },
+    {
+      "instance": 3,
+      "neural_seed_mean": {
+        "completed": 97.66666666666667,
+        "objective": 1346.3891599391898,
+        "raw_cost": 1869.0769049097216,
+        "distance": 846.6101603124097,
+        "vehicles": 17.0
+      },
+      "insertion": {
+        "completed": 98,
+        "objective": 1152.8933398288568,
+        "raw_cost": 1527.1849391152666,
+        "distance": 644.9739682659822,
+        "vehicles": 13
+      },
+      "scip_incumbent": {
+        "completed": 98,
+        "objective": 1152.8933398288568,
+        "raw_cost": 1527.1849391152666,
+        "distance": 644.9739682659822,
+        "vehicles": 13
+      },
+      "scip_status": "timelimit",
+      "scip_gap": 4320.825490246653,
+      "scip_improvement": 0.0
+    },
+    {
+      "instance": 4,
+      "neural_seed_mean": {
+        "completed": 97.33333333333333,
+        "objective": 1538.014270166411,
+        "raw_cost": 2037.4481479828664,
+        "distance": 820.8364049916268,
+        "vehicles": 15.666666666666666
+      },
+      "insertion": {
+        "completed": 98,
+        "objective": 1152.9414815943576,
+        "raw_cost": 1532.0408272491313,
+        "distance": 666.0782909235282,
+        "vehicles": 13
+      },
+      "scip_incumbent": {
+        "completed": 98,
+        "objective": 1152.9414815943576,
+        "raw_cost": 1532.0408272491313,
+        "distance": 666.0782909235282,
+        "vehicles": 13
+      },
+      "scip_status": "timelimit",
+      "scip_gap": 4146.258526527187,
+      "scip_improvement": 0.0
+    },
+    {
+      "instance": 5,
+      "neural_seed_mean": {
+        "completed": 96.33333333333333,
+        "objective": 2112.201864207405,
+        "raw_cost": 2598.2406691448286,
+        "distance": 832.59023986464,
+        "vehicles": 16.666666666666668
+      },
+      "insertion": {
+        "completed": 98,
+        "objective": 1152.6572457583657,
+        "raw_cost": 1495.5248665241104,
+        "distance": 580.6934357206404,
+        "vehicles": 12
+      },
+      "scip_incumbent": {
+        "completed": 98,
+        "objective": 1152.6572457583657,
+        "raw_cost": 1495.5248665241104,
+        "distance": 580.6934357206404,
+        "vehicles": 12
+      },
+      "scip_status": "timelimit",
+      "scip_gap": 4110.155397067566,
+      "scip_improvement": 0.0
+    },
+    {
+      "instance": 6,
+      "neural_seed_mean": {
+        "completed": 96.0,
+        "objective": 2305.4018757144972,
+        "raw_cost": 2853.160708463984,
+        "distance": 855.4713273105867,
+        "vehicles": 17.0
+      },
+      "insertion": {
+        "completed": 99,
+        "objective": 577.8822064704241,
+        "raw_cost": 950.0076800455722,
+        "distance": 633.90981683171,
+        "vehicles": 13
+      },
+      "scip_incumbent": {
+        "completed": 99,
+        "objective": 577.8822064704241,
+        "raw_cost": 950.0076800455722,
+        "distance": 633.90981683171,
+        "vehicles": 13
+      },
+      "scip_status": "timelimit",
+      "scip_gap": 2077.4983356061784,
+      "scip_improvement": 0.0
+    },
+    {
+      "instance": 7,
+      "neural_seed_mean": {
+        "completed": 97.0,
+        "objective": 1729.1727923591995,
+        "raw_cost": 2235.1380150958034,
+        "distance": 862.8570432086493,
+        "vehicles": 17.0
+      },
+      "insertion": {
+        "completed": 100,
+        "objective": 2.893172950831364,
+        "raw_cost": 377.15230415640764,
+        "distance": 643.5580549685611,
+        "vehicles": 13
+      },
+      "scip_incumbent": {
+        "completed": 100,
+        "objective": 2.893172950831364,
+        "raw_cost": 377.15230415640764,
+        "distance": 643.5580549685611,
+        "vehicles": 13
+      },
+      "scip_status": "timelimit",
+      "scip_gap": 8.94688951641266,
+      "scip_improvement": 0.0
+    },
+    {
+      "instance": 8,
+      "neural_seed_mean": {
+        "completed": 96.33333333333333,
+        "objective": 2112.4164112678304,
+        "raw_cost": 2587.978925061459,
+        "distance": 801.1610797223443,
+        "vehicles": 15.666666666666666
+      },
+      "insertion": {
+        "completed": 99,
+        "objective": 577.6747674040785,
+        "raw_cost": 923.9514302402582,
+        "distance": 599.1821001825347,
+        "vehicles": 12
+      },
+      "scip_incumbent": {
+        "completed": 99,
+        "objective": 577.6747674040785,
+        "raw_cost": 923.9514302402582,
+        "distance": 599.1821001825347,
+        "vehicles": 12
+      },
+      "scip_status": "timelimit",
+      "scip_gap": 2113.4749049223183,
+      "scip_improvement": 0.0
+    },
+    {
+      "instance": 9,
+      "neural_seed_mean": {
+        "completed": 95.0,
+        "objective": 2880.3104185169777,
+        "raw_cost": 3421.5079471376216,
+        "distance": 831.6109176740811,
+        "vehicles": 17.0
+      },
+      "insertion": {
+        "completed": 100,
+        "objective": 3.138181065994261,
+        "raw_cost": 402.74176793729765,
+        "distance": 666.0018424238149,
+        "vehicles": 14
+      },
+      "scip_incumbent": {
+        "completed": 100,
+        "objective": 3.138181065994261,
+        "raw_cost": 402.74176793729765,
+        "distance": 666.0018424238149,
+        "vehicles": 14
+      },
+      "scip_status": "timelimit",
+      "scip_gap": 9.548639428929373,
+      "scip_improvement": 0.0
+    },
+    {
+      "instance": 10,
+      "neural_seed_mean": {
+        "completed": 97.33333333333333,
+        "objective": 1538.1871063247606,
+        "raw_cost": 2048.972798069972,
+        "distance": 826.4762435497654,
+        "vehicles": 16.0
+      },
+      "insertion": {
+        "completed": 100,
+        "objective": 2.900718630001534,
+        "raw_cost": 377.25569094384855,
+        "distance": 643.5127491326347,
+        "vehicles": 13
+      },
+      "scip_incumbent": {
+        "completed": 100,
+        "objective": 2.900718630001534,
+        "raw_cost": 377.25569094384855,
+        "distance": 643.5127491326347,
+        "vehicles": 13
+      },
+      "scip_status": "timelimit",
+      "scip_gap": 8.935817911568186,
+      "scip_improvement": 0.0
+    },
+    {
+      "instance": 11,
+      "neural_seed_mean": {
+        "completed": 94.66666666666667,
+        "objective": 3071.2709204552316,
+        "raw_cost": 3594.4358269098047,
+        "distance": 878.0609915499621,
+        "vehicles": 17.0
+      },
+      "insertion": {
+        "completed": 97,
+        "objective": 1727.8922617099493,
+        "raw_cost": 2101.7056789489616,
+        "distance": 641.9934553080103,
+        "vehicles": 13
+      },
+      "scip_incumbent": {
+        "completed": 97,
+        "objective": 1727.8922617099493,
+        "raw_cost": 2101.7056789489616,
+        "distance": 641.9934553080103,
+        "vehicles": 13
+      },
+      "scip_status": "timelimit",
+      "scip_gap": 6158.862809481881,
+      "scip_improvement": 0.0
+    },
+    {
+      "instance": 12,
+      "neural_seed_mean": {
+        "completed": 94.66666666666667,
+        "objective": 3071.6407407332567,
+        "raw_cost": 3606.8512924319916,
+        "distance": 870.647835839723,
+        "vehicles": 17.0
+      },
+      "insertion": {
+        "completed": 99,
+        "objective": 578.1572500541902,
+        "raw_cost": 982.88900836466,
+        "distance": 695.9270566223393,
+        "vehicles": 14
+      },
+      "scip_incumbent": {
+        "completed": 99,
+        "objective": 578.1572500541902,
+        "raw_cost": 982.88900836466,
+        "distance": 695.9270566223393,
+        "vehicles": 14
+      },
+      "scip_status": "timelimit",
+      "scip_gap": 1916.343380331422,
+      "scip_improvement": 0.0
+    },
+    {
+      "instance": 13,
+      "neural_seed_mean": {
+        "completed": 95.0,
+        "objective": 2879.2988838828423,
+        "raw_cost": 3370.086896035926,
+        "distance": 823.2197604029471,
+        "vehicles": 16.0
+      },
+      "insertion": {
+        "completed": 100,
+        "objective": 2.8939033084991506,
+        "raw_cost": 376.24502565644906,
+        "distance": 638.6971448015405,
+        "vehicles": 13
+      },
+      "scip_incumbent": {
+        "completed": 100,
+        "objective": 2.8939033084991506,
+        "raw_cost": 376.24502565644906,
+        "distance": 638.6971448015405,
+        "vehicles": 13
+      },
+      "scip_status": "timelimit",
+      "scip_gap": 9.072280300287089,
+      "scip_improvement": 0.0
+    },
+    {
+      "instance": 14,
+      "neural_seed_mean": {
+        "completed": 93.33333333333333,
+        "objective": 3838.3924181249226,
+        "raw_cost": 4376.94530316445,
+        "distance": 874.2355988334485,
+        "vehicles": 17.0
+      },
+      "insertion": {
+        "completed": 99,
+        "objective": 578.1860182085763,
+        "raw_cost": 987.1590777585417,
+        "distance": 719.5533320156227,
+        "vehicles": 14
+      },
+      "scip_incumbent": {
+        "completed": 99,
+        "objective": 578.1860182085763,
+        "raw_cost": 987.1590777585417,
+        "distance": 719.5533320156227,
+        "vehicles": 14
+      },
+      "scip_status": "timelimit",
+      "scip_gap": 2044.9647869231644,
+      "scip_improvement": 0.0
+    },
+    {
+      "instance": 15,
+      "neural_seed_mean": {
+        "completed": 96.66666666666667,
+        "objective": 1921.4018271632488,
+        "raw_cost": 2448.369276240338,
+        "distance": 870.9696225675962,
+        "vehicles": 17.0
+      },
+      "insertion": {
+        "completed": 99,
+        "objective": 577.885809736145,
+        "raw_cost": 950.4476955636612,
+        "distance": 634.7075233223367,
+        "vehicles": 13
+      },
+      "scip_incumbent": {
+        "completed": 99,
+        "objective": 577.885809736145,
+        "raw_cost": 950.4476955636612,
+        "distance": 634.7075233223367,
+        "vehicles": 13
+      },
+      "scip_status": "timelimit",
+      "scip_gap": 2023.1654104901513,
+      "scip_improvement": 0.0
+    },
+    {
+      "instance": 16,
+      "neural_seed_mean": {
+        "completed": 93.33333333333333,
+        "objective": 3837.6185460789015,
+        "raw_cost": 4339.656316992794,
+        "distance": 842.2928366764636,
+        "vehicles": 16.666666666666668
+      },
+      "insertion": {
+        "completed": 100,
+        "objective": 2.907579573389132,
+        "raw_cost": 379.3324302384763,
+        "distance": 656.5378055347786,
+        "vehicles": 13
+      },
+      "scip_incumbent": {
+        "completed": 100,
+        "objective": 2.907579573389132,
+        "raw_cost": 379.3324302384763,
+        "distance": 656.5378055347786,
+        "vehicles": 13
+      },
+      "scip_status": "timelimit",
+      "scip_gap": 9.173171808212238,
+      "scip_improvement": 0.0
+    },
+    {
+      "instance": 17,
+      "neural_seed_mean": {
+        "completed": 94.33333333333333,
+        "objective": 3262.741810593588,
+        "raw_cost": 3776.827749331356,
+        "distance": 861.4193139711301,
+        "vehicles": 17.0
+      },
+      "insertion": {
+        "completed": 99,
+        "objective": 578.0606079913891,
+        "raw_cost": 963.6356907711813,
+        "distance": 680.6026429981908,
+        "vehicles": 13
+      },
+      "scip_incumbent": {
+        "completed": 99,
+        "objective": 578.0606079913891,
+        "raw_cost": 963.6356907711813,
+        "distance": 680.6026429981908,
+        "vehicles": 13
+      },
+      "scip_status": "timelimit",
+      "scip_gap": 2023.2799274284164,
+      "scip_improvement": 0.0
+    },
+    {
+      "instance": 18,
+      "neural_seed_mean": {
+        "completed": 98.0,
+        "objective": 1154.1882936380127,
+        "raw_cost": 1627.9773270430749,
+        "distance": 794.5089142032243,
+        "vehicles": 15.333333333333334
+      },
+      "insertion": {
+        "completed": 100,
+        "objective": 2.6596496805956313,
+        "raw_cost": 343.5083199534822,
+        "distance": 565.3163314804185,
+        "vehicles": 12
+      },
+      "scip_incumbent": {
+        "completed": 100,
+        "objective": 2.6596496805956313,
+        "raw_cost": 343.5083199534822,
+        "distance": 565.3163314804185,
+        "vehicles": 12
+      },
+      "scip_status": "timelimit",
+      "scip_gap": 8.28530341341667,
+      "scip_improvement": 0.0
+    },
+    {
+      "instance": 19,
+      "neural_seed_mean": {
+        "completed": 95.0,
+        "objective": 2879.1955914212194,
+        "raw_cost": 3382.459811013899,
+        "distance": 839.298285565728,
+        "vehicles": 17.0
+      },
+      "insertion": {
+        "completed": 100,
+        "objective": 2.932600556191036,
+        "raw_cost": 377.70102097568736,
+        "distance": 638.5992073019079,
+        "vehicles": 13
+      },
+      "scip_incumbent": {
+        "completed": 100,
+        "objective": 2.932600556191036,
+        "raw_cost": 377.70102097568736,
+        "distance": 638.5992073019079,
+        "vehicles": 13
+      },
+      "scip_status": "timelimit",
+      "scip_gap": 9.340814936138798,
+      "scip_improvement": 0.0
+    },
+    {
+      "instance": 20,
+      "neural_seed_mean": {
+        "completed": 92.66666666666667,
+        "objective": 4221.218965294319,
+        "raw_cost": 4740.42964739196,
+        "distance": 862.471033485207,
+        "vehicles": 17.0
+      },
+      "insertion": {
+        "completed": 100,
+        "objective": 3.1588820133779247,
+        "raw_cost": 410.2160848012812,
+        "distance": 711.3977854084319,
+        "vehicles": 14
+      },
+      "scip_incumbent": {
+        "completed": 100,
+        "objective": 3.1588820133779247,
+        "raw_cost": 410.2160848012812,
+        "distance": 711.3977854084319,
+        "vehicles": 14
+      },
+      "scip_status": "timelimit",
+      "scip_gap": 9.395142237464674,
+      "scip_improvement": 0.0
+    },
+    {
+      "instance": 21,
+      "neural_seed_mean": {
+        "completed": 94.33333333333333,
+        "objective": 3263.3786298981872,
+        "raw_cost": 3790.601280823545,
+        "distance": 830.9859231544712,
+        "vehicles": 16.666666666666668
+      },
+      "insertion": {
+        "completed": 100,
+        "objective": 3.1880295207690597,
+        "raw_cost": 412.342994826647,
+        "distance": 719.3483756065175,
+        "vehicles": 14
+      },
+      "scip_incumbent": {
+        "completed": 100,
+        "objective": 3.1880295207690597,
+        "raw_cost": 412.342994826647,
+        "distance": 719.3483756065175,
+        "vehicles": 14
+      },
+      "scip_status": "timelimit",
+      "scip_gap": 9.640224891196295,
+      "scip_improvement": 0.0
+    },
+    {
+      "instance": 22,
+      "neural_seed_mean": {
+        "completed": 94.33333333333333,
+        "objective": 3262.4000423467023,
+        "raw_cost": 3760.9092598995026,
+        "distance": 838.192740104481,
+        "vehicles": 17.0
+      },
+      "insertion": {
+        "completed": 98,
+        "objective": 1153.3967084979138,
+        "raw_cost": 1591.4238510758103,
+        "distance": 772.319853414816,
+        "vehicles": 15
+      },
+      "scip_incumbent": {
+        "completed": 98,
+        "objective": 1153.3967084979138,
+        "raw_cost": 1591.4238510758103,
+        "distance": 772.319853414816,
+        "vehicles": 15
+      },
+      "scip_status": "timelimit",
+      "scip_gap": 3947.734595202383,
+      "scip_improvement": 0.0
+    },
+    {
+      "instance": 23,
+      "neural_seed_mean": {
+        "completed": 95.66666666666667,
+        "objective": 2496.6958289034396,
+        "raw_cost": 3033.701567441198,
+        "distance": 870.9023420815155,
+        "vehicles": 17.0
+      },
+      "insertion": {
+        "completed": 100,
+        "objective": 3.144051318139331,
+        "raw_cost": 409.4314748711068,
+        "distance": 710.4030241151506,
+        "vehicles": 14
+      },
+      "scip_incumbent": {
+        "completed": 100,
+        "objective": 3.144051318139331,
+        "raw_cost": 409.4314748711068,
+        "distance": 710.4030241151506,
+        "vehicles": 14
+      },
+      "scip_status": "timelimit",
+      "scip_gap": 10.067139602127162,
+      "scip_improvement": 0.0
+    },
+    {
+      "instance": 24,
+      "neural_seed_mean": {
+        "completed": 94.33333333333333,
+        "objective": 3262.1898848501005,
+        "raw_cost": 3743.904117051367,
+        "distance": 804.1324947706206,
+        "vehicles": 16.666666666666668
+      },
+      "insertion": {
+        "completed": 100,
+        "objective": 2.888836061909814,
+        "raw_cost": 373.7937334540246,
+        "distance": 621.9804374531508,
+        "vehicles": 13
+      },
+      "scip_incumbent": {
+        "completed": 100,
+        "objective": 2.888836061909814,
+        "raw_cost": 373.7937334540246,
+        "distance": 621.9804374531508,
+        "vehicles": 13
+      },
+      "scip_status": "timelimit",
+      "scip_gap": 8.715066518258139,
+      "scip_improvement": 0.0
+    },
+    {
+      "instance": 25,
+      "neural_seed_mean": {
+        "completed": 95.66666666666667,
+        "objective": 2497.016762900792,
+        "raw_cost": 3042.4873035631517,
+        "distance": 851.1891951708094,
+        "vehicles": 17.0
+      },
+      "insertion": {
+        "completed": 98,
+        "objective": 1152.9352069733334,
+        "raw_cost": 1531.158883765616,
+        "distance": 661.4849919114828,
+        "vehicles": 13
+      },
+      "scip_incumbent": {
+        "completed": 98,
+        "objective": 1152.9352069733334,
+        "raw_cost": 1531.158883765616,
+        "distance": 661.4849919114828,
+        "vehicles": 13
+      },
+      "scip_status": "timelimit",
+      "scip_gap": 4037.389027415919,
+      "scip_improvement": 0.0
+    },
+    {
+      "instance": 26,
+      "neural_seed_mean": {
+        "completed": 96.33333333333333,
+        "objective": 2112.9034960649274,
+        "raw_cost": 2624.2901452432257,
+        "distance": 836.3929859002823,
+        "vehicles": 16.666666666666668
+      },
+      "insertion": {
+        "completed": 100,
+        "objective": 2.9273502507518545,
+        "raw_cost": 383.7328053704124,
+        "distance": 681.3454789414053,
+        "vehicles": 13
+      },
+      "scip_incumbent": {
+        "completed": 100,
+        "objective": 2.9273502507518545,
+        "raw_cost": 383.7328053704124,
+        "distance": 681.3454789414053,
+        "vehicles": 13
+      },
+      "scip_status": "timelimit",
+      "scip_gap": 9.304461912437574,
+      "scip_improvement": 0.0
+    },
+    {
+      "instance": 27,
+      "neural_seed_mean": {
+        "completed": 96.66666666666667,
+        "objective": 1920.5906536025232,
+        "raw_cost": 2411.75508693442,
+        "distance": 821.7444357593912,
+        "vehicles": 17.0
+      },
+      "insertion": {
+        "completed": 100,
+        "objective": 2.8882639601520026,
+        "raw_cost": 372.6488999377133,
+        "distance": 614.7712433033183,
+        "vehicles": 13
+      },
+      "scip_incumbent": {
+        "completed": 100,
+        "objective": 2.8882639601520026,
+        "raw_cost": 372.6488999377133,
+        "distance": 614.7712433033183,
+        "vehicles": 13
+      },
+      "scip_status": "timelimit",
+      "scip_gap": 8.654630229166546,
+      "scip_improvement": 0.0
+    },
+    {
+      "instance": 28,
+      "neural_seed_mean": {
+        "completed": 96.0,
+        "objective": 2304.064731762777,
+        "raw_cost": 2799.1899785992355,
+        "distance": 846.3162685821577,
+        "vehicles": 16.666666666666668
+      },
+      "insertion": {
+        "completed": 99,
+        "objective": 577.9292203464503,
+        "raw_cost": 956.0196582547342,
+        "distance": 662.6564988467555,
+        "vehicles": 13
+      },
+      "scip_incumbent": {
+        "completed": 99,
+        "objective": 577.9292203464503,
+        "raw_cost": 956.0196582547342,
+        "distance": 662.6564988467555,
+        "vehicles": 13
+      },
+      "scip_status": "timelimit",
+      "scip_gap": 2142.111614736624,
+      "scip_improvement": 0.0
+    },
+    {
+      "instance": 29,
+      "neural_seed_mean": {
+        "completed": 93.0,
+        "objective": 4029.30343450597,
+        "raw_cost": 4529.4164281058875,
+        "distance": 854.2302587462276,
+        "vehicles": 16.333333333333332
+      },
+      "insertion": {
+        "completed": 99,
+        "objective": 577.9534786527726,
+        "raw_cost": 951.7265632922496,
+        "distance": 626.8423100808808,
+        "vehicles": 13
+      },
+      "scip_incumbent": {
+        "completed": 99,
+        "objective": 577.9534786527726,
+        "raw_cost": 951.7265632922496,
+        "distance": 626.8423100808808,
+        "vehicles": 13
+      },
+      "scip_status": "timelimit",
+      "scip_gap": 2066.9107516454646,
+      "scip_improvement": 0.0
+    }
+  ]
+}

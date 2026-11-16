@@ -1,0 +1,1255 @@
+{
+  "scope": "road-native road-aware development only; never formal P1 testing",
+  "generator_version": 2,
+  "seed": 2026111303,
+  "samples": 4,
+  "graph_size": 50,
+  "graph_sha256": "572f667e850d1c352768315e37da09d9f20f8a2bc7cff3f7e24187e16cf4331f",
+  "formal_test_road_cases_sha256": "fb062d7696da02dabf56f5d93f9efbe74db75dff61ec05aa6151dc558b708b98",
+  "formal_test_seed": 2026111201,
+  "matrix_speed_kph": 25.0,
+  "terminal_sampling": "directly on largest strongly connected OSM driving graph",
+  "time_window_basis": "road shortest-path distance at constant protocol speed",
+  "elapsed_seconds": 20.29822145800017,
+  "status": "prepared",
+  "output": "experiments/shenzhen_real_road_20261112/road_native_preflight_seed2026111303_n4.pt",
+  "sha256": "e2df109fd658b70593b0a7dcaa73095b5197894842e626b35077494d927cf742",
+  "cases": [
+    {
+      "instance": 0,
+      "unique_road_nodes": 101,
+      "band_fallbacks": 0,
+      "pair_distance_km_mean": 5.914691711471033,
+      "pair_distance_km_max": 11.334628897631388,
+      "pair_info": [
+        {
+          "order": 0,
+          "band": "cargo_long",
+          "distance_km": 6.721741312071429,
+          "band_fallback": false
+        },
+        {
+          "order": 1,
+          "band": "passenger_short",
+          "distance_km": 4.215234325834065,
+          "band_fallback": false
+        },
+        {
+          "order": 2,
+          "band": "passenger_mid",
+          "distance_km": 6.413740277585066,
+          "band_fallback": false
+        },
+        {
+          "order": 3,
+          "band": "passenger_short",
+          "distance_km": 4.840877613502308,
+          "band_fallback": false
+        },
+        {
+          "order": 4,
+          "band": "cargo_short",
+          "distance_km": 4.397920046575011,
+          "band_fallback": false
+        },
+        {
+          "order": 5,
+          "band": "passenger_mid",
+          "distance_km": 7.314319865620149,
+          "band_fallback": false
+        },
+        {
+          "order": 6,
+          "band": "cargo_short",
+          "distance_km": 3.370018117462315,
+          "band_fallback": false
+        },
+        {
+          "order": 7,
+          "band": "passenger_short",
+          "distance_km": 4.073066840000097,
+          "band_fallback": false
+        },
+        {
+          "order": 8,
+          "band": "passenger_short",
+          "distance_km": 3.585744532824363,
+          "band_fallback": false
+        },
+        {
+          "order": 9,
+          "band": "passenger_mid",
+          "distance_km": 8.654494999708435,
+          "band_fallback": false
+        },
+        {
+          "order": 10,
+          "band": "passenger_mid",
+          "distance_km": 6.365860539240366,
+          "band_fallback": false
+        },
+        {
+          "order": 11,
+          "band": "cargo_short",
+          "distance_km": 3.3789885035462937,
+          "band_fallback": false
+        },
+        {
+          "order": 12,
+          "band": "passenger_short",
+          "distance_km": 4.163657858142105,
+          "band_fallback": false
+        },
+        {
+          "order": 13,
+          "band": "passenger_mid",
+          "distance_km": 7.0285030972765385,
+          "band_fallback": false
+        },
+        {
+          "order": 14,
+          "band": "cargo_short",
+          "distance_km": 7.179458142776609,
+          "band_fallback": false
+        },
+        {
+          "order": 15,
+          "band": "cargo_short",
+          "distance_km": 2.627638134407439,
+          "band_fallback": false
+        },
+        {
+          "order": 16,
+          "band": "passenger_short",
+          "distance_km": 3.699324804678497,
+          "band_fallback": false
+        },
+        {
+          "order": 17,
+          "band": "passenger_short",
+          "distance_km": 4.945674980990326,
+          "band_fallback": false
+        },
+        {
+          "order": 18,
+          "band": "passenger_short",
+          "distance_km": 3.4810339031457516,
+          "band_fallback": false
+        },
+        {
+          "order": 19,
+          "band": "passenger_mid",
+          "distance_km": 9.078125659448444,
+          "band_fallback": false
+        },
+        {
+          "order": 20,
+          "band": "passenger_short",
+          "distance_km": 4.715871798559264,
+          "band_fallback": false
+        },
+        {
+          "order": 21,
+          "band": "passenger_mid",
+          "distance_km": 9.724298890836117,
+          "band_fallback": false
+        },
+        {
+          "order": 22,
+          "band": "passenger_mid",
+          "distance_km": 9.392386664934255,
+          "band_fallback": false
+        },
+        {
+          "order": 23,
+          "band": "passenger_short",
+          "distance_km": 4.6178938568027,
+          "band_fallback": false
+        },
+        {
+          "order": 24,
+          "band": "passenger_mid",
+          "distance_km": 7.074655125787808,
+          "band_fallback": false
+        },
+        {
+          "order": 25,
+          "band": "cargo_short",
+          "distance_km": 9.694518470483642,
+          "band_fallback": false
+        },
+        {
+          "order": 26,
+          "band": "cargo_short",
+          "distance_km": 2.7169069995574233,
+          "band_fallback": false
+        },
+        {
+          "order": 27,
+          "band": "cargo_short",
+          "distance_km": 8.513431012495623,
+          "band_fallback": false
+        },
+        {
+          "order": 28,
+          "band": "passenger_long",
+          "distance_km": 10.00085131114793,
+          "band_fallback": false
+        },
+        {
+          "order": 29,
+          "band": "passenger_short",
+          "distance_km": 4.9679576817042514,
+          "band_fallback": false
+        },
+        {
+          "order": 30,
+          "band": "cargo_long",
+          "distance_km": 11.334628897631388,
+          "band_fallback": false
+        },
+        {
+          "order": 31,
+          "band": "passenger_short",
+          "distance_km": 3.6451251539469687,
+          "band_fallback": false
+        },
+        {
+          "order": 32,
+          "band": "cargo_short",
+          "distance_km": 3.8054362777565536,
+          "band_fallback": false
+        },
+        {
+          "order": 33,
+          "band": "passenger_short",
+          "distance_km": 3.2691336026205735,
+          "band_fallback": false
+        },
+        {
+          "order": 34,
+          "band": "cargo_short",
+          "distance_km": 7.391164085924677,
+          "band_fallback": false
+        },
+        {
+          "order": 35,
+          "band": "cargo_short",
+          "distance_km": 8.615605320073804,
+          "band_fallback": false
+        },
+        {
+          "order": 36,
+          "band": "passenger_short",
+          "distance_km": 3.82414874712983,
+          "band_fallback": false
+        },
+        {
+          "order": 37,
+          "band": "passenger_short",
+          "distance_km": 3.8386037656663903,
+          "band_fallback": false
+        },
+        {
+          "order": 38,
+          "band": "cargo_short",
+          "distance_km": 8.054901707497688,
+          "band_fallback": false
+        },
+        {
+          "order": 39,
+          "band": "cargo_short",
+          "distance_km": 6.997656778482584,
+          "band_fallback": false
+        },
+        {
+          "order": 40,
+          "band": "passenger_mid",
+          "distance_km": 6.861100686362598,
+          "band_fallback": false
+        },
+        {
+          "order": 41,
+          "band": "passenger_short",
+          "distance_km": 3.9168838923592317,
+          "band_fallback": false
+        },
+        {
+          "order": 42,
+          "band": "cargo_short",
+          "distance_km": 5.502824234178401,
+          "band_fallback": false
+        },
+        {
+          "order": 43,
+          "band": "cargo_short",
+          "distance_km": 2.9562835808735635,
+          "band_fallback": false
+        },
+        {
+          "order": 44,
+          "band": "cargo_short",
+          "distance_km": 5.848658116475818,
+          "band_fallback": false
+        },
+        {
+          "order": 45,
+          "band": "cargo_long",
+          "distance_km": 1.506900136606143,
+          "band_fallback": false
+        },
+        {
+          "order": 46,
+          "band": "cargo_long",
+          "distance_km": 9.894160227851064,
+          "band_fallback": false
+        },
+        {
+          "order": 47,
+          "band": "cargo_short",
+          "distance_km": 9.06998823351507,
+          "band_fallback": false
+        },
+        {
+          "order": 48,
+          "band": "passenger_short",
+          "distance_km": 3.9331422948095005,
+          "band_fallback": false
+        },
+        {
+          "order": 49,
+          "band": "cargo_short",
+          "distance_km": 8.514044466645133,
+          "band_fallback": false
+        }
+      ]
+    },
+    {
+      "instance": 1,
+      "unique_road_nodes": 101,
+      "band_fallbacks": 0,
+      "pair_distance_km_mean": 5.5225001519811,
+      "pair_distance_km_max": 10.96801914722373,
+      "pair_info": [
+        {
+          "order": 0,
+          "band": "passenger_mid",
+          "distance_km": 6.8441376134059855,
+          "band_fallback": false
+        },
+        {
+          "order": 1,
+          "band": "cargo_short",
+          "distance_km": 9.9903058400999,
+          "band_fallback": false
+        },
+        {
+          "order": 2,
+          "band": "cargo_long",
+          "distance_km": 3.776713742573748,
+          "band_fallback": false
+        },
+        {
+          "order": 3,
+          "band": "cargo_short",
+          "distance_km": 3.9800907050865177,
+          "band_fallback": false
+        },
+        {
+          "order": 4,
+          "band": "passenger_long",
+          "distance_km": 10.96801914722373,
+          "band_fallback": false
+        },
+        {
+          "order": 5,
+          "band": "cargo_long",
+          "distance_km": 3.486838487040268,
+          "band_fallback": false
+        },
+        {
+          "order": 6,
+          "band": "cargo_short",
+          "distance_km": 5.08103037469377,
+          "band_fallback": false
+        },
+        {
+          "order": 7,
+          "band": "passenger_short",
+          "distance_km": 4.750541273825594,
+          "band_fallback": false
+        },
+        {
+          "order": 8,
+          "band": "passenger_short",
+          "distance_km": 3.845202808665826,
+          "band_fallback": false
+        },
+        {
+          "order": 9,
+          "band": "passenger_short",
+          "distance_km": 3.7107808047146946,
+          "band_fallback": false
+        },
+        {
+          "order": 10,
+          "band": "passenger_mid",
+          "distance_km": 7.980374187466333,
+          "band_fallback": false
+        },
+        {
+          "order": 11,
+          "band": "passenger_short",
+          "distance_km": 4.494084163322774,
+          "band_fallback": false
+        },
+        {
+          "order": 12,
+          "band": "passenger_short",
+          "distance_km": 4.7169309815300755,
+          "band_fallback": false
+        },
+        {
+          "order": 13,
+          "band": "cargo_short",
+          "distance_km": 1.6957046042962114,
+          "band_fallback": false
+        },
+        {
+          "order": 14,
+          "band": "passenger_short",
+          "distance_km": 3.947422419317312,
+          "band_fallback": false
+        },
+        {
+          "order": 15,
+          "band": "cargo_short",
+          "distance_km": 5.9624312420238175,
+          "band_fallback": false
+        },
+        {
+          "order": 16,
+          "band": "cargo_short",
+          "distance_km": 3.770325412712624,
+          "band_fallback": false
+        },
+        {
+          "order": 17,
+          "band": "cargo_short",
+          "distance_km": 4.050851248813053,
+          "band_fallback": false
+        },
+        {
+          "order": 18,
+          "band": "cargo_short",
+          "distance_km": 5.951696601520917,
+          "band_fallback": false
+        },
+        {
+          "order": 19,
+          "band": "cargo_short",
+          "distance_km": 3.619351377328164,
+          "band_fallback": false
+        },
+        {
+          "order": 20,
+          "band": "cargo_short",
+          "distance_km": 8.229551150515624,
+          "band_fallback": false
+        },
+        {
+          "order": 21,
+          "band": "passenger_mid",
+          "distance_km": 8.671331130082676,
+          "band_fallback": false
+        },
+        {
+          "order": 22,
+          "band": "cargo_long",
+          "distance_km": 4.7603508947452084,
+          "band_fallback": false
+        },
+        {
+          "order": 23,
+          "band": "cargo_short",
+          "distance_km": 9.869317299731676,
+          "band_fallback": false
+        },
+        {
+          "order": 24,
+          "band": "cargo_long",
+          "distance_km": 2.660646928518702,
+          "band_fallback": false
+        },
+        {
+          "order": 25,
+          "band": "cargo_short",
+          "distance_km": 6.384940021879587,
+          "band_fallback": false
+        },
+        {
+          "order": 26,
+          "band": "passenger_mid",
+          "distance_km": 8.501928407236893,
+          "band_fallback": false
+        },
+        {
+          "order": 27,
+          "band": "cargo_short",
+          "distance_km": 8.769310359477345,
+          "band_fallback": false
+        },
+        {
+          "order": 28,
+          "band": "passenger_short",
+          "distance_km": 3.475288391159491,
+          "band_fallback": false
+        },
+        {
+          "order": 29,
+          "band": "passenger_short",
+          "distance_km": 4.386050469052997,
+          "band_fallback": false
+        },
+        {
+          "order": 30,
+          "band": "passenger_short",
+          "distance_km": 3.805749609408182,
+          "band_fallback": false
+        },
+        {
+          "order": 31,
+          "band": "passenger_short",
+          "distance_km": 4.087580052270356,
+          "band_fallback": false
+        },
+        {
+          "order": 32,
+          "band": "passenger_mid",
+          "distance_km": 5.730426322422185,
+          "band_fallback": false
+        },
+        {
+          "order": 33,
+          "band": "passenger_short",
+          "distance_km": 3.893940493396485,
+          "band_fallback": false
+        },
+        {
+          "order": 34,
+          "band": "passenger_short",
+          "distance_km": 4.671695805354708,
+          "band_fallback": false
+        },
+        {
+          "order": 35,
+          "band": "passenger_mid",
+          "distance_km": 6.157176493398042,
+          "band_fallback": false
+        },
+        {
+          "order": 36,
+          "band": "passenger_short",
+          "distance_km": 4.6023521500258315,
+          "band_fallback": false
+        },
+        {
+          "order": 37,
+          "band": "passenger_short",
+          "distance_km": 4.2978031820977565,
+          "band_fallback": false
+        },
+        {
+          "order": 38,
+          "band": "cargo_short",
+          "distance_km": 8.047778983142324,
+          "band_fallback": false
+        },
+        {
+          "order": 39,
+          "band": "cargo_short",
+          "distance_km": 8.017735986240416,
+          "band_fallback": false
+        },
+        {
+          "order": 40,
+          "band": "cargo_short",
+          "distance_km": 0.6659342427558348,
+          "band_fallback": false
+        },
+        {
+          "order": 41,
+          "band": "passenger_mid",
+          "distance_km": 5.220771158445285,
+          "band_fallback": false
+        },
+        {
+          "order": 42,
+          "band": "cargo_short",
+          "distance_km": 8.290661133702642,
+          "band_fallback": false
+        },
+        {
+          "order": 43,
+          "band": "cargo_short",
+          "distance_km": 4.17291947561569,
+          "band_fallback": false
+        },
+        {
+          "order": 44,
+          "band": "passenger_mid",
+          "distance_km": 5.55618030607887,
+          "band_fallback": false
+        },
+        {
+          "order": 45,
+          "band": "cargo_short",
+          "distance_km": 4.2355270702154675,
+          "band_fallback": false
+        },
+        {
+          "order": 46,
+          "band": "cargo_short",
+          "distance_km": 9.777329145149267,
+          "band_fallback": false
+        },
+        {
+          "order": 47,
+          "band": "cargo_short",
+          "distance_km": 5.5040397202496925,
+          "band_fallback": false
+        },
+        {
+          "order": 48,
+          "band": "cargo_long",
+          "distance_km": 4.103664510845564,
+          "band_fallback": false
+        },
+        {
+          "order": 49,
+          "band": "cargo_short",
+          "distance_km": 6.954193670178842,
+          "band_fallback": false
+        }
+      ]
+    },
+    {
+      "instance": 2,
+      "unique_road_nodes": 101,
+      "band_fallbacks": 0,
+      "pair_distance_km_mean": 5.266072827223821,
+      "pair_distance_km_max": 10.394148493943144,
+      "pair_info": [
+        {
+          "order": 0,
+          "band": "passenger_short",
+          "distance_km": 4.612073308292194,
+          "band_fallback": false
+        },
+        {
+          "order": 1,
+          "band": "passenger_short",
+          "distance_km": 3.5161135760824327,
+          "band_fallback": false
+        },
+        {
+          "order": 2,
+          "band": "passenger_short",
+          "distance_km": 4.365864595314375,
+          "band_fallback": false
+        },
+        {
+          "order": 3,
+          "band": "passenger_mid",
+          "distance_km": 5.419730125991749,
+          "band_fallback": false
+        },
+        {
+          "order": 4,
+          "band": "cargo_short",
+          "distance_km": 7.524323371852721,
+          "band_fallback": false
+        },
+        {
+          "order": 5,
+          "band": "cargo_long",
+          "distance_km": 4.355348557573184,
+          "band_fallback": false
+        },
+        {
+          "order": 6,
+          "band": "cargo_short",
+          "distance_km": 5.7397270891898895,
+          "band_fallback": false
+        },
+        {
+          "order": 7,
+          "band": "passenger_short",
+          "distance_km": 4.182104503534681,
+          "band_fallback": false
+        },
+        {
+          "order": 8,
+          "band": "passenger_mid",
+          "distance_km": 6.717403613269296,
+          "band_fallback": false
+        },
+        {
+          "order": 9,
+          "band": "cargo_short",
+          "distance_km": 6.645712524324461,
+          "band_fallback": false
+        },
+        {
+          "order": 10,
+          "band": "passenger_short",
+          "distance_km": 4.71290472471389,
+          "band_fallback": false
+        },
+        {
+          "order": 11,
+          "band": "cargo_long",
+          "distance_km": 2.866174309155837,
+          "band_fallback": false
+        },
+        {
+          "order": 12,
+          "band": "passenger_mid",
+          "distance_km": 5.360431311774094,
+          "band_fallback": false
+        },
+        {
+          "order": 13,
+          "band": "cargo_short",
+          "distance_km": 3.7581744248766484,
+          "band_fallback": false
+        },
+        {
+          "order": 14,
+          "band": "passenger_short",
+          "distance_km": 3.9207806614396814,
+          "band_fallback": false
+        },
+        {
+          "order": 15,
+          "band": "passenger_mid",
+          "distance_km": 7.601238932687032,
+          "band_fallback": false
+        },
+        {
+          "order": 16,
+          "band": "cargo_short",
+          "distance_km": 4.898019765135214,
+          "band_fallback": false
+        },
+        {
+          "order": 17,
+          "band": "passenger_short",
+          "distance_km": 3.4826203203211548,
+          "band_fallback": false
+        },
+        {
+          "order": 18,
+          "band": "cargo_short",
+          "distance_km": 2.742081847260353,
+          "band_fallback": false
+        },
+        {
+          "order": 19,
+          "band": "passenger_mid",
+          "distance_km": 6.7720220575576455,
+          "band_fallback": false
+        },
+        {
+          "order": 20,
+          "band": "passenger_short",
+          "distance_km": 4.929668562057589,
+          "band_fallback": false
+        },
+        {
+          "order": 21,
+          "band": "passenger_short",
+          "distance_km": 3.158009313547691,
+          "band_fallback": false
+        },
+        {
+          "order": 22,
+          "band": "cargo_short",
+          "distance_km": 5.811157779928389,
+          "band_fallback": false
+        },
+        {
+          "order": 23,
+          "band": "cargo_short",
+          "distance_km": 0.5484914316025232,
+          "band_fallback": false
+        },
+        {
+          "order": 24,
+          "band": "cargo_long",
+          "distance_km": 8.04674441078377,
+          "band_fallback": false
+        },
+        {
+          "order": 25,
+          "band": "passenger_short",
+          "distance_km": 3.350890678335686,
+          "band_fallback": false
+        },
+        {
+          "order": 26,
+          "band": "passenger_mid",
+          "distance_km": 5.266949970023923,
+          "band_fallback": false
+        },
+        {
+          "order": 27,
+          "band": "passenger_short",
+          "distance_km": 4.553636306261057,
+          "band_fallback": false
+        },
+        {
+          "order": 28,
+          "band": "passenger_short",
+          "distance_km": 4.292242916336346,
+          "band_fallback": false
+        },
+        {
+          "order": 29,
+          "band": "passenger_short",
+          "distance_km": 3.7607543267906816,
+          "band_fallback": false
+        },
+        {
+          "order": 30,
+          "band": "cargo_short",
+          "distance_km": 4.960573187561192,
+          "band_fallback": false
+        },
+        {
+          "order": 31,
+          "band": "passenger_short",
+          "distance_km": 3.2477754571555675,
+          "band_fallback": false
+        },
+        {
+          "order": 32,
+          "band": "cargo_short",
+          "distance_km": 3.1263227945307803,
+          "band_fallback": false
+        },
+        {
+          "order": 33,
+          "band": "passenger_long",
+          "distance_km": 10.394148493943144,
+          "band_fallback": false
+        },
+        {
+          "order": 34,
+          "band": "cargo_short",
+          "distance_km": 5.959340852441618,
+          "band_fallback": false
+        },
+        {
+          "order": 35,
+          "band": "passenger_mid",
+          "distance_km": 8.554104536240382,
+          "band_fallback": false
+        },
+        {
+          "order": 36,
+          "band": "cargo_short",
+          "distance_km": 5.490469971276126,
+          "band_fallback": false
+        },
+        {
+          "order": 37,
+          "band": "passenger_short",
+          "distance_km": 3.3822441720724794,
+          "band_fallback": false
+        },
+        {
+          "order": 38,
+          "band": "passenger_short",
+          "distance_km": 3.6424629874315255,
+          "band_fallback": false
+        },
+        {
+          "order": 39,
+          "band": "cargo_short",
+          "distance_km": 6.685223072050957,
+          "band_fallback": false
+        },
+        {
+          "order": 40,
+          "band": "cargo_short",
+          "distance_km": 8.000196218655509,
+          "band_fallback": false
+        },
+        {
+          "order": 41,
+          "band": "cargo_short",
+          "distance_km": 9.668643761082297,
+          "band_fallback": false
+        },
+        {
+          "order": 42,
+          "band": "passenger_short",
+          "distance_km": 3.0126880341125823,
+          "band_fallback": false
+        },
+        {
+          "order": 43,
+          "band": "passenger_short",
+          "distance_km": 4.373071289562201,
+          "band_fallback": false
+        },
+        {
+          "order": 44,
+          "band": "cargo_short",
+          "distance_km": 7.479863313496862,
+          "band_fallback": false
+        },
+        {
+          "order": 45,
+          "band": "passenger_mid",
+          "distance_km": 5.997520833160462,
+          "band_fallback": false
+        },
+        {
+          "order": 46,
+          "band": "passenger_mid",
+          "distance_km": 6.034002959837047,
+          "band_fallback": false
+        },
+        {
+          "order": 47,
+          "band": "cargo_short",
+          "distance_km": 4.799309328250606,
+          "band_fallback": false
+        },
+        {
+          "order": 48,
+          "band": "cargo_long",
+          "distance_km": 6.378644302050367,
+          "band_fallback": false
+        },
+        {
+          "order": 49,
+          "band": "passenger_mid",
+          "distance_km": 9.205640480265213,
+          "band_fallback": false
+        }
+      ]
+    },
+    {
+      "instance": 3,
+      "unique_road_nodes": 101,
+      "band_fallbacks": 0,
+      "pair_distance_km_mean": 5.6333742910985185,
+      "pair_distance_km_max": 11.28907270495067,
+      "pair_info": [
+        {
+          "order": 0,
+          "band": "cargo_short",
+          "distance_km": 6.77339414490203,
+          "band_fallback": false
+        },
+        {
+          "order": 1,
+          "band": "cargo_short",
+          "distance_km": 5.641460789427368,
+          "band_fallback": false
+        },
+        {
+          "order": 2,
+          "band": "cargo_short",
+          "distance_km": 5.022357633123719,
+          "band_fallback": false
+        },
+        {
+          "order": 3,
+          "band": "cargo_short",
+          "distance_km": 9.493032804309466,
+          "band_fallback": false
+        },
+        {
+          "order": 4,
+          "band": "passenger_mid",
+          "distance_km": 5.558561227596699,
+          "band_fallback": false
+        },
+        {
+          "order": 5,
+          "band": "passenger_mid",
+          "distance_km": 7.678324334323103,
+          "band_fallback": false
+        },
+        {
+          "order": 6,
+          "band": "passenger_short",
+          "distance_km": 3.8885142108359165,
+          "band_fallback": false
+        },
+        {
+          "order": 7,
+          "band": "passenger_long",
+          "distance_km": 10.177128713546324,
+          "band_fallback": false
+        },
+        {
+          "order": 8,
+          "band": "cargo_long",
+          "distance_km": 5.099290233419373,
+          "band_fallback": false
+        },
+        {
+          "order": 9,
+          "band": "passenger_short",
+          "distance_km": 3.6196846343112337,
+          "band_fallback": false
+        },
+        {
+          "order": 10,
+          "band": "cargo_short",
+          "distance_km": 4.713180879047113,
+          "band_fallback": false
+        },
+        {
+          "order": 11,
+          "band": "passenger_mid",
+          "distance_km": 5.294334721085827,
+          "band_fallback": false
+        },
+        {
+          "order": 12,
+          "band": "passenger_short",
+          "distance_km": 4.450360038192112,
+          "band_fallback": false
+        },
+        {
+          "order": 13,
+          "band": "passenger_short",
+          "distance_km": 3.970659488200927,
+          "band_fallback": false
+        },
+        {
+          "order": 14,
+          "band": "passenger_short",
+          "distance_km": 3.234742522430235,
+          "band_fallback": false
+        },
+        {
+          "order": 15,
+          "band": "cargo_short",
+          "distance_km": 4.545524636589168,
+          "band_fallback": false
+        },
+        {
+          "order": 16,
+          "band": "passenger_short",
+          "distance_km": 4.311332236794014,
+          "band_fallback": false
+        },
+        {
+          "order": 17,
+          "band": "passenger_mid",
+          "distance_km": 7.171070324844433,
+          "band_fallback": false
+        },
+        {
+          "order": 18,
+          "band": "passenger_short",
+          "distance_km": 3.8709673263366082,
+          "band_fallback": false
+        },
+        {
+          "order": 19,
+          "band": "passenger_mid",
+          "distance_km": 7.43919035439399,
+          "band_fallback": false
+        },
+        {
+          "order": 20,
+          "band": "cargo_short",
+          "distance_km": 5.1993502317645515,
+          "band_fallback": false
+        },
+        {
+          "order": 21,
+          "band": "cargo_short",
+          "distance_km": 3.6743048911940894,
+          "band_fallback": false
+        },
+        {
+          "order": 22,
+          "band": "cargo_short",
+          "distance_km": 4.37550439780691,
+          "band_fallback": false
+        },
+        {
+          "order": 23,
+          "band": "passenger_short",
+          "distance_km": 4.908417301395244,
+          "band_fallback": false
+        },
+        {
+          "order": 24,
+          "band": "passenger_mid",
+          "distance_km": 7.27689822141967,
+          "band_fallback": false
+        },
+        {
+          "order": 25,
+          "band": "passenger_mid",
+          "distance_km": 5.007665106037448,
+          "band_fallback": false
+        },
+        {
+          "order": 26,
+          "band": "cargo_short",
+          "distance_km": 2.314294742416172,
+          "band_fallback": false
+        },
+        {
+          "order": 27,
+          "band": "passenger_mid",
+          "distance_km": 9.872782403774284,
+          "band_fallback": false
+        },
+        {
+          "order": 28,
+          "band": "passenger_mid",
+          "distance_km": 5.124316487742822,
+          "band_fallback": false
+        },
+        {
+          "order": 29,
+          "band": "cargo_long",
+          "distance_km": 8.48973810637501,
+          "band_fallback": false
+        },
+        {
+          "order": 30,
+          "band": "passenger_short",
+          "distance_km": 4.771128848946216,
+          "band_fallback": false
+        },
+        {
+          "order": 31,
+          "band": "passenger_long",
+          "distance_km": 11.28907270495067,
+          "band_fallback": false
+        },
+        {
+          "order": 32,
+          "band": "passenger_short",
+          "distance_km": 3.5882444378811575,
+          "band_fallback": false
+        },
+        {
+          "order": 33,
+          "band": "passenger_short",
+          "distance_km": 4.06300614267314,
+          "band_fallback": false
+        },
+        {
+          "order": 34,
+          "band": "passenger_short",
+          "distance_km": 4.222153096423341,
+          "band_fallback": false
+        },
+        {
+          "order": 35,
+          "band": "passenger_mid",
+          "distance_km": 5.692279290353578,
+          "band_fallback": false
+        },
+        {
+          "order": 36,
+          "band": "passenger_short",
+          "distance_km": 4.348510511306705,
+          "band_fallback": false
+        },
+        {
+          "order": 37,
+          "band": "passenger_short",
+          "distance_km": 4.980660791892936,
+          "band_fallback": false
+        },
+        {
+          "order": 38,
+          "band": "cargo_long",
+          "distance_km": 7.325369142097151,
+          "band_fallback": false
+        },
+        {
+          "order": 39,
+          "band": "passenger_mid",
+          "distance_km": 7.659232926897963,
+          "band_fallback": false
+        },
+        {
+          "order": 40,
+          "band": "passenger_mid",
+          "distance_km": 5.225728876509554,
+          "band_fallback": false
+        },
+        {
+          "order": 41,
+          "band": "cargo_short",
+          "distance_km": 6.229641013169835,
+          "band_fallback": false
+        },
+        {
+          "order": 42,
+          "band": "passenger_short",
+          "distance_km": 4.87483630376714,
+          "band_fallback": false
+        },
+        {
+          "order": 43,
+          "band": "cargo_short",
+          "distance_km": 8.964190302511073,
+          "band_fallback": false
+        },
+        {
+          "order": 44,
+          "band": "passenger_short",
+          "distance_km": 4.122995322561459,
+          "band_fallback": false
+        },
+        {
+          "order": 45,
+          "band": "passenger_short",
+          "distance_km": 4.73292905748947,
+          "band_fallback": false
+        },
+        {
+          "order": 46,
+          "band": "passenger_short",
+          "distance_km": 3.820400616379789,
+          "band_fallback": false
+        },
+        {
+          "order": 47,
+          "band": "passenger_short",
+          "distance_km": 4.1681723331070115,
+          "band_fallback": false
+        },
+        {
+          "order": 48,
+          "band": "cargo_short",
+          "distance_km": 9.500943598640108,
+          "band_fallback": false
+        },
+        {
+          "order": 49,
+          "band": "passenger_short",
+          "distance_km": 3.8928360937318205,
+          "band_fallback": false
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,183 @@
+{
+  "status": "completed",
+  "analysis_protocol": {
+    "independent_unit": "one frozen Shenzhen road instance",
+    "n_independent_instances": 32,
+    "neural_seed_handling": "three fixed training seeds averaged within each instance",
+    "search_seed_handling": "fixed search seed; not counted as replication",
+    "uncertainty": "paired percentile bootstrap over common instance indices",
+    "bootstrap_draws": 10000,
+    "bootstrap_seed": 20261113,
+    "road_cases_sha256": "fb062d7696da02dabf56f5d93f9efbe74db75dff61ec05aa6151dc558b708b98"
+  },
+  "road_representation_effect_road_minus_straight": {
+    "vehicles": {
+      "n_independent_instances": 32,
+      "mean_difference": 2.46875,
+      "ci95_low": 2.28125,
+      "ci95_high": 2.6257812499999886,
+      "positive_pairs": 32,
+      "ties": 0,
+      "negative_pairs": 0
+    },
+    "distance": {
+      "n_independent_instances": 32,
+      "mean_difference": 175.48936432390474,
+      "ci95_low": 166.19708097891962,
+      "ci95_high": 185.35980307522075,
+      "positive_pairs": 32,
+      "ties": 0,
+      "negative_pairs": 0
+    },
+    "energy": {
+      "n_independent_instances": 32,
+      "mean_difference": 31.763102895045723,
+      "ci95_low": 30.05424783606801,
+      "ci95_high": 33.50326359733828,
+      "positive_pairs": 32,
+      "ties": 0,
+      "negative_pairs": 0
+    },
+    "objective": {
+      "n_independent_instances": 32,
+      "mean_difference": 1.135428082924295,
+      "ci95_low": 1.0708713520120474,
+      "ci95_high": 1.2009523292485274,
+      "positive_pairs": 32,
+      "ties": 0,
+      "negative_pairs": 0
+    }
+  },
+  "uncalibrated_osm_speed_effect_osm_minus_fixed25": {
+    "vehicles": {
+      "n_independent_instances": 32,
+      "mean_difference": -1.9375,
+      "ci95_low": -2.09375,
+      "ci95_high": -1.75,
+      "positive_pairs": 0,
+      "ties": 0,
+      "negative_pairs": 32
+    },
+    "distance": {
+      "n_independent_instances": 32,
+      "mean_difference": 2.4537145142021473,
+      "ci95_low": -4.642535630880047,
+      "ci95_high": 9.922531975650417,
+      "positive_pairs": 19,
+      "ties": 0,
+      "negative_pairs": 13
+    },
+    "energy": {
+      "n_independent_instances": 32,
+      "mean_difference": 0.49100165303077103,
+      "ci95_low": -0.78949482821208,
+      "ci95_high": 1.8640650384282857,
+      "positive_pairs": 19,
+      "ties": 0,
+      "negative_pairs": 13
+    },
+    "objective": {
+      "n_independent_instances": 32,
+      "mean_difference": -0.6371108447687313,
+      "ci95_low": -0.6947710770022576,
+      "ci95_high": -0.5780187722508887,
+      "positive_pairs": 0,
+      "ties": 0,
+      "negative_pairs": 32
+    }
+  },
+  "quality_time_ladder_road_fixed25": {
+    "strict_insertion": {
+      "completed": {
+        "n": 32,
+        "mean": 47.28125,
+        "sd_across_instances": 2.1884502544332674,
+        "min": 41.0,
+        "max": 50.0
+      },
+      "service_rate_percent": 94.5625,
+      "full_service_instances": 6,
+      "seconds": {
+        "n": 32,
+        "mean": 0.1043147903433237,
+        "sd_across_instances": 0.012088946635484703,
+        "min": 0.08676658400509041,
+        "max": 0.14369733299827203
+      }
+    },
+    "neural_plus_road_repair": {
+      "completed": {
+        "n": 32,
+        "mean": 47.708333333333336,
+        "sd_across_instances": 1.8870431631633595,
+        "min": 43.0,
+        "max": 50.0
+      },
+      "service_rate_percent": 95.41666666666669,
+      "full_service_instances": 5,
+      "seconds": {
+        "n": 32,
+        "mean": 2.6597319201860046,
+        "sd_across_instances": 0.2729303254081203,
+        "min": 2.152568847324195,
+        "max": 3.204671416334653
+      }
+    },
+    "strong_lns": {
+      "completed": {
+        "n": 32,
+        "mean": 50.0,
+        "sd_across_instances": 0.0,
+        "min": 50.0,
+        "max": 50.0
+      },
+      "service_rate_percent": 100.0,
+      "full_service_instances": 32,
+      "seconds": {
+        "n": 32,
+        "mean": 10.10529530724989,
+        "sd_across_instances": 0.012082726050517896,
+        "min": 10.087710000007064,
+        "max": 10.144761250005104
+      }
+    },
+    "neural_minus_strict_completed": {
+      "n_independent_instances": 32,
+      "mean_difference": 0.42708333333333326,
+      "ci95_low": -0.3752604166666669,
+      "ci95_high": 1.2812499999999996,
+      "positive_pairs": 13,
+      "ties": 8,
+      "negative_pairs": 11
+    },
+    "lns_minus_neural_completed": {
+      "n_independent_instances": 32,
+      "mean_difference": 2.291666666666667,
+      "ci95_low": 1.666666666666667,
+      "ci95_high": 2.947916666666667,
+      "positive_pairs": 27,
+      "ties": 5,
+      "negative_pairs": 0
+    }
+  },
+  "neural_transfer_diagnostic": {
+    "direct_road_valid_plans": 0,
+    "direct_road_plans_total": 96,
+    "direct_road_valid_percent": 0.0,
+    "hard_invalid_after_repair": 0,
+    "instances_with_identical_repaired_routes_across_all_three_seeds": 18,
+    "mean_unique_repaired_solutions_per_instance": 1.53125,
+    "unique_repaired_solution_count_distribution": {
+      "1": 18,
+      "2": 11,
+      "3": 3
+    },
+    "interpretation": "The unchanged coordinate-trained policy did not directly satisfy the road-time protocol. Reported neural-pipeline outcomes therefore measure construction followed by mandatory pre-execution road-feasibility repair, not direct road-aware neural generalization."
+  },
+  "constraint_audit": {
+    "invalid_final_control_solutions": 0,
+    "control_solutions_audited": 96,
+    "invalid_final_neural_pipeline_solutions": 0,
+    "neural_pipeline_solutions_audited": 96
+  }
+}

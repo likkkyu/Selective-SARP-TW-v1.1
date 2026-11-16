@@ -1,0 +1,371 @@
+{
+  "status": "passed",
+  "scope": "paired confirmation on the same closed 100-instance N100 final set",
+  "experimental_unit": "paired N100 instance; neural seeds averaged within instance",
+  "bootstrap": {
+    "seed": 20261116,
+    "replicates": 20000,
+    "method": "nonparametric percentile bootstrap over paired instances"
+  },
+  "methods": {
+    "neural_start_seed_averaged": {
+      "service_rate": 0.9603333333333333,
+      "objective": 2285.640844690409,
+      "raw_cost_cny": 2808.1321569197926,
+      "distance_km": 850.2793352992434,
+      "vehicle_count": 16.72,
+      "recorded_inference_seconds": 8.428878965101516
+    },
+    "neural_plus_short_lns_seed_averaged": {
+      "service_rate": 0.9833,
+      "objective": 964.6988515897148,
+      "raw_cost_cny": 1466.3056156598514,
+      "distance_km": 827.8035491669763,
+      "vehicle_count": 16.35666666666667,
+      "recorded_component_seconds": 8.928906769556052
+    },
+    "strict_insertion": {
+      "service_rate": 0.9895999999999999,
+      "objective": 600.9940301286742,
+      "raw_cost_cny": 984.5001066035754,
+      "distance_km": 664.0495654716999,
+      "vehicle_count": 13.21,
+      "recorded_build_seconds": 36.44481233710976
+    },
+    "insertion_plus_short_lns": {
+      "service_rate": 0.9915,
+      "objective": 491.74650483945044,
+      "raw_cost_cny": 875.9731792377193,
+      "distance_km": 662.8436786442726,
+      "vehicle_count": 13.27,
+      "recorded_component_seconds": 36.94483593086043
+    },
+    "strong_lns_10s": {
+      "service_rate": 0.9998999999999999,
+      "objective": 8.578791379481018,
+      "raw_cost_cny": 371.1567784139705,
+      "distance_km": 589.5254486560954,
+      "vehicle_count": 12.91,
+      "recorded_component_seconds": 46.44487457501818
+    }
+  },
+  "paired": {
+    "neural_short_minus_neural_start_service_rate": {
+      "mean_difference": 0.022966666666666663,
+      "paired_instance_bootstrap_95pct_ci": [
+        0.02026666666666667,
+        0.025766666666666663
+      ],
+      "negative_instances": 0,
+      "ties": 5,
+      "positive_instances": 95,
+      "instances": 100
+    },
+    "neural_short_minus_neural_start_objective": {
+      "mean_difference": -1320.9419931006942,
+      "paired_instance_bootstrap_95pct_ci": [
+        -1481.9400262501526,
+        -1165.6985851509073
+      ],
+      "negative_instances": 99,
+      "ties": 1,
+      "positive_instances": 0,
+      "instances": 100
+    },
+    "neural_short_minus_neural_start_raw_cost_cny": {
+      "mean_difference": -1341.8265412599412,
+      "paired_instance_bootstrap_95pct_ci": [
+        -1503.7488009227648,
+        -1186.0015929768595
+      ],
+      "negative_instances": 99,
+      "ties": 1,
+      "positive_instances": 0,
+      "instances": 100
+    },
+    "neural_short_minus_neural_start_distance_km": {
+      "mean_difference": -22.475786132267093,
+      "paired_instance_bootstrap_95pct_ci": [
+        -25.539648258843677,
+        -19.334472272604177
+      ],
+      "negative_instances": 92,
+      "ties": 1,
+      "positive_instances": 7,
+      "instances": 100
+    },
+    "neural_short_minus_neural_start_vehicle_count": {
+      "mean_difference": -0.36333333333333373,
+      "paired_instance_bootstrap_95pct_ci": [
+        -0.4300000000000004,
+        -0.29666666666666713
+      ],
+      "negative_instances": 65,
+      "ties": 35,
+      "positive_instances": 0,
+      "instances": 100
+    },
+    "insertion_short_minus_insertion_start_service_rate": {
+      "mean_difference": 0.0019000000000000017,
+      "paired_instance_bootstrap_95pct_ci": [
+        0.0008000000000000007,
+        0.0032000000000000028
+      ],
+      "negative_instances": 0,
+      "ties": 88,
+      "positive_instances": 12,
+      "instances": 100
+    },
+    "insertion_short_minus_insertion_start_objective": {
+      "mean_difference": -109.24752528922374,
+      "paired_instance_bootstrap_95pct_ci": [
+        -183.9885522759676,
+        -46.007525474252844
+      ],
+      "negative_instances": 50,
+      "ties": 50,
+      "positive_instances": 0,
+      "instances": 100
+    },
+    "insertion_short_minus_insertion_start_raw_cost_cny": {
+      "mean_difference": -108.5269273658561,
+      "paired_instance_bootstrap_95pct_ci": [
+        -182.38770295243117,
+        -46.3094422326183
+      ],
+      "negative_instances": 48,
+      "ties": 50,
+      "positive_instances": 2,
+      "instances": 100
+    },
+    "insertion_short_minus_insertion_start_distance_km": {
+      "mean_difference": -1.2058868274272379,
+      "paired_instance_bootstrap_95pct_ci": [
+        -2.8419004014490117,
+        0.4577227512500926
+      ],
+      "negative_instances": 35,
+      "ties": 50,
+      "positive_instances": 15,
+      "instances": 100
+    },
+    "insertion_short_minus_insertion_start_vehicle_count": {
+      "mean_difference": 0.06,
+      "paired_instance_bootstrap_95pct_ci": [
+        0.02,
+        0.11
+      ],
+      "negative_instances": 0,
+      "ties": 94,
+      "positive_instances": 6,
+      "instances": 100
+    },
+    "neural_short_minus_insertion_start_service_rate": {
+      "mean_difference": -0.0063,
+      "paired_instance_bootstrap_95pct_ci": [
+        -0.01046666666666667,
+        -0.002200000000000005
+      ],
+      "negative_instances": 58,
+      "ties": 5,
+      "positive_instances": 37,
+      "instances": 100
+    },
+    "neural_short_minus_insertion_start_objective": {
+      "mean_difference": 363.70482146104064,
+      "paired_instance_bootstrap_95pct_ci": [
+        129.88410759504862,
+        597.5391374872067
+      ],
+      "negative_instances": 37,
+      "ties": 0,
+      "positive_instances": 63,
+      "instances": 100
+    },
+    "neural_short_minus_insertion_start_raw_cost_cny": {
+      "mean_difference": 481.8055090562762,
+      "paired_instance_bootstrap_95pct_ci": [
+        252.71190026117182,
+        716.0586778083448
+      ],
+      "negative_instances": 37,
+      "ties": 0,
+      "positive_instances": 63,
+      "instances": 100
+    },
+    "neural_short_minus_insertion_start_distance_km": {
+      "mean_difference": 163.7539836952765,
+      "paired_instance_bootstrap_95pct_ci": [
+        155.9412407767107,
+        171.39825208105896
+      ],
+      "negative_instances": 0,
+      "ties": 0,
+      "positive_instances": 100,
+      "instances": 100
+    },
+    "neural_short_minus_insertion_start_vehicle_count": {
+      "mean_difference": 3.1466666666666665,
+      "paired_instance_bootstrap_95pct_ci": [
+        2.996666666666666,
+        3.2966666666666664
+      ],
+      "negative_instances": 0,
+      "ties": 0,
+      "positive_instances": 100,
+      "instances": 100
+    },
+    "neural_short_minus_insertion_short_service_rate": {
+      "mean_difference": -0.008200000000000002,
+      "paired_instance_bootstrap_95pct_ci": [
+        -0.012166666666666673,
+        -0.004265833333333399
+      ],
+      "negative_instances": 61,
+      "ties": 5,
+      "positive_instances": 34,
+      "instances": 100
+    },
+    "neural_short_minus_insertion_short_objective": {
+      "mean_difference": 472.9523467502644,
+      "paired_instance_bootstrap_95pct_ci": [
+        250.62489481077137,
+        701.0350322773595
+      ],
+      "negative_instances": 34,
+      "ties": 0,
+      "positive_instances": 66,
+      "instances": 100
+    },
+    "neural_short_minus_insertion_short_raw_cost_cny": {
+      "mean_difference": 590.3324364221323,
+      "paired_instance_bootstrap_95pct_ci": [
+        367.3939492703922,
+        822.9008689174832
+      ],
+      "negative_instances": 34,
+      "ties": 0,
+      "positive_instances": 66,
+      "instances": 100
+    },
+    "neural_short_minus_insertion_short_distance_km": {
+      "mean_difference": 164.9598705227037,
+      "paired_instance_bootstrap_95pct_ci": [
+        157.45257601002206,
+        172.43674204332908
+      ],
+      "negative_instances": 0,
+      "ties": 0,
+      "positive_instances": 100,
+      "instances": 100
+    },
+    "neural_short_minus_insertion_short_vehicle_count": {
+      "mean_difference": 3.0866666666666664,
+      "paired_instance_bootstrap_95pct_ci": [
+        2.936666666666666,
+        3.2366666666666664
+      ],
+      "negative_instances": 0,
+      "ties": 0,
+      "positive_instances": 100,
+      "instances": 100
+    },
+    "neural_short_minus_strong_lns_service_rate": {
+      "mean_difference": -0.01660000000000001,
+      "paired_instance_bootstrap_95pct_ci": [
+        -0.019666666666666676,
+        -0.013766666666666675
+      ],
+      "negative_instances": 88,
+      "ties": 12,
+      "positive_instances": 0,
+      "instances": 100
+    },
+    "neural_short_minus_strong_lns_objective": {
+      "mean_difference": 956.1200602102338,
+      "paired_instance_bootstrap_95pct_ci": [
+        791.254641769647,
+        1132.4326419785004
+      ],
+      "negative_instances": 0,
+      "ties": 0,
+      "positive_instances": 100,
+      "instances": 100
+    },
+    "neural_short_minus_strong_lns_raw_cost_cny": {
+      "mean_difference": 1095.148837245881,
+      "paired_instance_bootstrap_95pct_ci": [
+        930.3698815093479,
+        1272.1190091004487
+      ],
+      "negative_instances": 0,
+      "ties": 0,
+      "positive_instances": 100,
+      "instances": 100
+    },
+    "neural_short_minus_strong_lns_distance_km": {
+      "mean_difference": 238.278100510881,
+      "paired_instance_bootstrap_95pct_ci": [
+        231.26571911722698,
+        245.19022762796044
+      ],
+      "negative_instances": 0,
+      "ties": 0,
+      "positive_instances": 100,
+      "instances": 100
+    },
+    "neural_short_minus_strong_lns_vehicle_count": {
+      "mean_difference": 3.4466666666666663,
+      "paired_instance_bootstrap_95pct_ci": [
+        3.34,
+        3.5533333333333332
+      ],
+      "negative_instances": 0,
+      "ties": 0,
+      "positive_instances": 100,
+      "instances": 100
+    }
+  },
+  "audit": {
+    "instances": 100,
+    "methods": {
+      "neural_314159": {
+        "start_service_rate": 0.9721,
+        "short_lns_service_rate": 0.9873,
+        "start_mean_objective": 1609.5405810564725,
+        "short_lns_mean_objective": 735.0480102775525,
+        "mean_search_seconds": 0.5000253903711563
+      },
+      "neural_271828": {
+        "start_service_rate": 0.9596,
+        "short_lns_service_rate": 0.9832,
+        "start_mean_objective": 2327.2300487252064,
+        "short_lns_mean_objective": 969.9795655704075,
+        "mean_search_seconds": 0.5000310092116707
+      },
+      "neural_161803": {
+        "start_service_rate": 0.9493,
+        "short_lns_service_rate": 0.9794,
+        "start_mean_objective": 2920.151904289547,
+        "short_lns_mean_objective": 1189.0689789211845,
+        "mean_search_seconds": 0.500027013780782
+      },
+      "strict_insertion": {
+        "start_service_rate": 0.9896,
+        "short_lns_service_rate": 0.9915,
+        "start_mean_objective": 600.9940301286742,
+        "short_lns_mean_objective": 491.74650483945044,
+        "mean_search_seconds": 0.5000235937506659
+      }
+    },
+    "hard_violations": 0,
+    "unfulfilled": 0,
+    "all_trips_at_least_four": true
+  },
+  "timing_boundary": {
+    "publication_grade_cross_method_ratio_available": false,
+    "reason": "neural inference was recorded on the AutoDL GPU node, whereas insertion and both LNS runs were recorded on the local CPU; quality comparisons are paired and valid, but end-to-end cross-method time ratios require a same-machine benchmark",
+    "within_local_short_lns_budget_is_matched": true
+  },
+  "claim_boundary": "the 0.5-second LNS materially improves neural construction, but superiority over insertion or 10-second LNS may be claimed only if the paired estimates support it"
+}

@@ -1,0 +1,60 @@
+{
+  "status": "frozen_before_hybrid_evaluation",
+  "created_utc": "2026-11-16T04:26:28Z",
+  "scope": "matched 0.5-second LNS confirmation from each of three frozen neural starts and the deterministic strict-insertion start on the exact closed 100-instance N100 final set",
+  "timing_disclosure": "the 0.5-second budget was selected in earlier development/confirmation work, before the present closed neural final-test and shared-baseline outcomes; this protocol was frozen after raw starts were observed but before any hybrid outcome",
+  "graph_size": 100,
+  "dataset_seed": 2026111901,
+  "samples": 100,
+  "neural_seeds": [314159, 271828, 161803],
+  "short_lns": {
+    "search_seed": 1234,
+    "seconds_per_instance": 0.5,
+    "max_iterations": 1000,
+    "same_budget_and_seed_for_every_start": true,
+    "description": "bounded in-house LNS, not a published ALNS implementation"
+  },
+  "hard_minimum_completed_orders_per_trip": 4,
+  "max_concurrent_open_orders": 6,
+  "cost_semantics_version": 4,
+  "total_timeout_seconds": 1800,
+  "stopping_rule": "all 100 instances and all four starts per instance or fail closed; no outcome-based exclusions",
+  "statistics": "N100 instance is the paired experimental unit; neural results are averaged across the three frozen training seeds within each instance before paired inference",
+  "claim_boundary": "confirmation of the neural-construction-plus-neighborhood-improvement quality-time tradeoff; it does not establish superiority over strict insertion or strong 10-second LNS unless the paired results support that claim",
+  "input_reports": [
+    {
+      "label": "neural_314159",
+      "path": "/Users/likeyu/Downloads/project-vrp-v6-4-main/experiments/drl_canonical_audit_20261115/remote_evidence/lazy_transfer_formal_20261116/drl_lazy_v4_transfer_formal_20261116/seed_314159/final_test/report.json",
+      "sha256": "6fba9a685faec8be302f09670f76ea3c749186bc0652e3497accf7b74fe34893"
+    },
+    {
+      "label": "neural_271828",
+      "path": "/Users/likeyu/Downloads/project-vrp-v6-4-main/experiments/drl_canonical_audit_20261115/remote_evidence/lazy_transfer_formal_20261116/drl_lazy_v4_transfer_formal_20261116/seed_271828/final_test/report.json",
+      "sha256": "941315f217ccff2da55eb5b2988c3eca608677ebda385599a6fe0eba49fb22ee"
+    },
+    {
+      "label": "neural_161803",
+      "path": "/Users/likeyu/Downloads/project-vrp-v6-4-main/experiments/drl_canonical_audit_20261115/remote_evidence/lazy_transfer_formal_20261116/drl_lazy_v4_transfer_formal_20261116/seed_161803/final_test/report.json",
+      "sha256": "60c032c9e953c1cbfea89764939386126f3e0892f2e8d3d6b093113101ec7334"
+    },
+    {
+      "label": "strict_insertion",
+      "path": "/Users/likeyu/Downloads/project-vrp-v6-4-main/experiments/lazy_v4_shared_baselines_20261116/formal_v3/results/REPORT.json",
+      "sha256": "e00f73d7f37b22bef1d9f5b6a335f8bf6f991ce08cec323a433bcd1908c7d3a6"
+    }
+  ],
+  "source_sha256": {
+    "experiments/lazy_v4_hybrid_confirmation_20261116/run.py": "56711e76d6b5f68ce2e62354b3e6a91c9fd1237efb5e61ce761ed89981f2e0a8",
+    "experiments/drl_canonical_audit_20261115/audit_common.py": "47b122896316c335c04e25e31a9515b1d64f499f019b35b10bdedd7d96d3a328",
+    "experiments/drl_canonical_audit_20261115/evaluate_lazy_v4_canonical.py": "5ce5d743ae17d9e80c7c7e452b2c3b67b1b50c18da3afef684bb1bc99d482dce",
+    "experiments/drl_canonical_audit_20261115/admission_lazy_v4.py": "3198ac9799409698134985b089f51197714ede24128438e9a28fce0f4ebc0a93",
+    "experiments/drl_canonical_audit_20261115/lazy_decoder_v4.py": "5eaa413ea02de6602e63117dd87f2532b4323d967e7d3200282f41cb78f66a4c",
+    "experiments/evaluation_alignment_20261103/snapshot/problem_mcvrptw_v2.py": "d003d1bb87a89e414df4c5921f275f97ff5d586dbf5174140e1bc29a8033cc43",
+    "experiments/dispatch_clock_fix_20261106/clock_patch.py": "9b9fa308db5068523c3e011945d56c46eca1f623c7c51432fd170b14bd859297",
+    "experiments/sensitivity_20261030/timing_candidate.py": "fe43b6c1896f4d3eb5e2318c9f2f33c9acfc3508625b22ecf7799bb5b708e6b6",
+    "experiments/sensitivity_20261030/completion_guard.py": "e6698d86a40aa7455ff1da4ae18e443ae00a20f3bce7d37584942b32a31db090",
+    "experiments/reject_ablation_20261029/depot_noop.py": "1c14b205a31d37a351eeaaa59e7d810fb74c8d4eae68a4ccf13f2292e7067ba5",
+    "experiments/hard4_lns_20261106/route_engine.py": "0a9d1977f19dbc4bfad7c2a0eb83eba4a00e00ee01f066335c521dcc39bc034f",
+    "experiments/hard4_lns_20261106/search.py": "ae50a644aba55b0b9d78a790ec6cbd9cef5d9f0226171e62636c9c4b427a75a7"
+  }
+}

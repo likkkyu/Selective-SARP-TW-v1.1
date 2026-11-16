@@ -1,0 +1,40 @@
+{
+  "status": "passed_current_19_reference_metadata_and_semantic_placement",
+  "audit_date": "2026-11-16",
+  "manuscript": "wtc2027_zh/论文正文.md",
+  "manuscript_sha256": "9d81f94451b2149e4dc7058037150255d8ef9b9a1642fb2ac28f3284b0c04199",
+  "scope": "Bibliographic metadata, continuous citation coverage, and local claim-to-source semantic support; not independent replication of cited studies",
+  "reference_count": 19,
+  "all_references_cited": true,
+  "continuous_numbering": true,
+  "withdraw_or_replace_required": [],
+  "references": [
+    {"id": 1, "status": "verified", "url": "https://policy.mofcom.gov.cn/claw/clawContent.shtml?id=98871", "supports": "policy background"},
+    {"id": 2, "status": "verified", "url": "https://www.mdpi.com/2673-7590/4/4/55", "supports": "integrated passenger-freight review"},
+    {"id": 3, "status": "verified", "url": "https://research.tue.nl/en/publications/the-share-a-ride-problem-people-and-parcels-sharing-taxis/", "supports": "SARP definition and integrated taxi pickup-delivery"},
+    {"id": 4, "status": "verified", "url": "https://trid.trb.org/View/2428153", "supports": "mixed ride-hailing and logistics vehicle SARP"},
+    {"id": 5, "status": "verified", "url": "https://journals.sagepub.com/doi/10.1177/03611981251318333", "supports": "rural bus-express collaborative delivery"},
+    {"id": 6, "status": "verified", "url": "https://onlinelibrary.wiley.com/doi/abs/10.1002/net.21481", "supports": "VRP lower bound on customers served per route"},
+    {"id": 7, "status": "verified", "url": "https://openreview.net/forum?id=ByxBFsRqYm", "supports": "attention-based route construction"},
+    {"id": 8, "status": "verified", "url": "https://ojs.aaai.org/index.php/AAAI/article/download/21236/20985", "supports": "paired pickup-delivery context embedding"},
+    {"id": 9, "status": "verified", "url": "https://research.tudelft.nl/en/publications/learning-to-solve-multiple-tsp-with-time-window-and-rejections-vi/", "supports": "multi-vehicle TSP with time windows and rejection"},
+    {"id": 10, "status": "verified", "url": "https://link.springer.com/article/10.1007/s11116-021-10248-7", "supports": "Beijing daytime off-peak 10:00-16:30"},
+    {"id": 11, "status": "verified", "url": "https://jdxb.bjtu.edu.cn/CN/10.11860/j.issn.1673-0291.20230162", "supports": "Sihui terminal off-peak 10:00-16:00"},
+    {"id": 12, "status": "verified", "url": "https://www.tr-cats.cn/CN/10.16503/j.cnki.2095-9931.2021.05.005", "supports": "Yantai weekday clustered interval including 09:30-16:30"},
+    {"id": 13, "status": "verified", "url": "https://ietresearch.onlinelibrary.wiley.com/doi/10.1049/itr2.70192", "supports": "published Beijing route 145 time-sliced passenger-flow table"},
+    {"id": 14, "status": "verified", "url": "https://ojs.aaai.org/index.php/AAAI/article/download/11694/11553", "supports": "multi-seed DRL reporting discipline"},
+    {"id": 15, "status": "verified", "url": "https://pubsonline.informs.org/doi/10.1287/trsc.1050.0135", "supports": "ALNS destroy-repair framework for PDPTW"},
+    {"id": 16, "status": "verified", "url": "https://link.springer.com/article/10.1007/s12532-008-0001-1", "supports": "SCIP constraint integer programming background"},
+    {"id": 17, "status": "verified", "url": "https://ebooks.iospress.nl/pdf/doi/10.3233/FAIA200124", "supports": "neural repair embedded in LNS"},
+    {"id": 18, "status": "verified", "url": "https://arxiv.org/abs/2310.04140", "supports": "fixed-time-budget and anytime neural routing evaluation"},
+    {"id": 19, "status": "verified", "url": "https://www.openstreetmap.org/copyright", "supports": "OpenStreetMap attribution and ODbL licensing for the Shenzhen road graph"}
+  ],
+  "semantic_boundaries": [
+    "10:00-16:00 is a literature-supported conservative scenario window, not a uniquely estimated optimum or measured spare-capacity guarantee",
+    "the route-145 figure is a descriptive replotted aggregate table without day-level uncertainty inference",
+    "minimum-customers-per-route literature does not validate the universal operational choice of four orders",
+    "runtime evidence is hardware- and implementation-conditional",
+    "OpenStreetMap attribution supports road-data provenance only; Shenzhen orders remain synthetic"
+  ],
+  "supersedes_for_current_manuscript": "wtc2027_zh/review_20261107/reference_audit.json"
+}

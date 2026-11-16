@@ -1,0 +1,15 @@
+{
+  "status": "pass",
+  "scope": "runtime smoke only; unchanged Euclidean-trained checkpoint",
+  "checkpoint_seed": 1234,
+  "instance": 0,
+  "decode_seconds_cpu": 0.23526062499149702,
+  "finite_cost": 9203.259765625,
+  "raw_candidate_valid": false,
+  "forced_underfilled_declines": 2,
+  "completed_orders": 34,
+  "vehicles": 7,
+  "minimum_completed_per_trip": 4,
+  "hard_violations": 0,
+  "interpretation_guard": "This verifies the matrix-aware code path, not model quality or road-aware learning."
+}

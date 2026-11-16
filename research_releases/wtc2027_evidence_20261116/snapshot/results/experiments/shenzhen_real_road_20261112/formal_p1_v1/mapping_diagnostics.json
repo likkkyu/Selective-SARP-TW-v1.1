@@ -1,0 +1,290 @@
+[
+  {
+    "instance": 0,
+    "passenger_orders": 25,
+    "cargo_orders": 25,
+    "unique_road_nodes": 101,
+    "synthetic_target_to_node_km_mean": 0.47980843106150756,
+    "synthetic_target_to_node_km_max": 3.431809220937221,
+    "road_to_straight_median": 1.376386448996056
+  },
+  {
+    "instance": 1,
+    "passenger_orders": 26,
+    "cargo_orders": 24,
+    "unique_road_nodes": 101,
+    "synthetic_target_to_node_km_mean": 0.45520285711914515,
+    "synthetic_target_to_node_km_max": 3.5865211408691553,
+    "road_to_straight_median": 1.351670094890888
+  },
+  {
+    "instance": 2,
+    "passenger_orders": 28,
+    "cargo_orders": 22,
+    "unique_road_nodes": 101,
+    "synthetic_target_to_node_km_mean": 0.4261715633398512,
+    "synthetic_target_to_node_km_max": 3.4370345678539618,
+    "road_to_straight_median": 1.3927762372674186
+  },
+  {
+    "instance": 3,
+    "passenger_orders": 31,
+    "cargo_orders": 19,
+    "unique_road_nodes": 101,
+    "synthetic_target_to_node_km_mean": 0.6847680742668184,
+    "synthetic_target_to_node_km_max": 3.519428568912502,
+    "road_to_straight_median": 1.3875140939529573
+  },
+  {
+    "instance": 4,
+    "passenger_orders": 34,
+    "cargo_orders": 16,
+    "unique_road_nodes": 101,
+    "synthetic_target_to_node_km_mean": 0.5443896501723564,
+    "synthetic_target_to_node_km_max": 3.431809220937221,
+    "road_to_straight_median": 1.3919407186338901
+  },
+  {
+    "instance": 5,
+    "passenger_orders": 35,
+    "cargo_orders": 15,
+    "unique_road_nodes": 101,
+    "synthetic_target_to_node_km_mean": 0.5858535457275892,
+    "synthetic_target_to_node_km_max": 3.4326541105151858,
+    "road_to_straight_median": 1.444734319746779
+  },
+  {
+    "instance": 6,
+    "passenger_orders": 33,
+    "cargo_orders": 17,
+    "unique_road_nodes": 101,
+    "synthetic_target_to_node_km_mean": 0.4840147052003269,
+    "synthetic_target_to_node_km_max": 3.616569366607902,
+    "road_to_straight_median": 1.3839178262685268
+  },
+  {
+    "instance": 7,
+    "passenger_orders": 27,
+    "cargo_orders": 23,
+    "unique_road_nodes": 101,
+    "synthetic_target_to_node_km_mean": 0.9310473021662482,
+    "synthetic_target_to_node_km_max": 3.586445297300439,
+    "road_to_straight_median": 1.3747590995473693
+  },
+  {
+    "instance": 8,
+    "passenger_orders": 30,
+    "cargo_orders": 20,
+    "unique_road_nodes": 101,
+    "synthetic_target_to_node_km_mean": 0.3789739551138557,
+    "synthetic_target_to_node_km_max": 3.5339253611749886,
+    "road_to_straight_median": 1.3986170470332935
+  },
+  {
+    "instance": 9,
+    "passenger_orders": 29,
+    "cargo_orders": 21,
+    "unique_road_nodes": 101,
+    "synthetic_target_to_node_km_mean": 0.693073110129331,
+    "synthetic_target_to_node_km_max": 3.6351287783952326,
+    "road_to_straight_median": 1.3812574266847233
+  },
+  {
+    "instance": 10,
+    "passenger_orders": 30,
+    "cargo_orders": 20,
+    "unique_road_nodes": 101,
+    "synthetic_target_to_node_km_mean": 0.4111910358188711,
+    "synthetic_target_to_node_km_max": 3.431809220937221,
+    "road_to_straight_median": 1.3869758261818417
+  },
+  {
+    "instance": 11,
+    "passenger_orders": 26,
+    "cargo_orders": 24,
+    "unique_road_nodes": 101,
+    "synthetic_target_to_node_km_mean": 0.6516676142268284,
+    "synthetic_target_to_node_km_max": 3.507257278844167,
+    "road_to_straight_median": 1.428508706534724
+  },
+  {
+    "instance": 12,
+    "passenger_orders": 24,
+    "cargo_orders": 26,
+    "unique_road_nodes": 101,
+    "synthetic_target_to_node_km_mean": 0.7258403523827991,
+    "synthetic_target_to_node_km_max": 3.462459358627139,
+    "road_to_straight_median": 1.3821436373329008
+  },
+  {
+    "instance": 13,
+    "passenger_orders": 28,
+    "cargo_orders": 22,
+    "unique_road_nodes": 101,
+    "synthetic_target_to_node_km_mean": 0.6150323958268232,
+    "synthetic_target_to_node_km_max": 3.434450852259679,
+    "road_to_straight_median": 1.412769264738424
+  },
+  {
+    "instance": 14,
+    "passenger_orders": 33,
+    "cargo_orders": 17,
+    "unique_road_nodes": 101,
+    "synthetic_target_to_node_km_mean": 0.5847556123764752,
+    "synthetic_target_to_node_km_max": 3.4321447339153592,
+    "road_to_straight_median": 1.3816090587576468
+  },
+  {
+    "instance": 15,
+    "passenger_orders": 30,
+    "cargo_orders": 20,
+    "unique_road_nodes": 101,
+    "synthetic_target_to_node_km_mean": 0.5086692938077565,
+    "synthetic_target_to_node_km_max": 3.5126577443930898,
+    "road_to_straight_median": 1.3466250376975126
+  },
+  {
+    "instance": 16,
+    "passenger_orders": 30,
+    "cargo_orders": 20,
+    "unique_road_nodes": 101,
+    "synthetic_target_to_node_km_mean": 0.4186862690591132,
+    "synthetic_target_to_node_km_max": 3.431809220937221,
+    "road_to_straight_median": 1.3940893066258337
+  },
+  {
+    "instance": 17,
+    "passenger_orders": 31,
+    "cargo_orders": 19,
+    "unique_road_nodes": 101,
+    "synthetic_target_to_node_km_mean": 0.44433444740836336,
+    "synthetic_target_to_node_km_max": 3.4321447339153592,
+    "road_to_straight_median": 1.3904324685356801
+  },
+  {
+    "instance": 18,
+    "passenger_orders": 26,
+    "cargo_orders": 24,
+    "unique_road_nodes": 101,
+    "synthetic_target_to_node_km_mean": 0.508090389177981,
+    "synthetic_target_to_node_km_max": 3.475072705453277,
+    "road_to_straight_median": 1.383642451183499
+  },
+  {
+    "instance": 19,
+    "passenger_orders": 32,
+    "cargo_orders": 18,
+    "unique_road_nodes": 101,
+    "synthetic_target_to_node_km_mean": 0.7516101757987361,
+    "synthetic_target_to_node_km_max": 3.6231892211555023,
+    "road_to_straight_median": 1.3984391213646403
+  },
+  {
+    "instance": 20,
+    "passenger_orders": 26,
+    "cargo_orders": 24,
+    "unique_road_nodes": 101,
+    "synthetic_target_to_node_km_mean": 0.6220041853101199,
+    "synthetic_target_to_node_km_max": 3.5304574353371527,
+    "road_to_straight_median": 1.384660205469893
+  },
+  {
+    "instance": 21,
+    "passenger_orders": 33,
+    "cargo_orders": 17,
+    "unique_road_nodes": 101,
+    "synthetic_target_to_node_km_mean": 0.4253335904353716,
+    "synthetic_target_to_node_km_max": 3.4326541105151858,
+    "road_to_straight_median": 1.4026712460197182
+  },
+  {
+    "instance": 22,
+    "passenger_orders": 32,
+    "cargo_orders": 18,
+    "unique_road_nodes": 101,
+    "synthetic_target_to_node_km_mean": 0.4196306508164753,
+    "synthetic_target_to_node_km_max": 3.4321447339153592,
+    "road_to_straight_median": 1.3748067096951733
+  },
+  {
+    "instance": 23,
+    "passenger_orders": 27,
+    "cargo_orders": 23,
+    "unique_road_nodes": 101,
+    "synthetic_target_to_node_km_mean": 0.5733677956472787,
+    "synthetic_target_to_node_km_max": 3.4321447339153592,
+    "road_to_straight_median": 1.396946903614451
+  },
+  {
+    "instance": 24,
+    "passenger_orders": 30,
+    "cargo_orders": 20,
+    "unique_road_nodes": 101,
+    "synthetic_target_to_node_km_mean": 0.4842405294075228,
+    "synthetic_target_to_node_km_max": 3.5824593718979547,
+    "road_to_straight_median": 1.3970218456232484
+  },
+  {
+    "instance": 25,
+    "passenger_orders": 26,
+    "cargo_orders": 24,
+    "unique_road_nodes": 101,
+    "synthetic_target_to_node_km_mean": 0.6519053829514214,
+    "synthetic_target_to_node_km_max": 3.6307147417128034,
+    "road_to_straight_median": 1.3857365247496087
+  },
+  {
+    "instance": 26,
+    "passenger_orders": 29,
+    "cargo_orders": 21,
+    "unique_road_nodes": 101,
+    "synthetic_target_to_node_km_mean": 0.4109256027956592,
+    "synthetic_target_to_node_km_max": 3.4321447339153592,
+    "road_to_straight_median": 1.3779136462627362
+  },
+  {
+    "instance": 27,
+    "passenger_orders": 30,
+    "cargo_orders": 20,
+    "unique_road_nodes": 101,
+    "synthetic_target_to_node_km_mean": 0.3817062664679001,
+    "synthetic_target_to_node_km_max": 3.3772630497858107,
+    "road_to_straight_median": 1.398642070879075
+  },
+  {
+    "instance": 28,
+    "passenger_orders": 28,
+    "cargo_orders": 22,
+    "unique_road_nodes": 101,
+    "synthetic_target_to_node_km_mean": 0.6048319608992071,
+    "synthetic_target_to_node_km_max": 3.4322106839325786,
+    "road_to_straight_median": 1.4044849095802228
+  },
+  {
+    "instance": 29,
+    "passenger_orders": 23,
+    "cargo_orders": 27,
+    "unique_road_nodes": 101,
+    "synthetic_target_to_node_km_mean": 0.38230544905623115,
+    "synthetic_target_to_node_km_max": 3.4321447339153592,
+    "road_to_straight_median": 1.357563279049307
+  },
+  {
+    "instance": 30,
+    "passenger_orders": 29,
+    "cargo_orders": 21,
+    "unique_road_nodes": 101,
+    "synthetic_target_to_node_km_mean": 0.5749357900743641,
+    "synthetic_target_to_node_km_max": 3.4905674430186533,
+    "road_to_straight_median": 1.370215837515889
+  },
+  {
+    "instance": 31,
+    "passenger_orders": 29,
+    "cargo_orders": 21,
+    "unique_road_nodes": 101,
+    "synthetic_target_to_node_km_mean": 0.7812400367512541,
+    "synthetic_target_to_node_km_max": 3.4973961633301274,
+    "road_to_straight_median": 1.4370163139114052
+  }
+]

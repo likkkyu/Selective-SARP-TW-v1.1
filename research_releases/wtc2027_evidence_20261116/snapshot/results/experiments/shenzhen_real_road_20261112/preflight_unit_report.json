@@ -1,0 +1,19 @@
+{
+  "status": "pass",
+  "graph_nodes": 5,
+  "graph_edges": 14,
+  "snap_offsets_km_max": 0.015100728423812295,
+  "matrix": {
+    "terminals": 4,
+    "unique_locations": 4,
+    "distance_km_min": 1.0272343034504077,
+    "distance_km_mean": 1.2698003064374166,
+    "distance_km_max": 2.139185105786021,
+    "road_to_straight_median": 1.020408163414797,
+    "road_to_straight_p95": 1.2100892426120982,
+    "implied_speed_kph_median": 36.0,
+    "asymmetric_distance_pairs": 1,
+    "asymmetric_time_pairs": 0
+  },
+  "route_distance_km": 8.387530276760746
+}

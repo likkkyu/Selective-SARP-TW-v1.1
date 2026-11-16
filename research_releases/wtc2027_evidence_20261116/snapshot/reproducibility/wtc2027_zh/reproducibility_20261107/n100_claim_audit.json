@@ -1,0 +1,167 @@
+{
+  "status": "passed",
+  "scope": "Headline N100 numerical and boundary-text consistency across the current manuscript, supplement, and frozen JSON evidence",
+  "boundary": "This deterministic gate verifies only declared string/value consistency. It does not validate experimental design, execution, solver optimality, or publication readiness.",
+  "source_statuses": {
+    "quality": "passed",
+    "timing": "passed",
+    "alignment": "passed",
+    "dataset_equivalence": "passed"
+  },
+  "inputs": [
+    {
+      "path": "wtc2027_zh/论文正文.md",
+      "sha256": "9d81f94451b2149e4dc7058037150255d8ef9b9a1642fb2ac28f3284b0c04199"
+    },
+    {
+      "path": "wtc2027_zh/方法与复现补充说明.md",
+      "sha256": "5f4a76ca883c839c3f5ded2c6da3e95eece442fe7b53c9282381ebfabec35fd3"
+    },
+    {
+      "path": "experiments/lazy_v4_hybrid_confirmation_20261116/PAIRED_ANALYSIS.json",
+      "sha256": "c587c7af714b921eaa9b12ca7110c9e0356eef0103675155ba0c05136ba5236b"
+    },
+    {
+      "path": "experiments/lazy_v4_same_machine_timing_20261116/remote_evidence/formal_v2/ANALYSIS.json",
+      "sha256": "f559f7278393a0b68c0d1e828246cfa99348fc7f1010d2540f86251195428b51"
+    },
+    {
+      "path": "experiments/lazy_v4_scip_alignment_20261116/HYBRID_PAIRED_ANALYSIS.json",
+      "sha256": "246b1217e1c1c3feeeee265796c3a0dc64aab0228dea7de0a306da9fcb9d98ee"
+    },
+    {
+      "path": "experiments/lazy_v4_scip_alignment_20261116/DATASET_EQUIVALENCE.json",
+      "sha256": "e2fd3ea02178c8f01cbad254dd607933bf81630ef1dee21450701c23ae926ea8"
+    }
+  ],
+  "checks": [
+    {
+      "id": "main_n100_raw_service",
+      "document": "论文正文.md",
+      "expected_text": "96.03%",
+      "passed": true
+    },
+    {
+      "id": "main_n100_hybrid_service",
+      "document": "论文正文.md",
+      "expected_text": "98.33%",
+      "passed": true
+    },
+    {
+      "id": "main_n100_insertion_hybrid_service",
+      "document": "论文正文.md",
+      "expected_text": "99.15%",
+      "passed": true
+    },
+    {
+      "id": "main_n100_hybrid_gain",
+      "document": "论文正文.md",
+      "expected_text": "2.297",
+      "passed": true
+    },
+    {
+      "id": "main_same_node_neural_hybrid_time",
+      "document": "论文正文.md",
+      "expected_text": "9.68 s",
+      "passed": true
+    },
+    {
+      "id": "main_same_node_insertion_hybrid_time",
+      "document": "论文正文.md",
+      "expected_text": "54.39 s",
+      "passed": true
+    },
+    {
+      "id": "main_alignment_hybrid_service",
+      "document": "论文正文.md",
+      "expected_text": "97.90%",
+      "passed": true
+    },
+    {
+      "id": "main_alignment_scip_time",
+      "document": "论文正文.md",
+      "expected_text": "344.75 s",
+      "passed": true
+    },
+    {
+      "id": "main_alignment_solver_boundary",
+      "document": "论文正文.md",
+      "expected_text": "未证明最优且未改善初解",
+      "passed": true
+    },
+    {
+      "id": "supp_raw_service",
+      "document": "方法与复现补充说明.md",
+      "expected_text": "96.033%",
+      "passed": true
+    },
+    {
+      "id": "supp_hybrid_service",
+      "document": "方法与复现补充说明.md",
+      "expected_text": "98.330%",
+      "passed": true
+    },
+    {
+      "id": "supp_insertion_short_service",
+      "document": "方法与复现补充说明.md",
+      "expected_text": "99.150%",
+      "passed": true
+    },
+    {
+      "id": "supp_strong_service",
+      "document": "方法与复现补充说明.md",
+      "expected_text": "99.990%",
+      "passed": true
+    },
+    {
+      "id": "supp_neural_time",
+      "document": "方法与复现补充说明.md",
+      "expected_text": "9.183",
+      "passed": true
+    },
+    {
+      "id": "supp_insertion_time",
+      "document": "方法与复现补充说明.md",
+      "expected_text": "53.888",
+      "passed": true
+    },
+    {
+      "id": "supp_alignment_hybrid_service",
+      "document": "方法与复现补充说明.md",
+      "expected_text": "97.90%",
+      "passed": true
+    },
+    {
+      "id": "supp_alignment_hybrid_time",
+      "document": "方法与复现补充说明.md",
+      "expected_text": "2.554",
+      "passed": true
+    },
+    {
+      "id": "supp_alignment_insertion_time",
+      "document": "方法与复现补充说明.md",
+      "expected_text": "36.055",
+      "passed": true
+    },
+    {
+      "id": "supp_alignment_scip_time",
+      "document": "方法与复现补充说明.md",
+      "expected_text": "344.753",
+      "passed": true
+    },
+    {
+      "id": "supp_alignment_hybrid_gain",
+      "document": "方法与复现补充说明.md",
+      "expected_text": "2.300",
+      "passed": true
+    },
+    {
+      "id": "supp_dataset_sha",
+      "document": "方法与复现补充说明.md",
+      "expected_text": "d874cb88ebf8e035738d1b1666cff7897b14c1d937a2ab4b1812d1ba0f39ffba",
+      "passed": true
+    }
+  ],
+  "passed_checks": 21,
+  "total_checks": 21
+}

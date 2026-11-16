@@ -1,0 +1,598 @@
+{
+  "status": "completed",
+  "scope": "frozen 128-case Shenzhen road-native formal test",
+  "test_pool_sha256": "600e11131f8de7c0c3d6a356c6ff5438e59075e1955dc23884a76ab188ca7711",
+  "model_lock_sha256": "32c815445a9de1697aa159d83c4190edd0cbb677bab4082097cc732736bac62e",
+  "independent_unit": "road-native test instance",
+  "n_independent_instances": 128,
+  "nested_repeats": "three independently trained neural seeds per instance; one fixed LNS search seed",
+  "bootstrap": {
+    "resamples": 20000,
+    "seed": 2026111402,
+    "unit": "paired test instance",
+    "interval": "percentile 95% confidence interval for the conditional instance mean"
+  },
+  "inference_boundary": "Instance bootstrap intervals are conditional on the three frozen neural models, the fixed test generator, and LNS search seed 1234. They are not population-level uncertainty over all possible training or search seeds.",
+  "method_summary": {
+    "neural": {
+      "completed_orders": {
+        "mean": 45.21875,
+        "sd_across_instances": 2.518327396982013,
+        "bootstrap_95_ci_for_mean": [
+          44.7578125,
+          45.625
+        ],
+        "min": 28.666666666666668,
+        "max": 49.333333333333336
+      },
+      "service_rate_percent": {
+        "mean": 90.4375,
+        "sd_across_instances": 5.036654793964026,
+        "bootstrap_95_ci_for_mean": [
+          89.53645833333333,
+          91.24479166666667
+        ],
+        "min": 57.333333333333336,
+        "max": 98.66666666666667
+      },
+      "objective": {
+        "mean": 2753.188721963576,
+        "sd_across_instances": 1447.8249837125024,
+        "bootstrap_95_ci_for_mean": [
+          2522.7080195536355,
+          3019.6473233646616
+        ],
+        "min": 387.36742591614603,
+        "max": 12269.123306725958
+      },
+      "vehicles": {
+        "mean": 8.424479166666668,
+        "sd_across_instances": 0.5169309183688902,
+        "bootstrap_95_ci_for_mean": [
+          8.330729166666668,
+          8.5078125
+        ],
+        "min": 5.333333333333333,
+        "max": 9.0
+      },
+      "algorithm_seconds": {
+        "mean": 0.24446982485911423,
+        "sd_across_instances": 0.03057997338164116,
+        "bootstrap_95_ci_for_mean": [
+          0.23924667953295872,
+          0.2497798164068153
+        ],
+        "min": 0.1818990276636517,
+        "max": 0.3343712779994045
+      },
+      "full_service_instances": 0,
+      "hard_invalid": 0
+    },
+    "hybrid": {
+      "completed_orders": {
+        "mean": 49.994791666666664,
+        "sd_across_instances": 0.04150230047698457,
+        "bootstrap_95_ci_for_mean": [
+          49.986979166666664,
+          50.0
+        ],
+        "min": 49.666666666666664,
+        "max": 50.0
+      },
+      "service_rate_percent": {
+        "mean": 99.98958333333333,
+        "sd_across_instances": 0.08300460095396914,
+        "bootstrap_95_ci_for_mean": [
+          99.97395833333333,
+          100.0
+        ],
+        "min": 99.33333333333333,
+        "max": 100.0
+      },
+      "objective": {
+        "mean": 6.430740626964275,
+        "sd_across_instances": 23.894301485509786,
+        "bootstrap_95_ci_for_mean": [
+          3.4219012336044417,
+          10.936715997388044
+        ],
+        "min": 2.969757947674038,
+        "max": 195.3421063055786
+      },
+      "vehicles": {
+        "mean": 8.15625,
+        "sd_across_instances": 0.32384798179174457,
+        "bootstrap_95_ci_for_mean": [
+          8.1015625,
+          8.213541666666666
+        ],
+        "min": 7.0,
+        "max": 9.0
+      },
+      "algorithm_seconds": {
+        "mean": 3.244529219632701,
+        "sd_across_instances": 0.030580137135780106,
+        "bootstrap_95_ci_for_mean": [
+          3.239330185812179,
+          3.2499523701741744
+        ],
+        "min": 3.1819439583293083,
+        "max": 3.334415152998796
+      },
+      "full_service_instances": 126,
+      "hard_invalid": 0
+    },
+    "insertion": {
+      "completed_orders": {
+        "mean": 48.5,
+        "sd_across_instances": 1.5420612036834052,
+        "bootstrap_95_ci_for_mean": [
+          48.21875,
+          48.7578125
+        ],
+        "min": 41.0,
+        "max": 50.0
+      },
+      "service_rate_percent": {
+        "mean": 97.0,
+        "sd_across_instances": 3.0841224073668103,
+        "bootstrap_95_ci_for_mean": [
+          96.453125,
+          97.515625
+        ],
+        "min": 82.0,
+        "max": 100.0
+      },
+      "objective": {
+        "mean": 865.9634596143923,
+        "sd_across_instances": 886.5381750781135,
+        "bootstrap_95_ci_for_mean": [
+          717.744956116896,
+          1023.1318668133716
+        ],
+        "min": 3.3786307579347215,
+        "max": 5177.682813318094
+      },
+      "vehicles": {
+        "mean": 7.984375,
+        "sd_across_instances": 0.5609942663959533,
+        "bootstrap_95_ci_for_mean": [
+          7.890625,
+          8.078125
+        ],
+        "min": 6.0,
+        "max": 9.0
+      },
+      "algorithm_seconds": {
+        "mean": 0.10477575034349229,
+        "sd_across_instances": 0.010053930613592083,
+        "bootstrap_95_ci_for_mean": [
+          0.1030636380325376,
+          0.10654168707257695
+        ],
+        "min": 0.08322566699644085,
+        "max": 0.14910779199999524
+      },
+      "full_service_instances": 41,
+      "hard_invalid": 0
+    },
+    "lns": {
+      "completed_orders": {
+        "mean": 49.984375,
+        "sd_across_instances": 0.12450690143095285,
+        "bootstrap_95_ci_for_mean": [
+          49.9609375,
+          50.0
+        ],
+        "min": 49.0,
+        "max": 50.0
+      },
+      "service_rate_percent": {
+        "mean": 99.96875,
+        "sd_across_instances": 0.2490138028619057,
+        "bootstrap_95_ci_for_mean": [
+          99.921875,
+          100.0
+        ],
+        "min": 98.0,
+        "max": 100.0
+      },
+      "objective": {
+        "mean": 12.405597097620927,
+        "sd_across_instances": 71.58752633718568,
+        "bootstrap_95_ci_for_mean": [
+          3.408468776872071,
+          25.892559633672093
+        ],
+        "min": 2.963938540539974,
+        "max": 578.3948788307225
+      },
+      "vehicles": {
+        "mean": 8.1171875,
+        "sd_across_instances": 0.4089759392649374,
+        "bootstrap_95_ci_for_mean": [
+          8.046875,
+          8.1875
+        ],
+        "min": 7.0,
+        "max": 9.0
+      },
+      "algorithm_seconds": {
+        "mean": 3.104818991898469,
+        "sd_across_instances": 0.010053891187390186,
+        "bootstrap_95_ci_for_mean": [
+          3.103069734187133,
+          3.1065901825989712
+        ],
+        "min": 3.08327220899082,
+        "max": 3.149153500002285
+      },
+      "full_service_instances": 126,
+      "hard_invalid": 0
+    }
+  },
+  "training_seed_summary": {
+    "neural": {
+      "training_seeds": [
+        1234,
+        4321,
+        8765
+      ],
+      "service_rate_percent_by_seed": [
+        90.5,
+        89.46875,
+        91.34375
+      ],
+      "service_rate_percent_mean": 90.4375,
+      "service_rate_percent_sd_across_training_seeds": 0.939061200082295,
+      "objective_by_seed": [
+        2735.0770033562585,
+        3031.9036796419314,
+        2492.5854828925385
+      ],
+      "objective_mean": 2753.188721963576,
+      "objective_sd_across_training_seeds": 270.11489240587457,
+      "full_service_instances_by_seed": {
+        "1234": 1,
+        "4321": 5,
+        "8765": 5
+      },
+      "note": "n=3 training seeds; descriptive mean and SD only, no population-level seed inference"
+    },
+    "hybrid": {
+      "training_seeds": [
+        1234,
+        4321,
+        8765
+      ],
+      "service_rate_percent_by_seed": [
+        100.0,
+        100.0,
+        99.96875
+      ],
+      "service_rate_percent_mean": 99.98958333333333,
+      "service_rate_percent_sd_across_training_seeds": 0.018042195912175808,
+      "objective_by_seed": [
+        3.4339437288822934,
+        3.4416671991233243,
+        12.416610952887208
+      ],
+      "objective_mean": 6.430740626964275,
+      "objective_sd_across_training_seeds": 5.183917204399746,
+      "full_service_instances_by_seed": {
+        "1234": 128,
+        "4321": 128,
+        "8765": 126
+      },
+      "note": "n=3 training seeds; descriptive mean and SD only, no population-level seed inference"
+    }
+  },
+  "paired_contrasts": {
+    "neural_minus_insertion": {
+      "completed_orders": {
+        "mean_delta": -3.28125,
+        "bootstrap_95_ci": [
+          -3.7864583333333335,
+          -2.817708333333334
+        ],
+        "positive_delta_instances": 7,
+        "zero_delta_instances": 5,
+        "negative_delta_instances": 116
+      },
+      "service_rate_percentage_points": {
+        "mean_delta": -6.5625,
+        "bootstrap_95_ci": [
+          -7.588541666666667,
+          -5.625
+        ],
+        "positive_delta_instances": 7,
+        "zero_delta_instances": 5,
+        "negative_delta_instances": 116
+      },
+      "objective": {
+        "mean_delta": 1887.225262349184,
+        "bootstrap_95_ci": [
+          1622.0837941341028,
+          2180.6595682513675
+        ],
+        "positive_delta_instances": 121,
+        "zero_delta_instances": 0,
+        "negative_delta_instances": 7
+      },
+      "vehicles": {
+        "mean_delta": 0.4401041666666667,
+        "bootstrap_95_ci": [
+          0.31510416666666663,
+          0.5598958333333334
+        ],
+        "positive_delta_instances": 90,
+        "zero_delta_instances": 16,
+        "negative_delta_instances": 22
+      },
+      "algorithm_seconds": {
+        "mean_delta": 0.13969407451562194,
+        "bootstrap_95_ci": [
+          0.1346103906995751,
+          0.14493951509002206
+        ],
+        "positive_delta_instances": 128,
+        "zero_delta_instances": 0,
+        "negative_delta_instances": 0
+      }
+    },
+    "neural_minus_lns": {
+      "completed_orders": {
+        "mean_delta": -4.765625,
+        "bootstrap_95_ci": [
+          -5.229166666666667,
+          -4.359375
+        ],
+        "positive_delta_instances": 0,
+        "zero_delta_instances": 0,
+        "negative_delta_instances": 128
+      },
+      "service_rate_percentage_points": {
+        "mean_delta": -9.53125,
+        "bootstrap_95_ci": [
+          -10.473958333333332,
+          -8.702994791666677
+        ],
+        "positive_delta_instances": 0,
+        "zero_delta_instances": 0,
+        "negative_delta_instances": 128
+      },
+      "objective": {
+        "mean_delta": 2740.783124865955,
+        "bootstrap_95_ci": [
+          2508.7106551017523,
+          3007.2641021316
+        ],
+        "positive_delta_instances": 128,
+        "zero_delta_instances": 0,
+        "negative_delta_instances": 0
+      },
+      "vehicles": {
+        "mean_delta": 0.30729166666666663,
+        "bootstrap_95_ci": [
+          0.20052083333333331,
+          0.40885416666666663
+        ],
+        "positive_delta_instances": 85,
+        "zero_delta_instances": 17,
+        "negative_delta_instances": 26
+      },
+      "algorithm_seconds": {
+        "mean_delta": -2.860349167039355,
+        "bootstrap_95_ci": [
+          -2.865329098807874,
+          -2.855149384674502
+        ],
+        "positive_delta_instances": 0,
+        "zero_delta_instances": 0,
+        "negative_delta_instances": 128
+      }
+    },
+    "hybrid_minus_insertion": {
+      "completed_orders": {
+        "mean_delta": 1.4947916666666665,
+        "bootstrap_95_ci": [
+          1.2369791666666665,
+          1.7682291666666665
+        ],
+        "positive_delta_instances": 87,
+        "zero_delta_instances": 41,
+        "negative_delta_instances": 0
+      },
+      "service_rate_percentage_points": {
+        "mean_delta": 2.989583333333333,
+        "bootstrap_95_ci": [
+          2.4791666666666665,
+          3.5416666666666665
+        ],
+        "positive_delta_instances": 87,
+        "zero_delta_instances": 41,
+        "negative_delta_instances": 0
+      },
+      "objective": {
+        "mean_delta": -859.5327189874279,
+        "bootstrap_95_ci": [
+          -1013.7378996566167,
+          -709.8276862108821
+        ],
+        "positive_delta_instances": 4,
+        "zero_delta_instances": 0,
+        "negative_delta_instances": 124
+      },
+      "vehicles": {
+        "mean_delta": 0.17187500000000008,
+        "bootstrap_95_ci": [
+          0.07812500000000008,
+          0.26569010416666117
+        ],
+        "positive_delta_instances": 51,
+        "zero_delta_instances": 55,
+        "negative_delta_instances": 22
+      },
+      "algorithm_seconds": {
+        "mean_delta": 3.1397534692892086,
+        "bootstrap_95_ci": [
+          3.134651032424365,
+          3.1450627223054073
+        ],
+        "positive_delta_instances": 128,
+        "zero_delta_instances": 0,
+        "negative_delta_instances": 0
+      }
+    },
+    "hybrid_minus_lns": {
+      "completed_orders": {
+        "mean_delta": 0.01041666666666663,
+        "bootstrap_95_ci": [
+          -0.007812500000000056,
+          0.036458333333333315
+        ],
+        "positive_delta_instances": 2,
+        "zero_delta_instances": 124,
+        "negative_delta_instances": 2
+      },
+      "service_rate_percentage_points": {
+        "mean_delta": 0.02083333333333326,
+        "bootstrap_95_ci": [
+          -0.01562500000000011,
+          0.07291666666666663
+        ],
+        "positive_delta_instances": 2,
+        "zero_delta_instances": 124,
+        "negative_delta_instances": 2
+      },
+      "objective": {
+        "mean_delta": -5.974856470656655,
+        "bootstrap_95_ci": [
+          -20.950340521991404,
+          4.517775787394335
+        ],
+        "positive_delta_instances": 62,
+        "zero_delta_instances": 0,
+        "negative_delta_instances": 66
+      },
+      "vehicles": {
+        "mean_delta": 0.03906250000000009,
+        "bootstrap_95_ci": [
+          -0.023437499999999882,
+          0.10156250000000008
+        ],
+        "positive_delta_instances": 34,
+        "zero_delta_instances": 71,
+        "negative_delta_instances": 23
+      },
+      "algorithm_seconds": {
+        "mean_delta": 0.1397102277342318,
+        "bootstrap_95_ci": [
+          0.13464796473726087,
+          0.14489635267323375
+        ],
+        "positive_delta_instances": 128,
+        "zero_delta_instances": 0,
+        "negative_delta_instances": 0
+      }
+    },
+    "hybrid_minus_neural": {
+      "completed_orders": {
+        "mean_delta": 4.776041666666666,
+        "bootstrap_95_ci": [
+          4.377604166666666,
+          5.239583333333334
+        ],
+        "positive_delta_instances": 128,
+        "zero_delta_instances": 0,
+        "negative_delta_instances": 0
+      },
+      "service_rate_percentage_points": {
+        "mean_delta": 9.552083333333332,
+        "bootstrap_95_ci": [
+          8.723958333333334,
+          10.47929687499999
+        ],
+        "positive_delta_instances": 128,
+        "zero_delta_instances": 0,
+        "negative_delta_instances": 0
+      },
+      "objective": {
+        "mean_delta": -2746.7579813366115,
+        "bootstrap_95_ci": [
+          -3010.2308417853337,
+          -2514.670931248987
+        ],
+        "positive_delta_instances": 0,
+        "zero_delta_instances": 0,
+        "negative_delta_instances": 128
+      },
+      "vehicles": {
+        "mean_delta": -0.2682291666666666,
+        "bootstrap_95_ci": [
+          -0.3671874999999998,
+          -0.16406250000000003
+        ],
+        "positive_delta_instances": 24,
+        "zero_delta_instances": 22,
+        "negative_delta_instances": 82
+      },
+      "algorithm_seconds": {
+        "mean_delta": 3.0000593947735865,
+        "bootstrap_95_ci": [
+          3.0000444868852463,
+          3.0000831224429088
+        ],
+        "positive_delta_instances": 128,
+        "zero_delta_instances": 0,
+        "negative_delta_instances": 0
+      }
+    }
+  },
+  "bounded_scip_reference": {
+    "instances": 16,
+    "seconds_per_instance": 5.0,
+    "statuses": {
+      "timelimit": 16
+    },
+    "insertion_service_rate_percent": 97.375,
+    "scip_incumbent_service_rate_percent": 97.375,
+    "insertion_objective_mean": 758.1655719418516,
+    "scip_incumbent_objective_mean": 758.1655719418516,
+    "objective_improvements_over_warm_start": 0,
+    "optimal_instances": 0,
+    "all_hard_audits_pass": true,
+    "maximum_road_replay_error": 4.440892098500626e-16,
+    "interpretation": "finite-time MIP incumbent/reference only; no exact-optimum claim"
+  },
+  "source_reports": {
+    "controls": {
+      "path": "experiments/shenzhen_real_road_20261112/road_native_formal_test_v1_controls_lns3s_seed1234/report.json",
+      "sha256": "e39afb6dac74d65a9f0fd01761fc08446745751c7b230a0331fd39664180786e"
+    },
+    "bounded_scip": {
+      "path": "experiments/shenzhen_real_road_20261112/road_native_formal_test_v1_scip5s_first16_hard4_v1/report.json",
+      "sha256": "7c18a83d30097fa882ff4b2d563e23174b0198a6276cf6cfa919ba30da40542d"
+    },
+    "neural_hybrid": {
+      "1234": {
+        "path": "experiments/shenzhen_real_road_20261112/road_native_formal_test_v1_neural_lns3s_model1234_search1234/report.json",
+        "sha256": "70848c7b685791b6d35de081a4c9ce74574c77c8eaa7f23b7a7528473c46fdf5"
+      },
+      "4321": {
+        "path": "experiments/shenzhen_real_road_20261112/road_native_formal_test_v1_neural_lns3s_model4321_search1234/report.json",
+        "sha256": "47782cc4fed80f44fa6eeaa89a3047ac3d25a05d6378849589a9a5af7c76ae55"
+      },
+      "8765": {
+        "path": "experiments/shenzhen_real_road_20261112/road_native_formal_test_v1_neural_lns3s_model8765_search1234/report.json",
+        "sha256": "d5a64673bdb91f02ac8eeba7a87f3bc2e7609d1f8df64763a9c431dea963f99f"
+      }
+    }
+  },
+  "software": {
+    "python": "3.12.9",
+    "numpy": "1.26.4",
+    "platform": "macOS-14.5-arm64-arm-64bit"
+  },
+  "data_scope_note": "Road topology and shortest-path matrices use the frozen Shenzhen OSM driving graph; pickup-delivery requests and time windows are controlled synthetic scenarios sampled directly on that graph, not observed trip records."
+}

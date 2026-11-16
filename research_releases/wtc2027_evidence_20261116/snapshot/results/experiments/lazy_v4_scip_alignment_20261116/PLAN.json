@@ -1,0 +1,44 @@
+{
+  "status": "frozen_before_current_model_alignment_evaluation",
+  "created_local": "2026-11-16T18:05:00+08:00",
+  "scope": "Evaluate the three frozen cost-v4 lazy-certificate N100 checkpoints on the exact 30-instance common set previously used for strict insertion and 300-second SCIP incumbents.",
+  "graph_size": 100,
+  "samples": 30,
+  "dataset_seed": 2026111600,
+  "scenario_path": "experiments/scip_multiscale_20261114/formal_v1_20261114/common_n100_seed2026111600.pt",
+  "scenario_sha256": "d874cb88ebf8e035738d1b1666cff7897b14c1d937a2ab4b1812d1ba0f39ffba",
+  "dataset_equivalence_gate": "Exact key and tensor equality between seed-regenerated data and the frozen scenario file for all 30 instances.",
+  "model": "lazy-certificate v4 greedy neural constructor",
+  "training_seeds": [314159, 271828, 161803],
+  "checkpoints": [
+    {
+      "seed": 314159,
+      "path": "experiments/drl_canonical_audit_20261115/remote_evidence/lazy_transfer_formal_20261116/drl_lazy_v4_transfer_formal_20261116/seed_314159/outputs/pomo_n100_optimized/model_best.pt",
+      "sha256": "55944fc4853f5d957a7bd47fe127cba2cf669675535fc4af8112b9c34a0fc188"
+    },
+    {
+      "seed": 271828,
+      "path": "experiments/drl_canonical_audit_20261115/remote_evidence/lazy_transfer_formal_20261116/drl_lazy_v4_transfer_formal_20261116/seed_271828/outputs/pomo_n100_optimized/model_best.pt",
+      "sha256": "170ca0f3268ce8915c1cdf0bb2a9061143078d627fbbeb9c1eb767d30368ffd1"
+    },
+    {
+      "seed": 161803,
+      "path": "experiments/drl_canonical_audit_20261115/remote_evidence/lazy_transfer_formal_20261116/drl_lazy_v4_transfer_formal_20261116/seed_161803/outputs/pomo_n100_optimized/model_best.pt",
+      "sha256": "085ec780623a092b4b1088e974eac66a50adda430e5daf8717a71716c0fdc9ea"
+    }
+  ],
+  "comparison_source": "experiments/scip_multiscale_20261114/formal_v1_20261114/results",
+  "comparison_methods": [
+    "strict insertion warm start",
+    "one-thread 300-second SCIP incumbent initialized by strict insertion"
+  ],
+  "hard_minimum_completed_orders_per_trip": 4,
+  "max_concurrent_open_orders": 6,
+  "cost_semantics_version": 4,
+  "dispatch_clock_version": 1,
+  "device": "local CPU",
+  "timeout_seconds_per_checkpoint": 3600,
+  "stopping_rule": "Evaluate all 30 instances for all three frozen checkpoints or fail closed; no retries or outcome-based exclusions.",
+  "statistics": "Instance is the paired unit. Average the three training-seed outcomes within each instance, then use a paired nonparametric bootstrap over 30 instances.",
+  "claim_boundary": "This is a post hoc alignment evaluation on an existing SCIP test set. It supports direct same-instance descriptive comparison, but is not a new blinded model-selection test and does not make a SCIP incumbent optimal."
+}

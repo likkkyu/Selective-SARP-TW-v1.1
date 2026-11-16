@@ -1,0 +1,23 @@
+{
+  "status": "failed",
+  "scope": "independent canonical-checkpoint audit; not model selection unless the caller predeclared this dataset",
+  "checkpoint": "/Users/likeyu/Downloads/project-vrp-v6-4-main/experiments/drl_canonical_audit_20261115/remote_evidence/lazy_transfer_formal_20261116/drl_lazy_v4_transfer_formal_20261116/seed_271828/outputs/pomo_n100_optimized/model_best.pt",
+  "checkpoint_sha256": "170ca0f3268ce8915c1cdf0bb2a9061143078d627fbbeb9c1eb767d30368ffd1",
+  "graph_size": 100,
+  "samples": 30,
+  "dataset_seed": 2026111600,
+  "device": "cpu",
+  "expected_versions": {
+    "canonical_training_version": 2,
+    "cost_semantics_version": 4,
+    "dispatch_clock_version": 1,
+    "completion_guard_version": 1,
+    "hard4_admission_version": 4,
+    "lazy_certificate_decoder_version": 4,
+    "depot_noop_version": 1
+  },
+  "rows": [],
+  "elapsed_seconds": 0.054545416991459206,
+  "error": "RuntimeError('Refuse to overwrite a changed target-mask helper')",
+  "traceback": "Traceback (most recent call last):\n  File \"/Users/likeyu/Downloads/project-vrp-v6-4-main/experiments/drl_canonical_audit_20261115/evaluate_canonical.py\", line 88, in main\n    install_deployment_patches()\n  File \"/Users/likeyu/Downloads/project-vrp-v6-4-main/experiments/drl_canonical_audit_20261115/evaluate_lazy_v4_canonical.py\", line 17, in install_lazy_patches\n    install_admission()\n  File \"/Users/likeyu/Downloads/project-vrp-v6-4-main/experiments/drl_canonical_audit_20261115/admission_lazy_v4.py\", line 78, in install\n    raise RuntimeError(\"Refuse to overwrite a changed target-mask helper\")\nRuntimeError: Refuse to overwrite a changed target-mask helper\n"
+}

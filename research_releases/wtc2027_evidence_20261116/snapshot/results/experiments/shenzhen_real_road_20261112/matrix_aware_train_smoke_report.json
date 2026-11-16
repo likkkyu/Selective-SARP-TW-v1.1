@@ -1,0 +1,17 @@
+{
+  "status": "pass",
+  "batch_size": 2,
+  "costs": [
+    11502.6376953125,
+    17251.744140625
+  ],
+  "log_likelihood": [
+    -41.21397399902344,
+    -33.1224479675293
+  ],
+  "loss": 11629.77734375,
+  "gradient_tensors": 89,
+  "gradient_l2_before_clip": 2530733.079536622,
+  "optimizer_step_completed": true,
+  "scope": "numerical smoke test only; formal test instances must not be used for training"
+}

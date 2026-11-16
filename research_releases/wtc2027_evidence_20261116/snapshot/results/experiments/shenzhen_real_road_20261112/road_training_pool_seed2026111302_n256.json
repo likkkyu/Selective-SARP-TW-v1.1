@@ -1,0 +1,1552 @@
+{
+  "scope": "road-aware neural training/validation only; never formal P1 testing",
+  "seed": 2026111302,
+  "samples": 256,
+  "graph_size": 50,
+  "graph_sha256": "572f667e850d1c352768315e37da09d9f20f8a2bc7cff3f7e24187e16cf4331f",
+  "formal_test_road_cases_sha256": "fb062d7696da02dabf56f5d93f9efbe74db75dff61ec05aa6151dc558b708b98",
+  "formal_test_seed": 2026111201,
+  "matrix_speed_kph": 25.0,
+  "elapsed_seconds": 2170.7827767080016,
+  "status": "prepared",
+  "output": "experiments/shenzhen_real_road_20261112/road_training_pool_seed2026111302_n256.pt",
+  "sha256": "00100086032a67d0df93447e33a9db50d2a6ae59e9c79b612dfdcda6c503aaeb",
+  "mapping": [
+    {
+      "instance": 0,
+      "unique_road_nodes": 101,
+      "snap_offset_km_mean": 0.6722257834775297,
+      "snap_offset_km_max": 3.624085918586266
+    },
+    {
+      "instance": 1,
+      "unique_road_nodes": 101,
+      "snap_offset_km_mean": 0.36448129182541567,
+      "snap_offset_km_max": 3.4321447339153592
+    },
+    {
+      "instance": 2,
+      "unique_road_nodes": 101,
+      "snap_offset_km_mean": 0.49950316315578863,
+      "snap_offset_km_max": 3.431809220937221
+    },
+    {
+      "instance": 3,
+      "unique_road_nodes": 101,
+      "snap_offset_km_mean": 0.4702380074045711,
+      "snap_offset_km_max": 2.693254831714487
+    },
+    {
+      "instance": 4,
+      "unique_road_nodes": 101,
+      "snap_offset_km_mean": 0.4145974902818006,
+      "snap_offset_km_max": 3.4734097170652722
+    },
+    {
+      "instance": 5,
+      "unique_road_nodes": 101,
+      "snap_offset_km_mean": 0.5826235953251281,
+      "snap_offset_km_max": 3.573562914942763
+    },
+    {
+      "instance": 6,
+      "unique_road_nodes": 101,
+      "snap_offset_km_mean": 0.41695884926263066,
+      "snap_offset_km_max": 3.429168346382518
+    },
+    {
+      "instance": 7,
+      "unique_road_nodes": 101,
+      "snap_offset_km_mean": 0.568591058350788,
+      "snap_offset_km_max": 3.431809220937221
+    },
+    {
+      "instance": 8,
+      "unique_road_nodes": 101,
+      "snap_offset_km_mean": 0.5535623400687844,
+      "snap_offset_km_max": 3.4326541105151858
+    },
+    {
+      "instance": 9,
+      "unique_road_nodes": 101,
+      "snap_offset_km_mean": 0.47635978101725346,
+      "snap_offset_km_max": 3.431809220937221
+    },
+    {
+      "instance": 10,
+      "unique_road_nodes": 101,
+      "snap_offset_km_mean": 0.5017858558489393,
+      "snap_offset_km_max": 3.6252495247047825
+    },
+    {
+      "instance": 11,
+      "unique_road_nodes": 101,
+      "snap_offset_km_mean": 0.39419494590528986,
+      "snap_offset_km_max": 3.431809220937221
+    },
+    {
+      "instance": 12,
+      "unique_road_nodes": 101,
+      "snap_offset_km_mean": 0.4499695528250501,
+      "snap_offset_km_max": 3.2727855359010265
+    },
+    {
+      "instance": 13,
+      "unique_road_nodes": 101,
+      "snap_offset_km_mean": 0.37467908352814205,
+      "snap_offset_km_max": 3.431809220937221
+    },
+    {
+      "instance": 14,
+      "unique_road_nodes": 101,
+      "snap_offset_km_mean": 0.4133456378365668,
+      "snap_offset_km_max": 3.4326541105151858
+    },
+    {
+      "instance": 15,
+      "unique_road_nodes": 101,
+      "snap_offset_km_mean": 0.42124643540279866,
+      "snap_offset_km_max": 3.431809220937221
+    },
+    {
+      "instance": 16,
+      "unique_road_nodes": 101,
+      "snap_offset_km_mean": 0.48063841779819466,
+      "snap_offset_km_max": 3.6055663501164403
+    },
+    {
+      "instance": 17,
+      "unique_road_nodes": 101,
+      "snap_offset_km_mean": 0.5718418937663262,
+      "snap_offset_km_max": 3.4003189878423514
+    },
+    {
+      "instance": 18,
+      "unique_road_nodes": 101,
+      "snap_offset_km_mean": 0.5283468374268069,
+      "snap_offset_km_max": 3.448034288630026
+    },
+    {
+      "instance": 19,
+      "unique_road_nodes": 101,
+      "snap_offset_km_mean": 0.3829150485437577,
+      "snap_offset_km_max": 3.431809220937221
+    },
+    {
+      "instance": 20,
+      "unique_road_nodes": 101,
+      "snap_offset_km_mean": 0.4918703706128466,
+      "snap_offset_km_max": 3.4326541105151858
+    },
+    {
+      "instance": 21,
+      "unique_road_nodes": 101,
+      "snap_offset_km_mean": 0.5159128795036235,
+      "snap_offset_km_max": 3.3931680013687266
+    },
+    {
+      "instance": 22,
+      "unique_road_nodes": 101,
+      "snap_offset_km_mean": 0.7144152877647598,
+      "snap_offset_km_max": 3.5478388513716688
+    },
+    {
+      "instance": 23,
+      "unique_road_nodes": 101,
+      "snap_offset_km_mean": 0.4415169560922019,
+      "snap_offset_km_max": 3.4321447339153592
+    },
+    {
+      "instance": 24,
+      "unique_road_nodes": 101,
+      "snap_offset_km_mean": 0.5209992767271925,
+      "snap_offset_km_max": 3.409679801322728
+    },
+    {
+      "instance": 25,
+      "unique_road_nodes": 101,
+      "snap_offset_km_mean": 0.4753476403200317,
+      "snap_offset_km_max": 3.4354880761467395
+    },
+    {
+      "instance": 26,
+      "unique_road_nodes": 101,
+      "snap_offset_km_mean": 0.35749812564721695,
+      "snap_offset_km_max": 3.4321447339153592
+    },
+    {
+      "instance": 27,
+      "unique_road_nodes": 101,
+      "snap_offset_km_mean": 0.3632170117696379,
+      "snap_offset_km_max": 2.7993908664967218
+    },
+    {
+      "instance": 28,
+      "unique_road_nodes": 101,
+      "snap_offset_km_mean": 0.35448281526618397,
+      "snap_offset_km_max": 3.3936955425482545
+    },
+    {
+      "instance": 29,
+      "unique_road_nodes": 101,
+      "snap_offset_km_mean": 0.396805724829163,
+      "snap_offset_km_max": 3.431809220937221
+    },
+    {
+      "instance": 30,
+      "unique_road_nodes": 101,
+      "snap_offset_km_mean": 0.38463999154736445,
+      "snap_offset_km_max": 3.4100557996492062
+    },
+    {
+      "instance": 31,
+      "unique_road_nodes": 101,
+      "snap_offset_km_mean": 0.46756439754012863,
+      "snap_offset_km_max": 3.519771205957783
+    },
+    {
+      "instance": 32,
+      "unique_road_nodes": 101,
+      "snap_offset_km_mean": 0.5365635128054124,
+      "snap_offset_km_max": 3.5549620330373943
+    },
+    {
+      "instance": 33,
+      "unique_road_nodes": 101,
+      "snap_offset_km_mean": 0.433130916079961,
+      "snap_offset_km_max": 3.4321447339153592
+    },
+    {
+      "instance": 34,
+      "unique_road_nodes": 101,
+      "snap_offset_km_mean": 0.7380392188253402,
+      "snap_offset_km_max": 3.4666631913895896
+    },
+    {
+      "instance": 35,
+      "unique_road_nodes": 101,
+      "snap_offset_km_mean": 0.4044228028919065,
+      "snap_offset_km_max": 3.419452831040292
+    },
+    {
+      "instance": 36,
+      "unique_road_nodes": 101,
+      "snap_offset_km_mean": 0.46069124262269123,
+      "snap_offset_km_max": 3.431809220937221
+    },
+    {
+      "instance": 37,
+      "unique_road_nodes": 101,
+      "snap_offset_km_mean": 0.5167815640575444,
+      "snap_offset_km_max": 3.4321447339153592
+    },
+    {
+      "instance": 38,
+      "unique_road_nodes": 101,
+      "snap_offset_km_mean": 0.5474469372136348,
+      "snap_offset_km_max": 3.5228343601396266
+    },
+    {
+      "instance": 39,
+      "unique_road_nodes": 101,
+      "snap_offset_km_mean": 0.328237523620647,
+      "snap_offset_km_max": 3.1204600218598975
+    },
+    {
+      "instance": 40,
+      "unique_road_nodes": 101,
+      "snap_offset_km_mean": 0.6599764507089133,
+      "snap_offset_km_max": 3.4321447339153592
+    },
+    {
+      "instance": 41,
+      "unique_road_nodes": 101,
+      "snap_offset_km_mean": 0.35010860540734645,
+      "snap_offset_km_max": 3.5856720401384443
+    },
+    {
+      "instance": 42,
+      "unique_road_nodes": 101,
+      "snap_offset_km_mean": 0.47135925437032244,
+      "snap_offset_km_max": 3.6171228565683484
+    },
+    {
+      "instance": 43,
+      "unique_road_nodes": 101,
+      "snap_offset_km_mean": 0.5011736681852346,
+      "snap_offset_km_max": 3.4826102424803405
+    },
+    {
+      "instance": 44,
+      "unique_road_nodes": 101,
+      "snap_offset_km_mean": 0.34447685484079316,
+      "snap_offset_km_max": 2.1223864530733008
+    },
+    {
+      "instance": 45,
+      "unique_road_nodes": 101,
+      "snap_offset_km_mean": 0.43211447931277164,
+      "snap_offset_km_max": 3.0232132337853974
+    },
+    {
+      "instance": 46,
+      "unique_road_nodes": 101,
+      "snap_offset_km_mean": 0.6079456137579367,
+      "snap_offset_km_max": 3.5773574217539994
+    },
+    {
+      "instance": 47,
+      "unique_road_nodes": 101,
+      "snap_offset_km_mean": 0.43677677958145195,
+      "snap_offset_km_max": 3.544009557027583
+    },
+    {
+      "instance": 48,
+      "unique_road_nodes": 101,
+      "snap_offset_km_mean": 0.47265089536696653,
+      "snap_offset_km_max": 3.532104935919583
+    },
+    {
+      "instance": 49,
+      "unique_road_nodes": 101,
+      "snap_offset_km_mean": 0.6410408823472246,
+      "snap_offset_km_max": 3.43373934847617
+    },
+    {
+      "instance": 50,
+      "unique_road_nodes": 101,
+      "snap_offset_km_mean": 0.4898454008002777,
+      "snap_offset_km_max": 3.4321447339153592
+    },
+    {
+      "instance": 51,
+      "unique_road_nodes": 101,
+      "snap_offset_km_mean": 0.4722913570254274,
+      "snap_offset_km_max": 3.431809220937221
+    },
+    {
+      "instance": 52,
+      "unique_road_nodes": 101,
+      "snap_offset_km_mean": 0.48284354082124054,
+      "snap_offset_km_max": 3.565432311401731
+    },
+    {
+      "instance": 53,
+      "unique_road_nodes": 101,
+      "snap_offset_km_mean": 0.39360419377925304,
+      "snap_offset_km_max": 3.555129321617337
+    },
+    {
+      "instance": 54,
+      "unique_road_nodes": 101,
+      "snap_offset_km_mean": 0.41958519349779266,
+      "snap_offset_km_max": 3.5131339684232428
+    },
+    {
+      "instance": 55,
+      "unique_road_nodes": 101,
+      "snap_offset_km_mean": 0.40262846097769484,
+      "snap_offset_km_max": 3.32887071222857
+    },
+    {
+      "instance": 56,
+      "unique_road_nodes": 101,
+      "snap_offset_km_mean": 0.7133872917105231,
+      "snap_offset_km_max": 3.574544471817045
+    },
+    {
+      "instance": 57,
+      "unique_road_nodes": 101,
+      "snap_offset_km_mean": 0.5337323149138503,
+      "snap_offset_km_max": 3.431809220937221
+    },
+    {
+      "instance": 58,
+      "unique_road_nodes": 101,
+      "snap_offset_km_mean": 0.38542824289424993,
+      "snap_offset_km_max": 3.455246817956607
+    },
+    {
+      "instance": 59,
+      "unique_road_nodes": 101,
+      "snap_offset_km_mean": 0.4849549909928384,
+      "snap_offset_km_max": 3.4321447339153592
+    },
+    {
+      "instance": 60,
+      "unique_road_nodes": 101,
+      "snap_offset_km_mean": 0.4356909174888636,
+      "snap_offset_km_max": 3.431809220937221
+    },
+    {
+      "instance": 61,
+      "unique_road_nodes": 101,
+      "snap_offset_km_mean": 0.6272240965395649,
+      "snap_offset_km_max": 3.4781817953327963
+    },
+    {
+      "instance": 62,
+      "unique_road_nodes": 101,
+      "snap_offset_km_mean": 0.43870931416222236,
+      "snap_offset_km_max": 3.445722962440412
+    },
+    {
+      "instance": 63,
+      "unique_road_nodes": 101,
+      "snap_offset_km_mean": 0.49956931844455166,
+      "snap_offset_km_max": 3.435501629793107
+    },
+    {
+      "instance": 64,
+      "unique_road_nodes": 101,
+      "snap_offset_km_mean": 0.4426440001014551,
+      "snap_offset_km_max": 3.411203498680976
+    },
+    {
+      "instance": 65,
+      "unique_road_nodes": 101,
+      "snap_offset_km_mean": 0.3622884925925584,
+      "snap_offset_km_max": 3.5210337305878374
+    },
+    {
+      "instance": 66,
+      "unique_road_nodes": 101,
+      "snap_offset_km_mean": 0.42268503405232266,
+      "snap_offset_km_max": 3.2323713259107865
+    },
+    {
+      "instance": 67,
+      "unique_road_nodes": 101,
+      "snap_offset_km_mean": 0.5545825236339695,
+      "snap_offset_km_max": 3.4685648284018935
+    },
+    {
+      "instance": 68,
+      "unique_road_nodes": 101,
+      "snap_offset_km_mean": 0.497047979026464,
+      "snap_offset_km_max": 3.4456567922506416
+    },
+    {
+      "instance": 69,
+      "unique_road_nodes": 101,
+      "snap_offset_km_mean": 0.8535231107849204,
+      "snap_offset_km_max": 3.58348459312398
+    },
+    {
+      "instance": 70,
+      "unique_road_nodes": 101,
+      "snap_offset_km_mean": 0.60748451093165,
+      "snap_offset_km_max": 3.4326541105151858
+    },
+    {
+      "instance": 71,
+      "unique_road_nodes": 101,
+      "snap_offset_km_mean": 0.4360404633647232,
+      "snap_offset_km_max": 3.3943371370324353
+    },
+    {
+      "instance": 72,
+      "unique_road_nodes": 101,
+      "snap_offset_km_mean": 0.45361848532131244,
+      "snap_offset_km_max": 3.505078307199294
+    },
+    {
+      "instance": 73,
+      "unique_road_nodes": 101,
+      "snap_offset_km_mean": 0.6330509902613805,
+      "snap_offset_km_max": 3.4894099486318857
+    },
+    {
+      "instance": 74,
+      "unique_road_nodes": 101,
+      "snap_offset_km_mean": 0.7121578775221309,
+      "snap_offset_km_max": 3.4354880761467395
+    },
+    {
+      "instance": 75,
+      "unique_road_nodes": 101,
+      "snap_offset_km_mean": 0.43509951336180475,
+      "snap_offset_km_max": 3.431809220937221
+    },
+    {
+      "instance": 76,
+      "unique_road_nodes": 101,
+      "snap_offset_km_mean": 0.7133043467648773,
+      "snap_offset_km_max": 3.554362249214355
+    },
+    {
+      "instance": 77,
+      "unique_road_nodes": 101,
+      "snap_offset_km_mean": 0.34461048596626487,
+      "snap_offset_km_max": 3.447472115995611
+    },
+    {
+      "instance": 78,
+      "unique_road_nodes": 101,
+      "snap_offset_km_mean": 0.6425370301921937,
+      "snap_offset_km_max": 3.4436579301224253
+    },
+    {
+      "instance": 79,
+      "unique_road_nodes": 101,
+      "snap_offset_km_mean": 0.47286093375993804,
+      "snap_offset_km_max": 3.431809220937221
+    },
+    {
+      "instance": 80,
+      "unique_road_nodes": 101,
+      "snap_offset_km_mean": 0.6340745734872799,
+      "snap_offset_km_max": 3.5798341993098415
+    },
+    {
+      "instance": 81,
+      "unique_road_nodes": 101,
+      "snap_offset_km_mean": 0.6902314754742005,
+      "snap_offset_km_max": 3.5054140757840444
+    },
+    {
+      "instance": 82,
+      "unique_road_nodes": 101,
+      "snap_offset_km_mean": 0.27436131982670675,
+      "snap_offset_km_max": 2.7684405454646943
+    },
+    {
+      "instance": 83,
+      "unique_road_nodes": 101,
+      "snap_offset_km_mean": 0.5432573084062646,
+      "snap_offset_km_max": 3.443399047144434
+    },
+    {
+      "instance": 84,
+      "unique_road_nodes": 101,
+      "snap_offset_km_mean": 0.46339815267847867,
+      "snap_offset_km_max": 3.6131618392428786
+    },
+    {
+      "instance": 85,
+      "unique_road_nodes": 101,
+      "snap_offset_km_mean": 0.33722263273758024,
+      "snap_offset_km_max": 3.431809220937221
+    },
+    {
+      "instance": 86,
+      "unique_road_nodes": 101,
+      "snap_offset_km_mean": 0.6827769378272993,
+      "snap_offset_km_max": 3.4321447339153592
+    },
+    {
+      "instance": 87,
+      "unique_road_nodes": 101,
+      "snap_offset_km_mean": 0.8298475191769903,
+      "snap_offset_km_max": 3.5785884502608347
+    },
+    {
+      "instance": 88,
+      "unique_road_nodes": 101,
+      "snap_offset_km_mean": 0.6294438528409069,
+      "snap_offset_km_max": 3.4326541105151858
+    },
+    {
+      "instance": 89,
+      "unique_road_nodes": 101,
+      "snap_offset_km_mean": 0.602544464428834,
+      "snap_offset_km_max": 3.435501629793107
+    },
+    {
+      "instance": 90,
+      "unique_road_nodes": 101,
+      "snap_offset_km_mean": 0.4287795992894205,
+      "snap_offset_km_max": 3.4791933297249082
+    },
+    {
+      "instance": 91,
+      "unique_road_nodes": 101,
+      "snap_offset_km_mean": 0.443462448582466,
+      "snap_offset_km_max": 3.444199360418214
+    },
+    {
+      "instance": 92,
+      "unique_road_nodes": 101,
+      "snap_offset_km_mean": 0.5981571323965049,
+      "snap_offset_km_max": 3.4666445180859577
+    },
+    {
+      "instance": 93,
+      "unique_road_nodes": 101,
+      "snap_offset_km_mean": 0.3987956945304818,
+      "snap_offset_km_max": 3.3947691485513354
+    },
+    {
+      "instance": 94,
+      "unique_road_nodes": 101,
+      "snap_offset_km_mean": 0.5108234784363168,
+      "snap_offset_km_max": 3.5635928900910208
+    },
+    {
+      "instance": 95,
+      "unique_road_nodes": 101,
+      "snap_offset_km_mean": 0.3391574732520728,
+      "snap_offset_km_max": 3.431809220937221
+    },
+    {
+      "instance": 96,
+      "unique_road_nodes": 101,
+      "snap_offset_km_mean": 0.7743782892042087,
+      "snap_offset_km_max": 3.43373934847617
+    },
+    {
+      "instance": 97,
+      "unique_road_nodes": 101,
+      "snap_offset_km_mean": 0.3873225917876189,
+      "snap_offset_km_max": 3.4232878506198623
+    },
+    {
+      "instance": 98,
+      "unique_road_nodes": 101,
+      "snap_offset_km_mean": 0.42283273944347666,
+      "snap_offset_km_max": 3.4570447631085996
+    },
+    {
+      "instance": 99,
+      "unique_road_nodes": 101,
+      "snap_offset_km_mean": 0.5873585906623159,
+      "snap_offset_km_max": 3.507346455992652
+    },
+    {
+      "instance": 100,
+      "unique_road_nodes": 101,
+      "snap_offset_km_mean": 0.39049437528598535,
+      "snap_offset_km_max": 3.525249260049659
+    },
+    {
+      "instance": 101,
+      "unique_road_nodes": 101,
+      "snap_offset_km_mean": 0.647961018325675,
+      "snap_offset_km_max": 3.549091940238153
+    },
+    {
+      "instance": 102,
+      "unique_road_nodes": 101,
+      "snap_offset_km_mean": 0.42487926402518583,
+      "snap_offset_km_max": 3.576406457634927
+    },
+    {
+      "instance": 103,
+      "unique_road_nodes": 101,
+      "snap_offset_km_mean": 0.4487495776759373,
+      "snap_offset_km_max": 3.431809220937221
+    },
+    {
+      "instance": 104,
+      "unique_road_nodes": 101,
+      "snap_offset_km_mean": 0.3834400712031194,
+      "snap_offset_km_max": 3.5872825418772307
+    },
+    {
+      "instance": 105,
+      "unique_road_nodes": 101,
+      "snap_offset_km_mean": 0.4944236814289646,
+      "snap_offset_km_max": 3.5856124063844605
+    },
+    {
+      "instance": 106,
+      "unique_road_nodes": 101,
+      "snap_offset_km_mean": 0.5457035290174039,
+      "snap_offset_km_max": 3.245202003878762
+    },
+    {
+      "instance": 107,
+      "unique_road_nodes": 101,
+      "snap_offset_km_mean": 0.44482739749117767,
+      "snap_offset_km_max": 3.4833315302047683
+    },
+    {
+      "instance": 108,
+      "unique_road_nodes": 101,
+      "snap_offset_km_mean": 0.7050760229574062,
+      "snap_offset_km_max": 3.40959863458542
+    },
+    {
+      "instance": 109,
+      "unique_road_nodes": 101,
+      "snap_offset_km_mean": 0.5067447985501621,
+      "snap_offset_km_max": 3.4321447339153592
+    },
+    {
+      "instance": 110,
+      "unique_road_nodes": 101,
+      "snap_offset_km_mean": 0.5052659767352224,
+      "snap_offset_km_max": 3.4742279382949626
+    },
+    {
+      "instance": 111,
+      "unique_road_nodes": 101,
+      "snap_offset_km_mean": 0.5519724566058728,
+      "snap_offset_km_max": 3.6047187215836756
+    },
+    {
+      "instance": 112,
+      "unique_road_nodes": 101,
+      "snap_offset_km_mean": 0.7351707404158946,
+      "snap_offset_km_max": 3.486498214207083
+    },
+    {
+      "instance": 113,
+      "unique_road_nodes": 101,
+      "snap_offset_km_mean": 0.34661793726611184,
+      "snap_offset_km_max": 3.264552751253286
+    },
+    {
+      "instance": 114,
+      "unique_road_nodes": 101,
+      "snap_offset_km_mean": 0.4553905295458337,
+      "snap_offset_km_max": 3.4968229994570947
+    },
+    {
+      "instance": 115,
+      "unique_road_nodes": 101,
+      "snap_offset_km_mean": 0.669358428815411,
+      "snap_offset_km_max": 3.4534474636986325
+    },
+    {
+      "instance": 116,
+      "unique_road_nodes": 101,
+      "snap_offset_km_mean": 0.4783054749614013,
+      "snap_offset_km_max": 3.495814125175636
+    },
+    {
+      "instance": 117,
+      "unique_road_nodes": 101,
+      "snap_offset_km_mean": 0.6914154127586316,
+      "snap_offset_km_max": 3.461239316089351
+    },
+    {
+      "instance": 118,
+      "unique_road_nodes": 101,
+      "snap_offset_km_mean": 0.4554975338586619,
+      "snap_offset_km_max": 3.431809220937221
+    },
+    {
+      "instance": 119,
+      "unique_road_nodes": 101,
+      "snap_offset_km_mean": 0.517397577871893,
+      "snap_offset_km_max": 3.4183536067433775
+    },
+    {
+      "instance": 120,
+      "unique_road_nodes": 101,
+      "snap_offset_km_mean": 0.4329658979826922,
+      "snap_offset_km_max": 3.4326541105151858
+    },
+    {
+      "instance": 121,
+      "unique_road_nodes": 101,
+      "snap_offset_km_mean": 0.32510016648181683,
+      "snap_offset_km_max": 3.431809220937221
+    },
+    {
+      "instance": 122,
+      "unique_road_nodes": 101,
+      "snap_offset_km_mean": 0.3230787096056867,
+      "snap_offset_km_max": 2.3140603114399063
+    },
+    {
+      "instance": 123,
+      "unique_road_nodes": 101,
+      "snap_offset_km_mean": 0.7632171519791441,
+      "snap_offset_km_max": 3.4636701877861436
+    },
+    {
+      "instance": 124,
+      "unique_road_nodes": 101,
+      "snap_offset_km_mean": 0.38445955156017514,
+      "snap_offset_km_max": 3.431809220937221
+    },
+    {
+      "instance": 125,
+      "unique_road_nodes": 101,
+      "snap_offset_km_mean": 0.49856370557227275,
+      "snap_offset_km_max": 3.431809220937221
+    },
+    {
+      "instance": 126,
+      "unique_road_nodes": 101,
+      "snap_offset_km_mean": 0.8093454359613602,
+      "snap_offset_km_max": 3.5881956539527775
+    },
+    {
+      "instance": 127,
+      "unique_road_nodes": 101,
+      "snap_offset_km_mean": 0.5646668540817147,
+      "snap_offset_km_max": 3.6124739361943177
+    },
+    {
+      "instance": 128,
+      "unique_road_nodes": 101,
+      "snap_offset_km_mean": 0.5781131745523205,
+      "snap_offset_km_max": 3.566247697940729
+    },
+    {
+      "instance": 129,
+      "unique_road_nodes": 101,
+      "snap_offset_km_mean": 0.9123307241051039,
+      "snap_offset_km_max": 3.6232992925088294
+    },
+    {
+      "instance": 130,
+      "unique_road_nodes": 101,
+      "snap_offset_km_mean": 0.5043965084093908,
+      "snap_offset_km_max": 3.3932115923886914
+    },
+    {
+      "instance": 131,
+      "unique_road_nodes": 101,
+      "snap_offset_km_mean": 0.4837502288709776,
+      "snap_offset_km_max": 3.36040978209859
+    },
+    {
+      "instance": 132,
+      "unique_road_nodes": 101,
+      "snap_offset_km_mean": 0.584482689616678,
+      "snap_offset_km_max": 3.4321447339153592
+    },
+    {
+      "instance": 133,
+      "unique_road_nodes": 101,
+      "snap_offset_km_mean": 0.46915777365449457,
+      "snap_offset_km_max": 3.5564548724617118
+    },
+    {
+      "instance": 134,
+      "unique_road_nodes": 101,
+      "snap_offset_km_mean": 0.6328966396155872,
+      "snap_offset_km_max": 3.586693964154719
+    },
+    {
+      "instance": 135,
+      "unique_road_nodes": 101,
+      "snap_offset_km_mean": 0.5344289865657053,
+      "snap_offset_km_max": 3.4321447339153592
+    },
+    {
+      "instance": 136,
+      "unique_road_nodes": 101,
+      "snap_offset_km_mean": 0.405790318998996,
+      "snap_offset_km_max": 3.431809220937221
+    },
+    {
+      "instance": 137,
+      "unique_road_nodes": 101,
+      "snap_offset_km_mean": 0.3226488908511681,
+      "snap_offset_km_max": 3.431809220937221
+    },
+    {
+      "instance": 138,
+      "unique_road_nodes": 101,
+      "snap_offset_km_mean": 0.5373489371537629,
+      "snap_offset_km_max": 3.4112314875752783
+    },
+    {
+      "instance": 139,
+      "unique_road_nodes": 101,
+      "snap_offset_km_mean": 0.46445235685483727,
+      "snap_offset_km_max": 3.431809220937221
+    },
+    {
+      "instance": 140,
+      "unique_road_nodes": 101,
+      "snap_offset_km_mean": 0.38113690663432165,
+      "snap_offset_km_max": 2.5818313088047007
+    },
+    {
+      "instance": 141,
+      "unique_road_nodes": 101,
+      "snap_offset_km_mean": 0.5228947083561178,
+      "snap_offset_km_max": 3.43373934847617
+    },
+    {
+      "instance": 142,
+      "unique_road_nodes": 101,
+      "snap_offset_km_mean": 0.5166564793580678,
+      "snap_offset_km_max": 3.4393000892180052
+    },
+    {
+      "instance": 143,
+      "unique_road_nodes": 101,
+      "snap_offset_km_mean": 0.4858158177108262,
+      "snap_offset_km_max": 3.204612184522776
+    },
+    {
+      "instance": 144,
+      "unique_road_nodes": 101,
+      "snap_offset_km_mean": 0.6430446667213976,
+      "snap_offset_km_max": 3.543711817293849
+    },
+    {
+      "instance": 145,
+      "unique_road_nodes": 101,
+      "snap_offset_km_mean": 0.5476186453213546,
+      "snap_offset_km_max": 3.431809220937221
+    },
+    {
+      "instance": 146,
+      "unique_road_nodes": 101,
+      "snap_offset_km_mean": 0.4302527125283426,
+      "snap_offset_km_max": 3.3926464338069726
+    },
+    {
+      "instance": 147,
+      "unique_road_nodes": 101,
+      "snap_offset_km_mean": 0.5272617862195106,
+      "snap_offset_km_max": 3.092552875304686
+    },
+    {
+      "instance": 148,
+      "unique_road_nodes": 101,
+      "snap_offset_km_mean": 0.44718017919613634,
+      "snap_offset_km_max": 3.4284809647201406
+    },
+    {
+      "instance": 149,
+      "unique_road_nodes": 101,
+      "snap_offset_km_mean": 0.4821372763094963,
+      "snap_offset_km_max": 3.431809220937221
+    },
+    {
+      "instance": 150,
+      "unique_road_nodes": 101,
+      "snap_offset_km_mean": 0.4246176395196454,
+      "snap_offset_km_max": 1.7831698883159752
+    },
+    {
+      "instance": 151,
+      "unique_road_nodes": 101,
+      "snap_offset_km_mean": 0.4959307441555552,
+      "snap_offset_km_max": 3.5735552168259863
+    },
+    {
+      "instance": 152,
+      "unique_road_nodes": 101,
+      "snap_offset_km_mean": 0.38934575883304495,
+      "snap_offset_km_max": 3.5860956171673672
+    },
+    {
+      "instance": 153,
+      "unique_road_nodes": 101,
+      "snap_offset_km_mean": 0.41138505240872425,
+      "snap_offset_km_max": 3.410828705974746
+    },
+    {
+      "instance": 154,
+      "unique_road_nodes": 101,
+      "snap_offset_km_mean": 0.6103636992429482,
+      "snap_offset_km_max": 3.4321447339153592
+    },
+    {
+      "instance": 155,
+      "unique_road_nodes": 101,
+      "snap_offset_km_mean": 0.6569770232179916,
+      "snap_offset_km_max": 3.48705489186297
+    },
+    {
+      "instance": 156,
+      "unique_road_nodes": 101,
+      "snap_offset_km_mean": 0.35420484585880746,
+      "snap_offset_km_max": 2.4886986003661167
+    },
+    {
+      "instance": 157,
+      "unique_road_nodes": 101,
+      "snap_offset_km_mean": 0.47638709345653196,
+      "snap_offset_km_max": 3.431809220937221
+    },
+    {
+      "instance": 158,
+      "unique_road_nodes": 101,
+      "snap_offset_km_mean": 0.6705646011837821,
+      "snap_offset_km_max": 3.4568012361520783
+    },
+    {
+      "instance": 159,
+      "unique_road_nodes": 101,
+      "snap_offset_km_mean": 0.7112251059783988,
+      "snap_offset_km_max": 3.4321447339153592
+    },
+    {
+      "instance": 160,
+      "unique_road_nodes": 101,
+      "snap_offset_km_mean": 0.561357853694686,
+      "snap_offset_km_max": 3.4019846121028543
+    },
+    {
+      "instance": 161,
+      "unique_road_nodes": 101,
+      "snap_offset_km_mean": 0.6742178917125402,
+      "snap_offset_km_max": 3.5779164139058635
+    },
+    {
+      "instance": 162,
+      "unique_road_nodes": 101,
+      "snap_offset_km_mean": 0.4446878529794597,
+      "snap_offset_km_max": 3.547027806908135
+    },
+    {
+      "instance": 163,
+      "unique_road_nodes": 101,
+      "snap_offset_km_mean": 0.5331407285810623,
+      "snap_offset_km_max": 3.431809220937221
+    },
+    {
+      "instance": 164,
+      "unique_road_nodes": 101,
+      "snap_offset_km_mean": 0.7094691472627096,
+      "snap_offset_km_max": 3.4354880761467395
+    },
+    {
+      "instance": 165,
+      "unique_road_nodes": 101,
+      "snap_offset_km_mean": 0.4177012397837751,
+      "snap_offset_km_max": 3.4321447339153592
+    },
+    {
+      "instance": 166,
+      "unique_road_nodes": 101,
+      "snap_offset_km_mean": 0.642673000243363,
+      "snap_offset_km_max": 3.4321447339153592
+    },
+    {
+      "instance": 167,
+      "unique_road_nodes": 101,
+      "snap_offset_km_mean": 0.5282348478649551,
+      "snap_offset_km_max": 3.4569771404573824
+    },
+    {
+      "instance": 168,
+      "unique_road_nodes": 101,
+      "snap_offset_km_mean": 0.49868474467909746,
+      "snap_offset_km_max": 3.3952896241002826
+    },
+    {
+      "instance": 169,
+      "unique_road_nodes": 101,
+      "snap_offset_km_mean": 0.5684027889929417,
+      "snap_offset_km_max": 3.4326541105151858
+    },
+    {
+      "instance": 170,
+      "unique_road_nodes": 101,
+      "snap_offset_km_mean": 0.44512801047404554,
+      "snap_offset_km_max": 3.4321447339153592
+    },
+    {
+      "instance": 171,
+      "unique_road_nodes": 101,
+      "snap_offset_km_mean": 0.44206390406953516,
+      "snap_offset_km_max": 3.3932508050892984
+    },
+    {
+      "instance": 172,
+      "unique_road_nodes": 101,
+      "snap_offset_km_mean": 0.5601044818977339,
+      "snap_offset_km_max": 3.4321447339153592
+    },
+    {
+      "instance": 173,
+      "unique_road_nodes": 101,
+      "snap_offset_km_mean": 1.0080153083977612,
+      "snap_offset_km_max": 3.5574473926685926
+    },
+    {
+      "instance": 174,
+      "unique_road_nodes": 101,
+      "snap_offset_km_mean": 0.5582043794015351,
+      "snap_offset_km_max": 3.633327613391652
+    },
+    {
+      "instance": 175,
+      "unique_road_nodes": 101,
+      "snap_offset_km_mean": 0.4413311205162974,
+      "snap_offset_km_max": 2.9727374197773635
+    },
+    {
+      "instance": 176,
+      "unique_road_nodes": 101,
+      "snap_offset_km_mean": 0.5092804791734852,
+      "snap_offset_km_max": 3.474671929497165
+    },
+    {
+      "instance": 177,
+      "unique_road_nodes": 101,
+      "snap_offset_km_mean": 0.39463758669541704,
+      "snap_offset_km_max": 3.431809220937221
+    },
+    {
+      "instance": 178,
+      "unique_road_nodes": 101,
+      "snap_offset_km_mean": 0.511005558073825,
+      "snap_offset_km_max": 3.4961097911923438
+    },
+    {
+      "instance": 179,
+      "unique_road_nodes": 101,
+      "snap_offset_km_mean": 0.7746456665034189,
+      "snap_offset_km_max": 3.596411924735832
+    },
+    {
+      "instance": 180,
+      "unique_road_nodes": 101,
+      "snap_offset_km_mean": 0.8691888099655647,
+      "snap_offset_km_max": 3.6581644105159947
+    },
+    {
+      "instance": 181,
+      "unique_road_nodes": 101,
+      "snap_offset_km_mean": 0.6803485725357917,
+      "snap_offset_km_max": 3.431809220937221
+    },
+    {
+      "instance": 182,
+      "unique_road_nodes": 101,
+      "snap_offset_km_mean": 0.3233204617535155,
+      "snap_offset_km_max": 3.4326541105151858
+    },
+    {
+      "instance": 183,
+      "unique_road_nodes": 101,
+      "snap_offset_km_mean": 0.4322180982457103,
+      "snap_offset_km_max": 3.4326541105151858
+    },
+    {
+      "instance": 184,
+      "unique_road_nodes": 101,
+      "snap_offset_km_mean": 0.8055227200658879,
+      "snap_offset_km_max": 3.562009707292839
+    },
+    {
+      "instance": 185,
+      "unique_road_nodes": 101,
+      "snap_offset_km_mean": 0.5219607033189834,
+      "snap_offset_km_max": 3.6209218020436835
+    },
+    {
+      "instance": 186,
+      "unique_road_nodes": 101,
+      "snap_offset_km_mean": 0.7804919708380637,
+      "snap_offset_km_max": 3.593037761744123
+    },
+    {
+      "instance": 187,
+      "unique_road_nodes": 101,
+      "snap_offset_km_mean": 0.407956048199816,
+      "snap_offset_km_max": 3.4326541105151858
+    },
+    {
+      "instance": 188,
+      "unique_road_nodes": 101,
+      "snap_offset_km_mean": 0.647668808849298,
+      "snap_offset_km_max": 3.5204835956746563
+    },
+    {
+      "instance": 189,
+      "unique_road_nodes": 101,
+      "snap_offset_km_mean": 0.5475970770908202,
+      "snap_offset_km_max": 3.4472909151957607
+    },
+    {
+      "instance": 190,
+      "unique_road_nodes": 101,
+      "snap_offset_km_mean": 0.5996505088644867,
+      "snap_offset_km_max": 3.4354880761467395
+    },
+    {
+      "instance": 191,
+      "unique_road_nodes": 101,
+      "snap_offset_km_mean": 0.540676044156498,
+      "snap_offset_km_max": 3.445081043023925
+    },
+    {
+      "instance": 192,
+      "unique_road_nodes": 101,
+      "snap_offset_km_mean": 0.4891911184712716,
+      "snap_offset_km_max": 3.6260487292883057
+    },
+    {
+      "instance": 193,
+      "unique_road_nodes": 101,
+      "snap_offset_km_mean": 0.7185558234135601,
+      "snap_offset_km_max": 3.6193531430146098
+    },
+    {
+      "instance": 194,
+      "unique_road_nodes": 101,
+      "snap_offset_km_mean": 0.6323509506177564,
+      "snap_offset_km_max": 3.437421001955963
+    },
+    {
+      "instance": 195,
+      "unique_road_nodes": 101,
+      "snap_offset_km_mean": 0.6100102422748617,
+      "snap_offset_km_max": 3.4354880761467395
+    },
+    {
+      "instance": 196,
+      "unique_road_nodes": 101,
+      "snap_offset_km_mean": 0.5650099125517416,
+      "snap_offset_km_max": 3.4432463689222375
+    },
+    {
+      "instance": 197,
+      "unique_road_nodes": 101,
+      "snap_offset_km_mean": 0.39142046046911144,
+      "snap_offset_km_max": 3.4321447339153592
+    },
+    {
+      "instance": 198,
+      "unique_road_nodes": 101,
+      "snap_offset_km_mean": 0.5697838182339108,
+      "snap_offset_km_max": 3.5399412383050306
+    },
+    {
+      "instance": 199,
+      "unique_road_nodes": 101,
+      "snap_offset_km_mean": 0.4777165894024551,
+      "snap_offset_km_max": 3.4586610150033428
+    },
+    {
+      "instance": 200,
+      "unique_road_nodes": 101,
+      "snap_offset_km_mean": 0.4607748735150249,
+      "snap_offset_km_max": 3.435501629793107
+    },
+    {
+      "instance": 201,
+      "unique_road_nodes": 101,
+      "snap_offset_km_mean": 0.6561888947185427,
+      "snap_offset_km_max": 3.43373934847617
+    },
+    {
+      "instance": 202,
+      "unique_road_nodes": 101,
+      "snap_offset_km_mean": 0.47937443560007076,
+      "snap_offset_km_max": 3.4321447339153592
+    },
+    {
+      "instance": 203,
+      "unique_road_nodes": 101,
+      "snap_offset_km_mean": 0.482340438608348,
+      "snap_offset_km_max": 3.4326541105151858
+    },
+    {
+      "instance": 204,
+      "unique_road_nodes": 101,
+      "snap_offset_km_mean": 0.3669225651709115,
+      "snap_offset_km_max": 3.229004633454652
+    },
+    {
+      "instance": 205,
+      "unique_road_nodes": 101,
+      "snap_offset_km_mean": 0.4280261407646588,
+      "snap_offset_km_max": 3.4321447339153592
+    },
+    {
+      "instance": 206,
+      "unique_road_nodes": 101,
+      "snap_offset_km_mean": 0.46989231164110823,
+      "snap_offset_km_max": 3.621510891951515
+    },
+    {
+      "instance": 207,
+      "unique_road_nodes": 101,
+      "snap_offset_km_mean": 0.4667294467190051,
+      "snap_offset_km_max": 3.534227532989268
+    },
+    {
+      "instance": 208,
+      "unique_road_nodes": 101,
+      "snap_offset_km_mean": 0.4905665762698662,
+      "snap_offset_km_max": 3.4687009637713255
+    },
+    {
+      "instance": 209,
+      "unique_road_nodes": 101,
+      "snap_offset_km_mean": 0.39944178923041107,
+      "snap_offset_km_max": 3.4321447339153592
+    },
+    {
+      "instance": 210,
+      "unique_road_nodes": 101,
+      "snap_offset_km_mean": 0.5063418428820645,
+      "snap_offset_km_max": 3.4738736602838287
+    },
+    {
+      "instance": 211,
+      "unique_road_nodes": 101,
+      "snap_offset_km_mean": 0.6199736562265512,
+      "snap_offset_km_max": 3.619807965555024
+    },
+    {
+      "instance": 212,
+      "unique_road_nodes": 101,
+      "snap_offset_km_mean": 0.6129116114958758,
+      "snap_offset_km_max": 3.5859220273867334
+    },
+    {
+      "instance": 213,
+      "unique_road_nodes": 101,
+      "snap_offset_km_mean": 0.5088314347267983,
+      "snap_offset_km_max": 3.431809220937221
+    },
+    {
+      "instance": 214,
+      "unique_road_nodes": 101,
+      "snap_offset_km_mean": 0.3374801608308273,
+      "snap_offset_km_max": 2.8161649398096933
+    },
+    {
+      "instance": 215,
+      "unique_road_nodes": 101,
+      "snap_offset_km_mean": 0.7272486102540592,
+      "snap_offset_km_max": 3.431809220937221
+    },
+    {
+      "instance": 216,
+      "unique_road_nodes": 101,
+      "snap_offset_km_mean": 0.5120679730890879,
+      "snap_offset_km_max": 3.5412151438359505
+    },
+    {
+      "instance": 217,
+      "unique_road_nodes": 101,
+      "snap_offset_km_mean": 0.5697569438573558,
+      "snap_offset_km_max": 3.5652747785839556
+    },
+    {
+      "instance": 218,
+      "unique_road_nodes": 101,
+      "snap_offset_km_mean": 0.8094874279145652,
+      "snap_offset_km_max": 3.62755056431142
+    },
+    {
+      "instance": 219,
+      "unique_road_nodes": 101,
+      "snap_offset_km_mean": 0.4234414245993789,
+      "snap_offset_km_max": 3.5601714752560385
+    },
+    {
+      "instance": 220,
+      "unique_road_nodes": 101,
+      "snap_offset_km_mean": 0.5585193940186458,
+      "snap_offset_km_max": 3.493569802947644
+    },
+    {
+      "instance": 221,
+      "unique_road_nodes": 101,
+      "snap_offset_km_mean": 0.4927153218720149,
+      "snap_offset_km_max": 3.4893497591605818
+    },
+    {
+      "instance": 222,
+      "unique_road_nodes": 101,
+      "snap_offset_km_mean": 0.42537875380651974,
+      "snap_offset_km_max": 3.618605727577223
+    },
+    {
+      "instance": 223,
+      "unique_road_nodes": 101,
+      "snap_offset_km_mean": 0.6993179527131957,
+      "snap_offset_km_max": 3.409964974107315
+    },
+    {
+      "instance": 224,
+      "unique_road_nodes": 101,
+      "snap_offset_km_mean": 0.3972585279541002,
+      "snap_offset_km_max": 3.4788769865994253
+    },
+    {
+      "instance": 225,
+      "unique_road_nodes": 101,
+      "snap_offset_km_mean": 0.8842745945397389,
+      "snap_offset_km_max": 3.5794367300095655
+    },
+    {
+      "instance": 226,
+      "unique_road_nodes": 101,
+      "snap_offset_km_mean": 0.3951243867553011,
+      "snap_offset_km_max": 3.417548757215696
+    },
+    {
+      "instance": 227,
+      "unique_road_nodes": 101,
+      "snap_offset_km_mean": 0.4422710018053833,
+      "snap_offset_km_max": 3.4321447339153592
+    },
+    {
+      "instance": 228,
+      "unique_road_nodes": 101,
+      "snap_offset_km_mean": 0.4241992590754619,
+      "snap_offset_km_max": 3.5487032429642493
+    },
+    {
+      "instance": 229,
+      "unique_road_nodes": 101,
+      "snap_offset_km_mean": 0.6617826659562319,
+      "snap_offset_km_max": 3.5907436844444973
+    },
+    {
+      "instance": 230,
+      "unique_road_nodes": 101,
+      "snap_offset_km_mean": 0.5495793774463729,
+      "snap_offset_km_max": 3.3977256477197546
+    },
+    {
+      "instance": 231,
+      "unique_road_nodes": 101,
+      "snap_offset_km_mean": 0.7753677557655212,
+      "snap_offset_km_max": 3.530396414541642
+    },
+    {
+      "instance": 232,
+      "unique_road_nodes": 101,
+      "snap_offset_km_mean": 0.48247191517918525,
+      "snap_offset_km_max": 3.4572834558015813
+    },
+    {
+      "instance": 233,
+      "unique_road_nodes": 101,
+      "snap_offset_km_mean": 0.43039480392992785,
+      "snap_offset_km_max": 3.4326541105151858
+    },
+    {
+      "instance": 234,
+      "unique_road_nodes": 101,
+      "snap_offset_km_mean": 0.5504355572535371,
+      "snap_offset_km_max": 3.43373934847617
+    },
+    {
+      "instance": 235,
+      "unique_road_nodes": 101,
+      "snap_offset_km_mean": 0.810309793733389,
+      "snap_offset_km_max": 3.631420244226315
+    },
+    {
+      "instance": 236,
+      "unique_road_nodes": 101,
+      "snap_offset_km_mean": 0.7725332515743699,
+      "snap_offset_km_max": 3.587054053812025
+    },
+    {
+      "instance": 237,
+      "unique_road_nodes": 101,
+      "snap_offset_km_mean": 0.5222614058332197,
+      "snap_offset_km_max": 3.443563108607997
+    },
+    {
+      "instance": 238,
+      "unique_road_nodes": 101,
+      "snap_offset_km_mean": 0.618421749282048,
+      "snap_offset_km_max": 3.4361412279708774
+    },
+    {
+      "instance": 239,
+      "unique_road_nodes": 101,
+      "snap_offset_km_mean": 0.5497437713185913,
+      "snap_offset_km_max": 3.431809220937221
+    },
+    {
+      "instance": 240,
+      "unique_road_nodes": 101,
+      "snap_offset_km_mean": 0.39014277958205673,
+      "snap_offset_km_max": 2.3475227712558646
+    },
+    {
+      "instance": 241,
+      "unique_road_nodes": 101,
+      "snap_offset_km_mean": 0.4320622282555722,
+      "snap_offset_km_max": 3.3935832175208707
+    },
+    {
+      "instance": 242,
+      "unique_road_nodes": 101,
+      "snap_offset_km_mean": 0.3545842280327065,
+      "snap_offset_km_max": 3.408767870706497
+    },
+    {
+      "instance": 243,
+      "unique_road_nodes": 101,
+      "snap_offset_km_mean": 0.4243495058819409,
+      "snap_offset_km_max": 2.435278236040638
+    },
+    {
+      "instance": 244,
+      "unique_road_nodes": 101,
+      "snap_offset_km_mean": 0.5925870186615833,
+      "snap_offset_km_max": 3.4506409134724065
+    },
+    {
+      "instance": 245,
+      "unique_road_nodes": 101,
+      "snap_offset_km_mean": 0.4793193913135052,
+      "snap_offset_km_max": 3.606069054082446
+    },
+    {
+      "instance": 246,
+      "unique_road_nodes": 101,
+      "snap_offset_km_mean": 0.4377521315566877,
+      "snap_offset_km_max": 3.4321447339153592
+    },
+    {
+      "instance": 247,
+      "unique_road_nodes": 101,
+      "snap_offset_km_mean": 0.4043809287857525,
+      "snap_offset_km_max": 3.132405671557367
+    },
+    {
+      "instance": 248,
+      "unique_road_nodes": 101,
+      "snap_offset_km_mean": 0.8602793910535408,
+      "snap_offset_km_max": 3.562834163244931
+    },
+    {
+      "instance": 249,
+      "unique_road_nodes": 101,
+      "snap_offset_km_mean": 0.508573612857859,
+      "snap_offset_km_max": 3.4321447339153592
+    },
+    {
+      "instance": 250,
+      "unique_road_nodes": 101,
+      "snap_offset_km_mean": 0.5834384597994013,
+      "snap_offset_km_max": 3.4468448431685035
+    },
+    {
+      "instance": 251,
+      "unique_road_nodes": 101,
+      "snap_offset_km_mean": 0.5246003695161496,
+      "snap_offset_km_max": 3.538945113167241
+    },
+    {
+      "instance": 252,
+      "unique_road_nodes": 101,
+      "snap_offset_km_mean": 0.45058756992537713,
+      "snap_offset_km_max": 3.4326541105151858
+    },
+    {
+      "instance": 253,
+      "unique_road_nodes": 101,
+      "snap_offset_km_mean": 0.4705087781679638,
+      "snap_offset_km_max": 3.460314718932681
+    },
+    {
+      "instance": 254,
+      "unique_road_nodes": 101,
+      "snap_offset_km_mean": 0.3538991278295711,
+      "snap_offset_km_max": 3.4326541105151858
+    },
+    {
+      "instance": 255,
+      "unique_road_nodes": 101,
+      "snap_offset_km_mean": 0.5850957329978792,
+      "snap_offset_km_max": 3.503696049877002
+    }
+  ]
+}

@@ -1,0 +1,51 @@
+{
+  "protocol": {
+    "status": "completed",
+    "scope": "road-matrix fine-tuning diagnostic; no formal P1 test exposure",
+    "pool_sha256": "e2df109fd658b70593b0a7dcaa73095b5197894842e626b35077494d927cf742",
+    "pool_seed": 2026111303,
+    "formal_test_sha256_excluded": "fb062d7696da02dabf56f5d93f9efbe74db75dff61ec05aa6151dc558b708b98",
+    "initial_checkpoint_sha256": "116e9b67cdd8cc5c1464d54b466693ddbfe7f4475625ca4350744201be8125f1",
+    "training_indices": [
+      0,
+      1,
+      2
+    ],
+    "validation_indices": [
+      3
+    ],
+    "epochs": 1,
+    "batch_size": 1,
+    "learning_rate": 1e-06,
+    "reinforce_baseline": "self_critical",
+    "gradient_clip": 1.0,
+    "seed": 20261113,
+    "max_minutes": 5.0,
+    "state_kwargs": {
+      "max_concurrent_open_orders": 6,
+      "min_orders_per_dispatch": 4,
+      "enable_delivery_viability": true,
+      "enable_viability_fallback": false,
+      "relax_pickup_commitment_trip_time": false
+    },
+    "completed_epochs": 1
+  },
+  "epochs": [
+    {
+      "epoch": 1,
+      "train_mean_cost": 10927.6513671875,
+      "train_mean_loss": 40048.471354166664,
+      "train_mean_gradient_norm_before_clip": 8044811.583333333,
+      "validation": {
+        "instances": 1,
+        "mean_cost": 5753.583984375,
+        "mean_completed": 40.0,
+        "service_rate_percent": 80.0,
+        "hard_invalid": 0,
+        "forced_underfilled_declines": 3,
+        "decode_seconds": 0.22117783400017288
+      }
+    }
+  ],
+  "status": "completed"
+}

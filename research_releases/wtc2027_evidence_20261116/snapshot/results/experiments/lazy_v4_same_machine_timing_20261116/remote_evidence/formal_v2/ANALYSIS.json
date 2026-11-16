@@ -1,0 +1,142 @@
+{
+  "status": "passed",
+  "scope": "same-node latency only; full 100-instance reports remain the quality evidence",
+  "environment": {
+    "platform": "Linux-5.15.0-94-generic-x86_64-with-glibc2.35",
+    "processor": "x86_64",
+    "logical_cpu_count": 128,
+    "python": "3.12.3 | packaged by Anaconda, Inc. | (main, May  6 2024, 19:46:43) [GCC 11.2.0]",
+    "torch": "2.8.0+cu128",
+    "cuda_runtime": "12.8",
+    "cuda_available": true,
+    "gpu": "NVIDIA GeForce RTX 4090 D",
+    "nvidia_smi": "NVIDIA GeForce RTX 4090 D, 595.71.05, 24564 MiB",
+    "torch_num_threads": 1
+  },
+  "selected_indices": [
+    0,
+    1,
+    4,
+    24,
+    26,
+    27,
+    28,
+    31,
+    32,
+    41,
+    43,
+    45,
+    46,
+    51,
+    55,
+    64,
+    66,
+    71,
+    72,
+    73,
+    76,
+    77,
+    80,
+    81,
+    82,
+    85,
+    86,
+    89,
+    91,
+    94
+  ],
+  "methods": {
+    "neural_by_seed": {
+      "314159": {
+        "n": 30,
+        "mean_seconds": 9.506047569494694,
+        "median_seconds": 9.41276457393542,
+        "p95_seconds": 10.896761140599846,
+        "min_seconds": 8.15052046906203,
+        "max_seconds": 14.240949185565114
+      },
+      "271828": {
+        "n": 30,
+        "mean_seconds": 8.660906397923828,
+        "median_seconds": 8.567719308659434,
+        "p95_seconds": 9.77136483765207,
+        "min_seconds": 7.368703684769571,
+        "max_seconds": 10.53645610716194
+      },
+      "161803": {
+        "n": 30,
+        "mean_seconds": 9.38336452630659,
+        "median_seconds": 9.144666224718094,
+        "p95_seconds": 11.301329106185584,
+        "min_seconds": 7.463856858201325,
+        "max_seconds": 13.132232997566462
+      }
+    },
+    "neural_seed_averaged": {
+      "n": 30,
+      "mean_seconds": 9.18343949790837,
+      "median_seconds": 9.103732378532488,
+      "p95_seconds": 10.213014592990898,
+      "min_seconds": 7.798207923769951,
+      "max_seconds": 12.190884586113194
+    },
+    "strict_insertion": {
+      "n": 30,
+      "mean_seconds": 53.888253316810975,
+      "median_seconds": 53.766200301703066,
+      "p95_seconds": 56.740196051076055,
+      "min_seconds": 48.4882454527542,
+      "max_seconds": 57.81814870145172
+    },
+    "neural_plus_0.5s_lns_derived": {
+      "n": 30,
+      "mean_seconds": 9.68343949790837,
+      "median_seconds": 9.603732378532488,
+      "p95_seconds": 10.713014592990898,
+      "min_seconds": 8.29820792376995,
+      "max_seconds": 12.690884586113194
+    },
+    "insertion_plus_0.5s_lns_derived": {
+      "n": 30,
+      "mean_seconds": 54.388253316810975,
+      "median_seconds": 54.266200301703066,
+      "p95_seconds": 57.240196051076055,
+      "min_seconds": 48.9882454527542,
+      "max_seconds": 58.31814870145172
+    },
+    "insertion_plus_10s_lns_derived": {
+      "n": 30,
+      "mean_seconds": 63.888253316810975,
+      "median_seconds": 63.766200301703066,
+      "p95_seconds": 66.74019605107605,
+      "min_seconds": 58.4882454527542,
+      "max_seconds": 67.81814870145172
+    }
+  },
+  "paired_bootstrap": {
+    "replicates": 20000,
+    "seed": 20261116,
+    "insertion_minus_neural_mean_seconds_95pct_ci": [
+      44.03861374581155,
+      45.38668417399077
+    ],
+    "insertion_over_neural_ratio_of_means_95pct_ci": [
+      5.680817085391941,
+      6.043818932510867
+    ],
+    "insertion_short_over_neural_short_ratio_of_means_95pct_ci": [
+      5.44615656738125,
+      5.776705140264375
+    ],
+    "strong_pipeline_over_neural_short_ratio_of_means_95pct_ci": [
+      6.3980158701099,
+      6.783424786435892
+    ]
+  },
+  "point_ratios": {
+    "insertion_over_neural": 5.86798152577633,
+    "insertion_short_over_neural_short": 5.6166255108589125,
+    "strong_pipeline_over_neural_short": 6.597681880556065
+  },
+  "claim_boundary": "time ratios are hardware-specific; report hardware and natural compute resources. The timing subset cannot replace the full 100-instance quality comparison."
+}

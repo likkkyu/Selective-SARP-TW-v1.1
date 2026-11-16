@@ -1,0 +1,30 @@
+{
+  "status": "frozen_before_results",
+  "scope": "three unchanged learned-policy training seeds; coordinate-based neural construction followed by pre-execution primary road_fixed25 repair and matched 0.5-second LNS",
+  "road_cases_sha256": "fb062d7696da02dabf56f5d93f9efbe74db75dff61ec05aa6151dc558b708b98",
+  "models": [
+    {
+      "seed": 1234,
+      "policy": "learned",
+      "checkpoint": "/Users/likeyu/Downloads/project-vrp-v6-4-main/artifacts/ablation_final_20261103/raw/pair1234/formal_learned_1234/outputs/pomo_n50_optimized/model_best.pt",
+      "sha256": "116e9b67cdd8cc5c1464d54b466693ddbfe7f4475625ca4350744201be8125f1"
+    },
+    {
+      "seed": 4321,
+      "policy": "learned",
+      "checkpoint": "/Users/likeyu/Downloads/project-vrp-v6-4-main/artifacts/ablation_final_20261103/raw/remaining/formal_learned_4321/outputs/pomo_n50_optimized/model_best.pt",
+      "sha256": "a87c248c4fd4b9933c690da4c3edbd1bd9208822e5ca101da04091b99e075a01"
+    },
+    {
+      "seed": 8765,
+      "policy": "learned",
+      "checkpoint": "/Users/likeyu/Downloads/project-vrp-v6-4-main/artifacts/ablation_final_20261103/raw/remaining/formal_learned_8765/outputs/pomo_n50_optimized/model_best.pt",
+      "sha256": "99f83d2410aa6c305796cc3b712bbc8c60050a24c3a39ea8eb9464948e1b1472"
+    }
+  ],
+  "repair_timeout_seconds_per_case": 5.0,
+  "lns_seconds": 0.5,
+  "search_seed": 1234,
+  "hard_minimum": 4,
+  "interpretation_guard": "Not a road-matrix-aware neural policy and not retraining. Rejected requests are declined before execution; invalid provisional road routes are never executed."
+}

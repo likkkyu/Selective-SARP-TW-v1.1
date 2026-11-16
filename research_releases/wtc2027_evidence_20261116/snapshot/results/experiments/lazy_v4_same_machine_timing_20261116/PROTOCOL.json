@@ -1,0 +1,52 @@
+{
+  "status": "frozen_before_same_machine_timing",
+  "created_utc": "2026-11-16T04:55:00Z",
+  "purpose": "publication-grade same-node wall-clock comparison without retraining or reopening model selection",
+  "quality_evidence_source": "the closed 100-instance neural, insertion and LNS reports remain authoritative for solution quality",
+  "graph_size": 100,
+  "final_dataset_seed": 2026111901,
+  "selection": {
+    "method": "sorted simple random sample without replacement from indices 0..99",
+    "selection_seed": 20261116,
+    "selected_indices": [0, 1, 4, 24, 26, 27, 28, 31, 32, 41, 43, 45, 46, 51, 55, 64, 66, 71, 72, 73, 76, 77, 80, 81, 82, 85, 86, 89, 91, 94],
+    "selected_before_any_same_machine_timing_outcome": true
+  },
+  "warmup": {
+    "dataset_seed": 2026111501,
+    "instances_per_method": 3,
+    "excluded_from_statistics": true
+  },
+  "neural_seeds": [314159, 271828, 161803],
+  "checkpoint_sha256": {
+    "314159": "55944fc4853f5d957a7bd47fe127cba2cf669675535fc4af8112b9c34a0fc188",
+    "271828": "170ca0f3268ce8915c1cdf0bb2a9061143078d627fbbeb9c1eb767d30368ffd1",
+    "161803": "085ec780623a092b4b1088e974eac66a50adda430e5daf8717a71716c0fdc9ea"
+  },
+  "frozen_report_sha256": {
+    "neural_314159": "6fba9a685faec8be302f09670f76ea3c749186bc0652e3497accf7b74fe34893",
+    "neural_271828": "941315f217ccff2da55eb5b2988c3eca608677ebda385599a6fe0eba49fb22ee",
+    "neural_161803": "60c032c9e953c1cbfea89764939386126f3e0892f2e8d3d6b093113101ec7334",
+    "strict_insertion": "e00f73d7f37b22bef1d9f5b6a335f8bf6f991ce08cec323a433bcd1908c7d3a6"
+  },
+  "methods": {
+    "neural_constructor": "batch size 1, greedy decoding, CUDA synchronization immediately before and after each timed forward pass",
+    "strict_insertion": "deterministic constructor on one CPU thread",
+    "neural_plus_short_lns": "derived as measured neural construction plus the predeclared 0.5-second LNS budget; quality remains from the full paired confirmation",
+    "insertion_plus_short_lns": "derived as measured insertion construction plus the same 0.5-second LNS budget",
+    "strong_lns": "derived as measured insertion construction plus the predeclared 10-second LNS budget"
+  },
+  "lns_search_seed": 1234,
+  "cpu_threads": 1,
+  "timing_clock": "time.monotonic/perf_counter wall clock",
+  "identity_gate": "every selected neural and insertion action sequence must match the corresponding frozen 100-instance report hash before its timing record is accepted",
+  "environment_record": ["CPU model", "logical and physical cores", "RAM", "GPU model", "driver", "CUDA", "PyTorch", "power state if available"],
+  "statistics": {
+    "experimental_unit": "selected N100 instance; neural training seeds retained separately and also averaged within instance",
+    "summaries": ["mean", "median", "p95", "paired-instance bootstrap 95% CI"],
+    "bootstrap_seed": 20261116,
+    "bootstrap_replicates": 20000
+  },
+  "claim_boundary": "time ratios are hardware-specific; report hardware and natural compute resources. The timing subset cannot replace the full 100-instance quality comparison.",
+  "total_timeout_seconds": 7200,
+  "stopping_rule": "all selected instances and methods or fail closed; no timing- or outcome-based exclusions"
+}

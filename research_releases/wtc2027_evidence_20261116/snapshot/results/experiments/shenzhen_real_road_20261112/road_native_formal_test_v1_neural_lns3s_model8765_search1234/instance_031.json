@@ -1,0 +1,167 @@
+{
+  "test_index": 31,
+  "neural": {
+    "cost": {
+      "objective": 1728.967431508316,
+      "raw_cost": 1995.0505900717758,
+      "energy": 88.86449105630136,
+      "distance": 489.61700987815857,
+      "passenger_delay_cost": 0.0,
+      "cargo_delay_cost": 1.1860990154743731,
+      "vehicle_cost": 180.0,
+      "reject_penalty": 1725.0,
+      "completed": 47,
+      "vehicles": 9
+    },
+    "audit": {
+      "valid": true,
+      "violations": [],
+      "completed": 47,
+      "vehicles": 9,
+      "minimum_completed_per_trip": 4
+    },
+    "seconds": 0.2262153749979916,
+    "forced_underfilled_declines": 0,
+    "routes": [
+      [
+        4,
+        9,
+        14,
+        54,
+        49,
+        64,
+        38,
+        24,
+        88,
+        74,
+        99,
+        59
+      ],
+      [
+        6,
+        28,
+        56,
+        29,
+        78,
+        19,
+        48,
+        69,
+        98,
+        79
+      ],
+      [
+        23,
+        2,
+        73,
+        45,
+        52,
+        42,
+        35,
+        95,
+        92,
+        85
+      ],
+      [
+        36,
+        40,
+        86,
+        1,
+        90,
+        15,
+        51,
+        11,
+        65,
+        61
+      ],
+      [
+        7,
+        8,
+        25,
+        57,
+        46,
+        34,
+        75,
+        58,
+        96,
+        84,
+        27,
+        32,
+        77,
+        82
+      ],
+      [
+        12,
+        47,
+        62,
+        97,
+        22,
+        72,
+        31,
+        13,
+        63,
+        81
+      ],
+      [
+        50,
+        17,
+        100,
+        67,
+        18,
+        68,
+        44,
+        94
+      ],
+      [
+        26,
+        21,
+        16,
+        37,
+        76,
+        71,
+        66,
+        30,
+        39,
+        80,
+        89,
+        87
+      ],
+      [
+        33,
+        10,
+        83,
+        41,
+        5,
+        60,
+        55,
+        91
+      ]
+    ]
+  },
+  "neural_lns": {
+    "cost": {
+      "objective": 3.7748549720960236,
+      "raw_cost": 256.47620553947075,
+      "energy": 76.43838669947367,
+      "distance": 421.7633373141289,
+      "passenger_delay_cost": 0.0,
+      "cargo_delay_cost": 0.03781883999708384,
+      "vehicle_cost": 180.0,
+      "reject_penalty": 0.0,
+      "completed": 50,
+      "vehicles": 9
+    },
+    "audit": {
+      "valid": true,
+      "violations": [],
+      "completed": 50,
+      "vehicles": 9,
+      "minimum_completed_per_trip": 4
+    },
+    "search_seconds": 3.0000209999998333,
+    "search_wall_seconds": 3.0000465839984827,
+    "integrated_seconds": 3.2262619589964743,
+    "iterations": 64,
+    "partial_last_iteration_discarded": true,
+    "route_evaluations": 348055
+  }
+}
