@@ -1,8 +1,8 @@
 {
   "status": "passed_current_19_reference_metadata_and_semantic_placement",
-  "audit_date": "2026-11-16",
+  "audit_date": "2026-11-17",
   "manuscript": "wtc2027_zh/论文正文.md",
-  "manuscript_sha256": "9d81f94451b2149e4dc7058037150255d8ef9b9a1642fb2ac28f3284b0c04199",
+  "manuscript_sha256": "17aa8b822271419e8572e49e2ad9d040ca69bbe9c4c54ae636eb0435216f7496",
   "scope": "Bibliographic metadata, continuous citation coverage, and local claim-to-source semantic support; not independent replication of cited studies",
   "reference_count": 19,
   "all_references_cited": true,

@@ -1,11 +1,11 @@
 {
-  "status": "published_git_snapshot",
-  "created_utc": "2026-11-16T13:55:53.272524+00:00",
+  "status": "local_candidate_not_published",
+  "created_utc": "2026-11-16T18:29:34.607735+00:00",
   "scope": "Code and result evidence for N100 and Shenzhen road-network validation; manuscript and all tensor/checkpoint files excluded",
   "source_git_head": "477897ca5fa1177930d4ca68a1acd81eda14ffeb",
   "source_worktree_note": "candidate includes explicitly hashed frozen source bytes and may be built from a dirty working tree",
   "previous_public_release_commit": "1505564a9fc06cf226d56eae30484adfc7b42574",
-  "manuscript_sha256": "9d81f94451b2149e4dc7058037150255d8ef9b9a1642fb2ac28f3284b0c04199",
+  "manuscript_sha256": "17aa8b822271419e8572e49e2ad9d040ca69bbe9c4c54ae636eb0435216f7496",
   "files": [
     {
       "path": "snapshot/frozen_code/experiments/dispatch_clock_fix_20261106/baseline_smoke.py",
@@ -719,13 +719,13 @@
     },
     {
       "path": "snapshot/reproducibility/wtc2027_zh/reproducibility_20261107/inventory.json",
-      "bytes": 106939,
-      "sha256": "8d1b283f79761563a232f096fe4fdd2b2122d33955d5691c565697cdc013e7a9"
+      "bytes": 108900,
+      "sha256": "59bfda29d3375cca4ba0d352be356a2fa3397cbdc79a8c7c47ba216f9c15db76"
     },
     {
       "path": "snapshot/reproducibility/wtc2027_zh/reproducibility_20261107/n100_claim_audit.json",
       "bytes": 4925,
-      "sha256": "fe30c578ded518d43031121cbb794ecff94b6f1cfd89c523f57f93bb81726ee1"
+      "sha256": "58f3b1f32b7ec1f286ad8a9869a1f14b2a2877e03083f5485fd5810fc92dae37"
     },
     {
       "path": "snapshot/reproducibility/wtc2027_zh/reproducibility_20261107/verify_n100_claims.py",
@@ -734,18 +734,18 @@
     },
     {
       "path": "snapshot/reproducibility/wtc2027_zh/review_20261116/QA_STATUS.json",
-      "bytes": 1652,
-      "sha256": "7242300e2b00a0c121e70e6d49bb97a4be788c64bda0503920ee9f6c5ec553e3"
+      "bytes": 1725,
+      "sha256": "487bcfa1000965a0d107c868da26c98b165ad1389db2e4b6aa446811002701bb"
     },
     {
       "path": "snapshot/reproducibility/wtc2027_zh/review_20261116/REFERENCE_VERIFICATION.json",
       "bytes": 4368,
-      "sha256": "a7da9b3133b821406d9ec83f6880be3bb0e4961461bb0091aec2f574edcd4a08"
+      "sha256": "7eb407f62f6f8bba68b72122e88b370326013a559e329d898a12f11912f45c1d"
     },
     {
       "path": "snapshot/reproducibility/wtc2027_zh/review_20261116/REFERENCE_VERIFICATION.md",
       "bytes": 5476,
-      "sha256": "dda5a16ab878f5e214529913e88d753fdf44b9c79da77f26d8d18360f59fa0fc"
+      "sha256": "83da3c6f9079c1e1a7ec90dc06886177341cf2da188b1f6b08c60b58ffd8b4c7"
     },
     {
       "path": "snapshot/results/experiments/lazy_v4_hybrid_confirmation_20261116/PAIRED_ANALYSIS.json",
@@ -4336,6 +4336,24 @@
       "bytes": 33364827
     },
     {
+      "policy": "learned_transfer",
+      "training_seed": 314159,
+      "sha256": "55944fc4853f5d957a7bd47fe127cba2cf669675535fc4af8112b9c34a0fc188",
+      "bytes": 33365723
+    },
+    {
+      "policy": "learned_transfer",
+      "training_seed": 271828,
+      "sha256": "170ca0f3268ce8915c1cdf0bb2a9061143078d627fbbeb9c1eb767d30368ffd1",
+      "bytes": 33365723
+    },
+    {
+      "policy": "learned_transfer",
+      "training_seed": 161803,
+      "sha256": "085ec780623a092b4b1088e974eac66a50adda430e5daf8717a71716c0fdc9ea",
+      "bytes": 33365723
+    },
+    {
       "initial_model_seed": 1234,
       "training_seed": 20261115,
       "checkpoint": "experiments/shenzhen_real_road_20261112/road_native_formal_n512_seed1234_v1/best.pt",
@@ -4414,8 +4432,5 @@
     "osm_derived_data": "ODbL; see ODBL_ATTRIBUTION.md",
     "model_weights": "not distributed and no reuse licence asserted"
   },
-  "boundary": "A public Git snapshot supplies code and result evidence, but is not an archival DOI, independent reproduction, field trial, model-weight release, or solver-optimality certificate.",
-  "public_candidate_commit_read_back": "752dbe53f93daf9558f16efbf7ce2b0f514dd863",
-  "public_branch": "codex/wtc-n100-road-release-20261116",
-  "publication_verification": "The candidate commit was pushed and its branch ref was read back with an exact SHA match before this finalization commit."
+  "boundary": "A local hash-audited candidate is not a public GitHub release, archival DOI, independent reproduction, field trial, or solver-optimality certificate."
 }

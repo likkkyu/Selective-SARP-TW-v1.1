@@ -36,4 +36,4 @@ The verifier checks every manifest member, rejects unlisted files inside `snapsh
 
 Project code retains the repository's existing licence notice. OpenStreetMap-derived road data are separately attributed in `ODBL_ATTRIBUTION.md` and remain subject to the Open Database License. No observed passenger records or private location traces are included.
 
-This snapshot is published on branch `codex/wtc-n100-road-release-20261116`. The first public candidate commit `752dbe53f93daf9558f16efbf7ce2b0f514dd863` was read back before the publication-status finalization commit. Use a fixed commit URL rather than the moving branch name when citing the evidence.
+This directory is a **local candidate until a Git commit is created and read back from GitHub**. Do not cite it by the local directory name as a public release.

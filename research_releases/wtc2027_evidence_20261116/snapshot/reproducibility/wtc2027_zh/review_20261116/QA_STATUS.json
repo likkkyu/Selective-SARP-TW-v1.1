@@ -1,13 +1,13 @@
 {
   "status": "passed",
-  "review_date": "2026-11-16",
-  "scope": "Current WTC Chinese working draft after addition of the 30-instance N100 SCIP alignment and Shenzhen real-road external-validation paragraph",
+  "review_date": "2026-11-17",
+  "scope": "Current WTC Chinese working draft after fixed-commit synchronization and nine-checkpoint availability correction",
   "source_path": "wtc2027_zh/论文正文.md",
-  "source_sha256": "9d81f94451b2149e4dc7058037150255d8ef9b9a1642fb2ac28f3284b0c04199",
+  "source_sha256": "17aa8b822271419e8572e49e2ad9d040ca69bbe9c4c54ae636eb0435216f7496",
   "docx_path": "wtc2027_zh/WTC2027_客货协同调度_中文工作稿.docx",
-  "docx_sha256": "03f3e3515c1ab57cf36a5c5aa1e4732fac2edc2ded6b75079fdf372bf050bf15",
+  "docx_sha256": "088b1a09704a93303fd53fe04207b1bdcfa25209126c20d51455b3553821dabe",
   "rendered_pdf_path": "wtc2027_zh/review_20261116/render/WTC2027_客货协同调度_中文工作稿.pdf",
-  "rendered_pdf_sha256": "604afff85fbbf8695a0f543f88656330048fe3ed9dcabb6f61a5eaf97e693eaf",
+  "rendered_pdf_sha256": "93714d12e5d2695868aae704e7aa6e813f4508f58b4981ea43f09e05f81878a9",
   "pages": 8,
   "complete_visual_review": true,
   "pages_reviewed": [1, 2, 3, 4, 5, 6, 7, 8],
@@ -19,7 +19,9 @@
     "new_alignment_paragraph_placement": "passed",
     "real_road_section_placement": "passed",
     "reference_19_and_osm_attribution": "passed",
-    "reference_page_legibility": "passed"
+    "reference_page_legibility": "passed",
+    "fixed_public_release_commit": "passed",
+    "nine_checkpoint_availability_statement": "passed"
   },
   "known_non_defects": [
     "Author, affiliation, funding and corresponding-author fields remain intentionally blank pending author input.",

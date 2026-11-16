@@ -1,6 +1,6 @@
 {
   "status": "complete_local_inventory",
-  "created_utc": "2026-11-16T13:49:58Z",
+  "created_utc": "2026-11-16T18:27:21Z",
   "target": "WTC2027 Chinese conference manuscript; availability appendix prepared as reproducibility material, not a claim that Nature-specific policy is mandatory",
   "studies": [
     {
@@ -1691,7 +1691,7 @@
     {
       "logical_path": "experiments/mip_scip_20261106/scip_selective.py",
       "sha256": "9cb731b5acd21a2aa0e1fbed9088222e89eba5cf8b22bfae83555c9d16307fa0",
-      "resolved_path": "thesis_research_20261107/dynamic_perfect_information_cap1_resolution_v1/source_snapshot/experiments/mip_scip_20261106/scip_selective.py",
+      "resolved_path": "research_releases/wtc2027_evidence_20261116/snapshot/frozen_code/experiments/mip_scip_20261106/scip_selective.py",
       "current_path_matches": false
     },
     {
@@ -1811,58 +1811,94 @@
   ],
   "checkpoints": [
     {
+      "scale": "N50",
       "policy": "learned",
       "training_seed": 1234,
       "path": "artifacts/ablation_final_20261103/raw/pair1234/formal_learned_1234/outputs/pomo_n50_optimized/model_best.pt",
       "bytes": 33364827,
       "sha256": "116e9b67cdd8cc5c1464d54b466693ddbfe7f4475625ca4350744201be8125f1",
       "hash_validation": "fresh final inventory",
-      "access_status": "local file; public model record not verified"
+      "access_status": "local file; checkpoint bytes not publicly released"
     },
     {
+      "scale": "N50",
       "policy": "service_first",
       "training_seed": 1234,
       "path": "artifacts/ablation_final_20261103/raw/pair1234/formal_service_first_1234/outputs/pomo_n50_optimized/model_best.pt",
       "bytes": 33364827,
       "sha256": "39e5f97dc9038b75eab258d5a92a3c75082e2a6dbf869205250e5d5f5b588701",
       "hash_validation": "fresh final inventory",
-      "access_status": "local file; public model record not verified"
+      "access_status": "local file; checkpoint bytes not publicly released"
     },
     {
+      "scale": "N50",
       "policy": "learned",
       "training_seed": 4321,
       "path": "artifacts/ablation_final_20261103/raw/remaining/formal_learned_4321/outputs/pomo_n50_optimized/model_best.pt",
       "bytes": 33364827,
       "sha256": "a87c248c4fd4b9933c690da4c3edbd1bd9208822e5ca101da04091b99e075a01",
       "hash_validation": "fresh final inventory",
-      "access_status": "local file; public model record not verified"
+      "access_status": "local file; checkpoint bytes not publicly released"
     },
     {
+      "scale": "N50",
       "policy": "service_first",
       "training_seed": 4321,
       "path": "artifacts/ablation_final_20261103/raw/remaining/formal_service_first_4321/outputs/pomo_n50_optimized/model_best.pt",
       "bytes": 33364827,
       "sha256": "347c8fea88d1e7f2be62e084f1ff62253c3a7b259a82cf3b110eaeb0380be227",
       "hash_validation": "fresh final inventory",
-      "access_status": "local file; public model record not verified"
+      "access_status": "local file; checkpoint bytes not publicly released"
     },
     {
+      "scale": "N50",
       "policy": "learned",
       "training_seed": 8765,
       "path": "artifacts/ablation_final_20261103/raw/remaining/formal_learned_8765/outputs/pomo_n50_optimized/model_best.pt",
       "bytes": 33364827,
       "sha256": "99f83d2410aa6c305796cc3b712bbc8c60050a24c3a39ea8eb9464948e1b1472",
       "hash_validation": "fresh final inventory",
-      "access_status": "local file; public model record not verified"
+      "access_status": "local file; checkpoint bytes not publicly released"
     },
     {
+      "scale": "N50",
       "policy": "service_first",
       "training_seed": 8765,
       "path": "artifacts/ablation_final_20261103/raw/remaining/formal_service_first_8765/outputs/pomo_n50_optimized/model_best.pt",
       "bytes": 33364827,
       "sha256": "36d5dcb15c3f500322986b437f9263f9af5f95715e4f881b5a1fa609bf911f1c",
       "hash_validation": "fresh final inventory",
-      "access_status": "local file; public model record not verified"
+      "access_status": "local file; checkpoint bytes not publicly released"
+    },
+    {
+      "scale": "N100",
+      "policy": "learned_transfer",
+      "training_seed": 314159,
+      "path": "experiments/drl_canonical_audit_20261115/remote_evidence/lazy_transfer_formal_20261116/drl_lazy_v4_transfer_formal_20261116/seed_314159/outputs/pomo_n100_optimized/model_best.pt",
+      "bytes": 33365723,
+      "sha256": "55944fc4853f5d957a7bd47fe127cba2cf669675535fc4af8112b9c34a0fc188",
+      "hash_validation": "fresh final inventory",
+      "access_status": "local file; checkpoint bytes not publicly released"
+    },
+    {
+      "scale": "N100",
+      "policy": "learned_transfer",
+      "training_seed": 271828,
+      "path": "experiments/drl_canonical_audit_20261115/remote_evidence/lazy_transfer_formal_20261116/drl_lazy_v4_transfer_formal_20261116/seed_271828/outputs/pomo_n100_optimized/model_best.pt",
+      "bytes": 33365723,
+      "sha256": "170ca0f3268ce8915c1cdf0bb2a9061143078d627fbbeb9c1eb767d30368ffd1",
+      "hash_validation": "fresh final inventory",
+      "access_status": "local file; checkpoint bytes not publicly released"
+    },
+    {
+      "scale": "N100",
+      "policy": "learned_transfer",
+      "training_seed": 161803,
+      "path": "experiments/drl_canonical_audit_20261115/remote_evidence/lazy_transfer_formal_20261116/drl_lazy_v4_transfer_formal_20261116/seed_161803/outputs/pomo_n100_optimized/model_best.pt",
+      "bytes": 33365723,
+      "sha256": "085ec780623a092b4b1088e974eac66a50adda430e5daf8717a71716c0fdc9ea",
+      "hash_validation": "fresh final inventory",
+      "access_status": "local file; checkpoint bytes not publicly released"
     }
   ],
   "supporting_validation": [
@@ -1953,7 +1989,7 @@
     },
     {
       "path": "wtc2027_zh/reproducibility_20261107/n100_claim_audit.json",
-      "sha256": "fe30c578ded518d43031121cbb794ecff94b6f1cfd89c523f57f93bb81726ee1",
+      "sha256": "58f3b1f32b7ec1f286ad8a9869a1f14b2a2877e03083f5485fd5810fc92dae37",
       "role": "supporting validation, training metadata or analytic derivation; not an extra performance replicate"
     },
     {
@@ -1983,12 +2019,12 @@
     },
     {
       "path": "wtc2027_zh/review_20261116/REFERENCE_VERIFICATION.md",
-      "sha256": "dda5a16ab878f5e214529913e88d753fdf44b9c79da77f26d8d18360f59fa0fc",
+      "sha256": "83da3c6f9079c1e1a7ec90dc06886177341cf2da188b1f6b08c60b58ffd8b4c7",
       "role": "supporting validation, training metadata or analytic derivation; not an extra performance replicate"
     },
     {
       "path": "wtc2027_zh/review_20261116/REFERENCE_VERIFICATION.json",
-      "sha256": "a7da9b3133b821406d9ec83f6880be3bb0e4961461bb0091aec2f574edcd4a08",
+      "sha256": "7eb407f62f6f8bba68b72122e88b370326013a559e329d898a12f11912f45c1d",
       "role": "supporting validation, training metadata or analytic derivation; not an extra performance replicate"
     }
   ],
@@ -2114,15 +2150,16 @@
   },
   "repository": {
     "user_provided_URL": "https://github.com/likkkyu/Selective-SARP-TW-v1.1",
-    "current_experimental_files_publicly_verified": false,
+    "current_experimental_files_publicly_verified": true,
+    "fixed_commit": "fb2d9588d8c5977af3a84cc1388aa60e2653ecd3",
+    "public_release_path": "research_releases/wtc2027_evidence_20261116",
     "archival_DOI": null,
     "release_tag": null
   },
   "replay_scope": "Second-confirmation pipeline relocated into fresh directory and smoke-tested on one case: 15 audited plans, 6/6 raw actions and objectives identical. No duplicated full benchmark or claim that all paper experiments have been independently reproduced.",
   "unresolved": [
-    "Final public release/archive location and identifier",
-    "Dataset/checkpoint reuse terms",
+    "Archival DOI/release tag and dataset/checkpoint reuse terms",
     "Author information and submission-environment MathType/format verification"
   ],
-  "boundary": "Inventory proves listed local files and frozen code hashes only. It does not prove public availability, complete FAIR compliance, publication readiness, or acceptance."
+  "boundary": "Inventory proves listed local files and frozen code hashes. The fixed Git snapshot establishes public code/result availability, but is not a DOI, independent reproduction, field trial, model-weight release, solver optimality certificate, acceptance, or complete FAIR compliance."
 }

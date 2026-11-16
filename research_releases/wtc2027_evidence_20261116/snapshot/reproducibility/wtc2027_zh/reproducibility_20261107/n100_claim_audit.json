@@ -11,7 +11,7 @@
   "inputs": [
     {
       "path": "wtc2027_zh/论文正文.md",
-      "sha256": "9d81f94451b2149e4dc7058037150255d8ef9b9a1642fb2ac28f3284b0c04199"
+      "sha256": "f54caf74aae0833db1d5791422497a4ab49ac37982eb182339d8a07ea263414b"
     },
     {
       "path": "wtc2027_zh/方法与复现补充说明.md",
